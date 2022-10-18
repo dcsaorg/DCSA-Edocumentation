@@ -26,7 +26,8 @@
 		<dcsa.shared-kernel.version>0.1.0</dcsa.shared-kernel.version>
 		<dcsa.shared-kernel.tag/>
 		<dcsa.shared-kernel.artifacttype>-SNAPSHOT</dcsa.shared-kernel.artifacttype>
-		<shared-kernel.version>${dcsa.shared-kernel.version}${dcsa.shared-kernel.tag}${dcsa.shared-kernel.artifacttype}</shared-kernel.version>
+		<shared-kernel.version>${dcsa.shared-kernel.version}${dcsa.shared-kernel.tag}${dcsa.shared-kernel.artifacttype}
+		</shared-kernel.version>
 		<!-- End: Define Shared kernel version -->
 
 		<hibernate-types.version>2.18.0</hibernate-types.version>
@@ -40,7 +41,7 @@
 		<module>edocumentation-domain</module>
 		<module>edocumentation-service</module>
 		<module>edocumentation-application</module>
-<!--		<module>edocumentation-integration-tests</module>-->
+		<!--		<module>edocumentation-integration-tests</module>-->
 	</modules>
 
 	<dependencies>

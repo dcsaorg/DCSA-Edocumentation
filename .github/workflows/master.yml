@@ -46,12 +46,12 @@ jobs:
             echo "Status is '$status' - waiting 5 secs ($retries retries left)"
             sleep 5
             retries=$((retries - 1))
-            status=$(curl -s http://localhost:9090/v2/actuator/health | jq -r '.status')
+            status=$(curl -s http://localhost:9090/actuator/health | jq -r '.status')
           done
 
           echo "Final status is '$status'"
           if [[ "$status" != "UP" ]]; then
-            curl -v http://localhost:9090/v2/actuator/health || :
+            curl -v http://localhost:9090/actuator/health || :
             docker ps || :
             docker logs dcsa-edocumentation-dcsa-edocumentation-1 || :
             exit 1
@@ -67,4 +67,4 @@ jobs:
 
       - name: Run Integration Tests
         run: |
-          cd DCSA-Edocumentation && failsafe:integration-test
+          cd DCSA-Edocumentation && mvn clean test-compile failsafe:integration-test
