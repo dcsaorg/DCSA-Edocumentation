@@ -12,6 +12,8 @@ camel:
 spring:
   application:
     name: DCSA-Edocumentation
+    bkg-context-path: v1
+    ebl-context-path: v2
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${db_hostname}/dcsa_openapi
@@ -35,7 +37,7 @@ spring:
 
 server:
   port: 9090
-  servlet.context-path: /v2
+  servlet.context-path: /
   error:
     include-binding-errors: on_param
     include-message: always
