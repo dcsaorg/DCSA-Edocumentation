@@ -12,6 +12,8 @@ import org.mapstruct.Named;
 public interface BookingSummaryMapper {
 
   @Mapping(source = "booking.vessel.vesselIMONumber", target = "vesselIMONumber")
+  @Mapping(source = "updatedDateTime", target = "bookingRequestUpdatedDateTime")
+  @Mapping(source = "bookingRequestDateTime", target = "bookingRequestCreatedDateTime")
   @Mapping(source = "preCarriageModeOfTransportCode", target = "preCarriageModeOfTransportCode", qualifiedByName = "toDCSATransportType")
   BookingSummaryTO BookingToBookingSummary(Booking booking);
 

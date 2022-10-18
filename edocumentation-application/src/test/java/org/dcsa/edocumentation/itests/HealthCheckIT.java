@@ -1,13 +1,17 @@
-package org.dcsa.edocumentation.itests.v2;
+package org.dcsa.edocumentation.itests;
 
 import io.restassured.http.ContentType;
 import org.dcsa.edocumentation.itests.config.RestAssuredConfigurator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
+@ActiveProfiles("test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class HealthCheckIT {
   @BeforeAll
   public static void initializeRestAssured() {
@@ -15,10 +19,10 @@ public class HealthCheckIT {
   }
 
   @Test
-  public void testHealth() {
+  void testHealth() {
     given()
       .contentType("application/json")
-      .get("/v2/actuator/health")
+      .get("/actuator/health")
       .then()
       .assertThat()
       .statusCode(200)

@@ -1,4 +1,4 @@
-package org.dcsa.edocumentation.service.datafactories;
+package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;

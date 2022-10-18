@@ -40,7 +40,7 @@
 		<module>edocumentation-domain</module>
 		<module>edocumentation-service</module>
 		<module>edocumentation-application</module>
-		<module>edocumentation-integration-tests</module>
+<!--		<module>edocumentation-integration-tests</module>-->
 	</modules>
 
 	<dependencies>

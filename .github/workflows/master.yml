@@ -67,4 +67,4 @@ jobs:
 
       - name: Run Integration Tests
         run: |
-          cd DCSA-Edocumentation && java -jar edocumentation-integration-tests/target/dcsa-edocumentation-integration-tests-with-dependencies.jar
+          cd DCSA-Edocumentation && failsafe:integration-test

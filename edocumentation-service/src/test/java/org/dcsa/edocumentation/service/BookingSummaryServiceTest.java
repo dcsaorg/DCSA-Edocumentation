@@ -1,8 +1,8 @@
 package org.dcsa.edocumentation.service;
 
+import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
-import org.dcsa.edocumentation.service.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.service.mapping.BookingSummaryMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
