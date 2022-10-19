@@ -51,7 +51,7 @@ class BookingSummaryServiceTest {
 
   @Test
   void testBookingSummary_singleResultNoDocumentStatus() {
-    Booking mockBooking = BookingDataFactory.singleShallowBookingWithVessel();
+    Booking mockBooking = BookingDataFactory.singleShallowBookingWithVesselAndModeOfTransport();
     Page<Booking> pagedResult = new PageImpl<>(List.of(mockBooking));
     when(bookingRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
 
@@ -67,7 +67,7 @@ class BookingSummaryServiceTest {
 
   @Test
   void testBookingSummary_singleResultWithDocumentStatus() {
-    Booking mockBooking = BookingDataFactory.singleShallowBookingWithVessel();
+    Booking mockBooking = BookingDataFactory.singleShallowBookingWithVesselAndModeOfTransport();
     Page<Booking> pagedResult = new PageImpl<>(List.of(mockBooking));
     when(bookingRepository.findAllByDocumentStatus(any(), any(Pageable.class)))
         .thenReturn(pagedResult);
@@ -83,7 +83,7 @@ class BookingSummaryServiceTest {
 
   @Test
   void testBookingSummary_multipleResultsWithoutDocumentStatus() {
-    List<Booking> mockBookings = BookingDataFactory.multipleShallowBookingsWithVessel();
+    List<Booking> mockBookings = BookingDataFactory.multipleShallowBookingsWithVesselAndModeOfTransport();
     Page<Booking> pagedResult = new PageImpl<>(mockBookings);
     when(bookingRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
 
@@ -101,7 +101,7 @@ class BookingSummaryServiceTest {
 
   @Test
   void testBookingSummary_multipleResultsWithDocumentStatus() {
-    List<Booking> mockBookings = BookingDataFactory.multipleShallowBookingsWithVessel();
+    List<Booking> mockBookings = BookingDataFactory.multipleShallowBookingsWithVesselAndModeOfTransport();
     Page<Booking> pagedResult = new PageImpl<>(mockBookings);
     when(bookingRepository.findAllByDocumentStatus(any(), any(Pageable.class)))
         .thenReturn(pagedResult);

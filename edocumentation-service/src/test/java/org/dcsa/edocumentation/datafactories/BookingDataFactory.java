@@ -2,6 +2,7 @@ package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.ModeOfTransport;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.skernel.domain.persistence.entity.enums.DimensionUnit;
@@ -44,11 +45,10 @@ public class BookingDataFactory {
         .isEquipmentSubstitutionAllowed(false)
         .declaredValueCurrency("EUR")
         .declaredValue(10000F)
-        .preCarriageModeOfTransportCode("1")
         .build();
   }
 
-  public Booking singleShallowBookingWithVessel() {
+  public Booking singleShallowBookingWithVesselAndModeOfTransport() {
     Vessel mockVessel =
         Vessel.builder()
             .id(UUID.fromString("f90de80b-af26-4703-93b0-722bb3fa69c7"))
@@ -62,6 +62,13 @@ public class BookingDataFactory {
             .dimensionUnit(DimensionUnit.MTR)
             .type(VesselType.CONT)
             .build();
+
+    ModeOfTransport mockModeOfTransport = ModeOfTransport.builder()
+      .code("1")
+      .description("Vessel")
+      .name("Vessel")
+      .dcsaTransportType(DCSATransportType.VESSEL)
+      .build();
 
     return Booking.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
@@ -92,12 +99,12 @@ public class BookingDataFactory {
         .isEquipmentSubstitutionAllowed(false)
         .declaredValueCurrency("EUR")
         .declaredValue(10000F)
-        .preCarriageModeOfTransportCode("1")
+        .modeOfTransport(mockModeOfTransport)
         .vessel(mockVessel)
         .build();
   }
 
-  public List<Booking> multipleShallowBookingsWithVessel() {
+  public List<Booking> multipleShallowBookingsWithVesselAndModeOfTransport() {
     Vessel mockVessel =
         Vessel.builder()
             .id(UUID.fromString("f90de80b-af26-4703-93b0-722bb3fa69c7"))
@@ -111,6 +118,13 @@ public class BookingDataFactory {
             .dimensionUnit(DimensionUnit.MTR)
             .type(VesselType.CONT)
             .build();
+
+    ModeOfTransport mockModeOfTransport = ModeOfTransport.builder()
+      .code("1")
+      .description("Vessel")
+      .name("Vessel")
+      .dcsaTransportType(DCSATransportType.VESSEL)
+      .build();
 
     Booking booking1 =
         Booking.builder()
@@ -142,7 +156,7 @@ public class BookingDataFactory {
             .isEquipmentSubstitutionAllowed(false)
             .declaredValueCurrency("EUR")
             .declaredValue(10000F)
-            .preCarriageModeOfTransportCode("1")
+            .modeOfTransport(mockModeOfTransport)
             .vessel(mockVessel)
             .build();
 
@@ -176,7 +190,7 @@ public class BookingDataFactory {
             .isEquipmentSubstitutionAllowed(false)
             .declaredValueCurrency("EUR")
             .declaredValue(2000F)
-            .preCarriageModeOfTransportCode("1")
+            .modeOfTransport(mockModeOfTransport)
             .vessel(mockVessel)
             .build();
 

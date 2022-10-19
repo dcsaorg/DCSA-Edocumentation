@@ -35,7 +35,6 @@ jobs:
 
       - name: Run Integration Tests
         run: |
-          echo "testcontainers.reuse.enable=true" > ~/.testcontainers.properties
           cd DCSA-Edocumentation
           mvn verify -DskipUnitTests
 

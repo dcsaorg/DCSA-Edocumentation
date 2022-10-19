@@ -32,8 +32,7 @@ public abstract class PostgeSqlContextAware {
                 "/referencedata.d")
             .withCopyFileToContainer(
                 MountableFile.forHostPath("../DCSA-Information-Model/datamodel/samples.d"),
-                "/samples.d")
-            .withReuse(true);
+                "/samples.d");
     postgresSQLContainer.start();
   }
 

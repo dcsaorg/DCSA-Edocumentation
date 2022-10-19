@@ -8,6 +8,13 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+@NamedEntityGraph(
+  name = "graph.booking-summary",
+  attributeNodes = {
+    @NamedAttributeNode("vessel"),
+    @NamedAttributeNode("modeOfTransport")
+  }
+)
 @Data
 @Builder
 @NoArgsConstructor
@@ -118,8 +125,14 @@ public class Booking {
   @Column(name = "declared_value")
   private Float declaredValue;
 
-  @Column(name = "pre_carriage_mode_of_transport_code", length = 3)
-  private String preCarriageModeOfTransportCode;
+//  @Column(name = "pre_carriage_mode_of_transport_code", length = 3)
+//  private String preCarriageModeOfTransportCode;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @JoinColumn(name = "pre_carriage_mode_of_transport_code")
+  private ModeOfTransport modeOfTransport;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
