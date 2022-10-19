@@ -13,7 +13,7 @@ import org.testcontainers.utility.MountableFile;
 
 @ActiveProfiles("test")
 @Testcontainers
-@DirtiesContext
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(initializers = {PostgeSqlContextAware.Initializer.class})
 public abstract class PostgeSqlContextAware {
