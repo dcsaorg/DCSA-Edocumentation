@@ -33,6 +33,11 @@ jobs:
       - name: Build Edocumentation
         run: cd DCSA-Edocumentation && mvn clean -U -B package -Ddcsa.artifacttype=-SNAPSHOT
 
+      - name: Run Integration Tests
+        run: |
+          cd DCSA-Edocumentation
+          mvn verify -DskipUnitTests
+
       - name: Build and run the microservices
         run: cd DCSA-Edocumentation && docker-compose -f docker-compose.yml --env-file=.github/.env up -d -V --build
 
@@ -46,12 +51,12 @@ jobs:
             echo "Status is '$status' - waiting 5 secs ($retries retries left)"
             sleep 5
             retries=$((retries - 1))
-            status=$(curl -s http://localhost:9090/v2/actuator/health | jq -r '.status')
+            status=$(curl -s http://localhost:9090/actuator/health | jq -r '.status')
           done
 
           echo "Final status is '$status'"
           if [[ "$status" != "UP" ]]; then
-            curl -v http://localhost:9090/v2/actuator/health || :
+            curl -v http://localhost:9090/actuator/health || :
             docker ps || :
             docker logs dcsa-edocumentation-dcsa-edocumentation-1 || :
             exit 1
@@ -64,7 +69,3 @@ jobs:
         if: ${{ steps.healthcheck.outputs.STATUS == 'UP' }}
         run: |
           echo "The DCSA-Edocumentation service is UP."
-
-      - name: Run Integration Tests
-        run: |
-          cd DCSA-Edocumentation && java -jar edocumentation-integration-tests/target/dcsa-edocumentation-integration-tests-with-dependencies.jar

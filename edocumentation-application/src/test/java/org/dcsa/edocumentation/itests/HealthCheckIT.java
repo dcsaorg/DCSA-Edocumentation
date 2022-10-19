@@ -1,4 +1,4 @@
-package org.dcsa.edocumentation.itests.v2;
+package org.dcsa.edocumentation.itests;
 
 import io.restassured.http.ContentType;
 import org.dcsa.edocumentation.itests.config.RestAssuredConfigurator;
@@ -8,17 +8,17 @@ import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-public class HealthCheckIT {
+public class HealthCheckIT extends PostgeSqlContextAware {
   @BeforeAll
   public static void initializeRestAssured() {
     RestAssuredConfigurator.initialize();
   }
 
   @Test
-  public void testHealth() {
+  void testHealth() {
     given()
       .contentType("application/json")
-      .get("/v2/actuator/health")
+      .get("/actuator/health")
       .then()
       .assertThat()
       .statusCode(200)
