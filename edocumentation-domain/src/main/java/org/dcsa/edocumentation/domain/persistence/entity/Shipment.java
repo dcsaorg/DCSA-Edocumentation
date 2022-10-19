@@ -10,8 +10,7 @@ import java.util.UUID;
 @NamedEntityGraph(
     name = "graph.shipment-summary",
     attributeNodes = {
-      @NamedAttributeNode("booking"),
-      @NamedAttributeNode("carrier"),
+      @NamedAttributeNode("booking")
     })
 @Data
 @Builder
