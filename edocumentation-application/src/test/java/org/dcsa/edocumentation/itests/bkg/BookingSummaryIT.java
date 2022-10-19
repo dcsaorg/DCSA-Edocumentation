@@ -1,11 +1,10 @@
 package org.dcsa.edocumentation.itests.bkg;
 
 import org.apache.http.HttpStatus;
+import org.dcsa.edocumentation.itests.PostgeSqlContextAware;
 import org.dcsa.edocumentation.itests.config.RestAssuredConfigurator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -14,9 +13,7 @@ import static org.dcsa.edocumentation.itests.config.TestUtil.jsonSchemaValidator
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 
-@ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class BookingSummaryIT {
+public class BookingSummaryIT extends PostgeSqlContextAware {
 
   private static final String BOOKING_SUMMARIES_ENDPOINT = "/v1/booking-summaries";
 

@@ -33,6 +33,12 @@ jobs:
       - name: Build Edocumentation
         run: cd DCSA-Edocumentation && mvn clean -U -B package -Ddcsa.artifacttype=-SNAPSHOT
 
+      - name: Run Integration Tests
+        run: |
+          echo "testcontainers.reuse.enable=true" > ~/.testcontainers.properties
+          cd DCSA-Edocumentation
+          mvn verify -DskipUnitTests
+
       - name: Build and run the microservices
         run: cd DCSA-Edocumentation && docker-compose -f docker-compose.yml --env-file=.github/.env up -d -V --build
 
@@ -64,7 +70,3 @@ jobs:
         if: ${{ steps.healthcheck.outputs.STATUS == 'UP' }}
         run: |
           echo "The DCSA-Edocumentation service is UP."
-
-      - name: Run Integration Tests
-        run: |
-          cd DCSA-Edocumentation && mvn clean test-compile failsafe:integration-test
