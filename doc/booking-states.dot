@@ -1,0 +1,64 @@
+digraph booking {
+  START [shape=circle style=filled color=green];
+  ACT_POST_BKG [shape=box label="CREATE (POST /v1/bookings)"];
+  ACT_UPDATE_BKG [shape=box label="UPDATE (PUT /v1/bookings)"];
+  ACT_AMEND_BKG [shape=box label="UPDATE (PUT /v1/bookings)"];
+  ACT_CANCEL_BKG [shape=box label="CANCEL (PATCH /v1/bookings)"];
+
+  ASYNC_VALIDATION [shape=diamond label="async validation"]
+
+  CANC, CMPL, REJE [color=red style=filled];
+
+  // Legend
+
+  subgraph legend {
+    label = "Legend";
+    key [label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+             <tr><td align="right" port="i1">Shipper -&gt; Carrier</td></tr>
+             <tr><td align="right" port="i2">Carrier -&gt; Shipper</td></tr>
+         </table>> shape=plaintext];
+    key2 [label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+              <tr><td port="i1">&nbsp;</td></tr>
+              <tr><td port="i2">&nbsp;</td></tr>
+         </table>> shape=plaintext];
+
+    key:i1:e -> key2:i1:w [color=blue];
+    key:i2:e -> key2:i2:w;
+
+    { rank=same; key key2 }
+  }
+
+  // Transitions
+
+  START -> ACT_POST_BKG -> RECE [color=blue];
+
+  CONF -> CMPL [label="via UC9 in EBL" color=red];
+
+  RECE -> ASYNC_VALIDATION;
+  ASYNC_VALIDATION -> PENU [label="UC2"];
+  ASYNC_VALIDATION -> PENC;
+
+  RECE, PENU -> ACT_UPDATE_BKG [color=blue label="UC3"];
+
+  RECE -> CONF [label="UC5"];
+  PENC -> CONF [label="UC5+UC8"];
+
+  PENU -> PENU [label="UC6"];
+  CONF -> PENU [label="UC9"];
+
+  PENC, CONF -> ACT_AMEND_BKG [color=blue label="UC7"];
+
+  ACT_AMEND_BKG -> PENC [color=blue label="UC7"];
+
+  ACT_UPDATE_BKG -> PENC [color=blue label="UC3"];
+
+  RECE, PENU, PENC -> REJE [label="UC4"];
+
+  RECE, PENU, PENC, CONF -> ACT_CANCEL_BKG [color=blue label="UC9"];
+  RECE, PENU, PENC, CONF -> CANC [label="UC10"];
+
+  ACT_CANCEL_BKG -> CANC [color=blue];
+
+  { rank=same; ACT_CANCEL_BKG CMPL REJE }
+
+}
