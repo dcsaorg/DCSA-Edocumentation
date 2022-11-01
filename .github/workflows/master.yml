@@ -69,3 +69,14 @@ jobs:
         if: ${{ steps.healthcheck.outputs.STATUS == 'UP' }}
         run: |
           echo "The DCSA-Edocumentation service is UP."
+
+      - name: Run Postman Integration Tests
+        id: run-newman
+        uses: anthonyvscode/newman-action@v1
+        with:
+          collection: DCSA-Edocumentation/postman_collection.json
+          reporters: cli
+          insecure: true
+
+      - name: Output summary to console
+        run: echo ${{ steps.run-newman.outputs.summary }}

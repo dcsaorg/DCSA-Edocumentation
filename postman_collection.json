@@ -1,0 +1,325 @@
+{
+	"info": {
+		"_postman_id": "0b27d7b6-2376-4c9c-aff2-2be26855399f",
+		"name": "DCSA-EDocumentation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18186286"
+	},
+	"item": [
+		{
+			"name": "Booking request summaries",
+			"item": [
+				{
+					"name": "Positive test cases",
+					"item": [
+						{
+							"name": "Booking request summaries",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Body contains 5 or more items', () => {\r",
+											"    pm.expect(pm.response.json().length).to.greaterThan(5);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/v1/booking-summaries",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"v1",
+										"booking-summaries"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Booking request summaries CMPL",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Body contains 0 or more items', () => {\r",
+											"    pm.expect(pm.response.json().length).to.equal(0);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/v1/booking-summaries?documentStatus=CMPL",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"v1",
+										"booking-summaries"
+									],
+									"query": [
+										{
+											"key": "documentStatus",
+											"value": "CMPL"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Booking request status per documentStatus",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let documentStatusses = pm.collectionVariables.get(\"DOCUMENT_STATUSSES\");\r",
+											"\r",
+											"if(!documentStatusses || documentStatusses.length == 0) {\r",
+											"    console.log(\"retrieving all known document statusses currently available\")\r",
+											"    let baseURL = pm.collectionVariables.get(\"BASE_URL\");\r",
+											"    pm.sendRequest(baseURL+\"/v1/booking-summaries\",function(err, response){\r",
+											"        let documentStatusses = response.json().map(({documentStatus}) => documentStatus);\r",
+											"        console.log(\">>document statusses: \", documentStatusses);\r",
+											"        pm.collectionVariables.set(\"DOCUMENT_STATUSSES\", documentStatusses);\r",
+											"    });\r",
+											"} else {\r",
+											"    let currentDocumentStatus = documentStatusses.shift();\r",
+											"    pm.request.url.query.add(\"documentStatus=\" + currentDocumentStatus);\r",
+											"    pm.collectionVariables.set(\"DOCUMENT_STATUSSES\", documentStatusses);\r",
+											"}\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const documentStatusses = pm.collectionVariables.get(\"DOCUMENT_STATUSSES\");\r",
+											"\r",
+											"if (documentStatusses && documentStatusses.length > 0){\r",
+											"    postman.setNextRequest(\"Booking request status per documentStatus\");\r",
+											"} else {\r",
+											"    postman.setNextRequest(null);\r",
+											"    pm.collectionVariables.unset(\"DOCUMENT_STATUSSES\");\r",
+											"}\r",
+											"\r",
+											"let documentStatusUnderTest = pm.request.url.query.get(\"documentStatus\");\r",
+											"\r",
+											"if(documentStatusUnderTest) {\r",
+											"    pm.test(\"documentStatus should be \" + documentStatusUnderTest, () => {\r",
+											"        let documentStatusses = pm.response.json().map(summary => summary.documentStatus);\r",
+											"        pm.expect(documentStatusses.every(v => v === documentStatusUnderTest)).to.eql(true);\r",
+											"    });\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/v1/booking-summaries",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"v1",
+										"booking-summaries"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"BOOKING_SUMMARY_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});",
+									"",
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Negative test cases",
+					"item": [
+						{
+							"name": "Booking request summaries Invalid documentStatus",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error reason is invalidParameter\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].reason).to.eql(\"invalidParameter\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"'documentStatus' must be of type BkgDocumentStatus\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/v1/booking-summaries?documentStatus=null",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"v1",
+										"booking-summaries"
+									],
+									"query": [
+										{
+											"key": "documentStatus",
+											"value": "null"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"ERROR_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});",
+									"",
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BOOKING_SUMMARY_SCHEMA",
+			"value": "{\"type\":\"array\",\"items\":{\"type\":\"object\",\"description\":\"Includes the information requested in a booking, service terms and types as well as the assigned booking reference by the carrier.\\n\",\"required\":[\"bookingRequestCreatedDateTime\",\"bookingRequestUpdatedDateTime\",\"cargoMovementTypeAtDestination\",\"cargoMovementTypeAtOrigin\",\"carrierBookingRequestReference\",\"deliveryTypeAtDestination\",\"documentStatus\",\"isEquipmentSubstitutionAllowed\",\"isExportDeclarationRequired\",\"isImportLicenseRequired\",\"isPartialLoadAllowed\",\"receiptTypeAtOrigin\",\"serviceContractReference\",\"submissionDateTime\"],\"properties\":{\"carrierBookingRequestReference\":{\"type\":\"string\",\"description\":\"A reference to the booking during the booking request phase\\n\"},\"documentStatus\":{\"type\":\"string\",\"description\":\"The status of the booking. Possible values are:\\n- RECE (Received)\\n- PENU (Pending Update)\\n- PENC (Pending Confirmation)\\n- CONF (Confirmed)\\n- REJE (Rejected)\\n- CANC (Cancelled)\\n- CMPL (Completed)\\n\\nMore details can be found on <a href=\\\"https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv\\\">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.\\n\",\"enum\":[\"RECE\",\"PENU\",\"PENC\",\"CONF\",\"REJE\",\"CANC\",\"CMPL\"]},\"bookingRequestCreatedDateTime\":{\"type\":\"string\",\"description\":\"The date and time when the booking request was created\\n\",\"format\":\"date-time\"},\"bookingRequestUpdatedDateTime\":{\"type\":\"string\",\"description\":\"Last date and time when the booking request was updated\\n\",\"format\":\"date-time\"},\"receiptTypeAtOrigin\":{\"maxLength\":3,\"type\":\"string\",\"description\":\"Indicates the type of service offered at Origin. Options are defined in the Receipt/Delivery entity.\\n\",\"enum\":[\"CY\",\"SD\",\"CFS\"]},\"deliveryTypeAtDestination\":{\"maxLength\":3,\"type\":\"string\",\"description\":\"Indicates the type of service offered at Destination. Options are defined in the Receipt/Delivery entity.\\n\",\"enum\":[\"CY\",\"SD\",\"CFS\"]},\"cargoMovementTypeAtOrigin\":{\"maxLength\":3,\"type\":\"string\",\"description\":\"Refers to the shipment term at the loading of the cargo into the container. Options are defined in the Cargo Movement Type entity.\\n\",\"enum\":[\"FCL\",\"LCL\",\"BB\"]},\"cargoMovementTypeAtDestination\":{\"maxLength\":3,\"type\":\"string\",\"description\":\"Refers to the shipment term at the unloading of the cargo out of the container. Options are defined in the Cargo Movement Type entity.\\n\",\"enum\":[\"FCL\",\"LCL\",\"BB\"]},\"serviceContractReference\":{\"maxLength\":30,\"type\":\"string\",\"description\":\"Reference number for agreement between shipper and carrier through which the shipper commits to provide a certain minimum quantity of cargo over a fixed period, and the carrier commits to a certain rate or rate schedule.\"},\"paymentTermCode\":{\"type\":\"string\",\"description\":\"Indicates whether freight & charges are due for payment before the shipment is effected, practically before the transport document is released to shipper (Prepaid) or before the shipment is finalized meaning cargo released to consignee (Collect)\\n- PRE (Prepaid)\\n- COL (Collect)\\n\",\"enum\":[\"PRE\",\"COL\"]},\"isPartialLoadAllowed\":{\"type\":\"boolean\",\"description\":\"Indication whether the shipper agrees to load part of the shipment in case where not all of the cargo is delivered within cut-off.\\n\"},\"isExportDeclarationRequired\":{\"type\":\"boolean\",\"description\":\"Information provided by the shipper whether an export declaration is required for this particular shipment/commodity/destination.\\n\"},\"exportDeclarationReference\":{\"maxLength\":35,\"type\":\"string\",\"description\":\"A government document permitting designated goods to be shipped out of the country.  Reference number assigned by an issuing authority to an Export License. The export license must be valid at time of departure. Required if Export declaration required is ‘True’.\\n\"},\"isImportLicenseRequired\":{\"type\":\"boolean\",\"description\":\"Information provided by the shipper whether an import permit or license is required for this particular shipment/commodity/destination.\\n\"},\"importLicenseReference\":{\"maxLength\":35,\"type\":\"string\",\"description\":\"A certificate, issued by countries exercising import controls, that permits importation of the articles stated in the license. Reference number assigned by an issuing authority to an Import License. The import license number must be valid at time of arrival. Required if import license required is ‘True’.\\n\"},\"submissionDateTime\":{\"type\":\"string\",\"description\":\"Date and time of submitting the relevant document and attributes\\n\",\"format\":\"date-time\"},\"isAMSACIFilingRequired\":{\"type\":\"boolean\",\"description\":\"Customs filing for US (AMS) or Canadian (ACI) customs\\n\"},\"isDestinationFilingRequired\":{\"type\":\"boolean\",\"description\":\"Indicates whether the shipper will perform the AMS/ACI filing directly or not. Mandatory if AMS/ACI filing is required\\n\"},\"contractQuotationReference\":{\"maxLength\":35,\"type\":\"string\",\"description\":\"Information provided by the shipper to identify whether pricing for the shipment has been agreed via a contract or a quotation reference. Mandatory if service contract (owner) is not provided.\\n\"},\"expectedDepartureDate\":{\"type\":\"string\",\"description\":\"The date when the shipment is expected to be loaded on board a vessel as provided by the shipper or its agent. If vessel/voyage or expected date of arrival is not provided, this is mandatory\\n\",\"format\":\"date\"},\"expectedArrivalAtPlaceOfDeliveryStartDate\":{\"type\":\"string\",\"description\":\"The start date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryEndDate`) for when the shipment is expected to arrive at final destination. If vessel/voyage or `expectedDepartureDate` is not provided, this is mandatory together with `expectedArrivalAtPlaceOfDeliveryEndDate`\\n\",\"format\":\"date\"},\"expectedArrivalAtPlaceOfDeliveryEndDate\":{\"type\":\"string\",\"description\":\"The end date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryStartDate`) for when the shipment is expected to arrive at final destination. If vessel/voyage or `expectedDepartureDate` is not provided, this is mandatory together with `expectedArrivalAtPlaceOfDeliveryStartDate`\\n\",\"format\":\"date\"},\"transportDocumentTypeCode\":{\"type\":\"string\",\"description\":\"Specifies the type of the transport document\\n- BOL (Bill of Lading)\\n- BTO (Bill of Lading to order)\\n- SWB (Sea Waybill)\\n\",\"enum\":[\"BOL\",\"BTO\",\"SWB\"]},\"transportDocumentReference\":{\"maxLength\":20,\"type\":\"string\",\"description\":\"A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.\\n\"},\"bookingChannelReference\":{\"maxLength\":20,\"type\":\"string\",\"description\":\"Identification number provided by the platform/channel used for booking request/confirmation, ex: Inttra booking reference, or GTNexus, other. Conditional on booking channel being used\\n\"},\"incoTerms\":{\"type\":\"string\",\"description\":\"Transport obligations, costs and risks as agreed between buyer and seller.\\n- FCA (Free Carrier)\\n- FOB (Free on Board)\\n\",\"enum\":[\"FCA\",\"FOB\"]},\"communicationChannelCode\":{\"maxLength\":2,\"type\":\"string\",\"description\":\"Specifying which communication channel is to be used for this booking e.g.\\n- EI (EDI transmission)\\n- EM (Email)\\n- AO (API)\\n\",\"enum\":[\"EI\",\"EM\",\"AO\"]},\"isEquipmentSubstitutionAllowed\":{\"type\":\"boolean\",\"description\":\"Indicates if an alternate equipment type can be provided by the carrier.\\n\"},\"vesselName\":{\"maxLength\":35,\"type\":\"string\",\"description\":\"The name of the Vessel given by the Vessel Operator and registered with IMO.\\n\"},\"vesselIMONumber\":{\"maxLength\":7,\"type\":\"string\",\"description\":\"The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel\\n\"},\"exportVoyageNumber\":{\"maxLength\":50,\"type\":\"string\",\"description\":\"The vessel operator-specific identifier of the export Voyage.\"},\"preCarriageModeOfTransportCode\":{\"type\":\"string\",\"description\":\"The mode of transport as defined by DCSA.\\n\",\"enum\":[\"VESSEL\",\"RAIL\",\"TRUCK\",\"BARGE\"]}}}}",
+			"type": "string"
+		},
+		{
+			"key": "ERROR_SCHEMA",
+			"value": "{\"required\":[\"errorDateTime\",\"errors\",\"httpMethod\",\"requestUri\",\"statusCode\",\"statusCodeText\"],\"type\":\"object\",\"properties\":{\"httpMethod\":{\"type\":\"string\",\"description\":\"The http request method type e.g. GET, POST\\n\",\"enum\":[\"GET\",\"HEAD\",\"POST\",\"PUT\",\"DELETE\",\"OPTION\",\"PATCH\"]},\"requestUri\":{\"type\":\"string\",\"description\":\"The request URI as it was sent\\n\"},\"statusCode\":{\"type\":\"integer\",\"description\":\"The HTTP status code\\n\"},\"statusCodeText\":{\"type\":\"string\",\"description\":\"The textual representation of the status code\\n\"},\"errorMessage\":{\"maxLength\":200,\"type\":\"string\",\"description\":\"Other error information\\n\"},\"providerCorrelationID\":{\"type\":\"string\",\"description\":\"A unique identifier for the transaction, e.g. a UUID\\n\"},\"errorDateTime\":{\"type\":\"string\",\"description\":\"The date and time (in ISO 8601 format) the error occurred.\\n\",\"format\":\"date-time\"},\"errors\":{\"minItems\":1,\"type\":\"array\",\"description\":\"List of detailed errors, e.g. fields that could not pass validation\\n\",\"items\":{\"allOf\":[{\"required\":[\"message\",\"reason\"],\"type\":\"object\",\"properties\":{\"errorCode\":{\"maximum\":7999,\"minimum\":7000,\"type\":\"integer\",\"description\":\"Standard error code see http://dcsa.org/error-codes (to be created). Examples: 7003 â€“ out or range value, 7004 -  invalid type\\n\"},\"field\":{\"type\":\"string\",\"description\":\"The field that caused the error, e.g. a failed validation\\n\"},\"value\":{\"type\":\"string\",\"description\":\"The value that of the field that caused the error\\n\"},\"reason\":{\"type\":\"string\",\"description\":\"High level error message\\n\"},\"message\":{\"type\":\"string\",\"description\":\"Additional information as to why the error occured\\n\"}},\"$schema\":\"http://json-schema.org/schema#\"}]}}},\"$schema\":\"http://json-schema.org/schema#\"}",
+			"type": "string"
+		},
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:9090",
+			"type": "string"
+		}
+	]
+}
