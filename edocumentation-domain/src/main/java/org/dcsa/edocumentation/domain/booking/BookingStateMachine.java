@@ -62,7 +62,7 @@ public interface BookingStateMachine {
    *
    * @return A state machine in the initial state.
    */
-  static BookingStateMachine startFromInitialState() {
+  static BookingStateMachine fromInitialState() {
     return new BookingStateMachineImpl();
   }
 
@@ -72,7 +72,7 @@ public interface BookingStateMachine {
    * @param currentStatus The current document status
    * @return A BookingStateMachine initialized in the given state.
    */
-  static BookingStateMachine startFromExistingState(BkgDocumentStatus currentStatus) {
+  static BookingStateMachine resumeFromState(BkgDocumentStatus currentStatus) {
     return new BookingStateMachineImpl(currentStatus);
   }
 

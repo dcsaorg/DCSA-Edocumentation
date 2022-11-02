@@ -1,49 +1,39 @@
 package org.dcsa.edocumentation.domain.booking;
 
-import lombok.Getter;
+import org.dcsa.edocumentation.domain.dfa.DFA;
+import org.dcsa.edocumentation.domain.dfa.DFADefinition;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
-import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
 
 public class BookingStateMachineImpl implements BookingStateMachine {
 
-  @Getter
-  BkgDocumentStatus currentStatus;
+  static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECE)
+    .nonTerminalState(RECE).successorNodes(REJE, CANC, PENU, PENC, CONF)
+    .nonTerminalState(PENU).successorNodes(REJE, CANC, PENU, PENC)
+    .nonTerminalState(PENC).successorNodes(REJE, CANC, PENU, PENC, CONF)
+    .nonTerminalState(CONF).successorNodes(REJE, CMPL, PENU, PENC)
+    .terminalStates(CANC, CMPL, REJE)
+    .build();
+
+
+  private final DFA<BkgDocumentStatus> dfa;
 
   BookingStateMachineImpl() {
-    currentStatus = BookingStateMachineTables.INITIAL_STATE;
+    dfa = BOOKING_DFA_DEFINITION.fromInitialState();
   }
 
   BookingStateMachineImpl(BkgDocumentStatus currentStatus) {
-    this.currentStatus = Objects.requireNonNull(currentStatus, "currentStatus cannot be null");
-    verifyState(currentStatus);
+    dfa = BOOKING_DFA_DEFINITION.resumeFromState(currentStatus);
+  }
+
+  @Override
+  public BkgDocumentStatus getCurrentStatus() {
+    return dfa.getCurrentState();
   }
 
   private void transitionTo(BkgDocumentStatus successor) {
-    verifyTransition(successor);
-    currentStatus = successor;
-  }
-
-  void verifyTransition(BkgDocumentStatus intendedSuccessor) {
-    Objects.requireNonNull(intendedSuccessor, "successor status cannot be null");
-    Set<BkgDocumentStatus> successors = BookingStateMachineTables.BOOKING_STATE_TRANSITION_TABLE.get(this.currentStatus);
-    if (successors == null) {
-      throw ConcreteRequestErrorMessageException.internalServerError("Unknown/Unhandled state: "
-        + this.currentStatus.name());
-    }
-    if (!successors.contains(intendedSuccessor)) {
-      String detail = "It is a terminal state!";
-      if (!successors.isEmpty()) {
-        detail = "The following states are valid: " + successors.stream()
-          .map(BkgDocumentStatus::name)
-          .collect(Collectors.joining(", ", "[", "]"));
-      }
-      throw ConcreteRequestErrorMessageException.internalServerError("Invalid transition: "
-        + this.currentStatus.name() + " *CANNOT* got to " + intendedSuccessor.name() + ": " + detail);
-    }
+    dfa.transitionTo(successor);
   }
 
   @Override
@@ -76,10 +66,4 @@ public class BookingStateMachineImpl implements BookingStateMachine {
     this.transitionTo(BkgDocumentStatus.CMPL);
   }
 
-  private static void verifyState(BkgDocumentStatus status) {
-    if (!BookingStateMachineTables.BOOKING_STATE_TRANSITION_TABLE.containsKey(status)) {
-      throw ConcreteRequestErrorMessageException.internalServerError("Invalid state: " + status.name()
-        + " is not in the transition table");
-    }
-  }
 }
