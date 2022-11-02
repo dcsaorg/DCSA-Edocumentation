@@ -110,6 +110,7 @@ public class DFADefinitionBuilder<S extends Enum<S>> {
     // The implementation should visit every state at most once.  If it does not, then someone
     // introduced a bug that (likely) makes it loop forever.
     final int loopMax = values().length;
+    pendingStates.add(initialState);
 
     while (!pendingStates.isEmpty()) {
       S nextState = pendingStates.iterator().next();
