@@ -23,6 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class ShippingInstructionSummaryController {
+
   private final ShippingInstructionSummaryService service;
 
   @GetMapping(path = "${spring.application.ebl-context-path}" + "/shipping-instructions-summaries")
