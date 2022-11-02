@@ -32,38 +32,34 @@ public class BookingStateMachineImpl implements BookingStateMachine {
     return dfa.getCurrentState();
   }
 
-  private void transitionTo(BkgDocumentStatus successor) {
-    dfa.transitionTo(successor);
-  }
-
   @Override
   public void cancel() {
-    this.transitionTo(BkgDocumentStatus.CANC);
+    dfa.transitionTo(CANC);
   }
 
   @Override
   public void reject() {
-    this.transitionTo(BkgDocumentStatus.REJE);
+    dfa.transitionTo(REJE);
   }
 
   @Override
   public void pendingUpdate() {
-    this.transitionTo(BkgDocumentStatus.PENU);
+    dfa.transitionTo(PENU);
   }
 
   @Override
   public void pendingConfirmation() {
-    this.transitionTo(BkgDocumentStatus.PENC);
+    dfa.transitionTo(PENC);
   }
 
   @Override
   public void confirm() {
-    this.transitionTo(BkgDocumentStatus.CONF);
+    dfa.transitionTo(CONF);
   }
 
   @Override
   public void complete() {
-    this.transitionTo(BkgDocumentStatus.CMPL);
+    dfa.transitionTo(CMPL);
   }
 
 }
