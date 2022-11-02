@@ -2,12 +2,9 @@ package org.dcsa.edocumentation.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
-import org.dcsa.edocumentation.service.ShippingInstructionService;
+import org.dcsa.edocumentation.service.ShippingInstructionSummaryService;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
-import org.dcsa.skernel.infrastructure.pagination.Cursor;
-import org.dcsa.skernel.infrastructure.pagination.CursorDefaults;
-import org.dcsa.skernel.infrastructure.pagination.PagedResult;
-import org.dcsa.skernel.infrastructure.pagination.Paginator;
+import org.dcsa.skernel.infrastructure.pagination.Pagination;
 import org.dcsa.skernel.infrastructure.sorting.Sorter;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -19,40 +16,47 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @Validated
 @RestController
 @RequiredArgsConstructor
 public class ShippingInstructionSummaryController {
-  private final ShippingInstructionService service;
-  private final Paginator paginator;
+  private final ShippingInstructionSummaryService service;
 
   @GetMapping(path = "${spring.application.ebl-context-path}" + "/shipping-instructions-summaries")
   @ResponseStatus(HttpStatus.OK)
   List<ShippingInstructionSummaryTO> getShippingInstructionSummaries(
-    @RequestParam(required = false) EblDocumentStatus documentStatus,
-    @RequestParam(required = false) String carrierBookingReference,
-    @RequestParam(required = false, defaultValue = "100") Integer limit,
-    @RequestParam(value = "sort", required = false) String sort,
-    @RequestParam(value = "API-Version", required = false) String apiVersion,
-    HttpServletRequest request,
-    HttpServletResponse response){
+      @RequestParam(required = false) EblDocumentStatus documentStatus,
+      @RequestParam(required = false) String carrierBookingReference,
+      @RequestParam(value = Pagination.DCSA_PAGE_PARAM_NAME, defaultValue = "0", required = false)
+          @Min(0)
+          int page,
+      @RequestParam(
+              value = Pagination.DCSA_PAGESIZE_PARAM_NAME,
+              defaultValue = "100",
+              required = false)
+          @Min(1)
+          int pageSize,
+      @RequestParam(value = Pagination.DCSA_SORT_PARAM_NAME, required = false) String sort,
+      @RequestParam(value = "API-Version", required = false) String apiVersion,
+      HttpServletRequest request,
+      HttpServletResponse response) {
 
-    Sorter sorter = configureSorter();
-    Cursor cursor =
-      paginator.parseRequest(request, new CursorDefaults(limit, sorter.parseSort(sort)));
-    PagedResult<ShippingInstructionSummaryTO> shippingInstructionSummaries =
-      service.findShippingInstructionSummaries(cursor, documentStatus, carrierBookingReference);
-    paginator.setPageHeaders(request, response, cursor, shippingInstructionSummaries);
-
-    return shippingInstructionSummaries.content();
-
+    return Pagination.with(request, response, page, pageSize)
+        .sortBy(
+            sort,
+            List.of(new Sort.Order(Sort.Direction.ASC, "shippingInstructionCreatedDateTime")),
+            Sorter.SortableFields.of(configureSortableFields())
+                .addMapping("shippingInstructionCreatedDateTime", "createdDateTime")
+                .addMapping("shippingInstructionUpdatedDateTime", "updatedDateTime"))
+        .paginate(
+            pageRequest ->
+                service.findShippingInstructionSummaries(pageRequest, documentStatus, carrierBookingReference));
   }
-  // TODO optimization suggested in BookingSummaryController
-  private Sorter configureSorter() {
-    return new Sorter(
-      List.of(new Cursor.SortBy(Sort.Direction.ASC, "shippingInstructionReference")),
+  private String[] configureSortableFields() {
+    return new String[] {
       "shippingInstructionReference",
       "documentStatus",
       "shippingInstructionCreatedDateTime",
@@ -64,6 +68,7 @@ public class ShippingInstructionSummaryController {
       "displayedNameForPlaceOfReceipt",
       "displayedNameForPortOfLoad",
       "displayedNameForPortOfDischarge",
-      "displayedNameForPlaceOfDelivery");
+      "displayedNameForPlaceOfDelivery"
+    };
   }
 }

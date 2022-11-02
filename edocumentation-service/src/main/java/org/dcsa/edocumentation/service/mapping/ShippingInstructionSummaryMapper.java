@@ -7,11 +7,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
-public interface ShippingInstructionMapper {
+public interface ShippingInstructionSummaryMapper {
   @Mapping(
     source = "shipments",
     target = "carrierBookingReferences")
-  ShippingInstructionSummaryTO ShippingInstructionToShippingInstructionSummary(ShippingInstruction shippingInstruction);
+  ShippingInstructionSummaryTO shippingInstructionToShippingInstructionSummary(ShippingInstruction shippingInstruction);
 
   default String mapShipmentToCarrierBookingReference(Shipment shipment) {
     return shipment.getCarrierBookingReference();

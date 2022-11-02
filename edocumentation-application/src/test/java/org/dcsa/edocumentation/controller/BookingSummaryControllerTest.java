@@ -9,7 +9,6 @@ import org.dcsa.skernel.errors.infrastructure.FallbackExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.JavaxValidationExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.SpringExceptionHandler;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
-import org.dcsa.skernel.infrastructure.pagination.Paginator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -38,13 +37,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
   JavaxValidationExceptionHandler.class,
   FallbackExceptionHandler.class,
   ConcreteRequestErrorMessageExceptionHandler.class,
-  Paginator.class
 })
 class BookingSummaryControllerTest {
 
   @Autowired MockMvc mockMvc;
-  @Autowired Paginator paginator;
   @MockBean BookingSummaryService bookingSummaryService;
+  private final String path = "/bkg/v1/booking-summaries";
 
   @Test
   void testBookingSummaryController_getBookingSummariesSingleResult() throws Exception {
@@ -53,7 +51,7 @@ class BookingSummaryControllerTest {
         .thenReturn(new PagedResult<>(new PageImpl<>(List.of(mockBookingSummaryTO))));
 
     mockMvc
-        .perform(get("/v1/booking-summaries").accept(MediaType.APPLICATION_JSON))
+        .perform(get(path).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
@@ -70,7 +68,7 @@ class BookingSummaryControllerTest {
         .thenReturn(new PagedResult<>(new PageImpl<>(mockBookingSummaryTO)));
 
     mockMvc
-        .perform(get("/v1/booking-summaries").accept(MediaType.APPLICATION_JSON))
+        .perform(get(path).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
@@ -91,7 +89,7 @@ class BookingSummaryControllerTest {
 
     mockMvc
         .perform(
-            get("/v1/booking-summaries")
+            get(path)
                 .param("documentStatus", "RECE")
                 .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
@@ -111,13 +109,13 @@ class BookingSummaryControllerTest {
 
     mockMvc
         .perform(
-            get("/v1/booking-summaries")
+            get(path)
                 .param("documentStatus", "INVALID")
                 .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.httpMethod").value("GET"))
-        .andExpect(jsonPath("$.requestUri").value("/v1/booking-summaries"))
+        .andExpect(jsonPath("$.requestUri").value(path))
         .andExpect(jsonPath("$.errors[0].reason").value("invalidParameter"))
         .andExpect(
             jsonPath("$.errors[0].message")

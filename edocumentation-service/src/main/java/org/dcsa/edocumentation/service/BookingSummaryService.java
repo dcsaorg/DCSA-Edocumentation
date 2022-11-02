@@ -8,6 +8,7 @@ import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
 import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.skernel.infrastructure.pagination.Cursor;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,15 +21,15 @@ public class BookingSummaryService {
   private final DocumentStatusMapper documentStatusMapper;
 
   public PagedResult<BookingSummaryTO> findBookingSummaries(
-      Cursor cursor, BkgDocumentStatus documentStatus) {
+    PageRequest pageRequest, BkgDocumentStatus documentStatus) {
 
     return new PagedResult<>(
         Optional.ofNullable(documentStatus)
             .map(documentStatusMapper::toDomainBkgDocumentStatus)
             .map(
                 bkgDocumentStatus ->
-                    repository.findAllByDocumentStatus(bkgDocumentStatus, cursor.toPageRequest()))
-            .orElseGet(() -> repository.findAll(cursor.toPageRequest()))
+                    repository.findAllByDocumentStatus(bkgDocumentStatus, pageRequest))
+            .orElseGet(() -> repository.findAll(pageRequest))
             .map(bookingSummaryMapper::BookingToBookingSummary));
   }
 }

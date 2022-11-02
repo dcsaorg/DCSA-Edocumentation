@@ -31,12 +31,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}/v1/booking-summaries",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-summaries",
 									"host": [
-										"{{BASE_URL}}"
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"v1",
 										"booking-summaries"
 									]
 								}
@@ -62,12 +61,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}/v1/booking-summaries?documentStatus=CMPL",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-summaries?documentStatus=CMPL",
 									"host": [
-										"{{BASE_URL}}"
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"v1",
 										"booking-summaries"
 									],
 									"query": [
@@ -92,9 +90,9 @@
 											"if(!documentStatusses || documentStatusses.length == 0) {\r",
 											"    console.log(\"retrieving all known document statusses currently available\")\r",
 											"    let baseURL = pm.collectionVariables.get(\"BASE_URL\");\r",
-											"    pm.sendRequest(baseURL+\"/v1/booking-summaries\",function(err, response){\r",
+											"    let contextPath = pm.collectionVariables.get(\"BKG_CONTEXT_PATH\");\r",
+											"    pm.sendRequest(baseURL+contextPath+\"/booking-summaries\",function(err, response){\r",
 											"        let documentStatusses = response.json().map(({documentStatus}) => documentStatus);\r",
-											"        console.log(\">>document statusses: \", documentStatusses);\r",
 											"        pm.collectionVariables.set(\"DOCUMENT_STATUSSES\", documentStatusses);\r",
 											"    });\r",
 											"} else {\r",
@@ -118,7 +116,7 @@
 											"if (documentStatusses && documentStatusses.length > 0){\r",
 											"    postman.setNextRequest(\"Booking request status per documentStatus\");\r",
 											"} else {\r",
-											"    postman.setNextRequest(null);\r",
+											"    postman.setNextRequest(\"Booking request summaries sort\");\r",
 											"    pm.collectionVariables.unset(\"DOCUMENT_STATUSSES\");\r",
 											"}\r",
 											"\r",
@@ -126,7 +124,7 @@
 											"\r",
 											"if(documentStatusUnderTest) {\r",
 											"    pm.test(\"documentStatus should be \" + documentStatusUnderTest, () => {\r",
-											"        let documentStatusses = pm.response.json().map(summary => summary.documentStatus);\r",
+											"        let documentStatusses = pm.response.json().map(({documentStatus}) => documentStatus);\r",
 											"        pm.expect(documentStatusses.every(v => v === documentStatusUnderTest)).to.eql(true);\r",
 											"    });\r",
 											"}\r",
@@ -140,13 +138,51 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}/v1/booking-summaries",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-summaries",
 									"host": [
-										"{{BASE_URL}}"
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"v1",
 										"booking-summaries"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Booking request summaries sort",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"First datetime is smaller then last date time when sorting on dateTime Ascending\", () => {\r",
+											"    let bookingRequestUpdatedDateTimes =  pm.response.json().map(({bookingRequestUpdatedDateTime}) => bookingRequestUpdatedDateTime);\r",
+											"    let firstTime = new Date(bookingRequestUpdatedDateTimes[0]);\r",
+											"    let lastTime = new Date(bookingRequestUpdatedDateTimes[bookingRequestUpdatedDateTimes.length - 1]);\r",
+											"    pm.expect(firstTime.getTime()).to.be.lessThan(lastTime.getTime());\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-summaries?sort=bookingRequestUpdatedDateTime:ASC",
+									"host": [
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+									],
+									"path": [
+										"booking-summaries"
+									],
+									"query": [
+										{
+											"key": "sort",
+											"value": "bookingRequestUpdatedDateTime:ASC"
+										}
 									]
 								}
 							},
@@ -215,12 +251,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}/v1/booking-summaries?documentStatus=null",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-summaries?documentStatus=null",
 									"host": [
-										"{{BASE_URL}}"
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"v1",
 										"booking-summaries"
 									],
 									"query": [
@@ -278,7 +313,734 @@
 					"script": {
 						"type": "text/javascript",
 						"exec": [
+							"pm.test(\"API-Version is present\", () => {",
+							"    pm.response.to.have.header(\"API-Version\");",
+							"});",
+							"",
+							"pm.test(\"API-Version header is set to 1.0\", () => {",
+							"",
+							"    pm.expect(pm.response.headers.get(\"API-Version\")).to.eql(\"1.0\");",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Shipment summaries",
+			"item": [
+				{
+					"name": "Positive test cases",
+					"item": [
+						{
+							"name": "Shipment summaries",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Body contains 5 or more items', () => {\r",
+											"    pm.expect(pm.response.json().length).to.greaterThan(5);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/shipment-summaries",
+									"host": [
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipment-summaries"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Shipment summaries CMPL",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Body contains 0 or more items', () => {\r",
+											"    pm.expect(pm.response.json().length).to.equal(0);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/shipment-summaries?documentStatus=CMPL",
+									"host": [
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipment-summaries"
+									],
+									"query": [
+										{
+											"key": "documentStatus",
+											"value": "CMPL"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Shipment summaries per documentStatus",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let documentStatusses = pm.collectionVariables.get(\"DOCUMENT_STATUSSES\");\r",
+											"\r",
+											"if(!documentStatusses || documentStatusses.length == 0) {\r",
+											"    console.log(\"retrieving all known document statusses currently available\")\r",
+											"    let baseURL = pm.collectionVariables.get(\"BASE_URL\");\r",
+											"    let contextPath = pm.collectionVariables.get(\"BKG_CONTEXT_PATH\");\r",
+											"    pm.sendRequest(baseURL+contextPath+\"/shipment-summaries\",function(err, response){\r",
+											"        let documentStatusses = response.json().map(({documentStatus}) => documentStatus);\r",
+											"        pm.collectionVariables.set(\"DOCUMENT_STATUSSES\", documentStatusses);\r",
+											"    });\r",
+											"} else {\r",
+											"    let currentDocumentStatus = documentStatusses.shift();\r",
+											"    pm.request.url.query.add(\"documentStatus=\" + currentDocumentStatus);\r",
+											"    pm.collectionVariables.set(\"DOCUMENT_STATUSSES\", documentStatusses);\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const documentStatusses = pm.collectionVariables.get(\"DOCUMENT_STATUSSES\");\r",
+											"\r",
+											"if (documentStatusses && documentStatusses.length > 0){\r",
+											"    postman.setNextRequest(\"Shipment summaries per documentStatus\");\r",
+											"} else {\r",
+											"    postman.setNextRequest(\"Shipment summaries sort\");\r",
+											"    pm.collectionVariables.unset(\"DOCUMENT_STATUSSES\");\r",
+											"}\r",
+											"\r",
+											"let documentStatusUnderTest = pm.request.url.query.get(\"documentStatus\");\r",
+											"\r",
+											"if(documentStatusUnderTest) {\r",
+											"    pm.test(\"documentStatus should be \" + documentStatusUnderTest, () => {\r",
+											"        let documentStatusses = pm.response.json().map(({documentStatus}) => documentStatus);\r",
+											"        pm.expect(documentStatusses.every(v => v === documentStatusUnderTest)).to.eql(true);\r",
+											"    });\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/shipment-summaries",
+									"host": [
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipment-summaries"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Shipment summaries sort",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"First datetime is smaller then last date time when sorting on dateTime Ascending\", () => {\r",
+											"    let shipmentUpdatedDateTimes =  pm.response.json().map(({shipmentUpdatedDateTime}) => shipmentUpdatedDateTime);\r",
+											"    let firstTime = new Date(shipmentUpdatedDateTimes[0]);\r",
+											"    let lastTime = new Date(shipmentUpdatedDateTimes[shipmentUpdatedDateTimes.length - 1]);\r",
+											"    pm.expect(firstTime.getTime()).to.be.lessThan(lastTime.getTime());\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/shipment-summaries?sort=shipmentUpdatedDateTime:ASC",
+									"host": [
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipment-summaries"
+									],
+									"query": [
+										{
+											"key": "sort",
+											"value": "shipmentUpdatedDateTime:ASC"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"SHIPMENT_SUMMARY_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});",
+									"",
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Negative test cases",
+					"item": [
+						{
+							"name": "Shipment summaries invalid documentStatus",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error reason is invalidParameter\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].reason).to.eql(\"invalidParameter\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"'documentStatus' must be of type BkgDocumentStatus\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/shipment-summaries?documentStatus=INVALID",
+									"host": [
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipment-summaries"
+									],
+									"query": [
+										{
+											"key": "documentStatus",
+											"value": "INVALID"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"ERROR_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});",
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
 							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"API-Version is present\", () => {",
+							"    pm.response.to.have.header(\"API-Version\");",
+							"});",
+							"",
+							"pm.test(\"API-Version header is set to 1.0\", () => {",
+							"",
+							"    pm.expect(pm.response.headers.get(\"API-Version\")).to.eql(\"1.0\");",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Shipping instruction summaries",
+			"item": [
+				{
+					"name": "Positive test cases",
+					"item": [
+						{
+							"name": "Shipping instruction summaries",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Body contains 5 or more items', () => {\r",
+											"    pm.expect(pm.response.json().length).to.greaterThan(5);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions-summaries",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions-summaries"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Shipping instructions summaries CMPL",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Body contains 0 or more items', () => {\r",
+											"    pm.expect(pm.response.json().length).to.equal(0);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions-summaries?documentStatus=VOID",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions-summaries"
+									],
+									"query": [
+										{
+											"key": "documentStatus",
+											"value": "VOID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Shipping instruction summaries per documentStatus",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let documentStatusses = pm.collectionVariables.get(\"DOCUMENT_STATUSSES\");\r",
+											"\r",
+											"if(!documentStatusses || documentStatusses.length == 0) {\r",
+											"    console.log(\"retrieving all known document statusses currently available\")\r",
+											"    let baseURL = pm.collectionVariables.get(\"BASE_URL\");\r",
+											"    let contextPath = pm.collectionVariables.get(\"EBL_CONTEXT_PATH\");\r",
+											"    pm.sendRequest(baseURL+contextPath+\"/shipping-instructions-summaries\",function(err, response){\r",
+											"        let documentStatusses = response.json().map(({documentStatus}) => documentStatus);\r",
+											"        pm.collectionVariables.set(\"DOCUMENT_STATUSSES\", documentStatusses);\r",
+											"    });\r",
+											"} else {\r",
+											"    let currentDocumentStatus = documentStatusses.shift();\r",
+											"    pm.request.url.query.add(\"documentStatus=\" + currentDocumentStatus);\r",
+											"    pm.collectionVariables.set(\"DOCUMENT_STATUSSES\", documentStatusses);\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const documentStatusses = pm.collectionVariables.get(\"DOCUMENT_STATUSSES\");\r",
+											"\r",
+											"if (documentStatusses && documentStatusses.length > 0){\r",
+											"    postman.setNextRequest(\"Shipping instruction summaries per documentStatus\");\r",
+											"} else {\r",
+											"    postman.setNextRequest(\"Shipping instruction for carrierBookingReference\");\r",
+											"    pm.collectionVariables.unset(\"DOCUMENT_STATUSSES\");\r",
+											"}\r",
+											"\r",
+											"let documentStatusUnderTest = pm.request.url.query.get(\"documentStatus\");\r",
+											"\r",
+											"if(documentStatusUnderTest) {\r",
+											"    pm.test(\"documentStatus should be \" + documentStatusUnderTest, () => {\r",
+											"        let documentStatusses = pm.response.json().map(({documentStatus}) => documentStatus);\r",
+											"        pm.expect(documentStatusses.every(v => v === documentStatusUnderTest)).to.eql(true);\r",
+											"    });\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions-summaries",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions-summaries"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Shipping instruction for carrierBookingReference",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonResponse = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Response contains only 1 summary\", () => {\r",
+											"    pm.expect(jsonResponse.length).to.eql(1);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Carrier booking reference matches filter request\", () => {\r",
+											"    pm.expect(jsonResponse[0].carrierBookingReferences[0]).to.eql(\"D659FDB7E33C\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions-summaries?carrierBookingReference=D659FDB7E33C",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions-summaries"
+									],
+									"query": [
+										{
+											"key": "carrierBookingReference",
+											"value": "D659FDB7E33C"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Shipping instruction for unknown carrierBookingReference",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonResponse = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Response contains only 0 summaries\", () => {\r",
+											"    pm.expect(jsonResponse.length).to.eql(0);\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions-summaries?carrierBookingReference=unkown",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions-summaries"
+									],
+									"query": [
+										{
+											"key": "carrierBookingReference",
+											"value": "unkown"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Shipping instruction for multiple carrierBookingReferences",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonResponse = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Response contains only 1 summary\", () => {\r",
+											"    pm.expect(jsonResponse.length).to.eql(1);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Carrier booking reference matches filter request\", () => {\r",
+											"    pm.expect(jsonResponse[0].carrierBookingReferences[0]).to.eql(\"E379021B7782\");\r",
+											"    pm.expect(jsonResponse[0].carrierBookingReferences[1]).to.eql(\"A379021B7782\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions-summaries?carrierBookingReference=E379021B7782,A379021B7782",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions-summaries"
+									],
+									"query": [
+										{
+											"key": "carrierBookingReference",
+											"value": "E379021B7782,A379021B7782"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"SHIPPING_INSTRUCTIONS_SUMMARY_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});",
+									"",
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Negative test cases",
+					"item": [
+						{
+							"name": "Shipping instruction summaries invalid document status",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error reason is invalidParameter\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].reason).to.eql(\"invalidParameter\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"'documentStatus' must be of type EblDocumentStatus\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions-summaries?documentStatus=INVALID",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions-summaries"
+									],
+									"query": [
+										{
+											"key": "documentStatus",
+											"value": "INVALID"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"ERROR_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});",
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"API-Version is present\", () => {",
+							"    pm.response.to.have.header(\"API-Version\");",
+							"});",
+							"",
+							"pm.test(\"API-Version header is set to 2.0\", () => {",
+							"",
+							"    pm.expect(pm.response.headers.get(\"API-Version\")).to.eql(\"2.0\");",
+							"});"
 						]
 					}
 				}
@@ -320,6 +1082,24 @@
 			"key": "BASE_URL",
 			"value": "http://localhost:9090",
 			"type": "string"
+		},
+		{
+			"key": "SHIPMENT_SUMMARY_SCHEMA",
+			"value": "{\"type\":\"array\",\"items\":{\"type\":\"object\",\"description\":\"Shipment 'metadata'\\n\",\"required\":[\"carrierBookingReference\",\"shipmentCreatedDateTime\"],\"properties\":{\"carrierBookingReference\":{\"maxLength\":35,\"type\":\"string\",\"description\":\"A set of unique characters provided by carrier to identify a booking.\"},\"shipmentCreatedDateTime\":{\"type\":\"string\",\"description\":\"The date and time when the shipment was created (equivalent to when the Booking was confirmed).\\n\",\"format\":\"date-time\"},\"shipmentUpdatedDateTime\":{\"type\":\"string\",\"description\":\"Last date and time when the Shipment was updated.\\n\",\"format\":\"date-time\"},\"termsAndConditions\":{\"type\":\"string\",\"description\":\"Carrier general terms and conditions for the booking.\\n\"},\"carrierBookingRequestReference\":{\"type\":\"string\",\"description\":\"A reference to the booking during the booking request phase\\n\"},\"documentStatus\":{\"type\":\"string\",\"description\":\"The status of the booking. Possible values are:\\n- RECE (Received)\\n- PENU (Pending Update)\\n- PENC (Pending Confirmation)\\n- CONF (Confirmed)\\n- REJE (Rejected)\\n- CANC (Cancelled)\\n- CMPL (Completed)\\n\\nMore details can be found on <a href=\\\"https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv\\\">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.\\n\",\"enum\":[\"RECE\",\"PENU\",\"PENC\",\"CONF\",\"REJE\",\"CANC\",\"CMPL\"]}}}}",
+			"type": "string"
+		},
+		{
+			"key": "SHIPPING_INSTRUCTIONS_SUMMARY_SCHEMA",
+			"value": "{\"type\":\"array\",\"items\":{\"required\":[\"documentStatus\",\"isElectronic\",\"isShippedOnBoardType\",\"isToOrder\",\"shippingInstructionCreatedDateTime\",\"shippingInstructionReference\",\"shippingInstructionUpdatedDateTime\"],\"type\":\"object\",\"description\":\"A 'shallow' representation of the Shipping Instruction. This version of the Shipping Instruction does not contain nested objects. For a 'rich' version of the Shipping Instruction please use the `GET` endPoint.\\n\",\"properties\":{\"shippingInstructionReference\":{\"maxLength\":100,\"type\":\"string\",\"description\":\"The identifier for a shipping instruction provided by the carrier for system purposes.\\n\"},\"documentStatus\":{\"type\":\"string\",\"description\":\"The status of the Bill of Lading. Possible values are:\\n- RECE (Received)\\n- PENU (Pending Update)\\n- DRFT (Draft)\\n- PENA (Pending Approval)\\n- APPR (Approved)\\n- ISSU (Issued)\\n- SURR (Surrendered)\\n- VOID (Void)\\n\\nMore details can be found on <a href=\\\"https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv\\\">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.\\n\",\"enum\":[\"RECE\",\"PENU\",\"DRFT\",\"PENA\",\"APPR\",\"ISSU\",\"SURR\",\"VOID\"]},\"shippingInstructionCreatedDateTime\":{\"type\":\"string\",\"description\":\"Date and time when the ShippingInstruction was created\\n\",\"format\":\"date-time\"},\"shippingInstructionUpdatedDateTime\":{\"type\":\"string\",\"description\":\"Date and time when the ShippingInstruction was updated\\n\",\"format\":\"date-time\"},\"amendToTransportDocument\":{\"maxLength\":20,\"type\":\"string\",\"description\":\"This field can be used to reference a Transport Document that is issued (documentStatus = `ISSU`) in order to amend changes.\\n\\nThe field cannot be modified once set.\\n\"},\"transportDocumentTypeCode\":{\"type\":\"string\",\"description\":\"Specifies the type of the transport document\\n- BOL (Bill of Lading)\\n- SWB (Sea Waybill)\\n\",\"enum\":[\"BOL\",\"SWB\"]},\"isShippedOnBoardType\":{\"type\":\"boolean\",\"description\":\"Specifies whether the Transport document is a received for shipment, or shipped on board.\"},\"numberOfCopies\":{\"type\":\"integer\",\"description\":\"The requested number of copies of the Transport document to be issued by the carrier. Only applicable for physical documents\",\"minimum\":-2147483648,\"maximum\":2147483647},\"numberOfOriginals\":{\"type\":\"integer\",\"description\":\"Number of original copies of the negotiable bill of lading that has been requested by the customer.\\n\",\"minimum\":-2147483648,\"maximum\":2147483647},\"isElectronic\":{\"type\":\"boolean\",\"description\":\"An indicator whether the transport document is electronically transferred.\"},\"isToOrder\":{\"type\":\"boolean\",\"description\":\"Indicates whether the transport document is issued `to order` or not\\n\"},\"areChargesDisplayedOnOriginals\":{\"type\":\"boolean\",\"description\":\"An indicator of whether the charges are displayed on the original documents.\\n\"},\"areChargesDisplayedOnCopies\":{\"type\":\"boolean\",\"description\":\"An indicator of whether the charges are displayed on the copies of the documents.\\n\"},\"displayedNameForPlaceOfReceipt\":{\"maxLength\":250,\"type\":\"string\",\"description\":\"The address of the Party to be displayed on the transport document.\"},\"displayedNameForPortOfLoad\":{\"maxLength\":250,\"type\":\"string\",\"description\":\"The address of the Party to be displayed on the transport document.\"},\"displayedNameForPortOfDischarge\":{\"maxLength\":250,\"type\":\"string\",\"description\":\"The address of the Party to be displayed on the transport document.\"},\"displayedNameForPlaceOfDelivery\":{\"maxLength\":250,\"type\":\"string\",\"description\":\"The address of the Party to be displayed on the transport document.\"},\"carrierBookingReferences\":{\"type\":\"array\",\"description\":\"A list of all `carrierBookingReferences` used. The `carrierBookingReferences` are sourced from the `CargoItems` or the root object of the SI.\\n\",\"items\":{\"maxLength\":35,\"type\":\"string\",\"description\":\"A set of unique characters provided by carrier to identify a booking.\"}}}}}",
+			"type": "string"
+		},
+		{
+			"key": "BKG_CONTEXT_PATH",
+			"value": "/bkg/v1"
+		},
+		{
+			"key": "EBL_CONTEXT_PATH",
+			"value": "/ebl/v2"
 		}
 	]
 }

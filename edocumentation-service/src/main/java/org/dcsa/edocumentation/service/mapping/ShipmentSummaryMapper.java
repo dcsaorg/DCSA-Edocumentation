@@ -10,5 +10,6 @@ public interface ShipmentSummaryMapper {
   @Mapping(
       source = "booking.carrierBookingRequestReference",
       target = "carrierBookingRequestReference")
-  ShipmentSummaryTO ShipmentToShipmentSummary(Shipment shipment);
+  @Mapping(source = "booking.documentStatus", target = "documentStatus")
+  ShipmentSummaryTO shipmentToShipmentSummary(Shipment shipment);
 }

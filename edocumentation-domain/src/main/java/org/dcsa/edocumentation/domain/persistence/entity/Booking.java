@@ -53,7 +53,7 @@ public class Booking {
   private CargoMovementType cargoMovementTypeAtDestination;
 
   @Column(name = "booking_request_datetime")
-  private OffsetDateTime bookingRequestDateTime;
+  private OffsetDateTime bookingRequestCreatedDateTime;
 
   @Column(name = "service_contract_reference", length = 30)
   private String serviceContractReference;
@@ -125,9 +125,6 @@ public class Booking {
   @Column(name = "declared_value")
   private Float declaredValue;
 
-//  @Column(name = "pre_carriage_mode_of_transport_code", length = 3)
-//  private String preCarriageModeOfTransportCode;
-
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -148,5 +145,5 @@ public class Booking {
   // updatedDateTime is metadata to avoid having to query shipment_event for updated dateTime.
   // This is not part of the official IM model. They are added in the sql only.
   @Column(name = "updated_date_time")
-  protected OffsetDateTime updatedDateTime;
+  protected OffsetDateTime bookingRequestUpdatedDateTime;
 }

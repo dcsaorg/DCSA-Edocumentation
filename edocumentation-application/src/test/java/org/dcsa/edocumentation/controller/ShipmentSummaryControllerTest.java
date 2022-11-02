@@ -9,7 +9,6 @@ import org.dcsa.skernel.errors.infrastructure.FallbackExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.JavaxValidationExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.SpringExceptionHandler;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
-import org.dcsa.skernel.infrastructure.pagination.Paginator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,13 +36,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
   SpringExceptionHandler.class,
   JavaxValidationExceptionHandler.class,
   FallbackExceptionHandler.class,
-  ConcreteRequestErrorMessageExceptionHandler.class,
-  Paginator.class
+  ConcreteRequestErrorMessageExceptionHandler.class
 })
-public class ShipmentSummaryControllerTest {
-  private final String path = "/v1/shipment-summaries";
+class ShipmentSummaryControllerTest {
+  private final String path = "/bkg/v1/shipment-summaries";
   @Autowired MockMvc mockMvc;
-  @Autowired Paginator paginator;
   @MockBean ShipmentSummaryService shipmentSummaryService;
 
   @Test
@@ -106,9 +103,6 @@ public class ShipmentSummaryControllerTest {
   @Test
   void testShipmentSummaryController_getShipmentSummariesWithInvalidDocumentStatus()
       throws Exception {
-    ShipmentSummaryTO mockShipmentSummaryTO = ShipmentSummaryDataFactory.singleShipmentSummaryTO();
-    when(shipmentSummaryService.findShipmentSummaries(any(), eq(BkgDocumentStatus.RECE)))
-        .thenReturn(new PagedResult<>(new PageImpl<>(List.of(mockShipmentSummaryTO))));
 
     mockMvc
         .perform(get(path).param("documentStatus", "INVALID").accept(MediaType.APPLICATION_JSON))

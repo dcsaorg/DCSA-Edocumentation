@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.specification.ShippingInstructionSpecification;
-import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
+import org.dcsa.edocumentation.service.mapping.ShippingInstructionSummaryMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
-import org.dcsa.skernel.infrastructure.pagination.Cursor;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +15,12 @@ import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
-public class ShippingInstructionService {
+public class ShippingInstructionSummaryService {
   private final ShippingInstructionRepository shippingInstructionRepository;
-  private final ShippingInstructionMapper shippingInstructionMapper;
+  private final ShippingInstructionSummaryMapper shippingInstructionMapper;
 
   public PagedResult<ShippingInstructionSummaryTO> findShippingInstructionSummaries(
-      Cursor cursor, EblDocumentStatus documentStatus, @Nullable String carrierBookingReference) {
+    PageRequest pageRequest, EblDocumentStatus documentStatus, @Nullable String carrierBookingReference) {
     return new PagedResult<>(
         shippingInstructionRepository
             .findAll(
@@ -32,7 +32,8 @@ public class ShippingInstructionService {
                                 : Arrays.asList(carrierBookingReference.split(",")))
                         .documentStatus(documentStatus)
                         .build()),
-                cursor.toPageRequest())
-            .map(shippingInstructionMapper::ShippingInstructionToShippingInstructionSummary));
+              pageRequest)
+          .map(shippingInstruction -> shippingInstructionMapper.shippingInstructionToShippingInstructionSummary(shippingInstruction)));
+//            .map(shippingInstructionMapper::shippingInstructionToShippingInstructionSummary));
   }
 }

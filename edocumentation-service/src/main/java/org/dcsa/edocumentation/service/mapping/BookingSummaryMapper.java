@@ -9,8 +9,6 @@ import org.mapstruct.Mapping;
 public interface BookingSummaryMapper {
 
   @Mapping(source = "booking.vessel.vesselIMONumber", target = "vesselIMONumber")
-  @Mapping(source = "updatedDateTime", target = "bookingRequestUpdatedDateTime")
-  @Mapping(source = "bookingRequestDateTime", target = "bookingRequestCreatedDateTime")
   @Mapping(
       source = " booking.modeOfTransport.dcsaTransportType",
       target = "preCarriageModeOfTransportCode")
