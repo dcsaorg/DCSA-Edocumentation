@@ -25,6 +25,10 @@ class EblStateMachineTest {
     Assertions.assertEquals(RECE, stateMachine.getCurrentStatus());
     stateMachine.draft();
     Assertions.assertEquals(DRFT, stateMachine.getCurrentStatus());
+
+    // Verify resume
+    stateMachine = EBLStateMachine.resumeFromStateUsingDefaultFlow(DRFT);
+    Assertions.assertEquals(DRFT, stateMachine.getCurrentStatus());
     Assertions.assertTrue(stateMachine.isPendingApprovalSupported());
     stateMachine.pendingApproval();
     Assertions.assertEquals(PENA, stateMachine.getCurrentStatus());
@@ -44,6 +48,11 @@ class EblStateMachineTest {
     Assertions.assertEquals(APPR, stateMachine.getCurrentStatus());
     stateMachine.issue();
     Assertions.assertEquals(ISSU, stateMachine.getCurrentStatus());
+
+    stateMachine = EBLStateMachine.resumeFromStateUsingAmendmentFlow(DRFT);
+    Assertions.assertEquals(DRFT, stateMachine.getCurrentStatus());
+    stateMachine.approve();
+    Assertions.assertEquals(APPR, stateMachine.getCurrentStatus());
   }
 
 
@@ -61,6 +70,14 @@ class EblStateMachineTest {
 
     stateMachine.draft();
     // DRFT must go directly to APPR in the amendment flow.
+    Assertions.assertFalse(stateMachine.isPendingApprovalSupported());
+    Assertions.assertThrows(InternalServerErrorException.class, stateMachine::pendingApproval);
+    // Again, it retains the current state on invalid transitions.
+    Assertions.assertEquals(DRFT, stateMachine.getCurrentStatus());
+
+
+    stateMachine = EBLStateMachine.resumeFromStateUsingAmendmentFlow(DRFT);
+    // DRFT must go directly to APPR in the amendment flow - even after resume
     Assertions.assertFalse(stateMachine.isPendingApprovalSupported());
     Assertions.assertThrows(InternalServerErrorException.class, stateMachine::pendingApproval);
     // Again, it retains the current state on invalid transitions.
