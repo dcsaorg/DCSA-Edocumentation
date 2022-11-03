@@ -6,7 +6,6 @@ import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.service.mapping.BookingSummaryMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
-import org.dcsa.skernel.infrastructure.pagination.Cursor;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +17,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -41,13 +40,7 @@ class BookingSummaryServiceTest {
 
   @InjectMocks private BookingSummaryService bookingSummaryService;
 
-  private Cursor mockCursor;
-
-  @BeforeEach
-  void init() {
-    mockCursor =
-        new Cursor(1, 1, new Cursor.SortBy(Sort.Direction.ASC, "carrierBookingRequestReference"));
-  }
+  private final PageRequest mockPageRequest = PageRequest.of(1, 1);
 
   @Test
   void testBookingSummary_singleResultNoDocumentStatus() {
@@ -56,7 +49,7 @@ class BookingSummaryServiceTest {
     when(bookingRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
 
     PagedResult<BookingSummaryTO> result =
-        bookingSummaryService.findBookingSummaries(mockCursor, null);
+        bookingSummaryService.findBookingSummaries(mockPageRequest, null);
     assertEquals(1, result.totalPages());
     assertEquals(
         mockBooking.getCarrierBookingRequestReference(),
@@ -74,7 +67,7 @@ class BookingSummaryServiceTest {
 
     PagedResult<BookingSummaryTO> result =
         bookingSummaryService.findBookingSummaries(
-            mockCursor, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
+            mockPageRequest, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
     assertEquals(1, result.totalPages());
     assertEquals(
         mockBooking.getCarrierBookingRequestReference(),
@@ -83,12 +76,13 @@ class BookingSummaryServiceTest {
 
   @Test
   void testBookingSummary_multipleResultsWithoutDocumentStatus() {
-    List<Booking> mockBookings = BookingDataFactory.multipleShallowBookingsWithVesselAndModeOfTransport();
+    List<Booking> mockBookings =
+        BookingDataFactory.multipleShallowBookingsWithVesselAndModeOfTransport();
     Page<Booking> pagedResult = new PageImpl<>(mockBookings);
     when(bookingRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
 
     PagedResult<BookingSummaryTO> result =
-        bookingSummaryService.findBookingSummaries(mockCursor, null);
+        bookingSummaryService.findBookingSummaries(mockPageRequest, null);
     assertEquals(1, result.totalPages());
     assertEquals(2, result.content().size());
     assertEquals(
@@ -101,14 +95,15 @@ class BookingSummaryServiceTest {
 
   @Test
   void testBookingSummary_multipleResultsWithDocumentStatus() {
-    List<Booking> mockBookings = BookingDataFactory.multipleShallowBookingsWithVesselAndModeOfTransport();
+    List<Booking> mockBookings =
+        BookingDataFactory.multipleShallowBookingsWithVesselAndModeOfTransport();
     Page<Booking> pagedResult = new PageImpl<>(mockBookings);
     when(bookingRepository.findAllByDocumentStatus(any(), any(Pageable.class)))
         .thenReturn(pagedResult);
 
     PagedResult<BookingSummaryTO> result =
         bookingSummaryService.findBookingSummaries(
-            mockCursor, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
+            mockPageRequest, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
     assertEquals(1, result.totalPages());
     assertEquals(2, result.content().size());
     assertEquals(
@@ -126,7 +121,7 @@ class BookingSummaryServiceTest {
     when(bookingRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
 
     PagedResult<BookingSummaryTO> result =
-        bookingSummaryService.findBookingSummaries(mockCursor, null);
+        bookingSummaryService.findBookingSummaries(mockPageRequest, null);
     assertEquals(1, result.totalPages());
     assertEquals(
         mockBooking.getCarrierBookingRequestReference(),

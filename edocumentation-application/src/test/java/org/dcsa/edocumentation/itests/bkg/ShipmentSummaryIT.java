@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.is;
 
 public class ShipmentSummaryIT extends PostgeSqlContextAware {
 
-  private static final String SHIPMENT_SUMMARIES_ENDPOINT = "/v1/shipment-summaries";
+  private static final String SHIPMENT_SUMMARIES_ENDPOINT = "/bkg/v1/shipment-summaries";
 
   @BeforeAll
   public static void initializeRestAssured() {

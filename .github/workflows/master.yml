@@ -44,7 +44,7 @@ jobs:
       - name: Fetch Backend Status
         run: |
           sleep 10
-          status=$(curl -s http://localhost:9090/v2/actuator/health | jq -r '.status')
+          status=$(curl -s http://localhost:9090/actuator/health | jq -r '.status')
           retries=12
 
           while [[ "$status" != "UP" ]] && [[ $retries -gt 0 ]]; do

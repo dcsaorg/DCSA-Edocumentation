@@ -6,9 +6,7 @@ import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentSummaryMapper;
 import org.dcsa.edocumentation.transferobjects.ShipmentSummaryTO;
-import org.dcsa.skernel.infrastructure.pagination.Cursor;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -18,8 +16,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -28,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ShipmentSummaryServiceTest {
+class ShipmentSummaryServiceTest {
   @Mock private ShipmentRepository shipmentRepository;
 
   @Spy
@@ -39,13 +37,8 @@ public class ShipmentSummaryServiceTest {
       Mappers.getMapper(ShipmentSummaryMapper.class);
 
   @InjectMocks private ShipmentSummaryService shipmentSummaryService;
-  private Cursor mockCursor;
 
-  @BeforeEach
-  void init() {
-    mockCursor =
-        new Cursor(1, 1, new Cursor.SortBy(Sort.Direction.ASC, "carrierBookingRequestReference"));
-  }
+  private final PageRequest mockPageRequest = PageRequest.of(1, 1);
 
   @Test
   void testShipmentSummary_singleResultNoDocumentStatusWithoutBooking() {
@@ -54,7 +47,7 @@ public class ShipmentSummaryServiceTest {
     when(shipmentRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
 
     PagedResult<ShipmentSummaryTO> result =
-        shipmentSummaryService.findShipmentSummaries(mockCursor, null);
+        shipmentSummaryService.findShipmentSummaries(mockPageRequest, null);
     assertEquals(1, result.totalPages());
     assertEquals(
         mockShipment.getCarrierBookingReference(),
@@ -71,7 +64,7 @@ public class ShipmentSummaryServiceTest {
     when(shipmentRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
 
     PagedResult<ShipmentSummaryTO> result =
-        shipmentSummaryService.findShipmentSummaries(mockCursor, null);
+        shipmentSummaryService.findShipmentSummaries(mockPageRequest, null);
     assertEquals(1, result.totalPages());
     assertEquals(
         mockShipment.getCarrierBookingReference(),
@@ -90,7 +83,7 @@ public class ShipmentSummaryServiceTest {
 
     PagedResult<ShipmentSummaryTO> result =
         shipmentSummaryService.findShipmentSummaries(
-            mockCursor, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
+            mockPageRequest, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
     assertEquals(1, result.totalPages());
     assertEquals(
         mockShipment.getCarrierBookingReference(),
@@ -107,7 +100,7 @@ public class ShipmentSummaryServiceTest {
     when(shipmentRepository.findAll(any(Pageable.class))).thenReturn(pagedResult);
 
     PagedResult<ShipmentSummaryTO> result =
-        shipmentSummaryService.findShipmentSummaries(mockCursor, null);
+        shipmentSummaryService.findShipmentSummaries(mockPageRequest, null);
     assertEquals(1, result.totalPages());
     assertEquals(2, result.content().size());
     assertEquals(
@@ -133,7 +126,7 @@ public class ShipmentSummaryServiceTest {
 
     PagedResult<ShipmentSummaryTO> result =
         shipmentSummaryService.findShipmentSummaries(
-            mockCursor, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
+            mockPageRequest, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
     assertEquals(1, result.totalPages());
     assertEquals(2, result.content().size());
     assertEquals(

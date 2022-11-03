@@ -1,13 +1,17 @@
 
 dcsa:
   specification:
-    version: 2.0
+    by-prefix:
+      - prefix: /ebl/v2
+        version: 2.0
+      - prefix: /bkg/v1
+        version: 1.0
 
 spring:
   application:
     name: DCSA-Edocumentation
-    bkg-context-path: v1
-    ebl-context-path: v2
+    bkg-context-path: /bkg/v1
+    ebl-context-path: /ebl/v2
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${db_hostname}/dcsa_openapi

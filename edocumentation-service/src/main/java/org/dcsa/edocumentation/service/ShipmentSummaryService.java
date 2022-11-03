@@ -6,8 +6,8 @@ import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentSummaryMapper;
 import org.dcsa.edocumentation.transferobjects.ShipmentSummaryTO;
 import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
-import org.dcsa.skernel.infrastructure.pagination.Cursor;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,7 +20,7 @@ public class ShipmentSummaryService {
   private final DocumentStatusMapper documentStatusMapper;
 
   public PagedResult<ShipmentSummaryTO> findShipmentSummaries(
-      Cursor cursor, BkgDocumentStatus documentStatus) {
+      PageRequest pageRequest, BkgDocumentStatus documentStatus) {
 
     return new PagedResult<>(
         Optional.ofNullable(documentStatus)
@@ -28,8 +28,8 @@ public class ShipmentSummaryService {
             .map(
                 bkgDocumentStatus ->
                     shipmentRepository.findAllByBookingDocumentStatus(
-                        bkgDocumentStatus, cursor.toPageRequest()))
-            .orElseGet(() -> shipmentRepository.findAll(cursor.toPageRequest()))
-            .map(shipmentSummaryMapper::ShipmentToShipmentSummary));
+                        bkgDocumentStatus, pageRequest))
+            .orElseGet(() -> shipmentRepository.findAll(pageRequest))
+            .map(shipmentSummaryMapper::shipmentToShipmentSummary));
   }
 }

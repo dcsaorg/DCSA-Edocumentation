@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.is;
 
 public class BookingSummaryIT extends PostgeSqlContextAware {
 
-  private static final String BOOKING_SUMMARIES_ENDPOINT = "/v1/booking-summaries";
+  private static final String BOOKING_SUMMARIES_ENDPOINT = "/bkg/v1/booking-summaries";
 
   @BeforeAll
   public static void initializeRestAssured() {
