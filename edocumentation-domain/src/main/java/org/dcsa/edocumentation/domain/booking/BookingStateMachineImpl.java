@@ -1,12 +1,15 @@
 package org.dcsa.edocumentation.domain.booking;
 
-import org.dcsa.edocumentation.domain.dfa.DFA;
+import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
+import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
 import org.dcsa.edocumentation.domain.dfa.DFADefinition;
+import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
 
-public class BookingStateMachineImpl implements BookingStateMachine {
+public class BookingStateMachineImpl extends AbstractStateMachine<BkgDocumentStatus> implements BookingStateMachine {
 
   static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECE)
     .nonTerminalState(RECE).successorNodes(REJE, CANC, PENU, PENC, CONF)
@@ -16,15 +19,12 @@ public class BookingStateMachineImpl implements BookingStateMachine {
     .terminalStates(CANC, CMPL, REJE)
     .build();
 
-
-  private final DFA<BkgDocumentStatus> dfa;
-
   BookingStateMachineImpl() {
-    dfa = BOOKING_DFA_DEFINITION.fromInitialState();
+    super(BOOKING_DFA_DEFINITION.fromInitialState());
   }
 
   BookingStateMachineImpl(BkgDocumentStatus currentStatus) {
-    dfa = BOOKING_DFA_DEFINITION.resumeFromState(currentStatus);
+    super(BOOKING_DFA_DEFINITION.resumeFromState(currentStatus));
   }
 
   @Override
@@ -34,32 +34,50 @@ public class BookingStateMachineImpl implements BookingStateMachine {
 
   @Override
   public void cancel() {
-    dfa.transitionTo(CANC);
+    transitionTo(CANC);
   }
 
   @Override
   public void reject() {
-    dfa.transitionTo(REJE);
+    transitionTo(REJE);
   }
 
   @Override
   public void pendingUpdate() {
-    dfa.transitionTo(PENU);
+    transitionTo(PENU);
   }
 
   @Override
   public void pendingConfirmation() {
-    dfa.transitionTo(PENC);
+    transitionTo(PENC);
   }
 
   @Override
   public void confirm() {
-    dfa.transitionTo(CONF);
+    transitionTo(CONF);
   }
 
   @Override
   public void complete() {
-    dfa.transitionTo(CMPL);
+    transitionTo(CMPL);
+  }
+
+  @Override
+  protected RuntimeException errorForAttemptLeavingToLeaveTerminalState(BkgDocumentStatus currentState, BkgDocumentStatus successorState, CannotLeaveTerminalStateException e) {
+    return ConcreteRequestErrorMessageException.conflict(
+      "Cannot perform the requested action on the booking because the booking is "
+        + currentState.getValue().toLowerCase() + " (" + currentState.name() + ")",
+      e
+    );
+  }
+
+  @Override
+  protected RuntimeException errorForTargetStatNotListedAsSuccessor(BkgDocumentStatus currentState, BkgDocumentStatus successorState, TargetStateIsNotSuccessorException e) {
+    return ConcreteRequestErrorMessageException.conflict(
+      "It is not possible to perform the requested action on the booking with documentStatus ("
+        + currentState.name() + ").",
+      e
+    );
   }
 
 }

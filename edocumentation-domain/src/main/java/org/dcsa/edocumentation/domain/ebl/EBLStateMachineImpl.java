@@ -1,12 +1,16 @@
 package org.dcsa.edocumentation.domain.ebl;
 
-import org.dcsa.edocumentation.domain.dfa.DFA;
+import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
+import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
 import org.dcsa.edocumentation.domain.dfa.DFADefinition;
+import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.dcsa.skernel.errors.exceptions.ConflictException;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
-public class EBLStateMachineImpl implements EBLStateMachine {
+public class EBLStateMachineImpl extends AbstractStateMachine<EblDocumentStatus> implements EBLStateMachine {
 
   static final DFADefinition<EblDocumentStatus> DEFAULT_EBL_DFA_DEFINITION = DFADefinition.builder(RECE)
     .nonTerminalState(RECE).successorNodes(PENU, DRFT)
@@ -29,19 +33,16 @@ public class EBLStateMachineImpl implements EBLStateMachine {
     .unreachableStates(PENU, PENA)
     .build();
 
-  private final DFA<EblDocumentStatus> dfa;
   private final boolean isAmendmentFlow;
 
   EBLStateMachineImpl(boolean isAmendmentFlow) {
+    super(fromFlow(isAmendmentFlow).fromInitialState());
     this.isAmendmentFlow = isAmendmentFlow;
-    DFADefinition<EblDocumentStatus> definition = fromFlow(isAmendmentFlow);
-    this.dfa = definition.fromInitialState();
   }
 
   EBLStateMachineImpl(boolean isAmendmentFlow, EblDocumentStatus resumeState) {
+    super(fromFlow(isAmendmentFlow).resumeFromState(resumeState));
     this.isAmendmentFlow = isAmendmentFlow;
-    DFADefinition<EblDocumentStatus> definition = fromFlow(isAmendmentFlow);
-    this.dfa = definition.resumeFromState(resumeState);
   }
 
   private static DFADefinition<EblDocumentStatus> fromFlow(boolean isAmendmentFlow) {
@@ -50,43 +51,74 @@ public class EBLStateMachineImpl implements EBLStateMachine {
 
   @Override
   public void receive() {
-    dfa.transitionTo(RECE);
+    transitionTo(RECE);
   }
 
   @Override
   public void pendingUpdate() {
-    dfa.transitionTo(PENU);
+    transitionTo(PENU);
+  }
+
+  @Override
+  public boolean isPendingUpdateSupported() {
+    return supportsState(PENU);
   }
 
   @Override
   public void draft() {
-    dfa.transitionTo(DRFT);
+    transitionTo(DRFT);
   }
 
   @Override
   public void pendingApproval() {
-    dfa.transitionTo(PENA);
+    transitionTo(PENA);
+  }
+
+  @Override
+  public boolean isPendingApprovalSupported() {
+    return supportsState(PENA);
   }
 
   @Override
   public void approve() {
-    dfa.transitionTo(APPR);
+    transitionTo(APPR);
   }
 
   @Override
   public void issue() {
-    dfa.transitionTo(ISSU);
+    transitionTo(ISSU);
   }
 
   @Override
   public void surrender() {
-    dfa.transitionTo(SURR);
+    transitionTo(SURR);
   }
 
   @Override
   public void voidDocument() {
-    dfa.transitionTo(VOID);
+    transitionTo(VOID);
   }
+
+  @Override
+  protected RuntimeException errorForAttemptLeavingToLeaveTerminalState(EblDocumentStatus currentState, EblDocumentStatus successorState, CannotLeaveTerminalStateException e) {
+    // Special-case for terminal states, where we can generate quite nice sounding
+    // messages such as "... because the document is void (VOID)".
+    return ConcreteRequestErrorMessageException.conflict(
+      "Cannot perform the requested action on the document as the document is "
+        + currentState.getValue().toLowerCase() + " (" + currentState.name() + ")",
+      e
+    );
+  }
+
+  @Override
+  protected RuntimeException errorForTargetStatNotListedAsSuccessor(EblDocumentStatus currentState, EblDocumentStatus successorState, TargetStateIsNotSuccessorException e) {
+    return ConcreteRequestErrorMessageException.conflict(
+      "It is not possible to perform the requested action on the booking with documentStatus ("
+        + currentState.name() + ").",
+      e
+    );
+  }
+
 
   @Override
   public EblDocumentStatus getCurrentStatus() {
