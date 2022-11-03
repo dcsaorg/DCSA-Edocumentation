@@ -75,3 +75,8 @@ jobs:
 
       - name: Output summary to console
         run: echo ${{ steps.run-newman.outputs.summary }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: newman/DCSA-EDocumentation-*.html
