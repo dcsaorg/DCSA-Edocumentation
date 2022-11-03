@@ -70,7 +70,7 @@ jobs:
         uses: anthonyvscode/newman-action@v1
         with:
           collection: DCSA-Edocumentation/postman_collection.json
-          reporters: cli
+          reporters: cli,htmlextra
           insecure: true
 
       - name: Output summary to console
