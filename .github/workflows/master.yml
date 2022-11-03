@@ -65,13 +65,11 @@ jobs:
         run: |
           echo "The DCSA-Edocumentation service is UP."
 
+      - name: Prepare Postman Integration Tests
+        run: npm install -g newman newman-reporter-htmlextra
+
       - name: Run Postman Integration Tests
-        id: run-newman
-        uses: anthonyvscode/newman-action@v1
-        with:
-          collection: DCSA-Edocumentation/postman_collection.json
-          reporters: cli,htmlextra
-          insecure: true
+        run: newman run ./DCSA-Edocumentation/postman_collection.json --insecure --reporters=cli,htmlextra --reporter-htmlextra-export ./DCSA-Edocumentation/newman/report.html
 
       - name: Output summary to console
         run: echo ${{ steps.run-newman.outputs.summary }}
@@ -79,4 +77,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: test-report
-          path: newman/DCSA-EDocumentation-*.html
+          path: DCSA-Edocumentation/newman/report.html
