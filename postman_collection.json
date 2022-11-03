@@ -798,7 +798,7 @@
 											"});\r",
 											"\r",
 											"pm.test(\"Carrier booking reference matches filter request\", () => {\r",
-											"    pm.expect(jsonResponse[0].carrierBookingReferences[0]).to.eql(\"D659FDB7E33C\");\r",
+											"    pm.expect(jsonResponse[0].carrierBookingReferences.includes(\"D659FDB7E33C\")).to.eql(true);\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -880,8 +880,8 @@
 											"});\r",
 											"\r",
 											"pm.test(\"Carrier booking reference matches filter request\", () => {\r",
-											"    pm.expect(jsonResponse[0].carrierBookingReferences[0]).to.eql(\"E379021B7782\");\r",
-											"    pm.expect(jsonResponse[0].carrierBookingReferences[1]).to.eql(\"A379021B7782\");\r",
+											"    pm.expect(jsonResponse[0].carrierBookingReferences.includes(\"E379021B7782\")).to.eql(true);\r",
+											"    pm.expect(jsonResponse[0].carrierBookingReferences.includes(\"A379021B7782\")).to.eql(true);\r",
 											"});"
 										],
 										"type": "text/javascript"
