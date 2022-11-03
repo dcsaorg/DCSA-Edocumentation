@@ -86,15 +86,15 @@ public class DFADefinitionBuilder<S extends Enum<S>> {
   }
 
   public DFADefinition<S> build() {
-    EnumMap<S, DFADefinition.DFAStateInfo<S>> stateInfo = new EnumMap<>(initialState.getDeclaringClass());
+    EnumMap<S, DFAStateInfo<S>> stateInfo = new EnumMap<>(initialState.getDeclaringClass());
     for (S s : terminalStates) {
-      stateInfo.put(s, DFADefinition.DFAStateInfo.terminalState());
+      stateInfo.put(s, DFAStateInfo.terminalState());
     }
     for (S s : unreachableStates) {
-      stateInfo.put(s, DFADefinition.DFAStateInfo.unreachableState());
+      stateInfo.put(s, DFAStateInfo.unreachableState());
     }
     for (Map.Entry<S, EnumSet<S>> entry : successorStates.entrySet()) {
-      stateInfo.put(entry.getKey(), DFADefinition.DFAStateInfo.successorStates(entry.getValue()));
+      stateInfo.put(entry.getKey(), DFAStateInfo.successorStates(entry.getValue()));
     }
     DFADefinition<S> definition = new DFADefinition<>(initialState, Map.copyOf(stateInfo));
     EnumSet<S> expectedReachable = terminalStates.clone();
@@ -116,7 +116,7 @@ public class DFADefinitionBuilder<S extends Enum<S>> {
       S nextState = pendingStates.iterator().next();
       pendingStates.remove(nextState);
       reachableStates.add(nextState);
-      DFADefinition.DFAStateInfo<S> stateInfo = definition.getStateInfoForState(nextState);
+      DFAStateInfo<S> stateInfo = definition.getStateInfoForState(nextState);
       if (stateInfo == null) {
         throw ConcreteRequestErrorMessageException.internalServerError("It was possible to reach " + nextState.name()
           + ", which has not been declared as a known state");
