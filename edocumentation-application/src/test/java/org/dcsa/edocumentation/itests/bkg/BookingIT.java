@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.itests.bkg;
 
 import org.dcsa.edocumentation.datafactories.BookingRequestTODataFactory;
+import org.dcsa.edocumentation.itests.PostgeSqlContextAware;
 import org.dcsa.edocumentation.itests.config.RestAssuredConfigurator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,7 @@ import org.springframework.http.HttpStatus;
 
 import static io.restassured.RestAssured.given;
 
-public class BookingIT {
+public class BookingIT extends PostgeSqlContextAware {
   private static final String BOOKINGS_ENDPOINT = "/bkg/v1/bookings";
 
   @BeforeAll
