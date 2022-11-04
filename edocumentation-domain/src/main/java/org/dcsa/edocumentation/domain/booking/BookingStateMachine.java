@@ -1,6 +1,13 @@
 package org.dcsa.edocumentation.domain.booking;
 
+import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
+import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
+import org.dcsa.edocumentation.domain.dfa.DFADefinition;
+import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
 
 /**
  * Booking State Machine
@@ -20,42 +27,65 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus
  *    assert stateMachine.acceptDocumentChange().getCurrentStatus() == BkgDocumentStatus.PENC;
  * }</pre>
  */
-public interface BookingStateMachine {
+public class BookingStateMachine extends AbstractStateMachine<BkgDocumentStatus> {
+
+  private static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECE)
+    .nonTerminalState(RECE).successorNodes(REJE, CANC, PENU, PENC, CONF)
+    .nonTerminalState(PENU).successorNodes(REJE, CANC, PENU, PENC)
+    .nonTerminalState(PENC).successorNodes(REJE, CANC, PENU, PENC, CONF)
+    .nonTerminalState(CONF).successorNodes(REJE, CMPL, PENU, PENC)
+    .terminalStates(CANC, CMPL, REJE)
+    .build();
+
+  BookingStateMachine() {
+    super(BOOKING_DFA_DEFINITION.fromInitialState());
+  }
+
+  BookingStateMachine(BkgDocumentStatus currentStatus) {
+    super(BOOKING_DFA_DEFINITION.resumeFromState(currentStatus));
+  }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#CANC} state.
    */
-  void cancel();
+  public void cancel() {
+    transitionTo(CANC);
+  }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#REJE} state.
    */
-  void reject();
+  public void reject() {
+    transitionTo(REJE);
+  }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENU} state.
    */
-  void pendingUpdate();
+  public void pendingUpdate() {
+    transitionTo(PENU);
+  }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  void pendingConfirmation();
+  public void pendingConfirmation() {
+    transitionTo(PENC);
+  }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  void confirm();
+  public void confirm() {
+    transitionTo(CONF);
+  }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#CMPL} state.
    */
-  void complete();
-
-  /**
-   * @return The current status of the booking document
-   */
-  BkgDocumentStatus getCurrentStatus();
+  public void complete() {
+    transitionTo(CMPL);
+  }
 
   /**
    * Initialize a BookingStateMachine from an initial state.
@@ -63,7 +93,7 @@ public interface BookingStateMachine {
    * @return A state machine in the initial state.
    */
   static BookingStateMachine fromInitialState() {
-    return new BookingStateMachineImpl();
+    return new BookingStateMachine();
   }
 
   /**
@@ -73,7 +103,25 @@ public interface BookingStateMachine {
    * @return A BookingStateMachine initialized in the given state.
    */
   static BookingStateMachine resumeFromState(BkgDocumentStatus currentStatus) {
-    return new BookingStateMachineImpl(currentStatus);
+    return new BookingStateMachine(currentStatus);
   }
 
+
+  @Override
+  protected RuntimeException errorForAttemptLeavingToLeaveTerminalState(BkgDocumentStatus currentState, BkgDocumentStatus successorState, CannotLeaveTerminalStateException e) {
+    return ConcreteRequestErrorMessageException.conflict(
+      "Cannot perform the requested action on the booking because the booking is "
+        + currentState.getValue().toLowerCase() + " (" + currentState.name() + ")",
+      e
+    );
+  }
+
+  @Override
+  protected RuntimeException errorForTargetStatNotListedAsSuccessor(BkgDocumentStatus currentState, BkgDocumentStatus successorState, TargetStateIsNotSuccessorException e) {
+    return ConcreteRequestErrorMessageException.conflict(
+      "It is not possible to perform the requested action on the booking with documentStatus ("
+        + currentState.name() + ").",
+      e
+    );
+  }
 }
