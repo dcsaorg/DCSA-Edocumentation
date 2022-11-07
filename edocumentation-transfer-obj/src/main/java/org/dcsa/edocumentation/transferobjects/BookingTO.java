@@ -165,13 +165,4 @@ public record BookingTO(
 ) {
   @Builder(toBuilder = true)
   public BookingTO { }
-
-  public BookingTO forUpdates() {
-    return toBuilder()
-      .carrierBookingRequestReference(null)
-      .documentStatus(null)
-      .bookingRequestCreatedDateTime(null)
-      .bookingRequestUpdatedDateTime(null)
-      .build();
-  }
 }

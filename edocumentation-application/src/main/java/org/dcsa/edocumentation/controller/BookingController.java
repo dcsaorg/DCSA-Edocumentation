@@ -28,7 +28,15 @@ public class BookingController {
   @PostMapping(path = "${spring.application.bkg-context-path}/bookings")
   @ResponseStatus(HttpStatus.CREATED)
   public BookingRefStatusTO createBooking(@Valid @RequestBody BookingTO bookingRequest) {
-    return bookingService.createBooking(bookingRequest.forUpdates());
+    if (bookingRequest.carrierBookingRequestReference() != null
+      || bookingRequest.documentStatus() != null
+      || bookingRequest.bookingRequestCreatedDateTime() != null
+      || bookingRequest.bookingRequestUpdatedDateTime() != null) {
+      throw ConcreteRequestErrorMessageException.invalidInput(
+        "carrierBookingRequestReference, documentStatus, bookingRequestCreatedDateTime and"
+          + " bookingRequestUpdatedDateTime are not allowed when creating a booking");
+    }
+    return bookingService.createBooking(bookingRequest);
   }
 
   @PutMapping(path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}")
@@ -45,7 +53,14 @@ public class BookingController {
       throw ConcreteRequestErrorMessageException.invalidInput(
         "carrierBookingRequestReference must match bookingRequest.carrierBookingRequestReference");
     }
-    return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest.forUpdates());
+    if (bookingRequest.documentStatus() != null
+      || bookingRequest.bookingRequestCreatedDateTime() != null
+      || bookingRequest.bookingRequestUpdatedDateTime() != null) {
+      throw ConcreteRequestErrorMessageException.invalidInput(
+        "documentStatus, bookingRequestCreatedDateTime and"
+          + " bookingRequestUpdatedDateTime are not allowed when updating a booking");
+    }
+    return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest);
   }
 
   @GetMapping(path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}")
