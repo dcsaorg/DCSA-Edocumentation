@@ -16,7 +16,7 @@ import java.util.UUID;
   }
 )
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
@@ -76,9 +76,6 @@ public class Booking {
 
   @Column(name = "import_license_reference", length = 35)
   private String importLicenseReference;
-
-  @Column(name = "submission_datetime")
-  private OffsetDateTime submissionDateTime;
 
   @Column(name = "is_ams_aci_filing_required")
   private Boolean isAMSACIFilingRequired;

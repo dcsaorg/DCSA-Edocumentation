@@ -3,6 +3,7 @@ package org.dcsa.edocumentation.transferobjects;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
+import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.CargoMovementType;
 import org.dcsa.edocumentation.transferobjects.enums.CommunicationChannelCode;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
@@ -18,14 +19,18 @@ import org.dcsa.skernel.infrastructure.validation.RequiredIfTrue;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
+@AtLeast(
+  nonNullsRequired = 1,
+  fields = {"serviceContractReference", "contractQuotationReference"}
+)
 @AtLeast(
   nonNullsRequired = 1,
   fields = {
@@ -46,6 +51,15 @@ public record BookingTO(
   @Size(max = 100)
   String carrierBookingRequestReference,
 
+  /* Must be null in POST and PUT, must be non-null GET */
+  BkgDocumentStatus documentStatus,
+
+  /* Must be null in POST and PUT, must be non-null GET */
+  OffsetDateTime bookingRequestCreatedDateTime,
+
+  /* Must be null in POST and PUT, must be non-null GET */
+  OffsetDateTime bookingRequestUpdatedDateTime,
+
   @NotNull
   ReceiptDeliveryType receiptTypeAtOrigin,
 
@@ -58,7 +72,7 @@ public record BookingTO(
   @NotNull
   CargoMovementType cargoMovementTypeAtDestination,
 
-  @NotBlank @Size(max = 30)
+  @Size(max = 30)
   String serviceContractReference,
 
   @Size(max = 50)
@@ -151,4 +165,13 @@ public record BookingTO(
 ) {
   @Builder(toBuilder = true)
   public BookingTO { }
+
+  public BookingTO forUpdates() {
+    return toBuilder()
+      .carrierBookingRequestReference(null)
+      .documentStatus(null)
+      .bookingRequestCreatedDateTime(null)
+      .bookingRequestUpdatedDateTime(null)
+      .build();
+  }
 }

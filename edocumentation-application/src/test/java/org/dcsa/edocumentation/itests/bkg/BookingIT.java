@@ -1,8 +1,10 @@
 package org.dcsa.edocumentation.itests.bkg;
 
+import io.restassured.http.ContentType;
 import org.dcsa.edocumentation.datafactories.BookingRequestTODataFactory;
 import org.dcsa.edocumentation.itests.PostgeSqlContextAware;
 import org.dcsa.edocumentation.itests.config.RestAssuredConfigurator;
+import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -19,19 +21,20 @@ public class BookingIT extends PostgeSqlContextAware {
 
   @Test
   public void testCreate() {
-    given()
+    BookingRefStatusTO bookingRefStatusTO = given()
       .contentType("application/json")
       .body(BookingRequestTODataFactory.bookingRequestTO())
       .post(BOOKINGS_ENDPOINT)
       .then()
       .assertThat()
       .statusCode(HttpStatus.CREATED.value())
-      //.contentType(ContentType.JSON)
-      //.extract()
-      //.body()
-      //.jsonPath()
-      //.getObject(".", BookingTO.class)
+      .contentType(ContentType.JSON)
+      .extract()
+      .body()
+      .jsonPath()
+      .getObject(".", BookingRefStatusTO.class)
       ;
 
+    System.out.println(bookingRefStatusTO.toString());
   }
 }
