@@ -42,8 +42,8 @@ public class BookingController {
     BookingTO bookingRequest
   ) {
     if (bookingRequest.carrierBookingRequestReference() == null || !carrierBookingRequestReference.equals(bookingRequest.carrierBookingRequestReference())) {
-      throw ConcreteRequestErrorMessageException.invalidQuery(
-        "carrierBookingRequestReference", "must match bookingRequest.carrierBookingRequestReference");
+      throw ConcreteRequestErrorMessageException.invalidInput(
+        "carrierBookingRequestReference must match bookingRequest.carrierBookingRequestReference");
     }
     return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest.forUpdates());
   }

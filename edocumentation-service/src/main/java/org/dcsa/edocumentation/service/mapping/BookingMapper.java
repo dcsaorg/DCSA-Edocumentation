@@ -5,7 +5,7 @@ import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = LocationMapper.class)
 public interface BookingMapper {
   Booking toDAO(BookingTO bookingTO);
 
