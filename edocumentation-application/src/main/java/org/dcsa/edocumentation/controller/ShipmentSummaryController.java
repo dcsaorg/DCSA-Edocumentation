@@ -27,7 +27,7 @@ public class ShipmentSummaryController {
 
   @GetMapping(path = "${spring.application.bkg-context-path}" + "/shipment-summaries")
   @ResponseStatus(HttpStatus.OK)
-  public List<ShipmentSummaryTO> getBookingSummaries(
+  public List<ShipmentSummaryTO> getShipmentSummaries(
       @RequestParam(required = false) BkgDocumentStatus documentStatus,
       @RequestParam(value = Pagination.DCSA_PAGE_PARAM_NAME, defaultValue = "0", required = false)
       @Min(0)
