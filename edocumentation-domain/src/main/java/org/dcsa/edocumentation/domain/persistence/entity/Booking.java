@@ -2,6 +2,7 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
+import org.dcsa.skernel.domain.persistence.entity.Location;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -90,6 +91,12 @@ public class Booking {
   @Enumerated(EnumType.STRING)
   private IncoTerms incoTerms;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "invoice_payable_at_id")
+  private Location invoicePayableAt;
+
   @Column(name = "expected_departure_date")
   private LocalDate expectedDepartureDate;
 
@@ -130,11 +137,21 @@ public class Booking {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "vessel_id")
   private Vessel vessel;
 
-  // ToDo only the required associations for booking summaries have been implemented
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "voyage_id")
+  private Voyage voyage;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "place_of_issue_id")
+  private Location placeOfIssue;
 
   @Column(name = "valid_until")
   private OffsetDateTime validUntil;
