@@ -19,7 +19,8 @@ public enum ShipmentLocationTypeCode {
   PTP("Prohibited transshipment port"),
   RTP("Requested transshipment port"),
   FCD("Full container drop-off location"),
-  ECP("Empty container pick-up date and time")
+  ECP("Empty container pick-up date and time"),
+  IPA("IPA Invoice payable at");
   ;
 
   @Getter
