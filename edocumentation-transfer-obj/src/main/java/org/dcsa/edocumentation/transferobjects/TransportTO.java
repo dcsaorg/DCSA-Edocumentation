@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
-import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStage;
+import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.dcsa.skernel.infrastructure.validation.RequireType;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
@@ -15,8 +16,8 @@ import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
 
 public record TransportTO(
-    @Valid @NotNull(message = "The attribute transportPlanStage is required.")
-        TransportPlanStage transportPlanStage,
+    @Valid @NotNull(message = "The attribute transportPlanStageCode is required.")
+    TransportPlanStageCode transportPlanStageCode,
     @NotNull(message = "The attribute transportPlanStageSequenceNumber is required.")
         Integer transportPlanStageSequenceNumber,
     @Valid

@@ -21,6 +21,7 @@ public interface ShipmentRepository extends JpaRepository<Shipment, UUID> {
 
   @EntityGraph("graph.shipment-summary")
   Page<Shipment> findAll(Pageable pageable);
-
   Optional<Shipment> findByCarrierBookingReference(String carrierBookingReference);
+  @EntityGraph("graph.shipment")
+  Optional<Shipment> findShipmentByCarrierBookingReference(String carrierBookingReference);
 }

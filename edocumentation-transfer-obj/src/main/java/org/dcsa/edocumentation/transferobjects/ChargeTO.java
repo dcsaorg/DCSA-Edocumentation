@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-public record Charge(
+public record ChargeTO(
     @NotBlank(message = "The attribute chargeType is required.")
         @Size(max = 20, message = "The attribute chargeType has a max size of 20.")
         String chargeType,
@@ -25,5 +25,5 @@ public record Charge(
     @NotNull(message = "The attribute unitPrice is required.") Float unitPrice,
     @NotNull(message = "The attribute quantity is required.") Float quantity) {
   @Builder(toBuilder = true)
-  public Charge {}
+  public ChargeTO {}
 }

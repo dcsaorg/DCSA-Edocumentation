@@ -2,7 +2,7 @@ package org.dcsa.edocumentation.transferobjects;
 
 import lombok.Builder;
 
-public record CarrierClause(String clauseContent) {
+public record CarrierClauseTO(String clauseContent) {
   @Builder(toBuilder = true)
-  public CarrierClause {}
+  public CarrierClauseTO {}
 }

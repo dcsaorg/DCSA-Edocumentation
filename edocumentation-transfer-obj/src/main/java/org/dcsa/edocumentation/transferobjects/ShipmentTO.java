@@ -23,13 +23,13 @@ public record ShipmentTO(
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         OffsetDateTime shipmentUpdatedDateTime,
     String termsAndConditions,
-    @Valid BookingTO booking,
-    @Valid List<TransportTO> transports,
+    @NotNull @Valid BookingTO booking,
+    @NotNull @Valid List<TransportTO> transports,
     @Valid List<ShipmentCutOffTime> shipmentCutOffTimes,
     @Valid List<ShipmentLocationTO> shipmentLocations,
     @Valid List<ConfirmedEquipment> confirmedEquipments,
-    @Valid List<Charge> charges,
-    @Valid List<CarrierClause> carrierClauses) {
+    @Valid List<ChargeTO> charges,
+    @Valid List<CarrierClauseTO> carrierClauses) {
 
   @Builder(toBuilder = true)
   public ShipmentTO {}

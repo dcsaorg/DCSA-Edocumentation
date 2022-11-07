@@ -35,12 +35,12 @@ public class ShipmentLocation {
   @Column(name = "event_date_time")
   private OffsetDateTime eventDateTime;
 
-  // ToDo only the required associations for booking summaries and booking request have been
-  // implemented
-
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "booking_id")
   private Booking booking;
+
+  @Column(name = "shipment_id")
+  private UUID shipmentID;
 }
