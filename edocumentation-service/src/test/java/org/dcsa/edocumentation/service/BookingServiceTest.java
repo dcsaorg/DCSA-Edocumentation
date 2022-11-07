@@ -43,7 +43,7 @@ class BookingServiceTest {
   @Test
   void bookingServiceTest_testGetFullBooking() {
     when(repository.findBookingByCarrierBookingRequestReference(any()))
-        .thenReturn(BookingDataFactory.singleDeepBooking());
+      .thenReturn(Optional.of(BookingDataFactory.singleDeepBooking()));
 
     Optional<BookingTO> result = service.getBooking("test");
     assertTrue(result.isPresent());
@@ -60,7 +60,7 @@ class BookingServiceTest {
   @Test
   void bookingServiceTest_testGetMinimalBooking() {
     when(repository.findBookingByCarrierBookingRequestReference(any()))
-        .thenReturn(BookingDataFactory.singleMinimalBooking());
+        .thenReturn(Optional.of(BookingDataFactory.singleMinimalBooking()));
 
     Optional<BookingTO> result = service.getBooking("test");
     assertTrue(result.isPresent());
@@ -72,7 +72,7 @@ class BookingServiceTest {
 
   @Test
   void bookingServiceTest_testNoBookingFound() {
-    when(repository.findBookingByCarrierBookingRequestReference(any())).thenReturn(null);
+    when(repository.findBookingByCarrierBookingRequestReference(any())).thenReturn(Optional.empty());
 
     Optional<BookingTO> result = service.getBooking("test");
     assertFalse(result.isPresent());
@@ -80,7 +80,7 @@ class BookingServiceTest {
 
   @Test
   void bookingServiceTest_testNullCarrierBookingRequestReference() {
-    when(repository.findBookingByCarrierBookingRequestReference(null)).thenReturn(null);
+    when(repository.findBookingByCarrierBookingRequestReference(null)).thenReturn(Optional.empty());
 
     Optional<BookingTO> result = service.getBooking(null);
     assertFalse(result.isPresent());

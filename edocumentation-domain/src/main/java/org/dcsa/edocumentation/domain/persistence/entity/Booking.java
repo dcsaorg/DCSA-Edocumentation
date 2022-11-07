@@ -1,18 +1,55 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
-import org.dcsa.edocumentation.domain.dfa.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
+import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
+import org.dcsa.edocumentation.domain.dfa.DFA;
+import org.dcsa.edocumentation.domain.dfa.DFADefinition;
+import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.CommunicationChannelCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.IncoTerms;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.ReceiptDeliveryType;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedSubgraph;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.CANC;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.CMPL;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.CONF;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.PENC;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.PENU;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.RECE;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.REJE;
 
 @NamedEntityGraph(
     name = "graph.booking-summary",
@@ -43,7 +80,7 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumen
           attributeNodes = {@NamedAttributeNode("partyContactDetails")})
     })
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
@@ -113,9 +150,6 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
   @Column(name = "import_license_reference", length = 35)
   private String importLicenseReference;
 
-  @Column(name = "submission_datetime")
-  private OffsetDateTime submissionDateTime;
-
   @Column(name = "is_ams_aci_filing_required")
   private Boolean isAMSACIFilingRequired;
 
@@ -128,6 +162,12 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
   @Column(name = "incoterms")
   @Enumerated(EnumType.STRING)
   private IncoTerms incoTerms;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "invoice_payable_at_id")
+  private Location invoicePayableAt;
 
   @Column(name = "expected_departure_date")
   private LocalDate expectedDepartureDate;
@@ -163,27 +203,21 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "pre_carriage_mode_of_transport_code")
   private ModeOfTransport modeOfTransport;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "vessel_id")
   private Vessel vessel;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "place_of_issue_id")
   private Location placeOfIssue;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "invoice_payable_at_id")
-  private Location invoicePayableAt;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -215,8 +249,11 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
   @OneToMany(mappedBy = "booking")
   private Set<ShipmentLocation> shipmentLocations;
 
-  // ToDo only the required associations for booking summaries and booking request have been
-  // implemented
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "voyage_id")
+  private Voyage voyage;
 
   @Column(name = "valid_until")
   private OffsetDateTime validUntil;
@@ -269,7 +306,6 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
     transitionTo(CMPL);
   }
 
-
   @Transient
   private DFA<BkgDocumentStatus> dfa;
 
@@ -311,5 +347,4 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
       e
     );
   }
-
 }

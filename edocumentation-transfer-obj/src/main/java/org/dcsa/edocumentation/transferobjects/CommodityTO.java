@@ -20,7 +20,7 @@ public record CommodityTO(
 
   @Size(max = 10)
   @JsonProperty("HSCode")
-  String HSCode,
+  String hsCode,
 
   @NotNull
   Float cargoGrossWeight,

@@ -21,7 +21,7 @@ public class Commodity {
   @Id
   @GeneratedValue
   @Column(name = "id", nullable = false)
-  UUID id;
+  private UUID id;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

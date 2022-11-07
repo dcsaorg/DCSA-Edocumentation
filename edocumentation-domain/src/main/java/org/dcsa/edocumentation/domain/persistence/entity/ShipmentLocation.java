@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
@@ -22,7 +22,8 @@ public class ShipmentLocation {
   @Column(name = "id", nullable = false)
   private UUID id;
 
-  @OneToOne private Location location;
+  @OneToOne
+  private Location location;
 
   @Column(name = "shipment_location_type_code")
   @Enumerated(EnumType.STRING)

@@ -21,7 +21,8 @@ public class DocumentParty {
   @Column(name = "id", nullable = false)
   private UUID id;
 
-  @OneToOne private Party party;
+  @OneToOne
+  private Party party;
 
   @Column(name = "party_function")
   @Enumerated(EnumType.STRING)
