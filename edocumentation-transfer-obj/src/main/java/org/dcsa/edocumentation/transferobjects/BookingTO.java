@@ -134,7 +134,6 @@ public record BookingTO(
   List<ValueAddedServiceRequestTO> valueAddedServiceRequests,
 
   @Valid
-  @NotEmpty
   List<ReferenceTO> references,
 
   @Valid
