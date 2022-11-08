@@ -1177,14 +1177,6 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"const schema = pm.collectionVariables.get(\"ERROR_SCHEMA\");\r",
-											"const schemaObject = JSON.parse(schema);\r",
-											"\r",
-											"pm.test('Schema is valid', () => {\r",
-											"    pm.response.to.have.jsonSchema(schemaObject);\r",
-											"});\r",
-											"\r",
-											"\r",
 											"pm.test(\"Status code is 400\", () => {\r",
 											"    pm.response.to.have.status(400);\r",
 											"});\r",
@@ -1228,6 +1220,16 @@
 										"exec": [
 											"pm.test(\"Status code is 404\", function () {\r",
 											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error reason is notFound\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].reason).to.eql(\"notFound\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking found with carrierBookingRequestReference: IdoNotExist\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1266,7 +1268,12 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									""
+									"const schema = pm.collectionVariables.get(\"ERROR_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});"
 								]
 							}
 						}

@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.service.BookingService;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,12 +31,15 @@ public class BookingController {
       path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<BookingTO> getBooking(
+  public BookingTO getBooking(
       @Valid @PathVariable("carrierBookingRequestReference") @NotNull @Size(max = 100)
           String carrierBookingRequestReference) {
     return bookingService
         .getBooking(carrierBookingRequestReference)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+        .orElseThrow(
+            () ->
+                ConcreteRequestErrorMessageException.notFound(
+                    "No booking found with carrierBookingRequestReference: "
+                        + carrierBookingRequestReference));
   }
 }
