@@ -9,10 +9,10 @@ import java.util.List;
 
 public record RequestedEquipmentTO(
   @NotBlank @Size(max = 4)
-  String requestedEquipmentSizeType,
+  String sizeType,
 
   @NotNull
-  Integer requestedEquipmentUnits,
+  Integer units,
 
   List<@NotBlank @Size(max = 15) String> equipmentReferences,
 
