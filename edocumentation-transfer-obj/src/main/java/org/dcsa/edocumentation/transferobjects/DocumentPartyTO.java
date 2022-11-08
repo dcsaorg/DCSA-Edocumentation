@@ -6,6 +6,7 @@ import org.dcsa.edocumentation.transferobjects.enums.PartyFunction;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 public record DocumentPartyTO(
   @NotNull @Valid
@@ -14,8 +15,7 @@ public record DocumentPartyTO(
   @NotNull
   PartyFunction partyFunction,
 
-  @Size(max = 250)
-  String displayedAddress,
+  List<@Size(max = 250)String> displayedAddress,
 
   @NotNull
   Boolean isToBeNotified

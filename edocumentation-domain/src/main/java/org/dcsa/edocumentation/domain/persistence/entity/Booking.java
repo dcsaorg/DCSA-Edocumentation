@@ -2,19 +2,42 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
+import org.dcsa.skernel.domain.persistence.entity.Location;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @NamedEntityGraph(
-  name = "graph.booking-summary",
-  attributeNodes = {
-    @NamedAttributeNode("vessel"),
-    @NamedAttributeNode("modeOfTransport")
-  }
-)
+    name = "graph.booking-summary",
+    attributeNodes = {@NamedAttributeNode("vessel"), @NamedAttributeNode("modeOfTransport")})
+@NamedEntityGraph(
+    name = "graph.booking",
+    attributeNodes = {
+      @NamedAttributeNode("vessel"),
+      @NamedAttributeNode("modeOfTransport"),
+      @NamedAttributeNode("placeOfIssue"),
+      @NamedAttributeNode("invoicePayableAt"),
+      @NamedAttributeNode("commodities"),
+      @NamedAttributeNode("valueAddedServiceRequests"),
+      @NamedAttributeNode("references"),
+      @NamedAttributeNode("requestedEquipments"),
+      @NamedAttributeNode(value = "documentParties", subgraph = "graph.documentParties"),
+      @NamedAttributeNode("shipmentLocations")
+    },
+    subgraphs = {
+      @NamedSubgraph(
+          name = "graph.documentParties",
+          attributeNodes = {
+            @NamedAttributeNode("displayedAddress"),
+            @NamedAttributeNode(value = "party", subgraph = "graph.party")
+          }),
+      @NamedSubgraph(
+          name = "graph.party",
+          attributeNodes = {@NamedAttributeNode("partyContactDetails")})
+    })
 @Data
 @Builder
 @NoArgsConstructor
@@ -137,7 +160,50 @@ public class Booking {
   @JoinColumn(name = "vessel_id")
   private Vessel vessel;
 
-  // ToDo only the required associations for booking summaries have been implemented
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "place_of_issue_id")
+  private Location placeOfIssue;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "invoice_payable_at_id")
+  private Location invoicePayableAt;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "booking")
+  private Set<Commodity> commodities;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "booking")
+  private Set<ValueAddedServiceRequest> valueAddedServiceRequests;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "booking")
+  private Set<Reference> references;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "booking")
+  private Set<RequestedEquipment> requestedEquipments;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "booking")
+  private Set<DocumentParty> documentParties;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "booking")
+  private Set<ShipmentLocation> shipmentLocations;
+
+  // ToDo only the required associations for booking summaries and booking request have been
+  // implemented
 
   @Column(name = "valid_until")
   private OffsetDateTime validUntil;

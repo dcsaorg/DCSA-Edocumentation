@@ -1,29 +1,16 @@
 package org.dcsa.edocumentation.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
-import org.dcsa.edocumentation.transferobjects.enums.CargoMovementType;
-import org.dcsa.edocumentation.transferobjects.enums.CommunicationChannelCode;
-import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
-import org.dcsa.edocumentation.transferobjects.enums.IncoTerms;
-import org.dcsa.edocumentation.transferobjects.enums.PaymentTerm;
-import org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType;
-import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
-import org.dcsa.skernel.infrastructure.validation.AllOrNone;
-import org.dcsa.skernel.infrastructure.validation.AtLeast;
-import org.dcsa.skernel.infrastructure.validation.DateRange;
-import org.dcsa.skernel.infrastructure.validation.RequireType;
-import org.dcsa.skernel.infrastructure.validation.RequiredIfTrue;
-import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
+import org.dcsa.edocumentation.transferobjects.enums.*;
+import org.dcsa.skernel.infrastructure.validation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @AtLeast(
@@ -45,6 +32,15 @@ public record BookingTO(
   /* Must be null in POST, must be non-null in PUT and GET */
   @Size(max = 100)
   String carrierBookingRequestReference,
+
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  BkgDocumentStatus documentStatus,
+
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  OffsetDateTime bookingRequestCreatedDateTime,
+
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  OffsetDateTime bookingRequestUpdatedDateTime,
 
   @NotNull
   ReceiptDeliveryType receiptTypeAtOrigin,
@@ -138,6 +134,7 @@ public record BookingTO(
   List<ValueAddedServiceRequestTO> valueAddedServiceRequests,
 
   @Valid
+  @NotEmpty
   List<ReferenceTO> references,
 
   @Valid

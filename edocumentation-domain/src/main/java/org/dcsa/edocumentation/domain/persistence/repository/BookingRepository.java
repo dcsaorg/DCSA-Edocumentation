@@ -19,4 +19,7 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
   @EntityGraph("graph.booking-summary")
   Page<Booking> findAll(Pageable pageable);
+
+  @EntityGraph("graph.booking")
+  Booking findBookingByCarrierBookingRequestReference(String carrierBookingRequestReference);
 }
