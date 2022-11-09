@@ -1,14 +1,18 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
+import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.skernel.domain.persistence.entity.Location;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
+
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
 
 @NamedEntityGraph(
     name = "graph.booking-summary",
@@ -45,7 +49,16 @@ import java.util.UUID;
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "booking")
-public class Booking {
+public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
+
+  private static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECE)
+    .nonTerminalState(RECE).successorNodes(REJE, CANC, PENU, PENC, CONF)
+    .nonTerminalState(PENU).successorNodes(REJE, CANC, PENU, PENC)
+    .nonTerminalState(PENC).successorNodes(REJE, CANC, PENU, PENC, CONF)
+    .nonTerminalState(CONF).successorNodes(REJE, CMPL, PENU, PENC)
+    .terminalStates(CANC, CMPL, REJE)
+    .build();
+
   @Id
   @GeneratedValue
   @Column(name = "id", nullable = false)
@@ -212,4 +225,91 @@ public class Booking {
   // This is not part of the official IM model. They are added in the sql only.
   @Column(name = "updated_date_time")
   protected OffsetDateTime bookingRequestUpdatedDateTime;
+
+
+  /**
+   * Transition the booking into its {@link BkgDocumentStatus#CANC} state.
+   */
+  public void cancel() {
+    transitionTo(CANC);
+  }
+
+  /**
+   * Transition the booking into its {@link BkgDocumentStatus#REJE} state.
+   */
+  public void reject() {
+    transitionTo(REJE);
+  }
+
+  /**
+   * Transition the booking into its {@link BkgDocumentStatus#PENU} state.
+   */
+  public void pendingUpdate() {
+    transitionTo(PENU);
+  }
+
+  /**
+   * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
+   */
+  public void pendingConfirmation() {
+    transitionTo(PENC);
+  }
+
+  /**
+   * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
+   */
+  public void confirm() {
+    transitionTo(CONF);
+  }
+
+  /**
+   * Transition the booking into its {@link BkgDocumentStatus#CMPL} state.
+   */
+  public void complete() {
+    transitionTo(CMPL);
+  }
+
+
+  @Transient
+  private DFA<BkgDocumentStatus> dfa;
+
+  public void setDocumentStatus(BkgDocumentStatus documentStatus) {
+    this.documentStatus = documentStatus;
+    this.dfa = null;
+  }
+
+  protected DFA<BkgDocumentStatus> getDfa() {
+    if (dfa == null) {
+      // Lazily generate via getter - the `setDocumentStatus` is not called during
+      // the Builder's build method.
+      dfa = BOOKING_DFA_DEFINITION.resumeFromState(documentStatus);
+    }
+    return dfa;
+  }
+
+  @Override
+  protected void transitionTo(BkgDocumentStatus state) {
+    super.transitionTo(state);
+    this.documentStatus = state;
+    this.bookingRequestUpdatedDateTime = OffsetDateTime.now();
+  }
+
+  @Override
+  protected RuntimeException errorForAttemptLeavingToLeaveTerminalState(BkgDocumentStatus currentState, BkgDocumentStatus successorState, CannotLeaveTerminalStateException e) {
+    return ConcreteRequestErrorMessageException.conflict(
+      "Cannot perform the requested action on the booking because the booking is "
+        + currentState.getValue().toLowerCase() + " (" + currentState.name() + ")",
+      e
+    );
+  }
+
+  @Override
+  protected RuntimeException errorForTargetStatNotListedAsSuccessor(BkgDocumentStatus currentState, BkgDocumentStatus successorState, TargetStateIsNotSuccessorException e) {
+    return ConcreteRequestErrorMessageException.conflict(
+      "It is not possible to perform the requested action on the booking with documentStatus ("
+        + currentState.name() + ").",
+      e
+    );
+  }
+
 }
