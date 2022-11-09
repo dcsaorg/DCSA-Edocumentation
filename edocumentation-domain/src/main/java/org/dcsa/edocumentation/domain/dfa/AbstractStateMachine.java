@@ -1,27 +1,22 @@
 package org.dcsa.edocumentation.domain.dfa;
 
-import lombok.RequiredArgsConstructor;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
-@RequiredArgsConstructor
 public abstract class AbstractStateMachine<S extends Enum<S>> {
-
-  protected final DFA<S> dfa;
 
   protected abstract RuntimeException errorForAttemptLeavingToLeaveTerminalState(S currentState, S successorState, CannotLeaveTerminalStateException e);
   protected abstract RuntimeException errorForTargetStatNotListedAsSuccessor(S currentState, S successorState, TargetStateIsNotSuccessorException e);
 
-  public S getCurrentStatus() {
-    return dfa.getCurrentState();
-  }
+  protected abstract DFA<S> getDfa();
 
   protected boolean supportsState(S state) {
-    DFADefinition<S> dfaDefinition = dfa.getDefinition();
+    DFADefinition<S> dfaDefinition = getDfa().getDefinition();
     DFAStateInfo<S> stateInfo = dfaDefinition.getStateInfoForState(state);
     return stateInfo != null && stateInfo.validState();
   }
 
   protected void transitionTo(S state) {
+    DFA<S> dfa = getDfa();
     try {
       dfa.transitionTo(state);
     } catch (CannotLeaveTerminalStateException e) {

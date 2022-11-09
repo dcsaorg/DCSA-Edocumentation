@@ -1,10 +1,7 @@
 package org.dcsa.edocumentation.domain.ebl;
 
 import lombok.Getter;
-import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
-import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
-import org.dcsa.edocumentation.domain.dfa.DFADefinition;
-import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
+import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
@@ -36,15 +33,19 @@ public class EBLStateMachine extends AbstractStateMachine<EblDocumentStatus> {
   @Getter
   private final boolean isAmendmentFlow;
 
+  private final DFA<EblDocumentStatus> dfa;
+
   EBLStateMachine(boolean isAmendmentFlow) {
-    super(fromFlow(isAmendmentFlow).fromInitialState());
+    this.dfa = fromFlow(isAmendmentFlow).fromInitialState();
     this.isAmendmentFlow = isAmendmentFlow;
   }
 
   EBLStateMachine(boolean isAmendmentFlow, EblDocumentStatus resumeState) {
-    super(fromFlow(isAmendmentFlow).resumeFromState(resumeState));
+    this.dfa = fromFlow(isAmendmentFlow).resumeFromState(resumeState);
     this.isAmendmentFlow = isAmendmentFlow;
   }
+
+
 
   /**
    * Transition the document into its {@link EblDocumentStatus#RECE} state.
@@ -198,4 +199,12 @@ public class EBLStateMachine extends AbstractStateMachine<EblDocumentStatus> {
     return isAmendmentFlow ? AMENDMENT_EBL_DFA_DEFINITION : DEFAULT_EBL_DFA_DEFINITION;
   }
 
+  @Override
+  protected DFA<EblDocumentStatus> getDfa() {
+    return dfa;
+  }
+
+  public EblDocumentStatus getCurrentStatus() {
+    return getDfa().getCurrentState();
+  }
 }
