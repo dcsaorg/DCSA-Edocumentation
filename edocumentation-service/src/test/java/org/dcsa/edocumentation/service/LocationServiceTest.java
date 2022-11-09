@@ -2,12 +2,11 @@ package org.dcsa.edocumentation.service;
 
 import org.dcsa.edocumentation.datafactories.AddressDataFactory;
 import org.dcsa.edocumentation.datafactories.LocationDataFactory;
-import org.dcsa.edocumentation.domain.persistence.AddressRepository;
 import org.dcsa.edocumentation.domain.persistence.FacilityRepository;
 import org.dcsa.edocumentation.domain.persistence.entity.UnLocation;
 import org.dcsa.edocumentation.domain.persistence.repository.LocationRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.UnLocationRepository;
-import org.dcsa.edocumentation.service.mapping.AddressMapper;
+import org.dcsa.edocumentation.service.util.ResolvedEntity;
 import org.dcsa.edocumentation.transferobjects.AddressTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.FacilityLocationTO;
@@ -22,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Example;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,17 +38,16 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class LocationServiceTest {
+  @Mock private AddressService addressService;
   @Mock private LocationRepository locationRepository;
-  @Mock private AddressRepository addressRepository;
   @Mock private FacilityRepository facilityRepository;
   @Mock private UnLocationRepository unLocationRepository;
-  @Mock private AddressMapper addressMapper;
 
   @InjectMocks private LocationService locationService;
 
   @BeforeEach
   public void resetMocks() {
-    reset(locationRepository, addressRepository, facilityRepository, unLocationRepository, addressMapper);
+    reset(addressService, locationRepository, facilityRepository, unLocationRepository);
   }
 
   @Test
@@ -59,14 +56,12 @@ public class LocationServiceTest {
   }
 
   @Test
-  public void testAddressLocation_AddressNotFound() {
+  public void testAddressLocation_AddressNew() {
     // Setup
     AddressLocationTO locationTO = LocationDataFactory.addressLocationTO();
     Location location = LocationDataFactory.addressLocationWithId();
 
-    when(addressMapper.toDAO(any(AddressTO.class))).thenReturn(AddressDataFactory.addressWithoutId());
-    when(addressRepository.findAll(any(Example.class))).thenReturn(Collections.emptyList());
-    when(addressRepository.save(any(Address.class))).thenReturn(location.getAddress());
+    when(addressService.ensureResolvable(any(AddressTO.class))).thenReturn(new ResolvedEntity<>(AddressDataFactory.addressWithId(), true));
     when(locationRepository.save(any(Location.class))).thenReturn(location);
 
     // Execute
@@ -74,21 +69,18 @@ public class LocationServiceTest {
 
     // Verify
     assertEquals(location, actual);
-    verify(addressMapper).toDAO(locationTO.address());
-    verify(addressRepository).findAll(any(Example.class));
+    verify(addressService).ensureResolvable(locationTO.address());
     verify(locationRepository, never()).findByLocationNameAndAddress(anyString(), any(Address.class));
-    verify(addressRepository).save(AddressDataFactory.addressWithoutId());
     verify(locationRepository).save(LocationDataFactory.addressLocationWithoutId());
   }
 
   @Test
-  public void testAddressLocation_AddressFound_LocationNotFound() {
+  public void testAddressLocation_AddressExisting_LocationNotFound() {
     // Setup
     AddressLocationTO locationTO = LocationDataFactory.addressLocationTO();
     Location location = LocationDataFactory.addressLocationWithId();
 
-    when(addressMapper.toDAO(any(AddressTO.class))).thenReturn(AddressDataFactory.addressWithoutId());
-    when(addressRepository.findAll(any(Example.class))).thenReturn(List.of(location.getAddress()));
+    when(addressService.ensureResolvable(any(AddressTO.class))).thenReturn(new ResolvedEntity<>(AddressDataFactory.addressWithId(), false));
     when(locationRepository.findByLocationNameAndAddress(anyString(), any(Address.class))).thenReturn(Collections.emptyList());
     when(locationRepository.save(any(Location.class))).thenReturn(location);
 
@@ -97,21 +89,18 @@ public class LocationServiceTest {
 
     // Verify
     assertEquals(location, actual);
-    verify(addressMapper).toDAO(locationTO.address());
-    verify(addressRepository).findAll(any(Example.class));
+    verify(addressService).ensureResolvable(locationTO.address());
     verify(locationRepository).findByLocationNameAndAddress(locationTO.locationName(), location.getAddress());
-    verify(addressRepository, never()).save(any(Address.class));
     verify(locationRepository).save(LocationDataFactory.addressLocationWithoutId());
   }
 
   @Test
-  public void testAddressLocation_AddressFound_LocationFound() {
+  public void testAddressLocation_AddressExisting_LocationFound() {
     // Setup
     AddressLocationTO locationTO = LocationDataFactory.addressLocationTO();
     Location location = LocationDataFactory.addressLocationWithId();
 
-    when(addressMapper.toDAO(any(AddressTO.class))).thenReturn(AddressDataFactory.addressWithoutId());
-    when(addressRepository.findAll(any(Example.class))).thenReturn(List.of(location.getAddress()));
+    when(addressService.ensureResolvable(any(AddressTO.class))).thenReturn(new ResolvedEntity<>(AddressDataFactory.addressWithId(), false));
     when(locationRepository.findByLocationNameAndAddress(anyString(), any(Address.class))).thenReturn(List.of(location));
 
     // Execute
@@ -119,10 +108,8 @@ public class LocationServiceTest {
 
     // Verify
     assertEquals(location, actual);
-    verify(addressMapper).toDAO(locationTO.address());
-    verify(addressRepository).findAll(any(Example.class));
+    verify(addressService).ensureResolvable(locationTO.address());
     verify(locationRepository).findByLocationNameAndAddress(locationTO.locationName(), location.getAddress());
-    verify(addressRepository, never()).save(any(Address.class));
     verify(locationRepository, never()).save(any(Location.class));
   }
 

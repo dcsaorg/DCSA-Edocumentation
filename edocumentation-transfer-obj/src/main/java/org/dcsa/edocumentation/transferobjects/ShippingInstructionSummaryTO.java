@@ -72,6 +72,5 @@ public record ShippingInstructionSummaryTO(
   List<@Size(max = 100, message = "The attribute carrierBookingReference has a max size of 100.") String> carrierBookingReferences
 ) {
   @Builder
-  public ShippingInstructionSummaryTO {
-  }
+  public ShippingInstructionSummaryTO { }
 }

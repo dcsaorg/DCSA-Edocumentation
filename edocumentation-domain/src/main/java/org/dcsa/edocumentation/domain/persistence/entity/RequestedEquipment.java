@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
@@ -50,8 +50,8 @@ public class RequestedEquipment {
   @JoinTable(
       name = "requested_equipment_equipment",
       joinColumns = @JoinColumn(name = "requested_equipment_id", referencedColumnName = "id"),
-      inverseJoinColumns =
-          @JoinColumn(name = "equipment_reference", referencedColumnName = "equipment_reference"))
+      inverseJoinColumns = @JoinColumn(name = "equipment_reference", referencedColumnName = "equipment_reference")
+  )
   private Set<Equipment> equipments;
 
   // ToDo only the required associations for booking requests have been implemented

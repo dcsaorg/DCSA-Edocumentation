@@ -1,21 +1,16 @@
 package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.AddressRepository;
 import org.dcsa.edocumentation.domain.persistence.FacilityRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.LocationRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.UnLocationRepository;
-import org.dcsa.edocumentation.service.mapping.AddressMapper;
 import org.dcsa.edocumentation.transferobjects.LocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.FacilityLocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
-import org.dcsa.skernel.domain.persistence.entity.Address;
 import org.dcsa.skernel.domain.persistence.entity.Facility;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,11 +18,10 @@ import javax.transaction.Transactional;
 @Service
 @RequiredArgsConstructor
 public class LocationService {
+  private final AddressService addressService;
   private final LocationRepository locationRepository;
-  private final AddressRepository addressRepository;
   private final FacilityRepository facilityRepository;
   private final UnLocationRepository unLocationRepository;
-  private final AddressMapper addressMapper;
 
   /**
    * Ensures that a location is resolvable. This method only returns null if the input LocationTO is null, if the input
@@ -52,25 +46,12 @@ public class LocationService {
   }
 
   private Location ensureResolvable(AddressLocationTO locationTO) {
-    Address mappedAddress = addressMapper.toDAO(locationTO.address());
-    ExampleMatcher exampleMatcher = ExampleMatcher.matchingAll().withIncludeNullValues().withIgnorePaths("id");
-
-    return addressRepository.findAll(Example.of(mappedAddress, exampleMatcher)).stream()
-      .findFirst()
-      .map(address ->
-        locationRepository.findByLocationNameAndAddress(locationTO.locationName(), address).stream()
-          .findFirst()
-          .orElseGet(() ->
-            locationRepository.save(Location.builder()
-              .locationName(locationTO.locationName())
-              .address(address)
-              .build())
-          )
-      )
-      .orElseGet(() ->
-        locationRepository.save(Location.builder()
+    return addressService.ensureResolvable(locationTO.address())
+      .map(
+        address -> locationRepository.findByLocationNameAndAddress(locationTO.locationName(), address).stream().findFirst(),
+        address -> locationRepository.save(Location.builder()
           .locationName(locationTO.locationName())
-          .address(addressRepository.save(mappedAddress))
+          .address(address)
           .build())
       );
   }

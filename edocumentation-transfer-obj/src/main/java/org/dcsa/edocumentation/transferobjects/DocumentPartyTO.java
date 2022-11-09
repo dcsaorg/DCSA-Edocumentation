@@ -15,7 +15,7 @@ public record DocumentPartyTO(
   @NotNull
   PartyFunction partyFunction,
 
-  List<@Size(max = 250)String> displayedAddress,
+  List<@Size(max = 250) String> displayedAddress,
 
   @NotNull
   Boolean isToBeNotified

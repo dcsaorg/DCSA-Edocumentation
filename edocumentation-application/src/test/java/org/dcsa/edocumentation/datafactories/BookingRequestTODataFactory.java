@@ -6,6 +6,7 @@ import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.edocumentation.transferobjects.CommodityTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
+import org.dcsa.edocumentation.transferobjects.RequestedEquipmentTO;
 import org.dcsa.edocumentation.transferobjects.enums.CargoMovementType;
 import org.dcsa.edocumentation.transferobjects.enums.CommunicationChannelCode;
 import org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType;
@@ -53,6 +54,14 @@ public class BookingRequestTODataFactory {
           .build()
         )
       )
+      .requestedEquipments(List.of(
+        RequestedEquipmentTO.builder()
+          .sizeType("22GP")
+          .units(2)
+          .equipmentReferences(List.of("BMOU2149612", "APZU4812090"))
+          .isShipperOwned(true)
+          .build()
+      ))
       .expectedDepartureDate(LocalDate.now())
       .build();
   }
