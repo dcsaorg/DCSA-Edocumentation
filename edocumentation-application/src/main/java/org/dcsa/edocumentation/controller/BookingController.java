@@ -2,22 +2,19 @@ package org.dcsa.edocumentation.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.service.BookingService;
+import org.dcsa.edocumentation.transferobjects.BookingCancelRequestTO;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Validated
@@ -78,5 +75,26 @@ public class BookingController {
           + " bookingRequestUpdatedDateTime are not allowed when updating a booking");
     }
     return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest);
+  }
+
+  @PatchMapping(
+    path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}",
+    produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public BookingRefStatusTO cancelBooking(
+      @Valid @PathVariable("carrierBookingRequestReference") @NotNull @Size(max = 100)
+          String carrierBookingRequestReference,
+      @Valid @RequestBody BookingCancelRequestTO bookingCancelRequestTO) {
+    // Fail-safe: The @Valid + @EnumSubset should have covered this. But it felt weird
+    // just to ignore the documentStatus field...
+    if (bookingCancelRequestTO.documentStatus() != BkgDocumentStatus.CANC) {
+      throw ConcreteRequestErrorMessageException.invalidInput("documentStatus must be CANC");
+    }
+    return bookingService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO.reason())
+      .orElseThrow(
+        () ->
+          ConcreteRequestErrorMessageException.notFound(
+            "No booking found with carrierBookingRequestReference: "
+              + carrierBookingRequestReference));
   }
 }

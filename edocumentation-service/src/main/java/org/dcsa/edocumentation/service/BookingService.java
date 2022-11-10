@@ -4,20 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EventClassifierCode;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventTypeCode;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
+import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
+import org.dcsa.edocumentation.transferobjects.BookingCancelRequestTO;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.OffsetDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +33,7 @@ public class BookingService {
   private final ShipmentEventRepository shipmentEventRepository;
 
   private final BookingMapper bookingMapper;
+  private final DocumentStatusMapper documentStatusMapper;
 
   public Optional<BookingTO> getBooking(String carrierBookingRequestReference) {
     return bookingRepository
@@ -72,5 +70,20 @@ public class BookingService {
     requestedEquipmentService.createRequestedEquipments(bookingRequest.requestedEquipments(), booking);
     documentPartyService.createDocumentParties(bookingRequest.documentParties(), booking);
     shipmentLocationService.createShipmentLocations(bookingRequest.shipmentLocations(), booking);
+  }
+
+  @Transactional
+  public Optional<BookingRefStatusTO> cancelBooking(String carrierBookingRequestReference,
+                                                    String reason) {
+    Booking booking = bookingRepository.findBookingByCarrierBookingRequestReference(
+        carrierBookingRequestReference
+      ).orElse(null);
+    if (booking == null) {
+      return Optional.empty();
+    }
+    ShipmentEvent event = booking.cancel(reason);
+    bookingRepository.save(booking);
+    shipmentEventRepository.save(event);
+    return Optional.of(bookingMapper.toStatusDTO(booking));
   }
 }
