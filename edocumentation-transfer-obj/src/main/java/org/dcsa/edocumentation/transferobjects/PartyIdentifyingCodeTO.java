@@ -1,5 +1,6 @@
 package org.dcsa.edocumentation.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.DCSAResponsibleAgencyCode;
 
@@ -12,6 +13,7 @@ public record PartyIdentifyingCodeTO(
   String partyCode,
 
   @NotNull
+  @JsonProperty("DCSAResponsibleAgencyCode")
   DCSAResponsibleAgencyCode dcsaResponsibleAgencyCode,
 
   @Size(max = 100)
