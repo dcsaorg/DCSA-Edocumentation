@@ -2,6 +2,7 @@ package org.dcsa.edocumentation.service.util;
 
 import javax.transaction.Transactional;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -47,8 +48,19 @@ public abstract class EnsureResolvable<T, E> {
    * @param mapper custom mapper.
    */
   protected <C> C ensureResolvable(Collection<E> collection, Supplier<E> creator, BiFunction<E, Boolean, C> mapper) {
-    return collection
-      .stream().findFirst()
+    return ensureResolvable(collection.stream().findFirst(), creator, mapper);
+  }
+
+  /**
+   * Ensures that something is resolvable, creating new entities if needed and using a custom mapper
+   * to return the result.
+   *
+   * @param candidate potential candidate, if not empty it is used
+   * @param creator creator of entities in case the candidate is empty.
+   * @param mapper custom mapper.
+   */
+  protected <C> C ensureResolvable(Optional<E> candidate, Supplier<E> creator, BiFunction<E, Boolean, C> mapper) {
+    return candidate
       .map(entity -> mapper.apply(entity, false))
       .orElseGet(() -> mapper.apply(creator.get(), true));
   }
