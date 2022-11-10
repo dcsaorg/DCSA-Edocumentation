@@ -45,7 +45,10 @@ public class PartyIdentifyingCode {
   @Column(name = "code_list_name", length = 100)
   private String codeListName;
 
+  @Column(name = "party_code", length = 100)
+  private String partyCode;
+
   @Enumerated(EnumType.STRING)
-  @Column(name = "party_code")
-  private DCSAResponsibleAgencyCode partyCode;
+  @Column(name = "dcsa_responsible_agency_code")
+  private DCSAResponsibleAgencyCode dcsaResponsibleAgencyCode;
 }

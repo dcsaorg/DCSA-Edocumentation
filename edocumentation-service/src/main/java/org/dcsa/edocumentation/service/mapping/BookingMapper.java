@@ -1,6 +1,8 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventTypeCode;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.mapstruct.Mapper;
@@ -23,4 +25,7 @@ public interface BookingMapper {
   BookingTO toDTO(Booking booking);
 
   BookingRefStatusTO toStatusDTO(Booking booking);
+
+  ShipmentEventTypeCode toShipmentEventTypeCode(BkgDocumentStatus bkgDocumentStatus);
 }
+
