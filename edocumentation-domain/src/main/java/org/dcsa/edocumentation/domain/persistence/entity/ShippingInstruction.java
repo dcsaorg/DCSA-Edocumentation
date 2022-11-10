@@ -45,23 +45,23 @@ public class ShippingInstruction {
   @Column(name = "is_shipped_onboard_type")
   private Boolean isShippedOnboardType;
 
-  @Column(name = "number_of_copies")
-  private Integer numberOfCopies;
+  @Column(name = "number_of_copies_with_charges")
+  private Integer numberOfCopiesWithCharges;
 
-  @Column(name = "number_of_originals")
-  private Integer numberOfOriginals;
+  @Column(name = "number_of_copies_without_charges")
+  private Integer numberOfCopiesWithoutCharges;
+
+  @Column(name = "number_of_originals_with_charges")
+  private Integer numberOfOriginalsWithCharges;
+
+  @Column(name = "number_of_originals_without_charges")
+  private Integer numberOfOriginalsWithoutCharges;
 
   @Column(name = "is_electronic")
   private Boolean isElectronic;
 
   @Column(name = "is_to_order")
   private Boolean isToOrder;
-
-  @Column(name = "are_charges_displayed_on_originals")
-  private Boolean areChargesDisplayedOnOriginals;
-
-  @Column(name = "are_charges_displayed_on_copies")
-  private Boolean areChargesDisplayedOnCopies;
 
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "place_of_issue_id")

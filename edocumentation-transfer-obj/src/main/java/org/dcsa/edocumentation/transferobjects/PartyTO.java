@@ -27,7 +27,7 @@ public record PartyTO(
   List<PartyContactDetailsTO> partyContactDetails,
 
   @Valid
-  List<PartyIdentifyingCodesTO> identifyingCodes
+  List<PartyIdentifyingCodeTO> identifyingCodes
 ) {
   @Builder(toBuilder = true)
   public PartyTO { }

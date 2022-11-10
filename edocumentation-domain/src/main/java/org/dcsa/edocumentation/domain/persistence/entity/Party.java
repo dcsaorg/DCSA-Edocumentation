@@ -42,4 +42,9 @@ public class Party {
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "party")
   private Set<PartyContactDetails> partyContactDetails;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "party")
+  private Set<PartyIdentifyingCode> identifyingCodes;
 }
