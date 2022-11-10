@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.service;
 import org.dcsa.edocumentation.datafactories.AddressDataFactory;
 import org.dcsa.edocumentation.domain.persistence.AddressRepository;
 import org.dcsa.edocumentation.service.mapping.AddressMapper;
-import org.dcsa.edocumentation.service.util.ResolvedEntity;
+import org.dcsa.edocumentation.service.util.EnsureResolvable.ResolvedEntity;
 import org.dcsa.edocumentation.transferobjects.AddressTO;
 import org.dcsa.skernel.domain.persistence.entity.Address;
 import org.junit.jupiter.api.Test;
@@ -15,15 +15,13 @@ import org.springframework.data.domain.Example;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +34,7 @@ public class AddressServiceTest {
 
   @Test
   public void testNull() {
-    assertNull(addressService.ensureResolvable(null).entity());
+    assertNull(addressService.ensureResolvable(null));
   }
 
   @Test
@@ -49,7 +47,7 @@ public class AddressServiceTest {
     when(addressRepository.findAll(any(Example.class))).thenReturn(List.of(address));
 
     // Execute
-    ResolvedEntity<Address> actual = addressService.ensureResolvable(addressTO);
+    ResolvedEntity<Address> actual = addressService.ensureResolvableToResolvedEntity(addressTO);
 
     // Verify
     assertEquals(address, actual.entity());
@@ -71,7 +69,7 @@ public class AddressServiceTest {
     when(addressRepository.save(any(Address.class))).thenReturn(addressWithId);
 
     // Execute
-    ResolvedEntity<Address> actual = addressService.ensureResolvable(addressTO);
+    ResolvedEntity<Address> actual = addressService.ensureResolvableToResolvedEntity(addressTO);
 
     // Verify
     assertEquals(addressWithId, actual.entity());

@@ -11,6 +11,8 @@ import org.dcsa.edocumentation.transferobjects.RequestedEquipmentTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -26,24 +28,29 @@ public class RequestedEquipmentService {
   private final RequestedEquipmentRepository requestedEquipmentRepository;
   private final RequestedEquipmentMapper requestedEquipmentMapper;
 
+  @Transactional(TxType.MANDATORY)
   public void createRequestedEquipments(Collection<RequestedEquipmentTO> requestedEquipments, Booking booking) {
     if (requestedEquipments != null && !requestedEquipments.isEmpty()) {
-      Set<String> allRequestedEquipmentReferences = requestedEquipments.stream()
+      // Load all Equipments
+      Set<String> allEquipmentReferences = requestedEquipments.stream()
         .map(RequestedEquipmentTO::equipmentReferences)
         .filter(Objects::nonNull)
         .flatMap(Collection::stream)
         .collect(Collectors.toSet());
-      Map<String, Equipment> allRequestedEquipments =
-        equipmentRepository.findByEquipmentReferences(allRequestedEquipmentReferences).stream()
+      Map<String, Equipment> equipments =
+        equipmentRepository.findByEquipmentReferences(allEquipmentReferences).stream()
           .collect(Collectors.toMap(Equipment::getEquipmentReference, Function.identity()));
-      List<String> notFoundRequestedEquipmentReferences = allRequestedEquipmentReferences.stream()
-        .filter(ref -> !allRequestedEquipments.containsKey(ref))
+
+      // Check that we could find them all
+      List<String> notFoundRequestedEquipmentReferences = allEquipmentReferences.stream()
+        .filter(ref -> !equipments.containsKey(ref))
         .toList();
       if (!notFoundRequestedEquipmentReferences.isEmpty()) {
         throw ConcreteRequestErrorMessageException.notFound(
           "Could not find the following equipmentReferences in equipments: " + notFoundRequestedEquipmentReferences);
       }
 
+      // Create and save RequestedEquipments
       requestedEquipmentRepository.saveAll(
         requestedEquipments.stream()
           .map(reTO -> {
@@ -53,7 +60,7 @@ public class RequestedEquipmentService {
             } else {
               return re.toBuilder()
                 .equipments(reTO.equipmentReferences().stream()
-                  .map(allRequestedEquipments::get)
+                  .map(equipments::get)
                   .collect(Collectors.toSet())
                 )
                 .build();

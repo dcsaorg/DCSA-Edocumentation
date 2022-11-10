@@ -6,7 +6,6 @@ import org.dcsa.edocumentation.domain.persistence.FacilityRepository;
 import org.dcsa.edocumentation.domain.persistence.entity.UnLocation;
 import org.dcsa.edocumentation.domain.persistence.repository.LocationRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.UnLocationRepository;
-import org.dcsa.edocumentation.service.util.ResolvedEntity;
 import org.dcsa.edocumentation.transferobjects.AddressTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.FacilityLocationTO;
@@ -25,10 +24,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.never;
@@ -61,7 +62,11 @@ public class LocationServiceTest {
     AddressLocationTO locationTO = LocationDataFactory.addressLocationTO();
     Location location = LocationDataFactory.addressLocationWithId();
 
-    when(addressService.ensureResolvable(any(AddressTO.class))).thenReturn(new ResolvedEntity<>(AddressDataFactory.addressWithId(), true));
+    when(addressService.ensureResolvable(any(AddressTO.class), any(BiFunction.class)))
+      .thenAnswer(invocation -> {
+        BiFunction<Address, Boolean, Location> mapper = invocation.getArgument(1);
+        return mapper.apply(AddressDataFactory.addressWithId(), true);
+      });
     when(locationRepository.save(any(Location.class))).thenReturn(location);
 
     // Execute
@@ -69,7 +74,7 @@ public class LocationServiceTest {
 
     // Verify
     assertEquals(location, actual);
-    verify(addressService).ensureResolvable(locationTO.address());
+    verify(addressService).ensureResolvable(eq(locationTO.address()), any(BiFunction.class));
     verify(locationRepository, never()).findByLocationNameAndAddress(anyString(), any(Address.class));
     verify(locationRepository).save(LocationDataFactory.addressLocationWithoutId());
   }
@@ -80,7 +85,11 @@ public class LocationServiceTest {
     AddressLocationTO locationTO = LocationDataFactory.addressLocationTO();
     Location location = LocationDataFactory.addressLocationWithId();
 
-    when(addressService.ensureResolvable(any(AddressTO.class))).thenReturn(new ResolvedEntity<>(AddressDataFactory.addressWithId(), false));
+    when(addressService.ensureResolvable(any(AddressTO.class), any(BiFunction.class)))
+      .thenAnswer(invocation -> {
+      BiFunction<Address, Boolean, Location> mapper = invocation.getArgument(1);
+      return mapper.apply(AddressDataFactory.addressWithId(), false);
+    });
     when(locationRepository.findByLocationNameAndAddress(anyString(), any(Address.class))).thenReturn(Collections.emptyList());
     when(locationRepository.save(any(Location.class))).thenReturn(location);
 
@@ -89,7 +98,7 @@ public class LocationServiceTest {
 
     // Verify
     assertEquals(location, actual);
-    verify(addressService).ensureResolvable(locationTO.address());
+    verify(addressService).ensureResolvable(eq(locationTO.address()), any(BiFunction.class));
     verify(locationRepository).findByLocationNameAndAddress(locationTO.locationName(), location.getAddress());
     verify(locationRepository).save(LocationDataFactory.addressLocationWithoutId());
   }
@@ -100,7 +109,11 @@ public class LocationServiceTest {
     AddressLocationTO locationTO = LocationDataFactory.addressLocationTO();
     Location location = LocationDataFactory.addressLocationWithId();
 
-    when(addressService.ensureResolvable(any(AddressTO.class))).thenReturn(new ResolvedEntity<>(AddressDataFactory.addressWithId(), false));
+    when(addressService.ensureResolvable(any(AddressTO.class), any(BiFunction.class)))
+      .thenAnswer(invocation -> {
+      BiFunction<Address, Boolean, Location> mapper = invocation.getArgument(1);
+      return mapper.apply(AddressDataFactory.addressWithId(), false);
+    });
     when(locationRepository.findByLocationNameAndAddress(anyString(), any(Address.class))).thenReturn(List.of(location));
 
     // Execute
@@ -108,7 +121,7 @@ public class LocationServiceTest {
 
     // Verify
     assertEquals(location, actual);
-    verify(addressService).ensureResolvable(locationTO.address());
+    verify(addressService).ensureResolvable(eq(locationTO.address()), any(BiFunction.class));
     verify(locationRepository).findByLocationNameAndAddress(locationTO.locationName(), location.getAddress());
     verify(locationRepository, never()).save(any(Location.class));
   }
