@@ -14,11 +14,17 @@ class BookingStateMachineTest {
   @Test
   void testBasic() {
     Booking booking = Booking.builder().build();
+    booking.receive();
     Assertions.assertEquals(RECE, booking.getDocumentStatus());
-    booking.pendingConfirmation();
+    booking.pendingConfirmation("We provided what you requested. Please review it and confirm the booking");
     Assertions.assertEquals(PENC, booking.getDocumentStatus());
-    booking.pendingUpdate();
+    booking.pendingUpdate("Please provide foo!");
     Assertions.assertEquals(PENU, booking.getDocumentStatus());
+
+    booking = Booking.builder().documentStatus(RECE).build();
+    Assertions.assertEquals(RECE, booking.getDocumentStatus());
+    booking.pendingConfirmation("We provided what you requested. Please review it and confirm the booking");
+    Assertions.assertEquals(PENC, booking.getDocumentStatus());
   }
 
   @Test
@@ -30,11 +36,13 @@ class BookingStateMachineTest {
     };
     for (BkgDocumentStatus terminalState : terminalStates) {
       Booking booking = Booking.builder().documentStatus(terminalState).build();
-      Assertions.assertThrows(ConflictException.class, booking::cancel);
-      Assertions.assertThrows(ConflictException.class, booking::pendingUpdate);
+      Assertions.assertThrows(ConflictException.class,
+        () -> booking.cancel("We decided to booking somewhere else."));
+      Assertions.assertThrows(ConflictException.class, () -> booking.pendingUpdate("Please provide foo!"));
       Assertions.assertThrows(ConflictException.class, booking::complete);
-      Assertions.assertThrows(ConflictException.class, booking::pendingConfirmation);
-      Assertions.assertThrows(ConflictException.class, booking::reject);
+      Assertions.assertThrows(ConflictException.class,
+        () -> booking.pendingConfirmation("We provided what you requested. Please review it and confirm the booking"));
+      Assertions.assertThrows(ConflictException.class, () -> booking.reject("We cannot provide the service."));
       Assertions.assertThrows(ConflictException.class, booking::complete);
     }
     Booking booking = Booking.builder().documentStatus(PENU).build();

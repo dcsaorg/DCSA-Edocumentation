@@ -1,55 +1,22 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
 import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
-import org.dcsa.edocumentation.domain.dfa.DFA;
 import org.dcsa.edocumentation.domain.dfa.DFADefinition;
 import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.CommunicationChannelCode;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.IncoTerms;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.ReceiptDeliveryType;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.data.domain.Persistable;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedSubgraph;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.CANC;
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.CMPL;
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.CONF;
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.PENC;
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.PENU;
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.RECE;
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.REJE;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
 
 @NamedEntityGraph(
     name = "graph.booking-summary",
@@ -86,7 +53,7 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumen
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "booking")
-public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
+public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements Persistable<UUID> {
 
   private static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECE)
     .nonTerminalState(RECE).successorNodes(REJE, CANC, PENU, PENC, CONF)
@@ -97,7 +64,6 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
     .build();
 
   @Id
-  @GeneratedValue
   @Column(name = "id", nullable = false)
   private UUID id;
 
@@ -106,8 +72,7 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
 
   @Column(name = "document_status")
   @Enumerated(EnumType.STRING)
-  @Builder.Default
-  private BkgDocumentStatus documentStatus = BkgDocumentStatus.RECE;
+  private BkgDocumentStatus documentStatus;
 
   @Column(name = "receipt_type_at_origin")
   @Enumerated(EnumType.STRING)
@@ -263,71 +228,98 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> {
   @Column(name = "updated_date_time")
   protected OffsetDateTime bookingRequestUpdatedDateTime;
 
+  @Transient
+  private boolean isNew;
+
+  public boolean isNew() {
+    return id == null || isNew;
+  }
+
+
+  /**
+   * Transition the booking into its {@link BkgDocumentStatus#RECE} state.
+   */
+  public ShipmentEvent receive() {
+    return processTransition(RECE, null);
+  }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#CANC} state.
    */
-  public void cancel() {
-    transitionTo(CANC);
+  public ShipmentEvent cancel(String reason) {
+    return processTransition(CANC, reason);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#REJE} state.
    */
-  public void reject() {
-    transitionTo(REJE);
+  public ShipmentEvent reject(String reason) {
+    return processTransition(REJE, reason);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENU} state.
    */
-  public void pendingUpdate() {
-    transitionTo(PENU);
+  public ShipmentEvent pendingUpdate(String reason) {
+    return processTransition(PENU, reason);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  public void pendingConfirmation() {
-    transitionTo(PENC);
+  public ShipmentEvent pendingConfirmation(String reason) {
+    return processTransition(PENC, reason);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  public void confirm() {
-    transitionTo(CONF);
+  public ShipmentEvent confirm() {
+    return processTransition(CONF, null);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#CMPL} state.
    */
-  public void complete() {
-    transitionTo(CMPL);
-  }
-
-  @Transient
-  private DFA<BkgDocumentStatus> dfa;
-
-  public void setDocumentStatus(BkgDocumentStatus documentStatus) {
-    this.documentStatus = documentStatus;
-    this.dfa = null;
-  }
-
-  protected DFA<BkgDocumentStatus> getDfa() {
-    if (dfa == null) {
-      // Lazily generate via getter - the `setDocumentStatus` is not called during
-      // the Builder's build method.
-      dfa = BOOKING_DFA_DEFINITION.resumeFromState(documentStatus);
-    }
-    return dfa;
+  public ShipmentEvent complete() {
+    return processTransition(CMPL, null);
   }
 
   @Override
-  protected void transitionTo(BkgDocumentStatus state) {
-    super.transitionTo(state);
-    this.documentStatus = state;
-    this.bookingRequestUpdatedDateTime = OffsetDateTime.now();
+  protected DFADefinition<BkgDocumentStatus> getDfaDefinition() {
+    return BOOKING_DFA_DEFINITION;
+  }
+
+  @Override
+  protected BkgDocumentStatus getResumeFromState() {
+    return this.documentStatus;
+  }
+
+  protected ShipmentEvent processTransition(BkgDocumentStatus status, String reason) {
+    transitionTo(status);
+    OffsetDateTime now =  OffsetDateTime.now();
+    this.documentStatus = status;
+    this.bookingRequestUpdatedDateTime = now;
+    if (this.bookingRequestCreatedDateTime == null) {
+      this.bookingRequestCreatedDateTime = now;
+    }
+    if (id == null) {
+      id = UUID.randomUUID();
+      isNew = true;
+    }
+    if (carrierBookingRequestReference == null) {
+      carrierBookingRequestReference = UUID.randomUUID().toString();
+    }
+    return ShipmentEvent.builder()
+      .documentID(id)
+      .documentReference(carrierBookingRequestReference)
+      .documentTypeCode(DocumentTypeCode.CBR)
+      .shipmentEventTypeCode(status.asShipmentEventTypeCode())
+      .reason(reason)
+      .eventClassifierCode(EventClassifierCode.ACT)
+      .eventDateTime(now)
+      .eventCreatedDateTime(now)
+      .build();
   }
 
   @Override
