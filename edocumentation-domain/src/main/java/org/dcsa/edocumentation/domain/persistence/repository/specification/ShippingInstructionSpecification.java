@@ -3,9 +3,7 @@ package org.dcsa.edocumentation.domain.persistence.repository.specification;
 import lombok.Builder;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
-import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
-import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction_;
+import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -29,8 +27,8 @@ public class ShippingInstructionSpecification {
       final ShippingInstructionFilters filters) {
 
     return (root, query, builder) -> {
-      Join<ShippingInstruction, Shipment> ShippingInstructionShipmentJoin =
-          root.join(ShippingInstruction_.SHIPMENTS, JoinType.LEFT);
+      Join<ShippingInstruction, ConsignmentItem> shippingInstructionConsignmentItemJoin = root.join(ShippingInstruction_.CONSIGNMENT_ITEMS, JoinType.LEFT);
+      Join<ConsignmentItem, Shipment> consignmentItemShipmentJoin = shippingInstructionConsignmentItemJoin.join(ConsignmentItem_.SHIPMENT, JoinType.LEFT);
       List<Predicate> predicates = new ArrayList<>();
       if (null != filters.documentStatus) {
         Predicate predicate = builder.equal(root.get("documentStatus"), filters.documentStatus);
@@ -39,7 +37,7 @@ public class ShippingInstructionSpecification {
       if (null != filters.carrierBookingReference && !filters.carrierBookingReference.isEmpty()) {
         Predicate predicate =
             builder
-                .in(ShippingInstructionShipmentJoin.get("carrierBookingReference"))
+                .in(consignmentItemShipmentJoin.get("carrierBookingReference"))
                 .value(filters.carrierBookingReference);
         predicates.add(predicate);
       }

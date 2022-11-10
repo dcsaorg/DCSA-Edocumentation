@@ -42,6 +42,8 @@ public class DocumentParty {
   @JoinColumn(name = "booking_id")
   private Booking booking;
 
-  // ToDo only the required associations for booking summaries and booking request have been
-  // implemented
+  @JoinColumn(name = "shipping_instruction_id")
+  @Column(name = "shipping_instruction_id")
+  private UUID shippingInstructionID;
+
 }

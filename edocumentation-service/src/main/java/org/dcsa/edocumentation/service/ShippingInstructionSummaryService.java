@@ -35,7 +35,6 @@ public class ShippingInstructionSummaryService {
                         .documentStatus(documentStatus)
                         .build()),
               pageRequest)
-          .map(shippingInstruction -> shippingInstructionMapper.shippingInstructionToShippingInstructionSummary(shippingInstruction)));
-//            .map(shippingInstructionMapper::shippingInstructionToShippingInstructionSummary));
+            .map(shippingInstructionMapper::shippingInstructionToShippingInstructionSummary));
   }
 }

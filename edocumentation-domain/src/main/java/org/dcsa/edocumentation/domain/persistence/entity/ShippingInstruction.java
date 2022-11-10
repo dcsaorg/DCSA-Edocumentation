@@ -3,6 +3,7 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EventClassifierCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
@@ -11,18 +12,14 @@ import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
 @NamedEntityGraph(
-  name = "graph.shipping-instruction-summary",
-  attributeNodes = {
-    @NamedAttributeNode("shipments")
-  }
-)
+    name = "graph.shipping-instruction-summary",
+    attributeNodes = {@NamedAttributeNode("consignmentItems")})
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -55,8 +52,11 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     .build();
 
   @Id
+  @GeneratedValue
+  @Column(name = "id", nullable = false)
   private UUID id;
 
+  @GeneratedValue
   @Column(name = "shipping_instruction_reference")
   private String shippingInstructionReference;
 
@@ -71,7 +71,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   private OffsetDateTime shippingInstructionUpdatedDateTime;
 
   @Column(name = "is_shipped_onboard_type")
-  private Boolean isShippedOnboardType;
+  private Boolean isShippedOnBoardType;
 
   @Column(name = "number_of_copies_with_charges")
   private Integer numberOfCopiesWithCharges;
@@ -119,14 +119,45 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany
-  @JoinTable
-    (
-      name="consignment_item",
-      joinColumns={ @JoinColumn(name="shipping_instruction_id", referencedColumnName="id") },
-      inverseJoinColumns={ @JoinColumn(name="shipment_id", referencedColumnName="id", unique=true) }
-    )
-  private Set<Shipment> shipments = new LinkedHashSet<>();
+  @OneToMany(mappedBy = "shippingInstruction")
+  private Set<ConsignmentItem> consignmentItems;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "shippingInstructionID")
+  private Set<DocumentParty> documentParties;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "shippingInstructionID")
+  private Set<Reference> references;
+
+  // Todo consider if it makes sense to move this to a validation annotation
+  public Boolean hasOnlyConfirmedBookings() {
+
+    long unconfirmedBookingCount =
+      this.consignmentItems.stream()
+        .map(ConsignmentItem::getShipment)
+        .map(Shipment::getBooking)
+        .map(Booking::getDocumentStatus)
+        .filter(status -> !status.equals(BkgDocumentStatus.CONF))
+        .count();
+
+    return unconfirmedBookingCount < 1;
+  }
+
+  // Todo consider if it makes sense to move this to a validation annotation
+  public Boolean containsOneBooking() {
+    long distinctBookingCount =
+      this.consignmentItems.stream()
+        .map(ConsignmentItem::getShipment)
+        .map(Shipment::getBooking)
+        .map(Booking::getCarrierBookingRequestReference)
+        .distinct()
+        .count();
+
+    return distinctBookingCount == 1;
+  }
 
   /**
    * Transition the document into its {@link EblDocumentStatus#RECE} state.

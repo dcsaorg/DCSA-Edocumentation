@@ -54,5 +54,4 @@ public class RequestedEquipment {
   )
   private Set<Equipment> equipments;
 
-  // ToDo only the required associations for booking requests have been implemented
 }

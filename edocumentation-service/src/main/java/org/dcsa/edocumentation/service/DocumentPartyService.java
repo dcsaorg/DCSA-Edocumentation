@@ -4,11 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
 import org.dcsa.edocumentation.domain.persistence.entity.Party;
-import org.dcsa.edocumentation.domain.persistence.repository.DisplayedAddressRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.DocumentPartyRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.PartyContactDetailsRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.PartyIdentifyingCodeRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.PartyRepository;
+import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
+import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentPartyMapper;
 import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
@@ -43,40 +40,64 @@ public class DocumentPartyService {
     }
   }
 
-  private void createDocumentParty(DocumentPartyTO documentPartyTO, Booking booking) {
-    DocumentParty documentParty = documentPartyRepository.save(
-      documentPartyMapper.toDAO(documentPartyTO, booking).toBuilder()
-        .party(createParty(documentPartyTO.party()))
-        .build());
+  @Transactional(TxType.MANDATORY)
+  public void createDocumentParties(
+      Collection<DocumentPartyTO> documentParties, ShippingInstruction shippingInstruction) {
+    if (documentParties != null && !documentParties.isEmpty()) {
+      documentParties.forEach(
+          documentPartyTO ->
+              createDocumentPartyAndDisplayedAddress(
+                  documentPartyTO.displayedAddress(),
+                  documentPartyMapper.toDAO(documentPartyTO).toBuilder()
+                      .shippingInstructionID(shippingInstruction.getId())
+                      .party(createParty(documentPartyTO.party()))
+                      .build()));
+    }
+  }
 
-    List<String> displayedAddress = documentPartyTO.displayedAddress();
+
+  private void createDocumentParty(DocumentPartyTO documentPartyTO, Booking booking) {
+    DocumentParty documentPartyWithBooking =
+        documentPartyMapper.toDAO(documentPartyTO, booking).toBuilder()
+            .party(createParty(documentPartyTO.party()))
+            .build();
+
+    createDocumentPartyAndDisplayedAddress(
+        documentPartyTO.displayedAddress(), documentPartyWithBooking);
+  }
+
+  private void createDocumentPartyAndDisplayedAddress(
+      List<String> displayedAddress, DocumentParty documentParty) {
+    DocumentParty savedDocumentParty = documentPartyRepository.save(documentParty);
     if (displayedAddress != null && !displayedAddress.isEmpty()) {
       displayedAddressRepository.saveAll(
-        displayedAddressMapper.toDAO(displayedAddress, documentParty));
+          displayedAddressMapper.toDAO(displayedAddress, savedDocumentParty));
     }
   }
 
   private Party createParty(PartyTO partyTO) {
-    Party party = partyRepository.save(
-        documentPartyMapper.toDAO(partyTO).toBuilder()
-        .address(addressService.ensureResolvable(partyTO.address()))
-        .build());
+    Party party =
+        partyRepository.save(
+            documentPartyMapper.toDAO(partyTO).toBuilder()
+                .address(addressService.ensureResolvable(partyTO.address()))
+                .build());
 
     List<PartyContactDetailsTO> partyContactDetails = partyTO.partyContactDetails();
     if (partyContactDetails != null && !partyContactDetails.isEmpty()) {
       partyContactDetailsRepository.saveAll(
-        partyContactDetails.stream()
-          .map(partyContactDetailsTO -> documentPartyMapper.toDAO(partyContactDetailsTO, party))
-          .toList());
+          partyContactDetails.stream()
+              .map(partyContactDetailsTO -> documentPartyMapper.toDAO(partyContactDetailsTO, party))
+              .toList());
     }
 
     List<PartyIdentifyingCodeTO> identifyingCodes = partyTO.identifyingCodes();
     if (identifyingCodes != null && !identifyingCodes.isEmpty()) {
       partyIdentifyingCodeRepository.saveAll(
-        identifyingCodes.stream()
-          .map(partyIdentifyingCodeTO -> documentPartyMapper.toDAO(partyIdentifyingCodeTO, party))
-          .toList()
-      );
+          identifyingCodes.stream()
+              .map(
+                  partyIdentifyingCodeTO ->
+                      documentPartyMapper.toDAO(partyIdentifyingCodeTO, party))
+              .toList());
     }
 
     return party;
