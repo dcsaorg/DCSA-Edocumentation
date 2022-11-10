@@ -45,24 +45,17 @@ public class BookingService {
 
   @Transactional
   public BookingRefStatusTO createBooking(BookingTO bookingRequest) {
-    OffsetDateTime now = OffsetDateTime.now();
-    Booking.BookingBuilder bookingToSave = bookingMapper.toDAO(bookingRequest).toBuilder();
+    Booking booking = bookingMapper.toDAO(bookingRequest).toBuilder()
+      .voyage(voyageService.resolveVoyage(bookingRequest))
+      .vessel(vesselService.resolveVessel(bookingRequest))
+      .placeOfIssue(locationService.ensureResolvable(bookingRequest.placeOfBLIssue()))
+      .invoicePayableAt(locationService.ensureResolvable(bookingRequest.invoicePayableAt()))
+      .build();
 
-    Booking booking = bookingRepository.save(
-      bookingToSave
-        .carrierBookingRequestReference(UUID.randomUUID().toString())
-        .documentStatus(BkgDocumentStatus.RECE)
-        .bookingRequestCreatedDateTime(now)
-        .bookingRequestUpdatedDateTime(now)
-        .voyage(voyageService.resolveVoyage(bookingRequest))
-        .vessel(vesselService.resolveVessel(bookingRequest))
-        .placeOfIssue(locationService.ensureResolvable(bookingRequest.placeOfBLIssue()))
-        .invoicePayableAt(locationService.ensureResolvable(bookingRequest.invoicePayableAt()))
-        .build()
-    );
+    shipmentEventRepository.save(booking.receive());
+    booking = bookingRepository.save(booking);
 
     createDeepObjectsForBooking(bookingRequest, booking);
-    createShipmentEvent(booking);
 
     return bookingMapper.toStatusDTO(booking);
   }
@@ -79,17 +72,5 @@ public class BookingService {
     requestedEquipmentService.createRequestedEquipments(bookingRequest.requestedEquipments(), booking);
     documentPartyService.createDocumentParties(bookingRequest.documentParties(), booking);
     shipmentLocationService.createShipmentLocations(bookingRequest.shipmentLocations(), booking);
-  }
-
-  private void createShipmentEvent(Booking booking) {
-    shipmentEventRepository.save(ShipmentEvent.builder()
-      .documentTypeCode(DocumentTypeCode.CBR)
-      .eventClassifierCode(EventClassifierCode.ACT)
-      .documentID(booking.getId())
-      .shipmentEventTypeCode(bookingMapper.toShipmentEventTypeCode(booking.getDocumentStatus()))
-      .documentReference(booking.getCarrierBookingRequestReference())
-      .eventDateTime(booking.getBookingRequestCreatedDateTime())
-      .eventCreatedDateTime(OffsetDateTime.now())
-      .build());
   }
 }

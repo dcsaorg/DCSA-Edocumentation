@@ -2,7 +2,9 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.EventClassifierCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
@@ -60,8 +62,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   @Enumerated(EnumType.STRING)
   @Column(name = "document_status")
-  @Builder.Default
-  private EblDocumentStatus documentStatus = EblDocumentStatus.RECE;
+  private EblDocumentStatus documentStatus;
 
   @Column(name = "created_date_time")
   private OffsetDateTime shippingInstructionCreatedDateTime;
@@ -127,12 +128,11 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     )
   private Set<Shipment> shipments = new LinkedHashSet<>();
 
-
   /**
    * Transition the document into its {@link EblDocumentStatus#RECE} state.
    */
-  public void receive() {
-    transitionTo(RECE);
+  public ShipmentEvent receive() {
+    return processTransition(RECE, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
   /**
@@ -141,15 +141,15 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    * <p>This state is not supported in all EBL flows. E.g., it is not reachable
    * in the Amendment flow.</p>
    */
-  public void pendingUpdate() {
-    transitionTo(PENU);
+  public ShipmentEvent pendingUpdate(String reason) {
+    return processTransition(PENU, reason, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
   /**
    * Check whether the flow supports the {@link EblDocumentStatus#PENU} state.
    *
    * <p>This state is not supported in all EBL flows. This will return false when
-   * the EBL flow does not support this state at all. I.e., calling {@link #pendingUpdate()}
+   * the EBL flow does not support this state at all. I.e., calling {@link #pendingUpdate(String)}
    * will trigger an exception causing an internal server error status.</p>
    */
   public boolean isPendingUpdateSupported() {
@@ -159,8 +159,9 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   /**
    * Transition the document into its {@link EblDocumentStatus#DRFT} state.
    */
-  public void draft() {
-    transitionTo(DRFT);
+  public ShipmentEvent draft() {
+    // TODO: Should this be moved to the TRD?
+    return processTransition(DRFT, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
   /**
@@ -169,69 +170,66 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    * <p>This state is not supported in all EBL flows. E.g., it is not reachable
    * in the Amendment flow.</p>
    */
-  public void pendingApproval() {
-    transitionTo(PENA);
+  public ShipmentEvent pendingApproval(String reason) {
+    // TODO: Should this be moved to the TRD?
+    return processTransition(PENA, reason, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
   /**
    * Check whether the flow supports the {@link EblDocumentStatus#PENA} state.
    *
    * <p>This state is not supported in all EBL flows. This will return false when
-   * the EBL flow does not support this state at all. I.e., calling {@link #pendingApproval()}
+   * the EBL flow does not support this state at all. I.e., calling {@link #pendingApproval(String)}
    * will trigger an exception causing an internal server error status.</p>
    */
   public boolean isPendingApprovalSupported() {
+    // TODO: Move to the TRD if pendingApproval moves.
     return supportsState(PENA);
   }
 
   /**
    * Transition the document into its {@link EblDocumentStatus#APPR} state.
    */
-  public void approve() {
-    transitionTo(APPR);
+  public ShipmentEvent approve() {
+    // TODO: Should this be moved to the TRD?
+    return processTransition(APPR, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
   /**
    * Transition the document into its {@link EblDocumentStatus#ISSU} state.
    */
   public void issue() {
-    transitionTo(ISSU);
+    // TODO: Should this be moved to the TRD?
+    processTransition(ISSU, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
   /**
    * Transition the document into its {@link EblDocumentStatus#SURR} state.
    */
-  public void surrender() {
-    transitionTo(SURR);
+  public ShipmentEvent surrender() {
+    // TODO: Should this be moved to the TRD?
+    return processTransition(SURR, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
   /**
    * Transition the document into its {@link EblDocumentStatus#VOID} state.
    */
   // "void" is a keyword and cannot be used as a method name.
-  public void voidDocument() {
-    transitionTo(VOID);
+  public ShipmentEvent voidDocument() {
+    // TODO: Should this be moved to the TRD?
+    return processTransition(VOID, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
   @Transient
   private DFA<EblDocumentStatus> dfa;
 
-  public void setDocumentStatus(EblDocumentStatus documentStatus) {
-    this.documentStatus = documentStatus;
-    this.dfa = null;
-  }
-
-  private DFADefinition<EblDocumentStatus> getDfaDefinition() {
+  protected DFADefinition<EblDocumentStatus> getDfaDefinition() {
     return this.amendmentToTransportDocument != null ? AMENDMENT_EBL_DFA_DEFINITION : DEFAULT_EBL_DFA_DEFINITION;
   }
 
-  protected DFA<EblDocumentStatus> getDfa() {
-    if (dfa == null) {
-      // Lazily generate via getter - the `setDocumentStatus` is not called during
-      // the Builder's build method.
-      dfa = getDfaDefinition().resumeFromState(documentStatus);
-    }
-    return dfa;
+  @Override
+  protected EblDocumentStatus getResumeFromState() {
+    return this.documentStatus;
   }
 
   @Override
@@ -239,6 +237,23 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     super.transitionTo(state);
     this.documentStatus = state;
     this.shippingInstructionUpdatedDateTime = OffsetDateTime.now();
+  }
+
+  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode, UUID documentID, String documentReference) {
+    transitionTo(status);
+    OffsetDateTime now =  OffsetDateTime.now();
+    this.documentStatus = status;
+    this.shippingInstructionUpdatedDateTime = now;
+    return ShipmentEvent.builder()
+      .documentID(documentID)
+      .documentReference(documentReference)
+      .documentTypeCode(documentTypeCode)
+      .shipmentEventTypeCode(status.asShipmentEventTypeCode())
+      .reason(reason)
+      .eventClassifierCode(EventClassifierCode.ACT)
+      .eventDateTime(now)
+      .eventCreatedDateTime(now)
+      .build();
   }
 
   @Override

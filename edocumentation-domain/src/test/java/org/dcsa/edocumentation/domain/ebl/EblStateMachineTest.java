@@ -19,9 +19,10 @@ class EblStateMachineTest {
   @Test
   void testBasicDefaultFlow() {
     ShippingInstruction stateMachine = ShippingInstruction.builder().build();
+    stateMachine.receive();
     Assertions.assertEquals(RECE, stateMachine.getDocumentStatus());
     Assertions.assertTrue(stateMachine.isPendingUpdateSupported());
-    stateMachine.pendingUpdate();
+    stateMachine.pendingUpdate("Please fix foo!");
     Assertions.assertEquals(PENU, stateMachine.getDocumentStatus());
     stateMachine.receive();
     Assertions.assertEquals(RECE, stateMachine.getDocumentStatus());
@@ -32,7 +33,7 @@ class EblStateMachineTest {
     stateMachine = ShippingInstruction.builder().documentStatus(DRFT).build();
     Assertions.assertEquals(DRFT, stateMachine.getDocumentStatus());
     Assertions.assertTrue(stateMachine.isPendingApprovalSupported());
-    stateMachine.pendingApproval();
+    stateMachine.pendingApproval("We have provided foo, please approve the draft TRD");
     Assertions.assertEquals(PENA, stateMachine.getDocumentStatus());
     stateMachine.approve();
     Assertions.assertEquals(APPR, stateMachine.getDocumentStatus());
@@ -44,6 +45,7 @@ class EblStateMachineTest {
   void testBasicAmendmentFlow() {
     ShippingInstruction stateMachine = ShippingInstruction.builder().amendmentToTransportDocument(UUID.randomUUID())
       .build();
+    stateMachine.receive();
     Assertions.assertEquals(RECE, stateMachine.getDocumentStatus());
     stateMachine.draft();
     Assertions.assertEquals(DRFT, stateMachine.getDocumentStatus());
@@ -65,31 +67,32 @@ class EblStateMachineTest {
   void testBasicAmendmentFlowRestricted() {
     ShippingInstruction stateMachine = ShippingInstruction.builder().amendmentToTransportDocument(UUID.randomUUID())
       .build();
+    stateMachine.receive();
     Assertions.assertEquals(RECE, stateMachine.getDocumentStatus());
 
     // RECE must go directly to DRFT in the amendment flow (which is weird because there is no
     // reject state either... >.>)
     Assertions.assertFalse(stateMachine.isPendingUpdateSupported());
-    Assertions.assertThrows(InternalServerErrorException.class, stateMachine::pendingUpdate);
+    Assertions.assertThrows(InternalServerErrorException.class, () -> stateMachine.pendingUpdate("Not possible"));
     // The error should not have made it change state
     Assertions.assertEquals(RECE, stateMachine.getDocumentStatus());
 
     stateMachine.draft();
     // DRFT must go directly to APPR in the amendment flow.
     Assertions.assertFalse(stateMachine.isPendingApprovalSupported());
-    Assertions.assertThrows(InternalServerErrorException.class, stateMachine::pendingApproval);
+    Assertions.assertThrows(InternalServerErrorException.class, () -> stateMachine.pendingApproval("Not possible"));
     // Again, it retains the current state on invalid transitions.
     Assertions.assertEquals(DRFT, stateMachine.getDocumentStatus());
 
 
-    stateMachine = ShippingInstruction.builder().amendmentToTransportDocument(UUID.randomUUID())
+    ShippingInstruction amendmentStateMachine = ShippingInstruction.builder().amendmentToTransportDocument(UUID.randomUUID())
       .documentStatus(DRFT)
       .build();
     // DRFT must go directly to APPR in the amendment flow - even after resume
-    Assertions.assertFalse(stateMachine.isPendingApprovalSupported());
-    Assertions.assertThrows(InternalServerErrorException.class, stateMachine::pendingApproval);
+    Assertions.assertFalse(amendmentStateMachine.isPendingApprovalSupported());
+    Assertions.assertThrows(InternalServerErrorException.class, () -> amendmentStateMachine.pendingApproval("Not possible"));
     // Again, it retains the current state on invalid transitions.
-    Assertions.assertEquals(DRFT, stateMachine.getDocumentStatus());
+    Assertions.assertEquals(DRFT, amendmentStateMachine.getDocumentStatus());
   }
 
   @Test
@@ -101,9 +104,9 @@ class EblStateMachineTest {
     for (Function<EblDocumentStatus, ShippingInstruction> initializer : initializers) {
       ShippingInstruction stateMachine = initializer.apply(VOID);
       Assertions.assertThrows(ConflictException.class, stateMachine::receive);
-      Assertions.assertThrows(ConflictException.class, stateMachine::pendingUpdate);
+      Assertions.assertThrows(ConflictException.class, () -> stateMachine.pendingUpdate("Should throw"));
       Assertions.assertThrows(ConflictException.class, stateMachine::draft);
-      Assertions.assertThrows(ConflictException.class, stateMachine::pendingApproval);
+      Assertions.assertThrows(ConflictException.class, () -> stateMachine.pendingApproval("Should throw"));
       Assertions.assertThrows(ConflictException.class, stateMachine::approve);
       Assertions.assertThrows(ConflictException.class, stateMachine::issue);
       Assertions.assertThrows(ConflictException.class, stateMachine::surrender);
