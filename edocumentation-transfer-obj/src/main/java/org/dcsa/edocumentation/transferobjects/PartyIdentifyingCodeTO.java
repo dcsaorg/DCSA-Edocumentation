@@ -6,7 +6,7 @@ import org.dcsa.edocumentation.transferobjects.enums.DCSAResponsibleAgencyCode;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-public record PartyIdentifyingCodesTO(
+public record PartyIdentifyingCodeTO(
   @NotNull
   DCSAResponsibleAgencyCode partyCode,
 
@@ -14,5 +14,5 @@ public record PartyIdentifyingCodesTO(
   String codeListName
 ) {
   @Builder(toBuilder = true)
-  public PartyIdentifyingCodesTO { }
+  public PartyIdentifyingCodeTO { }
 }
