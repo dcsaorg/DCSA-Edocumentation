@@ -1064,10 +1064,6 @@
 					"name": "Positive test cases",
 					"item": [
 						{
-							"name": "Cancel Booking",
-							"item": []
-						},
-						{
 							"name": "Booking by carrierBookingRequestReference",
 							"event": [
 								{
@@ -1185,111 +1181,6 @@
 				{
 					"name": "Negative test cases",
 					"item": [
-						{
-							"name": "Cancel Booking",
-							"item": [
-								{
-									"name": "Cancel Booking not found",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code is 404\", function () {\r",
-													"    pm.response.to.have.status(404);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Error reason is notFound\", () => {\r",
-													"    var jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData.errors[0].reason).to.eql(\"notFound\");\r",
-													"});\r",
-													"\r",
-													"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
-													"    var jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking found with carrierBookingRequestReference: IdoNotExist\");\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "PATCH",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"documentStatus\": \"CANC\",\r\n    \"reason\": null\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/IdoNotExist",
-											"host": [
-												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
-											],
-											"path": [
-												"bookings",
-												"IdoNotExist"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Cancel Booking invalid documentStatus",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code is 400\", () => {\r",
-													"    pm.response.to.have.status(400);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Error reason is documentStatus\", () => {\r",
-													"    var jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData.errors[0].reason).to.eql(\"documentStatus\");\r",
-													"});\r",
-													"\r",
-													"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
-													"    var jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData.errors[0].message).to.eql(\"must be any of [CANC]\");\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "PATCH",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"documentStatus\": \"CONF\",\r\n    \"reason\": null\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/DoesNotMatter",
-											"host": [
-												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
-											],
-											"path": [
-												"bookings",
-												"DoesNotMatter"
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
 						{
 							"name": "Booking by carrierBookingRequestRereference",
 							"event": [
@@ -1426,6 +1317,441 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Cancel booking",
+			"item": [
+				{
+					"name": "Positive test cases",
+					"item": [
+						{
+							"name": "Test: Cancel newly created booking",
+							"item": [
+								{
+									"name": "Create a booking to be canceled",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const parsedBody = pm.response.json();\r",
+													"pm.collectionVariables.set(\"CARRIER_BOOKING_REQUEST_REFERENCE\", parsedBody.carrierBookingRequestReference);\r",
+													"\r",
+													"pm.test(\"Status code is 201\", () => {\r",
+													"    pm.response.to.have.status(201);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"documentStatus is RECE\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.documentStatus).to.eql(\"RECE\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"receiptTypeAtOrigin\": \"CY\",\r\n    \"deliveryTypeAtDestination\": \"CY\",\r\n    \"cargoMovementTypeAtOrigin\": \"BB\",\r\n    \"cargoMovementTypeAtDestination\": \"BB\",\r\n    \"serviceContractReference\": \"asdas\",\r\n    \"isPartialLoadAllowed\": false,\r\n    \"isExportDeclarationRequired\": false,\r\n    \"isImportLicenseRequired\": false,\r\n    \"isAMSACIFilingRequired\": false,\r\n    \"isDestinationFilingRequired\": false,\r\n    \"expectedDepartureDate\": \"2022-11-11\",\r\n    \"communicationChannelCode\": \"AO\",\r\n    \"isEquipmentSubstitutionAllowed\": false,\r\n    \"invoicePayableAt\": {\r\n        \"locationName\": \"address location\",\r\n        \"address\": {\r\n            \"name\": \"Henrik\"\r\n        }\r\n    },\r\n    \"placeOfBLIssue\": {\r\n        \"UNLocationCode\": \"DEHAM\",\r\n        \"locationName\": \"unlocation location\"\r\n    },\r\n    \"commodities\": [\r\n        {\r\n            \"commodityType\": \"blah blah blah\",\r\n            \"cargoGrossWeight\": 3.14,\r\n            \"cargoGrossWeightUnit\": \"KGM\"\r\n        },\r\n        {\r\n            \"commodityType\": \"blip blip blip\",\r\n            \"cargoGrossWeight\": 3.14,\r\n            \"cargoGrossWeightUnit\": \"KGM\"\r\n        }\r\n    ],\r\n    \"valueAddedServiceRequests\": [\r\n        {\r\n            \"valueAddedServiceCode\": \"CDECL\"\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"CR\",\r\n            \"value\": \"boink\"\r\n        }\r\n    ],\r\n    \"requestedEquipments\": [\r\n        {\r\n            \"sizeType\": \"22GP\",\r\n            \"units\": 2,\r\n            \"equipmentReferences\": [\r\n                \"BMOU2149612\",\r\n                \"APZU4812090\"\r\n            ],\r\n            \"isShipperOwned\": true\r\n        }\r\n    ],\r\n    \"shipmentLocations\": [\r\n        {\r\n            \"location\": {\r\n                \"locationName\": \"address location\",\r\n                \"address\": {\r\n                    \"name\": \"Henrik\"\r\n                }\r\n            },\r\n            \"displayedName\": \"pling\",\r\n            \"shipmentLocationTypeCode\": \"ECP\",\r\n            \"eventDateTime\": \"2022-11-11T11:09:28.292578512+01:00\"\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"host": [
+												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+											],
+											"path": [
+												"bookings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Cancel the new booking",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
+													"\r",
+													"pm.collectionVariables.unset(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
+													"\r",
+													"pm.test(\"Status code is 200\", () => {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"documentStatus must be CANC\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.documentStatus).to.eql(\"CANC\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"carrierBookingRequestReference must be as expected\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.carrierBookingRequestReference).to.eql(carrierBookingRequestReference);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.expect(pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\")).to.not.eql(undefined)"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"documentStatus\": \"CANC\",\r\n    \"reason\": \"We decided to book else where\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"host": [
+												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+											],
+											"path": [
+												"bookings",
+												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"BOOKING_RESPONSE_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"// We do not valid return codes here because create booking is a 201 and cancel is a 200.",
+									"// (which we could probably do a generic check for here, but we would still need a more",
+									"// precise check in the individual tests anyway).",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});",
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Negative test cases",
+					"item": [
+						{
+							"name": "Test: Cancel twice should fail",
+							"item": [
+								{
+									"name": "Create a booking to be canceled",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const parsedBody = pm.response.json();\r",
+													"pm.collectionVariables.set(\"CARRIER_BOOKING_REQUEST_REFERENCE\", parsedBody.carrierBookingRequestReference);\r",
+													"\r",
+													"pm.test(\"Status code is 201\", () => {\r",
+													"    pm.response.to.have.status(201);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"documentStatus is RECE\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.documentStatus).to.eql(\"RECE\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"receiptTypeAtOrigin\": \"CY\",\r\n    \"deliveryTypeAtDestination\": \"CY\",\r\n    \"cargoMovementTypeAtOrigin\": \"BB\",\r\n    \"cargoMovementTypeAtDestination\": \"BB\",\r\n    \"serviceContractReference\": \"asdas\",\r\n    \"isPartialLoadAllowed\": false,\r\n    \"isExportDeclarationRequired\": false,\r\n    \"isImportLicenseRequired\": false,\r\n    \"isAMSACIFilingRequired\": false,\r\n    \"isDestinationFilingRequired\": false,\r\n    \"expectedDepartureDate\": \"2022-11-11\",\r\n    \"communicationChannelCode\": \"AO\",\r\n    \"isEquipmentSubstitutionAllowed\": false,\r\n    \"invoicePayableAt\": {\r\n        \"locationName\": \"address location\",\r\n        \"address\": {\r\n            \"name\": \"Henrik\"\r\n        }\r\n    },\r\n    \"placeOfBLIssue\": {\r\n        \"UNLocationCode\": \"DEHAM\",\r\n        \"locationName\": \"unlocation location\"\r\n    },\r\n    \"commodities\": [\r\n        {\r\n            \"commodityType\": \"blah blah blah\",\r\n            \"cargoGrossWeight\": 3.14,\r\n            \"cargoGrossWeightUnit\": \"KGM\"\r\n        },\r\n        {\r\n            \"commodityType\": \"blip blip blip\",\r\n            \"cargoGrossWeight\": 3.14,\r\n            \"cargoGrossWeightUnit\": \"KGM\"\r\n        }\r\n    ],\r\n    \"valueAddedServiceRequests\": [\r\n        {\r\n            \"valueAddedServiceCode\": \"CDECL\"\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"CR\",\r\n            \"value\": \"boink\"\r\n        }\r\n    ],\r\n    \"requestedEquipments\": [\r\n        {\r\n            \"sizeType\": \"22GP\",\r\n            \"units\": 2,\r\n            \"equipmentReferences\": [\r\n                \"BMOU2149612\",\r\n                \"APZU4812090\"\r\n            ],\r\n            \"isShipperOwned\": true\r\n        }\r\n    ],\r\n    \"shipmentLocations\": [\r\n        {\r\n            \"location\": {\r\n                \"locationName\": \"address location\",\r\n                \"address\": {\r\n                    \"name\": \"Henrik\"\r\n                }\r\n            },\r\n            \"displayedName\": \"pling\",\r\n            \"shipmentLocationTypeCode\": \"ECP\",\r\n            \"eventDateTime\": \"2022-11-11T11:09:28.292578512+01:00\"\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"host": [
+												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+											],
+											"path": [
+												"bookings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Cancel Booking first time",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
+													"\r",
+													"pm.test(\"Status code is 200\", () => {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"documentStatus must be CANC\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.documentStatus).to.eql(\"CANC\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"carrierBookingRequestReference must be as expected\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.carrierBookingRequestReference).to.eql(carrierBookingRequestReference);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.expect(pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\")).to.not.eql(undefined)"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"documentStatus\": \"CANC\",\r\n    \"reason\": \"We decided to book else where\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"host": [
+												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+											],
+											"path": [
+												"bookings",
+												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Cancel Booking not found Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.unset(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
+													"\r",
+													"pm.test(\"Status code is 409\", () => {\r",
+													"    pm.response.to.have.status(409);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Error reason is conflict\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.errors[0].reason).to.eql(\"conflict\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Error message is as expected\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.errors[0].message).to.eql(\"Cannot perform the requested action on the booking because the booking is cancelled (CANC)\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.expect(pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\")).to.not.eql(undefined)\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"documentStatus\": \"CANC\",\r\n    \"reason\": null\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"host": [
+												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+											],
+											"path": [
+												"bookings",
+												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Cancel Booking not found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", () => {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error reason is notFound\", () => {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].reason).to.eql(\"notFound\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error message is as expected\", () => {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking found with carrierBookingRequestReference: IdoNotExist\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"documentStatus\": \"CANC\",\r\n    \"reason\": null\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/IdoNotExist",
+									"host": [
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+									],
+									"path": [
+										"bookings",
+										"IdoNotExist"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel Booking invalid documentStatus",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error reason is documentStatus\", () => {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].reason).to.eql(\"documentStatus\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error message is as expected\", () => {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"must be any of [CANC]\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"documentStatus\": \"CONF\",\r\n    \"reason\": null\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/DoesNotMatter",
+									"host": [
+										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+									],
+									"path": [
+										"bookings",
+										"DoesNotMatter"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
 		}
 	],
 	"event": [
@@ -1495,6 +1821,11 @@
 		{
 			"key": "EBL_SPEC_VERSION",
 			"value": "2.0",
+			"type": "default"
+		},
+		{
+			"key": "BOOKING_RESPONSE_SCHEMA",
+			"value": "{\"required\":[\"bookingRequestCreatedDateTime\",\"bookingRequestUpdatedDateTime\",\"carrierBookingRequestReference\",\"documentStatus\"],\"type\":\"object\",\"description\":\"The `carrierBookingRequestReference` along with the `documentStatus` is returned\\n\",\"properties\":{\"carrierBookingRequestReference\":{\"type\":\"string\",\"description\":\"A reference to the booking during the booking request phase\\n\"},\"documentStatus\":{\"type\":\"string\",\"description\":\"The status of the booking. Possible values are:\\n- RECE (Received)\\n- PENU (Pending Update)\\n- PENC (Pending Confirmation)\\n- CONF (Confirmed)\\n- REJE (Rejected)\\n- CANC (Cancelled)\\n- CMPL (Completed)\\n\\nMore details can be found on <a href=\\\"https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv\\\">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.\\n\",\"enum\":[\"RECE\",\"PENU\",\"PENC\",\"CONF\",\"REJE\",\"CANC\",\"CMPL\"]},\"bookingRequestCreatedDateTime\":{\"type\":\"string\",\"description\":\"The date and time when the booking request was created\\n\",\"format\":\"date-time\"},\"bookingRequestUpdatedDateTime\":{\"type\":\"string\",\"description\":\"Last date and time when the booking request was updated\\n\",\"format\":\"date-time\"}}}",
 			"type": "default"
 		}
 	]
