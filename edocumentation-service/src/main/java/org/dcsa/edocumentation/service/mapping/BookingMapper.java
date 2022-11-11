@@ -26,7 +26,5 @@ public interface BookingMapper {
   BookingTO toDTO(Booking booking);
 
   BookingRefStatusTO toStatusDTO(Booking booking);
-
-  ShipmentEventTypeCode toShipmentEventTypeCode(BkgDocumentStatus bkgDocumentStatus);
 }
 

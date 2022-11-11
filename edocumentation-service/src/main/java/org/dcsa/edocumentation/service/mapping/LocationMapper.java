@@ -3,9 +3,6 @@ package org.dcsa.edocumentation.service.mapping;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.transferobjects.LocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.FacilityLocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
 import org.dcsa.edocumentation.transferobjects.enums.FacilityCodeListProvider;
 import org.dcsa.skernel.domain.persistence.entity.Facility;
 import org.dcsa.skernel.domain.persistence.entity.Location;
@@ -23,7 +20,7 @@ public class LocationMapper {
     }
 
     if (location.getAddress() != null) {
-      return AddressLocationTO.builder()
+      return LocationTO.addressLocationBuilder()
         .locationName(location.getLocationName())
         .address(addressMapper.toDTO(location.getAddress()))
         .build();
@@ -40,14 +37,14 @@ public class LocationMapper {
       } else {
         throw new IllegalArgumentException("Facility '" + facility.getId()+ "' has neither SMDG code nor BIC code");
       }
-      return FacilityLocationTO.builder()
+      return LocationTO.facilityLocationBuilder()
         .locationName(location.getLocationName())
         .UNLocationCode(location.getUNLocationCode())
         .facilityCode(facilityCode)
         .facilityCodeListProvider(facilityCodeListProvider)
         .build();
     } else if (location.getUNLocationCode() != null) {
-      return UNLocationLocationTO.builder()
+      return LocationTO.unLocationLocationBuilder()
         .locationName(location.getLocationName())
         .UNLocationCode(location.getUNLocationCode())
         .build();

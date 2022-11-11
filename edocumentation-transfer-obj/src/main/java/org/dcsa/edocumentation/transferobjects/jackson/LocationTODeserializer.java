@@ -6,9 +6,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.dcsa.edocumentation.transferobjects.AddressTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.FacilityLocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
 import org.dcsa.edocumentation.transferobjects.enums.FacilityCodeListProvider;
 
 import java.io.IOException;
@@ -31,19 +28,19 @@ public class LocationTODeserializer extends StdDeserializer<LocationTO> {
           "Invalid json, cannot deserialize a location containing address together" +
             " with UNLocationCode, facilityCode or facilityCodeListProvider");
       }
-      return AddressLocationTO.builder()
+      return LocationTO.addressLocationBuilder()
         .locationName(combinedLocation.locationName)
         .address(combinedLocation.address)
         .build();
     } else if (combinedLocation.isFacility()) {
-      return FacilityLocationTO.builder()
+      return LocationTO.facilityLocationBuilder()
         .locationName(combinedLocation.locationName)
         .facilityCode(combinedLocation.facilityCode)
         .facilityCodeListProvider(combinedLocation.facilityCodeListProvider)
         .UNLocationCode(combinedLocation.UNLocationCode())
         .build();
     } else if (combinedLocation.isUNLocation()){
-      return UNLocationLocationTO.builder()
+      return LocationTO.unLocationLocationBuilder()
         .locationName(combinedLocation.locationName)
         .UNLocationCode(combinedLocation.UNLocationCode())
         .build();

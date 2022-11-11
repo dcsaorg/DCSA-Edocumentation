@@ -75,7 +75,7 @@ public class BookingService {
       .vessel(vesselService.resolveVessel(bookingRequest))
       .placeOfIssue(locationService.ensureResolvable(bookingRequest.placeOfBLIssue()))
       .invoicePayableAt(locationService.ensureResolvable(bookingRequest.invoicePayableAt()))
-      // Carrier over from the existing booking
+      // Carry over from the existing booking
       .carrierBookingRequestReference(existingBooking.getCarrierBookingRequestReference())
       .documentStatus(existingBooking.getDocumentStatus())
       .bookingRequestCreatedDateTime(existingBooking.getBookingRequestCreatedDateTime())

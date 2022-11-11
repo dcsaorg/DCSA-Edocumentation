@@ -17,6 +17,7 @@ public interface DocumentPartyMapper {
   @Mapping(source = "booking", target = "booking")
   @Mapping(source = "booking.id", target = "id", ignore = true)
   @Mapping(source = "documentPartyTO.displayedAddress", target = "displayedAddress", ignore = true)
+  @Mapping(source = "documentPartyTO.party", target = "party", ignore = true)
   DocumentParty toDAO(DocumentPartyTO documentPartyTO, Booking booking);
 
   @Mapping(source = "address", target = "address", ignore = true)

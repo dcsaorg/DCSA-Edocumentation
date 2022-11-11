@@ -9,7 +9,7 @@ import java.util.UUID;
 @UtilityClass
 public class AddressDataFactory {
   private static String name = "Asseco DK";
-  private static String street = "Kronprincessegade";
+  private static String street = "Kronprinsessegade";
   private static String streetNumber = "54";
   private static String floor = "5. sal";
   private static String postCode = "1306";
