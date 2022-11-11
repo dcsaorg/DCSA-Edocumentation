@@ -8,4 +8,7 @@ import org.mapstruct.Mapper;
 public interface DocumentStatusMapper {
   org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus toDomainBkgDocumentStatus(BkgDocumentStatus documentStatus);
   org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus toDomainEblDocumentStatus(EblDocumentStatus documentStatus);
+
+  BkgDocumentStatus toTransferBkgDocumentStatus(org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus documentStatus);
+  EblDocumentStatus toTransferEblDocumentStatus(org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus documentStatus);
 }

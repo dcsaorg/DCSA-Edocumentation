@@ -1,0 +1,23 @@
+package org.dcsa.edocumentation.service;
+
+import lombok.RequiredArgsConstructor;
+import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
+import org.dcsa.edocumentation.domain.persistence.repository.VesselRepository;
+import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class VesselService {
+  private final VesselRepository vesselRepository;
+
+  public Vessel resolveVessel(BookingTO bookingRequest) {
+    if (bookingRequest.vesselIMONumber() != null) {
+      return vesselRepository.findByVesselIMONumber(bookingRequest.vesselIMONumber())
+        .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound(
+          "No vessel with vesselIMONumber = '" + bookingRequest.vesselIMONumber() + "'"));
+    }
+    return null;
+  }
+}
