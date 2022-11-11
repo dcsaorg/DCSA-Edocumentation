@@ -14,6 +14,8 @@ import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.OffsetDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -59,8 +61,42 @@ public class BookingService {
   }
 
   @Transactional
-  public BookingRefStatusTO updateBooking(String carrierBookingRequestReference, BookingTO bookingRequest) {
-    return null; // TODO https://dcsa.atlassian.net/browse/DDT-1277
+  public Optional<BookingRefStatusTO> updateBooking(String carrierBookingRequestReference, BookingTO bookingRequest) {
+    Booking existingBooking = bookingRepository.findBookingByCarrierBookingRequestReference(
+      carrierBookingRequestReference
+    ).orElse(null);
+    if (existingBooking == null) {
+      return Optional.empty();
+    }
+    OffsetDateTime updateTime = OffsetDateTime.now();
+    existingBooking.lockVersion(updateTime);
+    Booking updatedBooking = bookingMapper.toDAO(bookingRequest).toBuilder()
+      .voyage(voyageService.resolveVoyage(bookingRequest))
+      .vessel(vesselService.resolveVessel(bookingRequest))
+      .placeOfIssue(locationService.ensureResolvable(bookingRequest.placeOfBLIssue()))
+      .invoicePayableAt(locationService.ensureResolvable(bookingRequest.invoicePayableAt()))
+      // Carrier over from the existing booking
+      .carrierBookingRequestReference(existingBooking.getCarrierBookingRequestReference())
+      .documentStatus(existingBooking.getDocumentStatus())
+      .bookingRequestCreatedDateTime(existingBooking.getBookingRequestCreatedDateTime())
+      .build();
+
+    // TODO: If we get "soft validation", we would have to conditionally call pendingUpdate here
+    ShipmentEvent updateEvent = updatedBooking.pendingConfirmation(null, updateTime);
+    // We have to flush the existing booking. Otherwise, JPA might be tempted to re-order that
+    // write/save until after the updatedBooking is saved (which triggers the unique constraint
+    // in the database).
+    bookingRepository.saveAndFlush(existingBooking);
+    updatedBooking = bookingRepository.save(updatedBooking);
+    shipmentEventRepository.save(updateEvent);
+
+    // A couple of fail-safe checks that should be unnecessary unless we introduce bugs.
+    assert existingBooking.getValidUntil() != null;
+    assert Objects.equals(existingBooking.getCarrierBookingRequestReference(), updatedBooking.getBookingChannelReference());
+    assert updatedBooking.getId() != null && !updatedBooking.getId().equals(existingBooking.getId());
+
+    createDeepObjectsForBooking(bookingRequest, updatedBooking);
+    return Optional.of(bookingMapper.toStatusDTO(updatedBooking));
   }
 
   private void createDeepObjectsForBooking(BookingTO bookingRequest, Booking booking) {

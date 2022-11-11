@@ -74,7 +74,12 @@ public class BookingController {
         "documentStatus, bookingRequestCreatedDateTime and"
           + " bookingRequestUpdatedDateTime are not allowed when updating a booking");
     }
-    return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest);
+    return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest)
+      .orElseThrow(
+        () ->
+          ConcreteRequestErrorMessageException.notFound(
+            "No booking found with carrierBookingRequestReference: "
+              + carrierBookingRequestReference));
   }
 
   @PatchMapping(
