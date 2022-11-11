@@ -260,15 +260,15 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENU} state.
    */
-  public ShipmentEvent pendingUpdate(String reason) {
-    return processTransition(PENU, reason);
+  public ShipmentEvent pendingUpdate(String reason, OffsetDateTime updateTime) {
+    return processTransition(PENU, reason, updateTime);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  public ShipmentEvent pendingConfirmation(String reason) {
-    return processTransition(PENC, reason);
+  public ShipmentEvent pendingConfirmation(String reason, OffsetDateTime updateTime) {
+    return processTransition(PENC, reason, updateTime);
   }
 
   /**
@@ -285,6 +285,13 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
     return processTransition(CMPL, null);
   }
 
+  public void lockVersion(OffsetDateTime lockTime) {
+    if (isNew()) {
+      throw new IllegalStateException("Cannot lock a \"new\" version of the booking entity!");
+    }
+    this.validUntil = lockTime;
+  }
+
   @Override
   protected DFADefinition<BkgDocumentStatus> getDfaDefinition() {
     return BOOKING_DFA_DEFINITION;
@@ -296,12 +303,18 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   }
 
   protected ShipmentEvent processTransition(BkgDocumentStatus status, String reason) {
+    return processTransition(status, reason, OffsetDateTime.now());
+  }
+
+  protected ShipmentEvent processTransition(BkgDocumentStatus status, String reason, OffsetDateTime updateTime) {
+    if (this.validUntil != null) {
+      throw new IllegalStateException("Cannot change state on a frozen version!");
+    }
     transitionTo(status);
-    OffsetDateTime now =  OffsetDateTime.now();
     this.documentStatus = status;
-    this.bookingRequestUpdatedDateTime = now;
+    this.bookingRequestUpdatedDateTime = updateTime;
     if (this.bookingRequestCreatedDateTime == null) {
-      this.bookingRequestCreatedDateTime = now;
+      this.bookingRequestCreatedDateTime = updateTime;
     }
     if (id == null) {
       id = UUID.randomUUID();
@@ -317,8 +330,8 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
       .shipmentEventTypeCode(status.asShipmentEventTypeCode())
       .reason(reason)
       .eventClassifierCode(EventClassifierCode.ACT)
-      .eventDateTime(now)
-      .eventCreatedDateTime(now)
+      .eventDateTime(updateTime)
+      .eventCreatedDateTime(updateTime)
       .build();
   }
 

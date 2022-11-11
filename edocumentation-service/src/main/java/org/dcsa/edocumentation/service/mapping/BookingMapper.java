@@ -12,7 +12,8 @@ import org.mapstruct.Mapping;
     componentModel = "spring",
     uses = {
       LocationMapper.class,
-      DisplayedAddressMapper.class
+      DisplayedAddressMapper.class,
+      RequestedEquipmentMapper.class
     }
 )
 public interface BookingMapper {

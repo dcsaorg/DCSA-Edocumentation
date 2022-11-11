@@ -2,10 +2,7 @@ package org.dcsa.edocumentation.service;
 
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
-import org.dcsa.edocumentation.service.mapping.AddressMapper;
-import org.dcsa.edocumentation.service.mapping.BookingMapper;
-import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
-import org.dcsa.edocumentation.service.mapping.LocationMapper;
+import org.dcsa.edocumentation.service.mapping.*;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +26,7 @@ class BookingServiceTest {
   @Mock private BookingRepository repository;
   @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
   @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
+  @Spy private RequestedEquipmentMapper requestedEquipmentMapper = Mappers.getMapper(RequestedEquipmentMapper.class);
 
   @InjectMocks private BookingService service;
 
@@ -38,6 +36,7 @@ class BookingServiceTest {
     DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
     ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
     ReflectionTestUtils.setField(bookingMapper, "displayedAddressMapper", displayedAddressMapper);
+    ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentMapper", requestedEquipmentMapper);
   }
 
   @Test
