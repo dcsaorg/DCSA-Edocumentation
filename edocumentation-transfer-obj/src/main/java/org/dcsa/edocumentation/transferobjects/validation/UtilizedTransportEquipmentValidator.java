@@ -28,7 +28,7 @@ public class UtilizedTransportEquipmentValidator
     return false;
   }
 
-  private Boolean containsWeightAndUnit(EquipmentTO equipment) {
+  private boolean containsWeightAndUnit(EquipmentTO equipment) {
     return Objects.nonNull(equipment.tareWeight()) && Objects.nonNull(equipment.weightUnit());
   }
 }
