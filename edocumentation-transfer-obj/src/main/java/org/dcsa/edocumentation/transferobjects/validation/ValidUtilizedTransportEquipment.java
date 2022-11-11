@@ -11,7 +11,7 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validate that a given String field contains a valid vessel IMO number
+ * Validate that a given UtilizedTransportEquipment contains a tareWeight and weightUnit for shipper owned equipment
  *
  * This constraint validation ensures that the UtilizedTransportEquipment is valid
  *
