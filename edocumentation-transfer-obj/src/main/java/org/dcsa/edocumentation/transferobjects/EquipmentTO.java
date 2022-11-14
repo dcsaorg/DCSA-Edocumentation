@@ -3,12 +3,12 @@ package org.dcsa.edocumentation.transferobjects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
-import org.dcsa.skernel.infrastructure.validation.RequiredIfOther;
+import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@RequiredIfOther(ifNotNull = "tareWeight", thenNotNull = "weightUnit")
+@AllOrNone({"tareWeight", "weightUnit"})
 public record EquipmentTO(
   @NotNull(message = "EquipmentReference is required.")
   @Size(max = 15)

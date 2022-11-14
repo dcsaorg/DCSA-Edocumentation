@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.transferobjects;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.TemperatureUnit;
 
-public record ActiveReeferSettings(
+public record ActiveReeferSettingsTO(
   Double temperatureMin,
 
   Double temperatureMax,
@@ -19,5 +19,5 @@ public record ActiveReeferSettings(
   Double ventilationMax
 ) {
   @Builder
-  public ActiveReeferSettings{}
+  public ActiveReeferSettingsTO {}
 }

@@ -4,14 +4,14 @@ import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.VolumeUnit;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
 import org.dcsa.edocumentation.transferobjects.validation.ValidUtilizedTransportEquipment;
-import org.dcsa.skernel.infrastructure.validation.RequiredIfOther;
+import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @ValidUtilizedTransportEquipment
-@RequiredIfOther(ifNotNull = "cargoGrossVolumeUnit", thenNotNull = "cargoGrossVolumeUnit")
+@AllOrNone({"cargoGrossVolumeUnit", "cargoGrossVolume"})
 public record UtilizedTransportEquipmentTO(
 
   @NotNull(message = "Equipment is required.")
@@ -35,7 +35,7 @@ public record UtilizedTransportEquipmentTO(
   List<SealTO> seals,
 
   @Valid
-  ActiveReeferSettings activeReeferSettings
+  ActiveReeferSettingsTO activeReeferSettingsTO
 ) {
   @Builder
   public UtilizedTransportEquipmentTO{}
