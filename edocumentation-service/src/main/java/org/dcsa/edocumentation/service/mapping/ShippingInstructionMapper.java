@@ -13,11 +13,6 @@ import org.mapstruct.Mapping;
     LocationMapper.class,
   })
 public interface ShippingInstructionMapper {
-  @Mapping(
-    source = "shipments",
-    target = "carrierBookingReferences")
-  ShippingInstructionSummaryTO ShippingInstructionToShippingInstructionSummary(ShippingInstruction shippingInstruction);
-
   // TODO: Complete this stub mapping (DDT-1296)
   ShippingInstruction toDAO(ShippingInstructionTO shippingInstructionTO);
 
