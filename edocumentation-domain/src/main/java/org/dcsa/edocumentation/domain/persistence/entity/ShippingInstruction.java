@@ -24,7 +24,7 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumen
   }
 )
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
@@ -93,7 +93,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "place_of_issue_id")
-  private Location placeOfIssueID;
+  private Location placeOfIssue;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "transport_document_type_code")

@@ -9,9 +9,12 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ShippingInstructionRepository  extends JpaRepository<ShippingInstruction, UUID> {
   @EntityGraph("graph.shipping-instruction-summary")
   Page<ShippingInstruction> findAll(@Nullable Specification<ShippingInstructionSpecification> spec, Pageable pageable);
+
+  Optional<ShippingInstruction> findByShippingInstructionReferenceAndValidUntilIsNull(String shippingInstructionReference);
 }
