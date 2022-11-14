@@ -3,14 +3,14 @@ package org.dcsa.edocumentation.transferobjects;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.VolumeUnit;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
-import org.dcsa.skernel.infrastructure.validation.RequiredIfOther;
+import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-@RequiredIfOther(ifNotNull = "volume", thenNotNull = "volumeUnit")
+@AllOrNone({"volume", "volumeUnit"})
 public record CargoItemTO(
 
   @Size(max = 15)
