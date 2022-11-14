@@ -42,6 +42,12 @@ public class DocumentParty {
   @JoinColumn(name = "booking_id")
   private Booking booking;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipping_instruction_id")
+  private ShippingInstruction shippingInstruction;
+
   // ToDo only the required associations for booking summaries and booking request have been
   // implemented
 }

@@ -1,6 +1,5 @@
 package org.dcsa.edocumentation.service.mapping;
 
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
 import org.dcsa.edocumentation.domain.persistence.entity.Party;
 import org.dcsa.edocumentation.domain.persistence.entity.PartyContactDetails;
@@ -14,10 +13,8 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface DocumentPartyMapper {
-  @Mapping(source = "booking", target = "booking")
-  @Mapping(source = "booking.id", target = "id", ignore = true)
   @Mapping(source = "documentPartyTO.displayedAddress", target = "displayedAddress", ignore = true)
-  DocumentParty toDAO(DocumentPartyTO documentPartyTO, Booking booking);
+  DocumentParty toDAO(DocumentPartyTO documentPartyTO);
 
   @Mapping(source = "address", target = "address", ignore = true)
   @Mapping(source = "partyContactDetails", target = "partyContactDetails", ignore = true)

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
 import org.dcsa.edocumentation.domain.persistence.entity.Party;
+import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.repository.DisplayedAddressRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.DocumentPartyRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.PartyContactDetailsRepository;
@@ -39,16 +40,31 @@ public class DocumentPartyService {
   @Transactional(TxType.MANDATORY)
   public void createDocumentParties(Collection<DocumentPartyTO> documentParties, Booking booking) {
     if (documentParties != null && !documentParties.isEmpty()) {
-      documentParties.forEach(documentPartyTO -> createDocumentParty(documentPartyTO, booking));
+      documentParties.forEach(documentPartyTO ->
+        createDocumentParty(documentPartyTO,
+          documentPartyMapper.toDAO(documentPartyTO).toBuilder().booking(booking)));
     }
   }
 
-  private void createDocumentParty(DocumentPartyTO documentPartyTO, Booking booking) {
+  @Transactional(TxType.MANDATORY)
+  public void createDocumentParties(Collection<DocumentPartyTO> documentParties, ShippingInstruction shippingInstruction) {
+    if (documentParties != null && !documentParties.isEmpty()) {
+      documentParties.forEach(documentPartyTO ->
+        createDocumentParty(documentPartyTO,
+          documentPartyMapper.toDAO(documentPartyTO).toBuilder().shippingInstruction(shippingInstruction)));
+    }
+  }
+
+  private void createDocumentParty(DocumentPartyTO documentPartyTO, DocumentParty.DocumentPartyBuilder builder) {
     DocumentParty documentParty = documentPartyRepository.save(
-      documentPartyMapper.toDAO(documentPartyTO, booking).toBuilder()
+      builder
         .party(createParty(documentPartyTO.party()))
         .build());
 
+    createDisplayedAddresses(documentPartyTO, documentParty);
+  }
+
+  private void createDisplayedAddresses(DocumentPartyTO documentPartyTO, DocumentParty documentParty) {
     List<String> displayedAddress = documentPartyTO.displayedAddress();
     if (displayedAddress != null && !displayedAddress.isEmpty()) {
       displayedAddressRepository.saveAll(
