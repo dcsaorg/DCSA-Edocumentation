@@ -1,38 +1,43 @@
 package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
+import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.specification.ShippingInstructionSpecification;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
-import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
-import org.dcsa.skernel.infrastructure.pagination.Cursor;
-import org.dcsa.skernel.infrastructure.pagination.PagedResult;
-import org.springframework.lang.Nullable;
+import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.ShippingInstructionTO;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ShippingInstructionService {
+
+  private final LocationService locationService;
+  private final ShipmentEventRepository shipmentEventRepository;
   private final ShippingInstructionRepository shippingInstructionRepository;
   private final ShippingInstructionMapper shippingInstructionMapper;
 
-  public PagedResult<ShippingInstructionSummaryTO> findShippingInstructionSummaries(
-      Cursor cursor, EblDocumentStatus documentStatus, @Nullable String carrierBookingReference) {
-    return new PagedResult<>(
-        shippingInstructionRepository
-            .findAll(
-                ShippingInstructionSpecification.withFilters(
-                    ShippingInstructionSpecification.ShippingInstructionFilters.builder()
-                        .carrierBookingReference(
-                            carrierBookingReference == null
-                                ? null
-                                : Arrays.asList(carrierBookingReference.split(",")))
-                        .documentStatus(documentStatus)
-                        .build()),
-                cursor.toPageRequest())
-            .map(shippingInstructionMapper::ShippingInstructionToShippingInstructionSummary));
+  public Optional<ShippingInstructionTO> findByReference(String shippingInstructionReference) {
+    // TODO: Verify the mapping (DDT-1296) and add positive postman tests with schema validation
+    return shippingInstructionRepository.findByShippingInstructionReferenceAndValidUntilIsNull(shippingInstructionReference)
+      .map(shippingInstructionMapper::toDTO);
+  }
+
+  public ShippingInstructionRefStatusTO createShippingInstruction(ShippingInstructionTO shippingInstructionTO) {
+    // TODO: Verify the mapping (DDT-1296) and add positive + negative postman tests
+    ShippingInstruction shippingInstruction = toDAOBuilder(shippingInstructionTO).build();
+    shipmentEventRepository.save(shippingInstruction.receive());
+    shippingInstruction = shippingInstructionRepository.save(shippingInstruction);
+    return shippingInstructionMapper.toStatusDTO(shippingInstruction);
+  }
+
+  // Return a builder because PUT will need to copy in some extra fields.
+  private ShippingInstruction.ShippingInstructionBuilder toDAOBuilder(ShippingInstructionTO shippingInstructionTO) {
+    // TODO: Verify this stub (DDT-1296)
+    return shippingInstructionMapper.toDAO(shippingInstructionTO).toBuilder()
+      .placeOfIssue(locationService.ensureResolvable(shippingInstructionTO.placeOfIssue()));
   }
 }
