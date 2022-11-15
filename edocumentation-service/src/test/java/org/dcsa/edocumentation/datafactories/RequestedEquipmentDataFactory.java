@@ -13,7 +13,7 @@ import java.util.UUID;
 @UtilityClass
 public class RequestedEquipmentDataFactory {
 
-  public RequestedEquipment singleRequestedEquipment() {
+  public static RequestedEquipment singleRequestedEquipment() {
     return RequestedEquipment.builder()
         .id(UUID.randomUUID())
         .confirmedEquipmentSizetype("confirmed size type")
@@ -30,66 +30,38 @@ public class RequestedEquipmentDataFactory {
         .build();
   }
 
-  public List<RequestedEquipmentTO> requestedEquipmentTOList() {
+  public static List<RequestedEquipmentTO> requestedEquipmentTOList() {
     return List.of(
       RequestedEquipmentTO.builder()
-        .equipmentReferences(List.of("Equipment_Ref_01", "Equipment_Ref_02", "Equipment_Ref_03"))
+        .equipmentReferences(List.of("Equipment_Ref_01"))
         .sizeType("size Type 1")
-        .units(3)
+        .units(1)
         .isShipperOwned(true)
         .build(),
       RequestedEquipmentTO.builder()
-        .equipmentReferences(List.of("Equipment_Ref_02", "Equipment_Ref_03", "Equipment_Ref_04"))
+        .equipmentReferences(List.of("Equipment_Ref_02"))
         .sizeType("size Type 2")
-        .units(3)
-        .isShipperOwned(true)
+        .units(1)
+        .isShipperOwned(false)
         .build()
     );
   }
 
-  public Set<String> equipmentReferenceList() {
-    return Set.of("Equipment_Ref_01", "Equipment_Ref_02", "Equipment_Ref_03", "Equipment_Ref_04");
-  }
 
-  public List<Equipment> equipmentList() {
-    return List.of(
-      Equipment.builder()
-        .equipmentReference("Equipment_Ref_01")
-        .tareWeight(100F)
-        .weightUnit(WeightUnit.KGM)
-        .build(),
-      Equipment.builder()
-        .equipmentReference("Equipment_Ref_02")
-        .tareWeight(314F)
-        .weightUnit(WeightUnit.KGM)
-        .build(),
-      Equipment.builder()
-        .equipmentReference("Equipment_Ref_03")
-        .tareWeight(99F)
-        .weightUnit(WeightUnit.KGM)
-        .build(),
-      Equipment.builder()
-        .equipmentReference("Equipment_Ref_04")
-        .tareWeight(5F)
-        .weightUnit(WeightUnit.KGM)
-        .build()
-    );
-  }
-
-  public List<RequestedEquipment> requestedEquipmentList() {
-    List<Equipment> equipments = equipmentList();
+  public static List<RequestedEquipment> requestedEquipmentList() {
+    List<Equipment> equipments = EquipmentDataFactory.equipmentList();
     return List.of(
       RequestedEquipment.builder()
         .isShipperOwned(true)
         .sizeType("size Type 1")
-        .units(3)
-        .equipments(Set.of(equipments.get(0), equipments.get(1), equipments.get(2)))
+        .units(1)
+        .equipments(Set.of(equipments.get(0)))
         .build(),
       RequestedEquipment.builder()
-        .isShipperOwned(true)
+        .isShipperOwned(false)
         .sizeType("size Type 2")
-        .units(3)
-        .equipments(Set.of(equipments.get(1), equipments.get(2), equipments.get(3)))
+        .units(1)
+        .equipments(Set.of(equipments.get(1)))
         .build()
     );
   }
