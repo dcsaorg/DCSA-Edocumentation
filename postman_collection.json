@@ -1,9 +1,8 @@
 {
 	"info": {
-		"_postman_id": "0b27d7b6-2376-4c9c-aff2-2be26855399f",
+		"_postman_id": "240fc6fa-ef3e-47ca-8965-c0188c13f245",
 		"name": "DCSA-EDocumentation",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "18186286"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -2513,6 +2512,172 @@
 								}
 							},
 							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Post booking",
+			"item": [
+				{
+					"name": "Positive test cases",
+					"item": [
+						{
+							"name": "Test: Post a newly created booking",
+							"item": [
+								{
+									"name": "Create a booking to be updated",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const parsedBody = pm.response.json();\r",
+													"pm.collectionVariables.set(\"CARRIER_BOOKING_REQUEST_REFERENCE\", parsedBody.carrierBookingRequestReference);\r",
+													"pm.collectionVariables.set(\"POST_BODY\", pm.request.body.raw)\r",
+													"\r",
+													"\r",
+													"pm.test(\"Status code is 201\", () => {\r",
+													"    pm.response.to.have.status(201);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"documentStatus is RECE\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.documentStatus).to.eql(\"RECE\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"receiptTypeAtOrigin\": \"CY\",\r\n    \"deliveryTypeAtDestination\": \"CY\",\r\n    \"cargoMovementTypeAtOrigin\": \"FCL\",\r\n    \"cargoMovementTypeAtDestination\": \"FCL\",\r\n    \"serviceContractReference\": \"serviceRef\",\r\n    \"carrierExportVoyageNumber\": \"2106W\",\r\n    \"universalExportVoyageReference\": \"35BQE\",\r\n    \"declaredValue\": 3.14,\r\n    \"declaredValueCurrency\": \"DKK\",\r\n    \"paymentTermCode\": \"PRE\",\r\n    \"isPartialLoadAllowed\": true,\r\n    \"isExportDeclarationRequired\": true,\r\n    \"exportDeclarationReference\": \"exportDeclarationRef\",\r\n    \"isImportLicenseRequired\": true,\r\n    \"importLicenseReference\": \"importLicenseRef\",\r\n    \"isAMSACIFilingRequired\": true,\r\n    \"isDestinationFilingRequired\": true,\r\n    \"contractQuotationReference\": \"contractQuotationRef\",\r\n    \"expectedDepartureDate\": \"2022-11-15\",\r\n    \"expectedArrivalAtPlaceOfDeliveryStartDate\": \"2022-11-15\",\r\n    \"expectedArrivalAtPlaceOfDeliveryEndDate\": \"2022-11-15\",\r\n    \"transportDocumentTypeCode\": \"BOL\",\r\n    \"transportDocumentReference\": \"transportDocumentRef\",\r\n    \"bookingChannelReference\": \"bookingChannelRef\",\r\n    \"incoTerms\": \"FOB\",\r\n    \"communicationChannelCode\": \"AO\",\r\n    \"isEquipmentSubstitutionAllowed\": true,\r\n    \"vesselIMONumber\": \"1234567\",\r\n    \"preCarriageModeOfTransportCode\": \"VESSEL\",\r\n    \"invoicePayableAt\": {\r\n        \"locationName\": \"Asseco DK office\",\r\n        \"address\": {\r\n            \"name\": \"Asseco DK\",\r\n            \"street\": \"Kronprinsessegade\",\r\n            \"streetNumber\": \"54\",\r\n            \"floor\": \"5. sal\",\r\n            \"postCode\": \"1306\",\r\n            \"city\": \"København\",\r\n            \"country\": \"Denmark\"\r\n        }\r\n    },\r\n    \"placeOfBLIssue\": {\r\n        \"locationName\": \"Asseco DK office\",\r\n        \"address\": {\r\n            \"name\": \"Asseco DK\",\r\n            \"street\": \"Kronprinsessegade\",\r\n            \"streetNumber\": \"54\",\r\n            \"floor\": \"5. sal\",\r\n            \"postCode\": \"1306\",\r\n            \"city\": \"København\",\r\n            \"country\": \"Denmark\"\r\n        }\r\n    },\r\n    \"commodities\": [\r\n        {\r\n            \"HSCode\": \"411510\",\r\n            \"commodityType\": \"commodity type\",\r\n            \"cargoGrossWeight\": 323.32,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"cargoGrossVolume\": 100.0,\r\n            \"cargoGrossVolumeUnit\": \"MTQ\",\r\n            \"numberOfPackages\": 1,\r\n            \"exportLicenseIssueDate\": \"2022-11-15\",\r\n            \"exportLicenseExpiryDate\": \"2023-05-15\"\r\n        }\r\n    ],\r\n    \"valueAddedServiceRequests\": [\r\n        {\r\n            \"valueAddedServiceCode\": \"SIOT\"\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"ref value\"\r\n        }\r\n    ],\r\n    \"requestedEquipments\": [\r\n        {\r\n            \"sizeType\": \"22GP\",\r\n            \"units\": 3,\r\n            \"equipmentReferences\": [\r\n                \"BMOU2149612\"\r\n            ],\r\n            \"isShipperOwned\": true\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"boring party\",\r\n                \"address\": {\r\n                    \"name\": \"Asseco DK\",\r\n                    \"street\": \"Kronprinsessegade\",\r\n                    \"streetNumber\": \"54\",\r\n                    \"floor\": \"5. sal\",\r\n                    \"postCode\": \"1306\",\r\n                    \"city\": \"København\",\r\n                    \"country\": \"Denmark\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"Henrik\"\r\n                    }\r\n                ],\r\n                \"identifyingCodes\": [\r\n                    {\r\n                        \"DCSAResponsibleAgencyCode\": \"DCSA\",\r\n                        \"partyCode\": \"reponsible fun\",\r\n                        \"codeListName\": \"irreponsible fun\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"BA\",\r\n            \"displayedAddress\": [\r\n                \"line1\",\r\n                \"line2\"\r\n            ],\r\n            \"isToBeNotified\": true\r\n        }\r\n    ],\r\n    \"shipmentLocations\": [\r\n        {\r\n            \"location\": {\r\n                \"locationName\": \"Asseco DK office\",\r\n                \"address\": {\r\n                    \"name\": \"Asseco DK\",\r\n                    \"street\": \"Kronprinsessegade\",\r\n                    \"streetNumber\": \"54\",\r\n                    \"floor\": \"5. sal\",\r\n                    \"postCode\": \"1306\",\r\n                    \"city\": \"København\",\r\n                    \"country\": \"Denmark\"\r\n                }\r\n            },\r\n            \"displayedName\": \"Displayed name\",\r\n            \"shipmentLocationTypeCode\": \"OIR\",\r\n            \"eventDateTime\": \"2022-11-15T10:34:41.99631016+01:00\"\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"host": [
+												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+											],
+											"path": [
+												"bookings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify saved carrierBookingRequestReference",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
+													"const postRequestBodyRaw = pm.collectionVariables.get(\"POST_BODY\");\r",
+													"\r",
+													"pm.collectionVariables.unset(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
+													"pm.collectionVariables.unset(\"POST_BODY\");\r",
+													"\r",
+													"pm.test(\"Status code is 200\", () => {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"\r",
+													"pm.test(\"Response contains updated values\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.carrierBookingRequestReference).to.eql(carrierBookingRequestReference);\r",
+													"\r",
+													"    // Posting a new bookign should put us in \"RECE\".\r",
+													"    pm.expect(jsonData.documentStatus).to.eql(\"RECE\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Response matches put (minus some carrier provided fields)\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    const postRequestBody = JSON.parse(postRequestBodyRaw);\r",
+													"\r",
+													"    delete jsonData[\"carrierBookingRequestReference\"];\r",
+													"    delete jsonData[\"documentStatus\"];\r",
+													"    delete jsonData[\"bookingRequestCreatedDateTime\"];\r",
+													"    delete jsonData[\"bookingRequestUpdatedDateTime\"];\r",
+													"\r",
+													"    // Bug?\r",
+													"    delete postRequestBody[\"universalExportVoyageReference\"];\r",
+													"    delete postRequestBody[\"preCarriageModeOfTransportCode\"];\r",
+													"\r",
+													"    // Remove eventDateTime form shipmentLocation. It is sensitive\r",
+													"    // things like ms precision and timezone.\r",
+													"    postRequestBody.shipmentLocations.forEach((sl) => delete sl.eventDateTime);\r",
+													"    jsonData.shipmentLocations.forEach((sl) => delete sl.eventDateTime);\r",
+													"\r",
+													"    // For debugging:\r",
+													"    console.log(jsonData);\r",
+													"    console.log(postRequestBody);\r",
+													"    pm.expect(jsonData).to.eql(postRequestBody);\r",
+													"});\r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"host": [
+												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+											],
+											"path": [
+												"bookings",
+												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"BOOKING_RESPONSE_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"// We do not valid return codes here because create booking is a 201 and cancel is a 200.",
+									"// (which we could probably do a generic check for here, but we would still need a more",
+									"// precise check in the individual tests anyway).",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});",
+									""
+								]
+							}
 						}
 					]
 				}
