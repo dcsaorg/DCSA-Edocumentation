@@ -5,10 +5,12 @@ import org.dcsa.edocumentation.datafactories.LocationDataFactory;
 import org.dcsa.edocumentation.datafactories.VesselDataFactory;
 import org.dcsa.edocumentation.datafactories.VoyageDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.ModeOfTransport;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventTypeCode;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
@@ -29,7 +31,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -119,10 +120,12 @@ class BookingServiceTest {
     @Mock private ReferenceService referenceService;
     @Mock private DocumentPartyService documentPartyService;
     @Mock private ShipmentLocationService shipmentLocationService;
+    @Mock private ModeOfTransportService modeOfTransportService;
 
     @Mock private BookingRepository bookingRepository;
     @Mock private ShipmentEventRepository shipmentEventRepository;
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
+    @Spy private ModeOfTransportMapper modeOfTransportMapper = Mappers.getMapper(ModeOfTransportMapper.class);
 
     @InjectMocks private BookingService bookingService;
 
@@ -137,6 +140,9 @@ class BookingServiceTest {
     void testCreateFullBooking() {
       Voyage voyage = VoyageDataFactory.voyage();
       Vessel vessel = VesselDataFactory.vessel();
+      ModeOfTransport modeOfTransport = ModeOfTransport.builder()
+        .dcsaTransportType(DCSATransportType.VESSEL)
+        .build();
       Location location = LocationDataFactory.addressLocationWithId();
       OffsetDateTime now = OffsetDateTime.now();
 
@@ -146,6 +152,7 @@ class BookingServiceTest {
         .voyage(voyage)
         .placeOfIssue(location)
         .invoicePayableAt(location)
+        .modeOfTransport(modeOfTransport)
         .build();
       Booking bookingSaved = bookingToSave.toBuilder()
         .carrierBookingRequestReference("carrierBookingRequestRef")
@@ -158,6 +165,7 @@ class BookingServiceTest {
       when(vesselService.resolveVessel(any())).thenReturn(vessel);
       when(locationService.ensureResolvable(any())).thenReturn(location);
       when(bookingRepository.save(any())).thenReturn(bookingSaved);
+      when(modeOfTransportService.resolveModeOfTransport(any())).thenReturn(modeOfTransport);
 
        // Execute
       BookingRefStatusTO result = bookingService.createBooking(bookingRequest);

@@ -2612,7 +2612,6 @@
 													"\r",
 													"    // Bug?\r",
 													"    delete postRequestBody[\"universalExportVoyageReference\"];\r",
-													"    delete postRequestBody[\"preCarriageModeOfTransportCode\"];\r",
 													"\r",
 													"    // Remove eventDateTime form shipmentLocation. It is sensitive\r",
 													"    // things like ms precision and timezone.\r",
