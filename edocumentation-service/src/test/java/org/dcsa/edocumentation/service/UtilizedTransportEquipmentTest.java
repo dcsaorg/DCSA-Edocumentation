@@ -99,6 +99,24 @@ class UtilizedTransportEquipmentTest {
   }
 
   @Test
+  void utilizedTransportEquipmentTest_oneCarrierOwnedEquipmentWithSeal() {
+    UtilizedTransportEquipmentTO utilizedTransportEquipmentTO =
+      UtilizedTransportEquipmentEquipmentDataFactory.singleCarrierOwnedWithSeal();
+
+    utilizedTransportEquipmentService.createUtilizedTransportEquipment(
+      List.of(utilizedTransportEquipmentTO));
+    verify(equipmentService)
+      .verifyCarrierOwnedEquipmentsExists(equipmentReferencesCapture.capture());
+    verify(equipmentService, times(1)).ensureResolvable(equipmentToCapture.capture());
+    assertEquals(
+      utilizedTransportEquipmentTO.equipment().equipmentReference(),
+      equipmentToCapture.getValue().equipmentReference());
+    assertEquals(
+      Set.of(utilizedTransportEquipmentTO.equipment().equipmentReference()),
+      equipmentReferencesCapture.getValue());
+  }
+
+  @Test
   void utilizedTransportEquipmentTest_twoCarrierOwnedEquipment() {
     List<UtilizedTransportEquipmentTO> mockUtilizedTransportEquipments =
         UtilizedTransportEquipmentEquipmentDataFactory.multipleCarrierOwned();

@@ -2,8 +2,7 @@ package org.dcsa.edocumentation.controller;
 
 import org.dcsa.edocumentation.service.ShippingInstructionService;
 import org.dcsa.edocumentation.transferobjects.*;
-import org.dcsa.edocumentation.transferobjects.enums.PartyFunction;
-import org.dcsa.edocumentation.transferobjects.enums.ReferenceType;
+import org.dcsa.edocumentation.transferobjects.enums.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,14 @@ class ShippingInstructionControllerTest {
 
     UtilizedTransportEquipmentTO utilizedTransportEquipmentTO = UtilizedTransportEquipmentTO.builder()
       .isShipperOwned(true)
-      .cargoGrossWeightUnit(org.dcsa.edocumentation.transferobjects.enums.WeightUnit.KGM)
+      .cargoGrossWeightUnit(WeightUnit.KGM)
       .cargoGrossWeight(120.3)
       .equipment(equipmentTO)
+      .seals(List.of(SealTO.builder()
+          .sealSource(SealSourceCode.CAR)
+          .sealType(SealTypeCode.BLT)
+          .sealNumber("12345")
+        .build()))
       .build();
 
     CargoItemTO cargoItemTo = CargoItemTO.builder()

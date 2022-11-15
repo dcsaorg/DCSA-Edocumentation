@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
@@ -35,6 +35,10 @@ public class UtilizedTransportEquipment {
   @JoinColumn(name = "equipment_reference")
   private Equipment equipment;
 
-  //ToDo associations with ActiveReeferSettings and Seals
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinColumn(name = "utilized_transport_equipment_id", nullable = false)
+  private Set<Seal> seals;
 
 }
