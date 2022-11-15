@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
+import org.dcsa.edocumentation.transferobjects.LocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.FacilityLocationTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
@@ -12,14 +13,14 @@ import java.util.UUID;
 @UtilityClass
 public class LocationDataFactory {
   public static AddressLocationTO addressLocationTO() {
-    return AddressLocationTO.builder()
+    return LocationTO.addressLocationBuilder()
       .locationName("Asseco DK office")
       .address(AddressDataFactory.addressTO())
       .build();
   }
 
   public static FacilityLocationTO facilityLocationTO() {
-    return FacilityLocationTO.builder()
+    return LocationTO.facilityLocationBuilder()
       .locationName(FacilityDataFactory.NAME)
       .UNLocationCode(FacilityDataFactory.UNLOCATION_CODE)
       .facilityCode(FacilityDataFactory.SMDG_CODE)
@@ -28,7 +29,7 @@ public class LocationDataFactory {
   }
 
   public static UNLocationLocationTO unLocationLocationTO() {
-    return UNLocationLocationTO.builder()
+    return LocationTO.unLocationLocationBuilder()
       .locationName("Rotterdam UNLocation")
       .UNLocationCode("NLRTM")
       .build();

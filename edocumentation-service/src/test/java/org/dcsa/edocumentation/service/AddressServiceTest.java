@@ -6,6 +6,7 @@ import org.dcsa.edocumentation.service.mapping.AddressMapper;
 import org.dcsa.edocumentation.service.util.EnsureResolvable.ResolvedEntity;
 import org.dcsa.edocumentation.transferobjects.AddressTO;
 import org.dcsa.skernel.domain.persistence.entity.Address;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +33,11 @@ public class AddressServiceTest {
   @Mock private AddressMapper addressMapper;
 
   @InjectMocks private AddressService addressService;
+
+  @BeforeEach
+  public void resetMocks() {
+    reset(addressRepository, addressMapper);
+  }
 
   @Test
   public void testNull() {

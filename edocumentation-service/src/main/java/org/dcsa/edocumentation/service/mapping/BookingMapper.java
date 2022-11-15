@@ -23,10 +23,9 @@ public interface BookingMapper {
   @Mapping(source = "placeOfIssue", target = "placeOfBLIssue")
   @Mapping(source = "voyage.carrierVoyageNumber", target = "carrierExportVoyageNumber")
   @Mapping(source = "vessel.vesselIMONumber", target = "vesselIMONumber")
+  @Mapping(source = "modeOfTransport.dcsaTransportType", target = "preCarriageModeOfTransportCode")
   BookingTO toDTO(Booking booking);
 
   BookingRefStatusTO toStatusDTO(Booking booking);
-
-  ShipmentEventTypeCode toShipmentEventTypeCode(BkgDocumentStatus bkgDocumentStatus);
 }
 

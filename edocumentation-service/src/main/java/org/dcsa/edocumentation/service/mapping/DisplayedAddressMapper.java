@@ -23,7 +23,7 @@ public class DisplayedAddressMapper {
   public Set<DisplayedAddress> toDAO(List<String> displayedAddresses, DocumentParty documentParty) {
     return IntStream.range(0, displayedAddresses.size())
       .mapToObj(index -> DisplayedAddress.builder()
-        .addressLineNumber(index)
+        .addressLineNumber(index + 1)
         .addressLine(displayedAddresses.get(index))
         .documentParty(documentParty)
         .build())

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public record PartyIdentifyingCodeTO(
-  @NotBlank
+  @NotBlank @Size(max = 100)
   String partyCode,
 
   @NotNull

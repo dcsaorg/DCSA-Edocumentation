@@ -19,6 +19,27 @@ public sealed interface LocationTO permits AddressLocationTO, FacilityLocationTO
   @Size(max = 100)
   String locationName();
 
+  /**
+   * Shortcut for creating a builder for a LocationTO of type AddressLocationTO.
+   */
+  static AddressLocationTO.AddressLocationTOBuilder addressLocationBuilder() {
+    return AddressLocationTO.builder();
+  }
+
+  /**
+   * Shortcut for creating a builder for a LocationTO of type FacilityLocationTO.
+   */
+  static FacilityLocationTO.FacilityLocationTOBuilder facilityLocationBuilder() {
+    return FacilityLocationTO.builder();
+  }
+
+  /**
+   * Shortcut for creating a builder for a LocationTO of type UNLocationLocationTO.
+   */
+  static UNLocationLocationTO.UNLocationLocationTOBuilder unLocationLocationBuilder() {
+    return UNLocationLocationTO.builder();
+  }
+
   record AddressLocationTO(
     @Size(max = 100)
     String locationName,

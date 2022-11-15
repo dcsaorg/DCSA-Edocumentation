@@ -37,14 +37,14 @@ public class Commodity {
   private String hsCode;
 
   @Column(name = "cargo_gross_weight")
-  private Double cargoGrossWeight;
+  private Float cargoGrossWeight;
 
   @Column(name = "cargo_gross_weight_unit")
   @Enumerated(EnumType.STRING)
   private WeightUnit cargoGrossWeightUnit;
 
   @Column(name = "cargo_gross_volume")
-  private Double cargoGrossVolume;
+  private Float cargoGrossVolume;
 
   @Column(name = "cargo_gross_volume_unit")
   @Enumerated(EnumType.STRING)

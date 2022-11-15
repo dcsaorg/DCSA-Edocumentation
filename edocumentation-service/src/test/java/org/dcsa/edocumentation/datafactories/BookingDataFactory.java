@@ -5,6 +5,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.ModeOfTransport;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
+import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.skernel.domain.persistence.entity.enums.DimensionUnit;
 
 import java.time.LocalDate;
@@ -49,19 +50,7 @@ public class BookingDataFactory {
   }
 
   public Booking singleShallowBookingWithVesselAndModeOfTransport() {
-    Vessel mockVessel =
-        Vessel.builder()
-            .id(UUID.fromString("f90de80b-af26-4703-93b0-722bb3fa69c7"))
-            .vesselIMONumber("1234567")
-            .name("Mock Vessel")
-            .flag("NL")
-            .callSignNumber("123456789012345678")
-            .isDummy(false)
-            .length(120F)
-            .width(40F)
-            .dimensionUnit(DimensionUnit.MTR)
-            .type(VesselType.CONT)
-            .build();
+    Vessel mockVessel = VesselDataFactory.vessel();
 
     ModeOfTransport mockModeOfTransport =
         ModeOfTransport.builder()
@@ -105,19 +94,7 @@ public class BookingDataFactory {
   }
 
   public List<Booking> multipleShallowBookingsWithVesselAndModeOfTransport() {
-    Vessel mockVessel =
-        Vessel.builder()
-            .id(UUID.fromString("f90de80b-af26-4703-93b0-722bb3fa69c7"))
-            .vesselIMONumber("1234567")
-            .name("Mock Vessel")
-            .flag("NL")
-            .callSignNumber("123456789012345678")
-            .isDummy(false)
-            .length(120F)
-            .width(40F)
-            .dimensionUnit(DimensionUnit.MTR)
-            .type(VesselType.CONT)
-            .build();
+    Vessel mockVessel = VesselDataFactory.vessel();
 
     ModeOfTransport mockModeOfTransport =
         ModeOfTransport.builder()
@@ -197,19 +174,7 @@ public class BookingDataFactory {
   }
 
   public Booking singleDeepBooking() {
-    Vessel mockVessel =
-        Vessel.builder()
-            .id(UUID.fromString("f90de80b-af26-4703-93b0-722bb3fa69c7"))
-            .vesselIMONumber("1234567")
-            .name("Mock Vessel")
-            .flag("NL")
-            .callSignNumber("123456789012345678")
-            .isDummy(false)
-            .length(120F)
-            .width(40F)
-            .dimensionUnit(DimensionUnit.MTR)
-            .type(VesselType.CONT)
-            .build();
+    Vessel mockVessel = VesselDataFactory.vessel();
 
     ModeOfTransport mockModeOfTransport =
         ModeOfTransport.builder()
@@ -277,5 +242,46 @@ public class BookingDataFactory {
         .isEquipmentSubstitutionAllowed(false)
         .commodities(Set.of(CommodityDataFactory.singleCommodity()))
         .build();
+  }
+
+  public BookingTO singleFullBookingRequestTO() {
+    return BookingTO.builder()
+      .receiptTypeAtOrigin(org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType.CY)
+      .deliveryTypeAtDestination(org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType.CY)
+      .cargoMovementTypeAtDestination(org.dcsa.edocumentation.transferobjects.enums.CargoMovementType.FCL)
+      .serviceContractReference("serviceRef")
+      .carrierExportVoyageNumber("voyageRef")
+      .universalExportVoyageReference("35BQE")
+      .declaredValue(3.14f)
+      .declaredValueCurrency("DKK")
+      .paymentTermCode(org.dcsa.edocumentation.transferobjects.enums.PaymentTerm.PRE)
+      .isPartialLoadAllowed(true)
+      .isExportDeclarationRequired(true)
+      .exportDeclarationReference("exportDeclarationRef")
+      .isImportLicenseRequired(true)
+      .importLicenseReference("importLicenseRef")
+      .isAMSACIFilingRequired(true)
+      .isDestinationFilingRequired(true)
+      .contractQuotationReference("contractQuotationRef")
+      .expectedDepartureDate(LocalDate.now())
+      .expectedArrivalAtPlaceOfDeliveryStartDate(LocalDate.now())
+      .expectedArrivalAtPlaceOfDeliveryEndDate(LocalDate.now())
+      .transportDocumentTypeCode(org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode.BOL)
+      .transportDocumentReference("transportDocumentRef")
+      .bookingChannelReference("bookingChannelRef")
+      .incoTerms(org.dcsa.edocumentation.transferobjects.enums.IncoTerms.FOB)
+      .communicationChannelCode(org.dcsa.edocumentation.transferobjects.enums.CommunicationChannelCode.AO)
+      .isEquipmentSubstitutionAllowed(true)
+      .vesselIMONumber("1234567")
+      .preCarriageModeOfTransportCode(org.dcsa.edocumentation.transferobjects.enums.DCSATransportType.VESSEL)
+      .invoicePayableAt(LocationDataFactory.addressLocationTO())
+      .placeOfBLIssue(LocationDataFactory.addressLocationTO())
+      .commodities(List.of(CommodityDataFactory.singleCommodityTO()))
+      .valueAddedServiceRequests(List.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestTO()))
+      .references(List.of(ReferenceDataFactory.singleReferenceTO()))
+      .requestedEquipments(RequestedEquipmentDataFactory.requestedEquipmentTOList())
+      .documentParties(List.of(DocumentPartyDataFactory.fullDocumentPartyTO()))
+      .shipmentLocations(List.of(ShipmentLocationDataFactory.shipmentLocationTO()))
+      .build();
   }
 }
