@@ -39,6 +39,7 @@ public class VoyageServiceTest {
   public void resolveVoyage_null() {
     // Setup
     BookingTO bookingTO = BookingTO.builder()
+      .universalExportVoyageReference(null)
       .carrierExportVoyageNumber(null)
       .build();
 
@@ -47,12 +48,14 @@ public class VoyageServiceTest {
 
     // Verify
     verify(voyageRepository, never()).findByCarrierVoyageNumber(any());
+    verify(voyageRepository, never()).findByUniversalVoyageReference(any());
   }
 
   @Test
-  public void resolveVoyage_unknown() {
+  public void resolveVoyage_UnknownCarrierExportVoyageNumber() {
     // Setup
     BookingTO bookingTO = BookingTO.builder()
+      .universalExportVoyageReference(null)
       .carrierExportVoyageNumber("voyageRef")
       .build();
     when(voyageRepository.findByCarrierVoyageNumber(any())).thenReturn(Collections.emptyList());
@@ -64,12 +67,14 @@ public class VoyageServiceTest {
     // Verify
     assertEquals("No voyages with carrierVoyageNumber = 'voyageRef'", exception.getMessage());
     verify(voyageRepository).findByCarrierVoyageNumber("voyageRef");
+    verify(voyageRepository, never()).findByUniversalVoyageReference(any());
   }
 
   @Test
-  public void resolveVoyage_known() {
+  public void resolveVoyage_KnownCarrierExportVoyageNumber() {
     // Setup
     BookingTO bookingTO = BookingTO.builder()
+      .universalExportVoyageReference(null)
       .carrierExportVoyageNumber("voyageRef")
       .build();
     Voyage expected = VoyageDataFactory.voyage();
@@ -81,5 +86,67 @@ public class VoyageServiceTest {
     // Verify
     assertEquals(expected, actual);
     verify(voyageRepository).findByCarrierVoyageNumber("voyageRef");
+    verify(voyageRepository, never()).findByUniversalVoyageReference(any());
+  }
+
+  @Test
+  public void resolveVoyage_UnknownUniversalVoyageReference() {
+    // Setup
+    BookingTO bookingTO = BookingTO.builder()
+      .universalExportVoyageReference("universalRef")
+      .carrierExportVoyageNumber(null)
+      .build();
+    when(voyageRepository.findByUniversalVoyageReference(any())).thenReturn(Collections.emptyList());
+
+    // Execute
+    NotFoundException exception =
+      assertThrows(NotFoundException.class, () -> voyageService.resolveVoyage(bookingTO));
+
+    // Verify
+    String message = "No voyages with universalVoyageReference = 'universalRef' and carrierExportVoyageNumber = 'null'";
+    assertEquals(message, exception.getMessage());
+    verify(voyageRepository, never()).findByCarrierVoyageNumber(any());
+    verify(voyageRepository).findByUniversalVoyageReference("universalRef");
+  }
+
+  @Test
+  public void resolveVoyage_KnownUniversalVoyageReference_MismatchCarrierExportVoyageNumber() {
+    // Setup
+    BookingTO bookingTO = BookingTO.builder()
+      .universalExportVoyageReference("universalRef")
+      .carrierExportVoyageNumber("unknown")
+      .build();
+    Voyage voyage = VoyageDataFactory.voyage();
+
+    when(voyageRepository.findByUniversalVoyageReference(any())).thenReturn(List.of(voyage));
+
+    // Execute
+    NotFoundException exception =
+      assertThrows(NotFoundException.class, () -> voyageService.resolveVoyage(bookingTO));
+
+    // Verify
+    String message = "No voyages with universalVoyageReference = 'universalRef' and carrierExportVoyageNumber = 'unknown'";
+    assertEquals(message, exception.getMessage());
+    verify(voyageRepository, never()).findByCarrierVoyageNumber(any());
+    verify(voyageRepository).findByUniversalVoyageReference("universalRef");
+  }
+
+  @Test
+  public void resolveVoyage_KnownUniversalVoyageReference() {
+    // Setup
+    BookingTO bookingTO = BookingTO.builder()
+      .universalExportVoyageReference("universalRef")
+      .carrierExportVoyageNumber(null)
+      .build();
+    Voyage expected = VoyageDataFactory.voyage();
+    when(voyageRepository.findByUniversalVoyageReference(any())).thenReturn(List.of(expected));
+
+    // Execute
+    Voyage actual = voyageService.resolveVoyage(bookingTO);
+
+    // Verify
+    assertEquals(expected, actual);
+    verify(voyageRepository, never()).findByCarrierVoyageNumber(any());
+    verify(voyageRepository).findByUniversalVoyageReference("universalRef");
   }
 }

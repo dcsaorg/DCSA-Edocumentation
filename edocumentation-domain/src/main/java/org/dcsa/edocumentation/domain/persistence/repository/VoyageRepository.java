@@ -9,5 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface VoyageRepository extends JpaRepository<Voyage, UUID> {
+  List<Voyage> findByUniversalVoyageReference(String universalVoyageReference);
   List<Voyage> findByCarrierVoyageNumber(String carrierVoyageNumber);
 }

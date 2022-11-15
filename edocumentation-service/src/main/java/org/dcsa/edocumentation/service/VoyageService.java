@@ -13,13 +13,24 @@ public class VoyageService {
   private final VoyageRepository voyageRepository;
 
   public Voyage resolveVoyage(BookingTO bookingRequest) {
-    if (bookingRequest.carrierExportVoyageNumber() != null) {
-      // Since carrierVoyageNumber is not unique in Voyage and booking does not supply a service to make it
+    String universalExportVoyageReference = bookingRequest.universalExportVoyageReference();
+    String carrierExportVoyageNumber = bookingRequest.carrierExportVoyageNumber();
+    if (universalExportVoyageReference != null) {
+      // Since universalVoyageReference is not unique in Voyage and booking does not supply a service to make it
       // unique we just take the first Voyage found.
-      return voyageRepository.findByCarrierVoyageNumber(bookingRequest.carrierExportVoyageNumber()).stream()
+      return voyageRepository.findByUniversalVoyageReference(universalExportVoyageReference).stream()
+        .filter(voyage -> carrierExportVoyageNumber == null || carrierExportVoyageNumber.equals(voyage.getCarrierVoyageNumber()))
         .findFirst()
         .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound(
-          "No voyages with carrierVoyageNumber = '" + bookingRequest.carrierExportVoyageNumber() + "'"));
+          "No voyages with universalVoyageReference = '" + universalExportVoyageReference
+            + "' and carrierExportVoyageNumber = '" + carrierExportVoyageNumber + "'"));
+    } else if (carrierExportVoyageNumber != null) {
+      // Since carrierVoyageNumber is not unique in Voyage and booking does not supply a service to make it
+      // unique we just take the first Voyage found.
+      return voyageRepository.findByCarrierVoyageNumber(carrierExportVoyageNumber).stream()
+        .findFirst()
+        .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound(
+          "No voyages with carrierVoyageNumber = '" + carrierExportVoyageNumber + "'"));
     }
     return null;
   }
