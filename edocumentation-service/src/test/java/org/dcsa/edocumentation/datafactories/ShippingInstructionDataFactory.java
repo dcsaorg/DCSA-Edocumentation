@@ -6,6 +6,8 @@ import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.VolumeUnit;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 import org.dcsa.skernel.domain.persistence.entity.Address;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.dcsa.skernel.domain.persistence.entity.Location;

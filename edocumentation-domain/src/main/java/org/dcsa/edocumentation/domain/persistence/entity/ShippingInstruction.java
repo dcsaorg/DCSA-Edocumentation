@@ -2,17 +2,14 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EventClassifierCode;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -336,5 +333,4 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
       e
     );
   }
-
 }
