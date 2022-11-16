@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -25,22 +25,33 @@ public class UtilizedTransportEquipmentService {
   private final EquipmentService equipmentService;
 
   @Transactional(Transactional.TxType.MANDATORY)
-  public List<UtilizedTransportEquipment> createUtilizedTransportEquipment(
+  public Map<String, UtilizedTransportEquipment> createUtilizedTransportEquipment(
       Collection<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs) {
 
-    Set<String> allCarrierOwnedEquipmentReferences = utilizedTransportEquipmentTOs.stream()
-      .filter(Predicate.not(UtilizedTransportEquipmentTO::isShipperOwned))
-      .map(UtilizedTransportEquipmentTO::equipment)
-      .map(EquipmentTO::equipmentReference)
-      .filter(Objects::nonNull)
-      .collect(Collectors.toSet());
+    Set<String> allCarrierOwnedEquipmentReferences =
+        utilizedTransportEquipmentTOs.stream()
+            .filter(Predicate.not(UtilizedTransportEquipmentTO::isShipperOwned))
+            .map(UtilizedTransportEquipmentTO::equipment)
+            .map(EquipmentTO::equipmentReference)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
 
     equipmentService.verifyCarrierOwnedEquipmentsExists(allCarrierOwnedEquipmentReferences);
 
     utilizedTransportEquipmentTOs.forEach(
-        utilizedTransportEquipmentTO -> equipmentService.ensureResolvable(utilizedTransportEquipmentTO.equipment()));
+        utilizedTransportEquipmentTO ->
+            equipmentService.ensureResolvable(utilizedTransportEquipmentTO.equipment()));
 
-    return utilizedTransportEquipmentRepository.saveAll(utilizedTransportEquipmentTOs.stream().map(utilizedTransportEquipmentMapper::toDAO).toList());
+    return utilizedTransportEquipmentRepository
+        .saveAll(
+            utilizedTransportEquipmentTOs.stream()
+                .map(utilizedTransportEquipmentMapper::toDAO)
+                .toList())
+        .stream()
+        .collect(
+            Collectors.toMap(
+                utilizedTransportEquipment ->
+                    utilizedTransportEquipment.getEquipment().getEquipmentReference(),
+                utilizedTransportEquipment -> utilizedTransportEquipment));
   }
-
 }

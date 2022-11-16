@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -46,11 +47,8 @@ public class ShippingInstructionService {
     // TODO: Verify the mapping (DDT-1296) and add positive + negative postman tests
 
     OffsetDateTime now = OffsetDateTime.now();
-    UUID shippingInstructionId = UUID.fromString("802ace2d-1f09-41e5-9176-020985455a6e");
-
     ShippingInstruction shippingInstruction =
         toDAOBuilder(shippingInstructionTO)
-          .id(shippingInstructionId)
           .shippingInstructionReference("SI_REF_FOO")
           .shippingInstructionCreatedDateTime(now)
           .shippingInstructionUpdatedDateTime(now)
@@ -60,17 +58,14 @@ public class ShippingInstructionService {
                     .collect(Collectors.toSet()))
 
             .build();
-    //    shipmentEventRepository.save(shippingInstruction.receive());
+//        shipmentEventRepository.save(shippingInstruction.receive());
     shippingInstruction.receive();
 
     shippingInstruction = shippingInstructionRepository.save(shippingInstruction);
     documentPartyService.createDocumentParties(shippingInstructionTO.documentParties(), shippingInstruction);
     referenceService.createReferences(shippingInstructionTO.references(), shippingInstruction);
-    List<UtilizedTransportEquipment> savedUtilizedTransportEquipments = utilizedTransportEquipmentService.createUtilizedTransportEquipment(shippingInstructionTO.utilizedTransportEquipments());
+    Map<String, UtilizedTransportEquipment> savedUtilizedTransportEquipments = utilizedTransportEquipmentService.createUtilizedTransportEquipment(shippingInstructionTO.utilizedTransportEquipments());
     stuffingService.createStuffing(shippingInstruction, savedUtilizedTransportEquipments, shippingInstructionTO.consignmentItems());
-    //    documentPartyService.createDocumentParties(shippingInstructionTO.documentParties());
-    //    referenceService.createReferences(shippingInstructionTO.references(),
-    // shippingInstruction);
     return shippingInstructionMapper.toStatusDTO(shippingInstruction);
   }
 
