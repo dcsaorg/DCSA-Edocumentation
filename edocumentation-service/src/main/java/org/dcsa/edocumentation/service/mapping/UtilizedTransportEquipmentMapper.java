@@ -7,5 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface UtilizedTransportEquipmentMapper {
 
+  //ToDo inject CargoItem in here to create a stuffing service
   UtilizedTransportEquipment toDAO(UtilizedTransportEquipmentTO utilizedTransportEquipmentTO);
 }

@@ -44,7 +44,8 @@ public class CargoItem {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "cargoItem")
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinColumn(name = "cargo_item_id", nullable = false, referencedColumnName = "id")
   private Set<CargoLineItem> cargoLineItems;
 
   @ToString.Exclude
@@ -52,11 +53,5 @@ public class CargoItem {
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "utilized_transport_equipment_id")
   private UtilizedTransportEquipment utilizedTransportEquipment;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "consignment_item_id")
-  private ConsignmentItem consignmentItem;
 
 }

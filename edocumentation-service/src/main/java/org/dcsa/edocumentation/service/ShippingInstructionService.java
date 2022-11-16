@@ -2,6 +2,7 @@ package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
+import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.service.mapping.DocumentPartyMapper;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,6 +30,7 @@ public class ShippingInstructionService {
   private final DocumentPartyMapper documentPartyMapper;
   private final ReferenceService referenceService;
   private final UtilizedTransportEquipmentService utilizedTransportEquipmentService;
+  private final StuffingService stuffingService;
 
   @Transactional
   public Optional<ShippingInstructionTO> findByReference(String shippingInstructionReference) {
@@ -63,8 +66,8 @@ public class ShippingInstructionService {
     shippingInstruction = shippingInstructionRepository.save(shippingInstruction);
     documentPartyService.createDocumentParties(shippingInstructionTO.documentParties(), shippingInstruction);
     referenceService.createReferences(shippingInstructionTO.references(), shippingInstruction);
-    utilizedTransportEquipmentService.createUtilizedTransportEquipment(shippingInstructionTO.utilizedTransportEquipments());
-
+    List<UtilizedTransportEquipment> savedUtilizedTransportEquipments = utilizedTransportEquipmentService.createUtilizedTransportEquipment(shippingInstructionTO.utilizedTransportEquipments());
+    stuffingService.createStuffing(shippingInstruction, savedUtilizedTransportEquipments, shippingInstructionTO.consignmentItems());
     //    documentPartyService.createDocumentParties(shippingInstructionTO.documentParties());
     //    referenceService.createReferences(shippingInstructionTO.references(),
     // shippingInstruction);

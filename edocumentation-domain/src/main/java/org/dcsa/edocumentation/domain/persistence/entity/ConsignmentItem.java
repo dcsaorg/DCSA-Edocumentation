@@ -25,9 +25,8 @@ public class ConsignmentItem {
   @Column(name = "description_of_goods")
   private String descriptionOfGoods;
 
-  @ManyToOne
-  @JoinColumn(name = "hs_code")
-  private HsCode hsCode;
+  @Column(name = "hs_code")
+  private String hsCode;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -63,7 +62,7 @@ public class ConsignmentItem {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "consignment_item_id", referencedColumnName = "id")
+  @JoinColumn(name = "consignment_item_id", referencedColumnName = "id", nullable = false)
   private Set<CargoItem> cargoItems;
 
 }

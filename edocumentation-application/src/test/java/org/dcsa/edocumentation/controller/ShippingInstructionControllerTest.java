@@ -38,16 +38,21 @@ class ShippingInstructionControllerTest {
       .build();
 
     CargoItemTO cargoItemTo = CargoItemTO.builder()
-      .weightUnit(org.dcsa.edocumentation.transferobjects.enums.WeightUnit.KGM)
+      .weightUnit(WeightUnit.KGM)
       .weight(120.3)
       .numberOfPackages(1)
       .packageCode("123")
+      .equipmentReference("eq_ref_01")
+      .cargoLineItems(List.of(CargoLineItemTO.builder()
+          .cargoLineItemID("Foo")
+          .shippingMarks("bar")
+        .build()))
       .build();
 
     ConsignmentItemTO consignmentItemTO = ConsignmentItemTO.builder()
       .weightUnit(org.dcsa.edocumentation.transferobjects.enums.WeightUnit.KGM)
       .weight(120.4)
-      .hsCode("41150")
+      .hsCode("411510")
       .descriptionOfGoods("description")
       .carrierBookingReference("cbr-b83765166707812c8ff4")
       .cargoItems(List.of(cargoItemTo))

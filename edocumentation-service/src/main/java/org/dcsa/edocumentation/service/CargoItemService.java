@@ -12,13 +12,13 @@ public class CargoItemService {
 
   private final CargoItemRepository repository;
 
-  public void createCargoItem(CargoItem cargoItem, ShippingInstruction shippingInstruction) {
-    repository.save(
-        cargoItem.toBuilder()
-            .consignmentItem(
-                cargoItem.getConsignmentItem().toBuilder()
-                    .shippingInstruction(shippingInstruction)
-                    .build())
-            .build());
-  }
+//  public void createCargoItem(CargoItem cargoItem, ShippingInstruction shippingInstruction) {
+//    repository.save(
+//        cargoItem.toBuilder()
+//            .consignmentItem(
+//                cargoItem.getConsignmentItem().toBuilder()
+//                    .shippingInstruction(shippingInstruction)
+//                    .build())
+//            .build());
+//  }
 }

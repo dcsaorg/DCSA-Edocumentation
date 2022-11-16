@@ -22,9 +22,7 @@ public class CargoLineItem {
   @Column(name = "shipping_marks", nullable = false)
   private String shippingMarks;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "cargo_item_id")
-  private CargoItem cargoItem;
+  @Column(name = "cargo_line_item_id", nullable = false)
+  private String cargoLineItemID;
+
 }
