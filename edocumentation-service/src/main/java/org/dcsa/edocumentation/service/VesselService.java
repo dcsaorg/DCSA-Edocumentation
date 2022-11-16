@@ -7,11 +7,14 @@ import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
 @RequiredArgsConstructor
 public class VesselService {
   private final VesselRepository vesselRepository;
 
+  @Transactional
   public Vessel resolveVessel(BookingTO bookingRequest) {
     if (bookingRequest.vesselIMONumber() != null) {
       return vesselRepository.findByVesselIMONumber(bookingRequest.vesselIMONumber())

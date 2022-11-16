@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 
 @Service
@@ -19,6 +20,7 @@ public class ShippingInstructionSummaryService {
   private final ShippingInstructionRepository shippingInstructionRepository;
   private final ShippingInstructionSummaryMapper shippingInstructionMapper;
 
+  @Transactional
   public PagedResult<ShippingInstructionSummaryTO> findShippingInstructionSummaries(
     PageRequest pageRequest, EblDocumentStatus documentStatus, @Nullable String carrierBookingReference) {
     return new PagedResult<>(

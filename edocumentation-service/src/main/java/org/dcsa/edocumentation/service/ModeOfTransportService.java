@@ -7,11 +7,14 @@ import org.dcsa.edocumentation.domain.persistence.repository.ModeOfTransportRepo
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
 @RequiredArgsConstructor
 public class ModeOfTransportService {
   private final ModeOfTransportRepository modeOfTransportRepository;
 
+  @Transactional
   public ModeOfTransport resolveModeOfTransport(DCSATransportType dcsaTransportType) {
     if (dcsaTransportType != null) {
       return modeOfTransportRepository.findByDcsaTransportType(dcsaTransportType)

@@ -11,6 +11,7 @@ import org.dcsa.skernel.infrastructure.pagination.PagedResult;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -20,6 +21,7 @@ public class BookingSummaryService {
   private final BookingSummaryMapper bookingSummaryMapper;
   private final DocumentStatusMapper documentStatusMapper;
 
+  @Transactional
   public PagedResult<BookingSummaryTO> findBookingSummaries(
     PageRequest pageRequest, BkgDocumentStatus documentStatus) {
 

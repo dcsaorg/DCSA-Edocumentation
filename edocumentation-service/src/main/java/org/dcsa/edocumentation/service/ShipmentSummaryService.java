@@ -10,6 +10,7 @@ import org.dcsa.skernel.infrastructure.pagination.PagedResult;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -19,6 +20,7 @@ public class ShipmentSummaryService {
   private final ShipmentSummaryMapper shipmentSummaryMapper;
   private final DocumentStatusMapper documentStatusMapper;
 
+  @Transactional
   public PagedResult<ShipmentSummaryTO> findShipmentSummaries(
       PageRequest pageRequest, BkgDocumentStatus documentStatus) {
 
