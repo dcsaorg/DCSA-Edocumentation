@@ -7,11 +7,14 @@ import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
 @RequiredArgsConstructor
 public class VoyageService {
   private final VoyageRepository voyageRepository;
 
+  @Transactional
   public Voyage resolveVoyage(BookingTO bookingRequest) {
     String universalExportVoyageReference = bookingRequest.universalExportVoyageReference();
     String carrierExportVoyageNumber = bookingRequest.carrierExportVoyageNumber();

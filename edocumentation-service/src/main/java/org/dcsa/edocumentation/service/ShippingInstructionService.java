@@ -9,6 +9,7 @@ import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionTO;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -20,12 +21,14 @@ public class ShippingInstructionService {
   private final ShippingInstructionRepository shippingInstructionRepository;
   private final ShippingInstructionMapper shippingInstructionMapper;
 
+  @Transactional
   public Optional<ShippingInstructionTO> findByReference(String shippingInstructionReference) {
     // TODO: Verify the mapping (DDT-1296) and add positive postman tests with schema validation
     return shippingInstructionRepository.findByShippingInstructionReferenceAndValidUntilIsNull(shippingInstructionReference)
       .map(shippingInstructionMapper::toDTO);
   }
 
+  @Transactional
   public ShippingInstructionRefStatusTO createShippingInstruction(ShippingInstructionTO shippingInstructionTO) {
     // TODO: Verify the mapping (DDT-1296) and add positive + negative postman tests
     ShippingInstruction shippingInstruction = toDAOBuilder(shippingInstructionTO).build();
