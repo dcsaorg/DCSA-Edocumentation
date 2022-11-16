@@ -21,6 +21,7 @@ public interface BookingMapper {
   Booking toDAO(BookingTO bookingTO);
 
   @Mapping(source = "placeOfIssue", target = "placeOfBLIssue")
+  @Mapping(source = "voyage.universalVoyageReference", target = "universalExportVoyageReference")
   @Mapping(source = "voyage.carrierVoyageNumber", target = "carrierExportVoyageNumber")
   @Mapping(source = "vessel.vesselIMONumber", target = "vesselIMONumber")
   @Mapping(source = "modeOfTransport.dcsaTransportType", target = "preCarriageModeOfTransportCode")
