@@ -149,4 +149,23 @@ public class VoyageServiceTest {
     verify(voyageRepository, never()).findByCarrierVoyageNumber(any());
     verify(voyageRepository).findByUniversalVoyageReference("universalRef");
   }
+
+  @Test
+  public void resolveVoyage_KnownUniversalVoyageReference_KnownCarrierExportVoyageNumber() {
+    // Setup
+    BookingTO bookingTO = BookingTO.builder()
+      .universalExportVoyageReference("universalRef")
+      .carrierExportVoyageNumber("voyageRef")
+      .build();
+    Voyage expected = VoyageDataFactory.voyage();
+    when(voyageRepository.findByUniversalVoyageReference(any())).thenReturn(List.of(expected));
+
+    // Execute
+    Voyage actual = voyageService.resolveVoyage(bookingTO);
+
+    // Verify
+    assertEquals(expected, actual);
+    verify(voyageRepository, never()).findByCarrierVoyageNumber(any());
+    verify(voyageRepository).findByUniversalVoyageReference("universalRef");
+  }
 }
