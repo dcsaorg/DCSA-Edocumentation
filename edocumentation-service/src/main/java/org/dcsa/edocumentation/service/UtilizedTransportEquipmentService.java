@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +39,7 @@ public class UtilizedTransportEquipmentService {
 
     equipmentService.verifyCarrierOwnedEquipmentsExists(allCarrierOwnedEquipmentReferences);
 
-    utilizedTransportEquipmentTOs.forEach(
-        utilizedTransportEquipmentTO ->
-            equipmentService.ensureResolvable(utilizedTransportEquipmentTO.equipment()));
+    equipmentService.resolveEquipments(utilizedTransportEquipmentTOs, UtilizedTransportEquipmentTO::isShipperOwned, e -> Stream.of(e.equipment()));
 
     return utilizedTransportEquipmentRepository
         .saveAll(
