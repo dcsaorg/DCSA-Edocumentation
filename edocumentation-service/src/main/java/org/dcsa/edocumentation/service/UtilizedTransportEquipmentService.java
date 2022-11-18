@@ -29,16 +29,6 @@ public class UtilizedTransportEquipmentService {
   public Map<String, UtilizedTransportEquipment> createUtilizedTransportEquipment(
       Collection<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs) {
 
-    Set<String> allCarrierOwnedEquipmentReferences =
-        utilizedTransportEquipmentTOs.stream()
-            .filter(Predicate.not(UtilizedTransportEquipmentTO::isShipperOwned))
-            .map(UtilizedTransportEquipmentTO::equipment)
-            .map(EquipmentTO::equipmentReference)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
-
-    equipmentService.verifyCarrierOwnedEquipmentsExists(allCarrierOwnedEquipmentReferences);
-
     equipmentService.resolveEquipments(utilizedTransportEquipmentTOs, UtilizedTransportEquipmentTO::isShipperOwned, e -> Stream.of(e.equipment()));
 
     return utilizedTransportEquipmentRepository

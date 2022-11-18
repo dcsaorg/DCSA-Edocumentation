@@ -21,22 +21,6 @@ public class EquipmentService {
   private final EquipmentRepository equipmentRepository;
   private final EquipmentMapper equipmentMapper;
 
-  public void verifyCarrierOwnedEquipmentsExists(
-      Set<String> allEquipmentReferences) {
-    Map<String, Equipment> equipments =
-      equipmentRepository.findByEquipmentReferences(allEquipmentReferences).stream()
-        .collect(Collectors.toMap(Equipment::getEquipmentReference, Function.identity()));
-
-    // Check that we could find them all
-    List<String> notFoundRequestedEquipmentReferences =
-      allEquipmentReferences.stream().filter(ref -> !equipments.containsKey(ref)).toList();
-    if (!notFoundRequestedEquipmentReferences.isEmpty()) {
-      throw ConcreteRequestErrorMessageException.notFound(
-        "Could not find the following equipmentReferences in equipments: "
-          + notFoundRequestedEquipmentReferences);
-    }
-  }
-
   /**
    * Resolves equipments.
    * @param collection collection of TOs that are not necessarily EquipmentTOs themselves but which contains EquipmentTOs.
