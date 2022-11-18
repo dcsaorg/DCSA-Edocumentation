@@ -26,7 +26,7 @@ public class EquipmentService extends EnsureResolvable<EquipmentTO, Equipment> {
   private final EquipmentMapper equipmentMapper;
 
   private final ExampleMatcher exampleMatcher =
-      ExampleMatcher.matchingAll().withIncludeNullValues().withIgnorePaths("equipmentReference");
+      ExampleMatcher.matchingAll().withIncludeNullValues();
 
   @Override
   @Transactional
