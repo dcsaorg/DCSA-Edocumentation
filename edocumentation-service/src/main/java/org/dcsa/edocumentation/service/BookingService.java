@@ -9,6 +9,7 @@ import org.dcsa.edocumentation.service.mapping.BookingMapper;
 import org.dcsa.edocumentation.service.mapping.ModeOfTransportMapper;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.skernel.infrastructure.services.LocationService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

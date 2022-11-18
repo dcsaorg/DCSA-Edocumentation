@@ -1,10 +1,11 @@
 package org.dcsa.edocumentation.transferobjects;
 
 import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.FacilityLocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
 import org.dcsa.edocumentation.transferobjects.enums.ShipmentLocationTypeCode;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.AddressLocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.FacilityLocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.UNLocationLocationTO;
 import org.dcsa.skernel.infrastructure.validation.RequireType;
 
 import javax.validation.Valid;

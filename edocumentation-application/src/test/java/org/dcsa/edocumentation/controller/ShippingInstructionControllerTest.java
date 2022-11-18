@@ -3,6 +3,7 @@ package org.dcsa.edocumentation.controller;
 import org.dcsa.edocumentation.service.ShippingInstructionService;
 import org.dcsa.edocumentation.transferobjects.*;
 import org.dcsa.edocumentation.transferobjects.enums.*;
+import org.dcsa.skernel.infrastructure.transferobject.AddressTO;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

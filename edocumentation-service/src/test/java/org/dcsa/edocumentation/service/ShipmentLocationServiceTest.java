@@ -7,6 +7,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentLocationRepository;
 import org.dcsa.edocumentation.service.mapping.ShipmentLocationMapper;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
+import org.dcsa.skernel.infrastructure.services.LocationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
