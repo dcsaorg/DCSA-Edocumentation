@@ -9,6 +9,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.EventClassifierCo
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
@@ -27,7 +28,7 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumen
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "shipping_instruction")
-public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus> {
+public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus> implements Persistable<UUID> {
 
 
   private static final DFADefinition<EblDocumentStatus> DEFAULT_EBL_DFA_DEFINITION = DFADefinition.builder(RECE)
@@ -159,6 +160,14 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return distinctBookingCount == 1;
   }
 
+  @Transient
+  private boolean isNew;
+
+  public boolean isNew() {
+    return id == null || isNew;
+  }
+
+
   /**
    * Transition the document into its {@link EblDocumentStatus#RECE} state.
    */
@@ -251,6 +260,14 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return processTransition(VOID, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
+  public void lockVersion(OffsetDateTime lockTime) {
+    if (isNew()) {
+      throw new IllegalStateException("Cannot lock a \"new\" version of the booking entity!");
+    }
+    this.validUntil = lockTime;
+  }
+
+
   @Transient
   private DFA<EblDocumentStatus> dfa;
 
@@ -271,10 +288,23 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
   protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode, UUID documentID, String documentReference) {
+    return processTransition(status, reason, documentTypeCode, documentID, documentReference, OffsetDateTime.now());
+  }
+
+  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode, UUID documentID, String documentReference, OffsetDateTime updateTime) {
     transitionTo(status);
-    OffsetDateTime now =  OffsetDateTime.now();
     this.documentStatus = status;
-    this.shippingInstructionUpdatedDateTime = now;
+    this.shippingInstructionUpdatedDateTime = updateTime;
+    if (this.shippingInstructionCreatedDateTime == null) {
+      this.shippingInstructionCreatedDateTime = updateTime;
+    }
+    if (id == null) {
+      id = UUID.randomUUID();
+      isNew = true;
+    }
+    if (shippingInstructionReference == null) {
+      shippingInstructionReference = UUID.randomUUID().toString();
+    }
     return ShipmentEvent.builder()
       .documentID(documentID)
       .documentReference(documentReference)
@@ -282,8 +312,8 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
       .shipmentEventTypeCode(status.asShipmentEventTypeCode())
       .reason(reason)
       .eventClassifierCode(EventClassifierCode.ACT)
-      .eventDateTime(now)
-      .eventCreatedDateTime(now)
+      .eventDateTime(updateTime)
+      .eventCreatedDateTime(updateTime)
       .build();
   }
 

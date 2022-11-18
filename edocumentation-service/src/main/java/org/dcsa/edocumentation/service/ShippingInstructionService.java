@@ -41,13 +41,8 @@ public class ShippingInstructionService {
       ShippingInstructionTO shippingInstructionTO) {
     // TODO: Verify the mapping (DDT-1296) and add positive + negative postman tests
 
-    OffsetDateTime now = OffsetDateTime.now();
-    ShippingInstruction shippingInstruction =
-        toDAOBuilder(shippingInstructionTO)
-          .shippingInstructionCreatedDateTime(now)
-          .shippingInstructionUpdatedDateTime(now).build();
-//        shipmentEventRepository.save(shippingInstruction.receive());
-    shippingInstruction.receive();
+    ShippingInstruction shippingInstruction = toDAOBuilder(shippingInstructionTO).build();
+    shipmentEventRepository.save(shippingInstruction.receive());
 
     shippingInstruction = shippingInstructionRepository.save(shippingInstruction);
     documentPartyService.createDocumentParties(shippingInstructionTO.documentParties(), shippingInstruction);
