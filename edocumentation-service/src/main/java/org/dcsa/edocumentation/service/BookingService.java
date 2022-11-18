@@ -45,19 +45,10 @@ public class BookingService {
 
   @Transactional
   public BookingRefStatusTO createBooking(BookingTO bookingRequest) {
-    Booking booking = bookingMapper.toDAO(bookingRequest).toBuilder()
-      .voyage(voyageService.resolveVoyage(bookingRequest))
-      .vessel(vesselService.resolveVessel(bookingRequest))
-      .modeOfTransport(modeOfTransportService.resolveModeOfTransport(
-        modeOfTransportMapper.toDAO(bookingRequest.preCarriageModeOfTransportCode())))
-      .placeOfIssue(locationService.ensureResolvable(bookingRequest.placeOfBLIssue()))
-      .invoicePayableAt(locationService.ensureResolvable(bookingRequest.invoicePayableAt()))
-      .build();
+    Booking booking = toDAOBuilder(bookingRequest).build();
 
     shipmentEventRepository.save(booking.receive());
-    booking = bookingRepository.save(booking);
-
-    createDeepObjectsForBooking(bookingRequest, booking);
+    booking = saveBooking(booking, bookingRequest);
 
     return bookingMapper.toStatusDTO(booking);
   }
@@ -72,11 +63,7 @@ public class BookingService {
     }
     OffsetDateTime updateTime = OffsetDateTime.now();
     existingBooking.lockVersion(updateTime);
-    Booking updatedBooking = bookingMapper.toDAO(bookingRequest).toBuilder()
-      .voyage(voyageService.resolveVoyage(bookingRequest))
-      .vessel(vesselService.resolveVessel(bookingRequest))
-      .placeOfIssue(locationService.ensureResolvable(bookingRequest.placeOfBLIssue()))
-      .invoicePayableAt(locationService.ensureResolvable(bookingRequest.invoicePayableAt()))
+    Booking updatedBooking = toDAOBuilder(bookingRequest)
       // Carry over from the existing booking
       .carrierBookingRequestReference(existingBooking.getCarrierBookingRequestReference())
       .documentStatus(existingBooking.getDocumentStatus())
@@ -89,7 +76,7 @@ public class BookingService {
     // write/save until after the updatedBooking is saved (which triggers the unique constraint
     // in the database).
     bookingRepository.saveAndFlush(existingBooking);
-    updatedBooking = bookingRepository.save(updatedBooking);
+    updatedBooking = saveBooking(updatedBooking, bookingRequest);
     shipmentEventRepository.save(updateEvent);
 
     // A couple of fail-safe checks that should be unnecessary unless we introduce bugs.
@@ -97,7 +84,6 @@ public class BookingService {
     assert Objects.equals(existingBooking.getCarrierBookingRequestReference(), updatedBooking.getBookingChannelReference());
     assert updatedBooking.getId() != null && !updatedBooking.getId().equals(existingBooking.getId());
 
-    createDeepObjectsForBooking(bookingRequest, updatedBooking);
     return Optional.of(bookingMapper.toStatusDTO(updatedBooking));
   }
 
@@ -113,15 +99,36 @@ public class BookingService {
   @Transactional
   public Optional<BookingRefStatusTO> cancelBooking(String carrierBookingRequestReference,
                                                     String reason) {
-    Booking booking = bookingRepository.findBookingByCarrierBookingRequestReference(
-        carrierBookingRequestReference
-      ).orElse(null);
-    if (booking == null) {
+    BookingTO bookingTO = this.getBooking(carrierBookingRequestReference).orElse(null);
+    if (bookingTO == null) {
       return Optional.empty();
     }
-    ShipmentEvent event = booking.cancel(reason);
-    bookingRepository.save(booking);
+    Booking existingBooking = this.bookingRepository.findBookingByCarrierBookingRequestReference(carrierBookingRequestReference)
+      .orElse(null);
+    assert existingBooking != null;
+    OffsetDateTime updateTime = OffsetDateTime.now();
+    existingBooking.lockVersion(updateTime);
+    bookingRepository.saveAndFlush(existingBooking);
+    Booking booking = toDAOBuilder(bookingTO).build();
+    ShipmentEvent event = booking.cancel(reason, updateTime);
+    booking = saveBooking(booking, bookingTO);
     shipmentEventRepository.save(event);
     return Optional.of(bookingMapper.toStatusDTO(booking));
+  }
+
+  private Booking saveBooking(Booking booking, BookingTO bookingRequest) {
+    Booking updatedBooking = bookingRepository.save(booking);
+    createDeepObjectsForBooking(bookingRequest, updatedBooking);
+    return updatedBooking;
+  }
+
+  private Booking.BookingBuilder toDAOBuilder(BookingTO bookingRequest) {
+    return bookingMapper.toDAO(bookingRequest).toBuilder()
+      .voyage(voyageService.resolveVoyage(bookingRequest))
+      .vessel(vesselService.resolveVessel(bookingRequest))
+      .modeOfTransport(modeOfTransportService.resolveModeOfTransport(
+        modeOfTransportMapper.toDAO(bookingRequest.preCarriageModeOfTransportCode())))
+      .placeOfIssue(locationService.ensureResolvable(bookingRequest.placeOfBLIssue()))
+      .invoicePayableAt(locationService.ensureResolvable(bookingRequest.invoicePayableAt()));
   }
 }
