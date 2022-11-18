@@ -44,7 +44,6 @@ public class ShippingInstructionService {
     OffsetDateTime now = OffsetDateTime.now();
     ShippingInstruction shippingInstruction =
         toDAOBuilder(shippingInstructionTO)
-          .shippingInstructionReference("SI_REF_FOO")
           .shippingInstructionCreatedDateTime(now)
           .shippingInstructionUpdatedDateTime(now).build();
 //        shipmentEventRepository.save(shippingInstruction.receive());
