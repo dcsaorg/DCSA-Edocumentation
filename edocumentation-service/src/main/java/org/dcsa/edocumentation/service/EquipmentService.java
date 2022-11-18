@@ -4,16 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.repository.EquipmentRepository;
 import org.dcsa.edocumentation.service.mapping.EquipmentMapper;
-import org.dcsa.edocumentation.service.util.EnsureResolvable;
 import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -21,28 +17,9 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class EquipmentService extends EnsureResolvable<EquipmentTO, Equipment> {
+public class EquipmentService {
   private final EquipmentRepository equipmentRepository;
   private final EquipmentMapper equipmentMapper;
-
-  private final ExampleMatcher exampleMatcher =
-      ExampleMatcher.matchingAll().withIncludeNullValues();
-
-  @Override
-  @Transactional
-  public <C> C ensureResolvable(EquipmentTO equipmentTO, BiFunction<Equipment, Boolean, C> mapper) {
-
-    if (equipmentTO == null) {
-      return mapper.apply(null, false);
-    }
-
-    Equipment equipment = equipmentMapper.toDAO(equipmentTO);
-
-    return ensureResolvable(
-        equipmentRepository.findAll(Example.of(equipment, exampleMatcher)),
-        () -> equipmentRepository.saveAndFlush(equipment),
-        mapper);
-  }
 
   public void verifyCarrierOwnedEquipmentsExists(
       Set<String> allEquipmentReferences) {

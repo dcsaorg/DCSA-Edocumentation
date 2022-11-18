@@ -12,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -36,7 +38,7 @@ class UtilizedTransportEquipmentTest {
   @InjectMocks UtilizedTransportEquipmentService utilizedTransportEquipmentService;
 
   @Captor ArgumentCaptor<Set<String>> equipmentReferencesCapture;
-  @Captor ArgumentCaptor<EquipmentTO> equipmentToCapture;
+  @Captor ArgumentCaptor<Collection<UtilizedTransportEquipmentTO>> utilizedTransportEquipmentsToCapture;
 
   @Test
   void utilizedTransportEquipmentTest_oneShipperOwnedEquipment() {
@@ -47,10 +49,10 @@ class UtilizedTransportEquipmentTest {
         List.of(utilizedTransportEquipmentTO));
     verify(equipmentService)
         .verifyCarrierOwnedEquipmentsExists(equipmentReferencesCapture.capture());
-    verify(equipmentService, times(1)).ensureResolvable(equipmentToCapture.capture());
+    verify(equipmentService, times(1)).resolveEquipments(utilizedTransportEquipmentsToCapture.capture(), any(), any());
     assertEquals(
-        utilizedTransportEquipmentTO.equipment().equipmentReference(),
-        equipmentToCapture.getValue().equipmentReference());
+      List.of(utilizedTransportEquipmentTO),
+        utilizedTransportEquipmentsToCapture.getValue());
     assertTrue(
         equipmentReferencesCapture
             .getValue()
@@ -67,13 +69,10 @@ class UtilizedTransportEquipmentTest {
         mockUtilizedTransportEquipments);
     verify(equipmentService)
         .verifyCarrierOwnedEquipmentsExists(equipmentReferencesCapture.capture());
-    verify(equipmentService, times(2)).ensureResolvable(equipmentToCapture.capture());
+    verify(equipmentService, times(1)).resolveEquipments(utilizedTransportEquipmentsToCapture.capture(), any(), any());
     assertEquals(
-        mockUtilizedTransportEquipments.get(0).equipment().equipmentReference(),
-        equipmentToCapture.getAllValues().get(0).equipmentReference());
-    assertEquals(
-        mockUtilizedTransportEquipments.get(1).equipment().equipmentReference(),
-        equipmentToCapture.getAllValues().get(1).equipmentReference());
+      mockUtilizedTransportEquipments,
+        utilizedTransportEquipmentsToCapture.getValue());
     assertTrue(
         equipmentReferencesCapture
             .getValue()
@@ -89,10 +88,10 @@ class UtilizedTransportEquipmentTest {
         List.of(utilizedTransportEquipmentTO));
     verify(equipmentService)
         .verifyCarrierOwnedEquipmentsExists(equipmentReferencesCapture.capture());
-    verify(equipmentService, times(1)).ensureResolvable(equipmentToCapture.capture());
+    verify(equipmentService, times(1)).resolveEquipments(utilizedTransportEquipmentsToCapture.capture(), any(), any());
     assertEquals(
-        utilizedTransportEquipmentTO.equipment().equipmentReference(),
-        equipmentToCapture.getValue().equipmentReference());
+        List.of(utilizedTransportEquipmentTO),
+        utilizedTransportEquipmentsToCapture.getValue());
     assertEquals(
         Set.of(utilizedTransportEquipmentTO.equipment().equipmentReference()),
         equipmentReferencesCapture.getValue());
@@ -107,10 +106,10 @@ class UtilizedTransportEquipmentTest {
       List.of(utilizedTransportEquipmentTO));
     verify(equipmentService)
       .verifyCarrierOwnedEquipmentsExists(equipmentReferencesCapture.capture());
-    verify(equipmentService, times(1)).ensureResolvable(equipmentToCapture.capture());
+    verify(equipmentService, times(1)).resolveEquipments(utilizedTransportEquipmentsToCapture.capture(), any(), any());
     assertEquals(
-      utilizedTransportEquipmentTO.equipment().equipmentReference(),
-      equipmentToCapture.getValue().equipmentReference());
+      List.of(utilizedTransportEquipmentTO),
+      utilizedTransportEquipmentsToCapture.getValue());
     assertEquals(
       Set.of(utilizedTransportEquipmentTO.equipment().equipmentReference()),
       equipmentReferencesCapture.getValue());
@@ -133,13 +132,10 @@ class UtilizedTransportEquipmentTest {
 
     verify(equipmentService)
         .verifyCarrierOwnedEquipmentsExists(equipmentReferencesCapture.capture());
-    verify(equipmentService, times(2)).ensureResolvable(equipmentToCapture.capture());
+    verify(equipmentService, times(1)).resolveEquipments(utilizedTransportEquipmentsToCapture.capture(), any(), any());
     assertEquals(
-        mockUtilizedTransportEquipments.get(0).equipment().equipmentReference(),
-        equipmentToCapture.getAllValues().get(0).equipmentReference());
-    assertEquals(
-        mockUtilizedTransportEquipments.get(1).equipment().equipmentReference(),
-        equipmentToCapture.getAllValues().get(1).equipmentReference());
+      mockUtilizedTransportEquipments,
+        utilizedTransportEquipmentsToCapture.getValue());
     assertEquals(mockCarrierOwnedEquipmentReferences, equipmentReferencesCapture.getValue());
   }
 
@@ -161,13 +157,10 @@ class UtilizedTransportEquipmentTest {
         mockUtilizedTransportEquipments);
     verify(equipmentService, times(1))
         .verifyCarrierOwnedEquipmentsExists(equipmentReferencesCapture.capture());
-    verify(equipmentService, times(2)).ensureResolvable(equipmentToCapture.capture());
+    verify(equipmentService, times(1)).resolveEquipments(utilizedTransportEquipmentsToCapture.capture(), any(), any());
     assertEquals(
-        mockUtilizedTransportEquipments.get(0).equipment().equipmentReference(),
-        equipmentToCapture.getAllValues().get(0).equipmentReference());
-    assertEquals(
-        mockUtilizedTransportEquipments.get(1).equipment().equipmentReference(),
-        equipmentToCapture.getAllValues().get(1).equipmentReference());
+      mockUtilizedTransportEquipments,
+        utilizedTransportEquipmentsToCapture.getValue());
     assertEquals(mockCarrierOwnedEquipmentReferences, equipmentReferencesCapture.getValue());
   }
 }
