@@ -1,12 +1,12 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.transferobjects.LocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.FacilityLocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
-import org.dcsa.edocumentation.transferobjects.enums.FacilityCodeListProvider;
 import org.dcsa.skernel.domain.persistence.entity.Location;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.AddressLocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.FacilityLocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.UNLocationLocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.enums.FacilityCodeListProvider;
 
 import java.util.UUID;
 

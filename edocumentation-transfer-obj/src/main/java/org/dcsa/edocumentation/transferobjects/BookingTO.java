@@ -2,8 +2,6 @@ package org.dcsa.edocumentation.transferobjects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.LocationTO.AddressLocationTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO.UNLocationLocationTO;
 import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.CargoMovementType;
 import org.dcsa.edocumentation.transferobjects.enums.CommunicationChannelCode;
@@ -12,6 +10,9 @@ import org.dcsa.edocumentation.transferobjects.enums.IncoTerms;
 import org.dcsa.edocumentation.transferobjects.enums.PaymentTerm;
 import org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.AddressLocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.UNLocationLocationTO;
 import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 import org.dcsa.skernel.infrastructure.validation.AtLeast;
 import org.dcsa.skernel.infrastructure.validation.DateRange;

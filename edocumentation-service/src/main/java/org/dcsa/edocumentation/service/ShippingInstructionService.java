@@ -8,6 +8,7 @@ import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstruction
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionTO;
+import org.dcsa.skernel.infrastructure.services.LocationService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
