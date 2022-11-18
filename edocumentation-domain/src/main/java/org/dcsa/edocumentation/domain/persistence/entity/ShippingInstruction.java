@@ -3,26 +3,24 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EventClassifierCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
 @NamedEntityGraph(
-  name = "graph.shipping-instruction-summary",
-  attributeNodes = {
-    @NamedAttributeNode("shipments")
-  }
-)
+    name = "graph.shipping-instruction-summary",
+    attributeNodes = {@NamedAttributeNode("consignmentItems")})
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -30,7 +28,7 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumen
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "shipping_instruction")
-public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus> {
+public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus> implements Persistable<UUID> {
 
 
   private static final DFADefinition<EblDocumentStatus> DEFAULT_EBL_DFA_DEFINITION = DFADefinition.builder(RECE)
@@ -55,8 +53,11 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     .build();
 
   @Id
+  @GeneratedValue
+  @Column(name = "id", nullable = false)
   private UUID id;
 
+  @GeneratedValue
   @Column(name = "shipping_instruction_reference")
   private String shippingInstructionReference;
 
@@ -71,7 +72,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   private OffsetDateTime shippingInstructionUpdatedDateTime;
 
   @Column(name = "is_shipped_onboard_type")
-  private Boolean isShippedOnboardType;
+  private Boolean isShippedOnBoardType;
 
   @Column(name = "number_of_copies_with_charges")
   private Integer numberOfCopiesWithCharges;
@@ -119,14 +120,53 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany
-  @JoinTable
-    (
-      name="consignment_item",
-      joinColumns={ @JoinColumn(name="shipping_instruction_id", referencedColumnName="id") },
-      inverseJoinColumns={ @JoinColumn(name="shipment_id", referencedColumnName="id", unique=true) }
-    )
-  private Set<Shipment> shipments = new LinkedHashSet<>();
+  @OneToMany(mappedBy = "shippingInstruction")
+  private Set<ConsignmentItem> consignmentItems;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "shippingInstructionID")
+  private Set<DocumentParty> documentParties;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "shippingInstructionID")
+  private Set<Reference> references;
+
+  // Todo consider if it makes sense to move this to a validation annotation
+  public Boolean hasOnlyConfirmedBookings() {
+
+    long unconfirmedBookingCount =
+      this.consignmentItems.stream()
+        .map(ConsignmentItem::getShipment)
+        .map(Shipment::getBooking)
+        .map(Booking::getDocumentStatus)
+        .filter(status -> !status.equals(BkgDocumentStatus.CONF))
+        .count();
+
+    return unconfirmedBookingCount < 1;
+  }
+
+  // Todo consider if it makes sense to move this to a validation annotation
+  public Boolean containsOneBooking() {
+    long distinctBookingCount =
+      this.consignmentItems.stream()
+        .map(ConsignmentItem::getShipment)
+        .map(Shipment::getBooking)
+        .map(Booking::getCarrierBookingRequestReference)
+        .distinct()
+        .count();
+
+    return distinctBookingCount == 1;
+  }
+
+  @Transient
+  private boolean isNew;
+
+  public boolean isNew() {
+    return id == null || isNew;
+  }
+
 
   /**
    * Transition the document into its {@link EblDocumentStatus#RECE} state.
@@ -220,6 +260,14 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return processTransition(VOID, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
   }
 
+  public void lockVersion(OffsetDateTime lockTime) {
+    if (isNew()) {
+      throw new IllegalStateException("Cannot lock a \"new\" version of the booking entity!");
+    }
+    this.validUntil = lockTime;
+  }
+
+
   @Transient
   private DFA<EblDocumentStatus> dfa;
 
@@ -240,10 +288,23 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
   protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode, UUID documentID, String documentReference) {
+    return processTransition(status, reason, documentTypeCode, documentID, documentReference, OffsetDateTime.now());
+  }
+
+  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode, UUID documentID, String documentReference, OffsetDateTime updateTime) {
     transitionTo(status);
-    OffsetDateTime now =  OffsetDateTime.now();
     this.documentStatus = status;
-    this.shippingInstructionUpdatedDateTime = now;
+    this.shippingInstructionUpdatedDateTime = updateTime;
+    if (this.shippingInstructionCreatedDateTime == null) {
+      this.shippingInstructionCreatedDateTime = updateTime;
+    }
+    if (id == null) {
+      id = UUID.randomUUID();
+      isNew = true;
+    }
+    if (shippingInstructionReference == null) {
+      shippingInstructionReference = UUID.randomUUID().toString();
+    }
     return ShipmentEvent.builder()
       .documentID(documentID)
       .documentReference(documentReference)
@@ -251,8 +312,8 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
       .shipmentEventTypeCode(status.asShipmentEventTypeCode())
       .reason(reason)
       .eventClassifierCode(EventClassifierCode.ACT)
-      .eventDateTime(now)
-      .eventCreatedDateTime(now)
+      .eventDateTime(updateTime)
+      .eventCreatedDateTime(updateTime)
       .build();
   }
 

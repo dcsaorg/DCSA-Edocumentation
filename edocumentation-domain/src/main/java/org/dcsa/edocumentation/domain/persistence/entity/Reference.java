@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
@@ -38,6 +38,14 @@ public class Reference {
   @JoinColumn(name = "booking_id")
   private Booking booking;
 
-  // ToDo only the required associations for booking requests have been implemented
+  @JoinColumn(name = "shipping_instruction_id")
+  @Column(name = "shipping_instruction_id")
+  private UUID shippingInstructionID;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "consignment_item_id")
+  private ConsignmentItem consignmentItem;
 
 }

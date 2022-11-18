@@ -1,10 +1,6 @@
 package org.dcsa.edocumentation.service.mapping;
 
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
-import org.dcsa.edocumentation.domain.persistence.entity.Party;
-import org.dcsa.edocumentation.domain.persistence.entity.PartyContactDetails;
-import org.dcsa.edocumentation.domain.persistence.entity.PartyIdentifyingCode;
+import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
 import org.dcsa.edocumentation.transferobjects.PartyContactDetailsTO;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
@@ -14,11 +10,16 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface DocumentPartyMapper {
+
+  //ToDO can be removed when booking takes the same approach as Shipping instruction for setting the FK
   @Mapping(source = "booking", target = "booking")
   @Mapping(source = "booking.id", target = "id", ignore = true)
   @Mapping(source = "documentPartyTO.displayedAddress", target = "displayedAddress", ignore = true)
   @Mapping(source = "documentPartyTO.party", target = "party", ignore = true)
   DocumentParty toDAO(DocumentPartyTO documentPartyTO, Booking booking);
+
+  @Mapping(source = "documentPartyTO.displayedAddress", target = "displayedAddress", ignore = true)
+  DocumentParty toDAO(DocumentPartyTO documentPartyTO);
 
   @Mapping(source = "address", target = "address", ignore = true)
   @Mapping(source = "partyContactDetails", target = "partyContactDetails", ignore = true)

@@ -62,7 +62,7 @@ class ShippingInstructionSummaryServiceTest {
     assertEquals(
         mockShippingInstruction.getShippingInstructionCreatedDateTime(),
         result.content().get(0).shippingInstructionCreatedDateTime());
-    assertNull(mockShippingInstruction.getShipments());
+    assertNull(mockShippingInstruction.getConsignmentItems());
   }
 
   @Test
@@ -82,7 +82,7 @@ class ShippingInstructionSummaryServiceTest {
     assertEquals(
       mockShippingInstruction.getShippingInstructionCreatedDateTime(),
       result.content().get(0).shippingInstructionCreatedDateTime());
-    assertNull(mockShippingInstruction.getShipments());
+    assertNull(mockShippingInstruction.getConsignmentItems());
   }
 
   @Test
@@ -104,9 +104,10 @@ class ShippingInstructionSummaryServiceTest {
         mockShippingInstruction.getShippingInstructionCreatedDateTime(),
         result.content().get(0).shippingInstructionCreatedDateTime());
     assertEquals(
-        mockShippingInstruction.getShipments().stream()
+        mockShippingInstruction.getConsignmentItems().stream()
             .toList()
             .get(0)
+            .getShipment()
             .getCarrierBookingReference(),
         result.content().get(0).carrierBookingReferences().get(0));
   }
@@ -130,9 +131,10 @@ class ShippingInstructionSummaryServiceTest {
       mockShippingInstruction.getShippingInstructionCreatedDateTime(),
       result.content().get(0).shippingInstructionCreatedDateTime());
     assertEquals(
-      mockShippingInstruction.getShipments().stream()
+      mockShippingInstruction.getConsignmentItems().stream()
         .toList()
         .get(0)
+        .getShipment()
         .getCarrierBookingReference(),
       result.content().get(0).carrierBookingReferences().get(0));
   }
@@ -156,9 +158,10 @@ class ShippingInstructionSummaryServiceTest {
       mockShippingInstruction.getShippingInstructionCreatedDateTime(),
       result.content().get(0).shippingInstructionCreatedDateTime());
     assertEquals(
-      mockShippingInstruction.getShipments().stream()
+      mockShippingInstruction.getConsignmentItems().stream()
         .toList()
         .get(0)
+        .getShipment()
         .getCarrierBookingReference(),
       result.content().get(0).carrierBookingReferences().get(0));
   }
@@ -182,9 +185,10 @@ class ShippingInstructionSummaryServiceTest {
       mockShippingInstruction.get(0).getShippingInstructionCreatedDateTime(),
       result.content().get(0).shippingInstructionCreatedDateTime());
     assertEquals(
-      mockShippingInstruction.get(0).getShipments().stream()
+      mockShippingInstruction.get(0).getConsignmentItems().stream()
         .toList()
         .get(0)
+        .getShipment()
         .getCarrierBookingReference(),
       result.content().get(0).carrierBookingReferences().get(0));
   }

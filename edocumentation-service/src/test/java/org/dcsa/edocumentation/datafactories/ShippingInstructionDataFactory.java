@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
+import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
@@ -24,7 +25,7 @@ public class ShippingInstructionDataFactory {
       .documentStatus(EblDocumentStatus.RECE)
       .shippingInstructionCreatedDateTime(OffsetDateTime.now())
       .shippingInstructionUpdatedDateTime(OffsetDateTime.now())
-      .isShippedOnboardType(true)
+      .isShippedOnBoardType(true)
       .numberOfCopiesWithCharges(3)
       .numberOfOriginalsWithCharges(3)
       .isElectronic(false)
@@ -48,7 +49,7 @@ public class ShippingInstructionDataFactory {
         .build())
       .build();
 
-    Set<Shipment> shipments = Set.of(Shipment.builder()
+    Shipment shipments = Shipment.builder()
         .carrierBookingReference(UUID.randomUUID().toString())
         .shipmentCreatedDateTime(OffsetDateTime.now())
         .shipmentCreatedDateTime(OffsetDateTime.now())
@@ -57,6 +58,10 @@ public class ShippingInstructionDataFactory {
         .carrier(Carrier.builder()
           .carrierName("dummy carrier")
           .build())
+      .build();
+
+    Set<ConsignmentItem> consignmentItems = Set.of(ConsignmentItem.builder()
+      .shipment(shipments)
       .build());
 
     return ShippingInstruction.builder()
@@ -65,7 +70,7 @@ public class ShippingInstructionDataFactory {
       .documentStatus(EblDocumentStatus.RECE)
       .shippingInstructionCreatedDateTime(OffsetDateTime.now())
       .shippingInstructionUpdatedDateTime(OffsetDateTime.now())
-      .isShippedOnboardType(true)
+      .isShippedOnBoardType(true)
       .numberOfCopiesWithCharges(3)
       .numberOfOriginalsWithCharges(3)
       .isElectronic(false)
@@ -76,7 +81,7 @@ public class ShippingInstructionDataFactory {
       .displayedNameForPlaceOfDelivery("Hong Kong")
       .displayedNameForPortOfLoad("Port of Long Beach")
       .displayedNameForPortOfDischarge("Port of Hong Kong")
-      .shipments(shipments)
+      .consignmentItems(consignmentItems)
       .build();
   }
 
@@ -91,7 +96,7 @@ public class ShippingInstructionDataFactory {
         .build())
       .build();
 
-    Set<Shipment> shipments = Set.of(Shipment.builder()
+    Shipment shipment = Shipment.builder()
       .carrierBookingReference(UUID.randomUUID().toString())
       .shipmentCreatedDateTime(OffsetDateTime.now())
       .shipmentCreatedDateTime(OffsetDateTime.now())
@@ -100,7 +105,13 @@ public class ShippingInstructionDataFactory {
       .carrier(Carrier.builder()
         .carrierName("dummy carrier")
         .build())
-      .build());
+      .build();
+
+    Set<ConsignmentItem> consignmentItems = Set.of(
+      ConsignmentItem.builder()
+        .shipment(shipment)
+        .build()
+    );
 
     return List.of(ShippingInstruction.builder()
       .id(UUID.randomUUID())
@@ -108,7 +119,7 @@ public class ShippingInstructionDataFactory {
       .documentStatus(EblDocumentStatus.RECE)
       .shippingInstructionCreatedDateTime(OffsetDateTime.now())
       .shippingInstructionUpdatedDateTime(OffsetDateTime.now())
-      .isShippedOnboardType(true)
+      .isShippedOnBoardType(true)
       .isElectronic(true)
       .isToOrder(false)
       .placeOfIssue(placeOfIssue)
@@ -117,7 +128,7 @@ public class ShippingInstructionDataFactory {
       .displayedNameForPlaceOfDelivery("Singapore")
       .displayedNameForPortOfLoad("Port of Rotterdam")
       .displayedNameForPortOfDischarge("Port of Singapore")
-      .shipments(shipments)
+      .consignmentItems(consignmentItems)
       .build(), singleShallowShippingInstructionWithPlaceOfIssueAndShipments());
   }
 }

@@ -5,13 +5,12 @@ import org.dcsa.skernel.domain.persistence.entity.Carrier;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @NamedEntityGraph(
     name = "graph.shipment-summary",
-    attributeNodes = {
-      @NamedAttributeNode("booking")
-    })
+    attributeNodes = {@NamedAttributeNode("booking")})
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,13 +19,22 @@ import java.util.UUID;
 @Entity
 @Table(name = "shipment")
 public class Shipment {
-  @Id private UUID id;
+
+  @Id
+  @GeneratedValue
+  @Column(name = "id", nullable = false)
+  private UUID id;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "booking_id")
   private Booking booking;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "shipment")
+  private Set<ConsignmentItem> consignmentItems;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
