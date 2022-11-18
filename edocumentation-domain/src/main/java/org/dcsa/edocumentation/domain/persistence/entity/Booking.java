@@ -246,8 +246,8 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#CANC} state.
    */
-  public ShipmentEvent cancel(String reason) {
-    return processTransition(CANC, reason);
+  public ShipmentEvent cancel(String reason, OffsetDateTime updateTime) {
+    return processTransition(CANC, reason, updateTime);
   }
 
   /**

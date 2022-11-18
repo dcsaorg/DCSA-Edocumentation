@@ -41,7 +41,7 @@ class BookingStateMachineTest {
     for (BkgDocumentStatus terminalState : terminalStates) {
       Booking booking = Booking.builder().documentStatus(terminalState).build();
       Assertions.assertThrows(ConflictException.class,
-        () -> booking.cancel("We decided to booking somewhere else."));
+        () -> booking.cancel("We decided to booking somewhere else.", now));
       Assertions.assertThrows(ConflictException.class, () -> booking.pendingUpdate("Please provide foo!", now));
       Assertions.assertThrows(ConflictException.class, booking::complete);
       Assertions.assertThrows(ConflictException.class,
