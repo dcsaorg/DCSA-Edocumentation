@@ -5,6 +5,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.VolumeUnit;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -63,6 +64,7 @@ public class ConsignmentItem {
   @EqualsAndHashCode.Exclude
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "consignment_item_id", referencedColumnName = "id", nullable = false)
-  private Set<CargoItem> cargoItems;
-
+  // Since the cargoItem.id is generated it can happen that two cargoItems have the same values and
+  // therefore cannot be added to the set
+  private List<CargoItem> cargoItems;
 }

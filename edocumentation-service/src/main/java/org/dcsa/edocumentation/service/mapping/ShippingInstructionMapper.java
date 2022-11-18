@@ -13,7 +13,6 @@ import org.mapstruct.Mapping;
     DisplayedAddressMapper.class
   })
 public interface ShippingInstructionMapper {
-  // TODO: Complete this stub mapping (DDT-1296)
   @Mapping(source = "documentParties", target = "documentParties", ignore = true)
   @Mapping(source = "consignmentItems", target = "consignmentItems", ignore = true)
   ShippingInstruction toDAO(ShippingInstructionTO shippingInstructionTO);

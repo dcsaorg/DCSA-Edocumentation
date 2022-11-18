@@ -1,7 +1,6 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.domain.persistence.entity.Seal;
 import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.edocumentation.transferobjects.SealTO;
 import org.dcsa.edocumentation.transferobjects.UtilizedTransportEquipmentTO;

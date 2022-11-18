@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.repository.ConsignementItemRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
+import org.dcsa.edocumentation.service.mapping.CargoItemMapper;
 import org.dcsa.edocumentation.service.mapping.ConsignmentItemMapper;
 import org.dcsa.edocumentation.transferobjects.CargoItemTO;
 import org.dcsa.edocumentation.transferobjects.ConsignmentItemTO;
@@ -22,6 +23,7 @@ public class StuffingService {
   private final ShipmentRepository shipmentRepository;
   private final ConsignmentItemMapper consignmentItemMapper;
   private final ConsignementItemRepository consignementItemRepository;
+  private final CargoItemMapper cargoItemMapper;
 
   public void createStuffing(
       ShippingInstruction shippingInstruction,
@@ -37,10 +39,7 @@ public class StuffingService {
                       .shipment(addShipment(consignmentItemTO.carrierBookingReference()))
                       .shippingInstruction(shippingInstruction)
                       .cargoItems(
-                          addCargoItems(
-                              consignmentItem,
-                              consignmentItemTO.cargoItems(),
-                              savedTransportEquipments))
+                          addCargoItems(consignmentItemTO.cargoItems(), savedTransportEquipments))
                       .build();
                 })
             .toList();
@@ -48,7 +47,8 @@ public class StuffingService {
     consignementItemRepository.saveAll(consignmentItems);
   }
 
-  // A Shipping instruction must link to a shipment (=approved booking)
+  // A Shipping instruction must link to a shipment (=approved booking) consignmentItems acts like a
+  // 'join-table' between shipping instruction and shipment
   private Shipment addShipment(String carrierBookingReference) {
     return shipmentRepository
         .findByCarrierBookingReference(carrierBookingReference)
@@ -60,18 +60,24 @@ public class StuffingService {
   }
 
   // Cargo items act as 'join-table' for utilizedTransportEquipment and consignment Items
-  private Set<CargoItem> addCargoItems(
-      ConsignmentItem consignmentItem,
+  private List<CargoItem> addCargoItems(
       List<CargoItemTO> cargoItems,
       Map<String, UtilizedTransportEquipment> savedTransportEquipments) {
+
     return cargoItems.stream()
-        .flatMap(
+        .map(
             cargoItemTO -> {
-              String equipmentReference = cargoItemTO.equipmentReference();
-              UtilizedTransportEquipment ute = savedTransportEquipments.get(equipmentReference);
-              return consignmentItem.getCargoItems().stream()
-                  .map(cargoItem -> cargoItem.toBuilder().utilizedTransportEquipment(ute).build());
+              UtilizedTransportEquipment ute =
+                  savedTransportEquipments.get(cargoItemTO.equipmentReference());
+              if (ute == null) {
+                throw ConcreteRequestErrorMessageException.invalidInput(
+                    "Could not find utilizedTransportEquipments for this cargoItems, based on equipmentReference: "
+                        + cargoItemTO.equipmentReference());
+              }
+              return cargoItemMapper.toDAO(cargoItemTO).toBuilder()
+                  .utilizedTransportEquipment(ute)
+                  .build();
             })
-        .collect(Collectors.toSet());
+        .toList();
   }
 }

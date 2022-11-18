@@ -5,7 +5,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
-import org.dcsa.edocumentation.service.mapping.DocumentPartyMapper;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionTO;
@@ -13,11 +12,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +24,6 @@ public class ShippingInstructionService {
   private final ShippingInstructionRepository shippingInstructionRepository;
   private final ShippingInstructionMapper shippingInstructionMapper;
   private final DocumentPartyService documentPartyService;
-  private final DocumentPartyMapper documentPartyMapper;
   private final ReferenceService referenceService;
   private final UtilizedTransportEquipmentService utilizedTransportEquipmentService;
   private final StuffingService stuffingService;
@@ -51,13 +46,7 @@ public class ShippingInstructionService {
         toDAOBuilder(shippingInstructionTO)
           .shippingInstructionReference("SI_REF_FOO")
           .shippingInstructionCreatedDateTime(now)
-          .shippingInstructionUpdatedDateTime(now)
-            .documentParties(
-                shippingInstructionTO.documentParties().stream()
-                    .map(documentPartyMapper::toDAO)
-                    .collect(Collectors.toSet()))
-
-            .build();
+          .shippingInstructionUpdatedDateTime(now).build();
 //        shipmentEventRepository.save(shippingInstruction.receive());
     shippingInstruction.receive();
 
