@@ -3,6 +3,7 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -16,6 +17,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import java.util.UUID;
 
+@NoArgsConstructor
 @SuperBuilder
 @Getter
 @Setter(AccessLevel.PRIVATE)
