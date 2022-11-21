@@ -37,6 +37,7 @@ public class BookingService {
   private final BookingMapper bookingMapper;
   private final ModeOfTransportMapper modeOfTransportMapper;
 
+  @Transactional
   public Optional<BookingTO> getBooking(String carrierBookingRequestReference) {
     return bookingRepository
       .findBookingByCarrierBookingRequestReference(carrierBookingRequestReference)

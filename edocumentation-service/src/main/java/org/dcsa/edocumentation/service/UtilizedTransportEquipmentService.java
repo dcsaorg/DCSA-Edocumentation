@@ -4,16 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
 import org.dcsa.edocumentation.domain.persistence.repository.UtilizedTransportEquipmentRepository;
 import org.dcsa.edocumentation.service.mapping.UtilizedTransportEquipmentMapper;
-import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.edocumentation.transferobjects.UtilizedTransportEquipmentTO;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
