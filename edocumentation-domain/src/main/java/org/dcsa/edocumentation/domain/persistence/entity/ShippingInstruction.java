@@ -53,11 +53,9 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     .build();
 
   @Id
-  @GeneratedValue
   @Column(name = "id", nullable = false)
   private UUID id;
 
-  @GeneratedValue
   @Column(name = "shipping_instruction_reference")
   private String shippingInstructionReference;
 
@@ -92,7 +90,9 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @Column(name = "is_to_order")
   private Boolean isToOrder;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "place_of_issue_id")
   private Location placeOfIssue;
 
@@ -172,7 +172,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    * Transition the document into its {@link EblDocumentStatus#RECE} state.
    */
   public ShipmentEvent receive() {
-    return processTransition(RECE, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
+    return processTransition(RECE, null, DocumentTypeCode.SHI);
   }
 
   /**
@@ -182,7 +182,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    * in the Amendment flow.</p>
    */
   public ShipmentEvent pendingUpdate(String reason) {
-    return processTransition(PENU, reason, DocumentTypeCode.SHI, id, shippingInstructionReference);
+    return processTransition(PENU, reason, DocumentTypeCode.SHI);
   }
 
   /**
@@ -201,7 +201,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    */
   public ShipmentEvent draft() {
     // TODO: Should this be moved to the TRD?
-    return processTransition(DRFT, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
+    return processTransition(DRFT, null, DocumentTypeCode.SHI);
   }
 
   /**
@@ -212,7 +212,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    */
   public ShipmentEvent pendingApproval(String reason) {
     // TODO: Should this be moved to the TRD?
-    return processTransition(PENA, reason, DocumentTypeCode.SHI, id, shippingInstructionReference);
+    return processTransition(PENA, reason, DocumentTypeCode.SHI);
   }
 
   /**
@@ -232,7 +232,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    */
   public ShipmentEvent approve() {
     // TODO: Should this be moved to the TRD?
-    return processTransition(APPR, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
+    return processTransition(APPR, null, DocumentTypeCode.SHI);
   }
 
   /**
@@ -240,7 +240,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    */
   public void issue() {
     // TODO: Should this be moved to the TRD?
-    processTransition(ISSU, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
+    processTransition(ISSU, null, DocumentTypeCode.SHI);
   }
 
   /**
@@ -248,7 +248,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    */
   public ShipmentEvent surrender() {
     // TODO: Should this be moved to the TRD?
-    return processTransition(SURR, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
+    return processTransition(SURR, null, DocumentTypeCode.SHI);
   }
 
   /**
@@ -257,7 +257,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   // "void" is a keyword and cannot be used as a method name.
   public ShipmentEvent voidDocument() {
     // TODO: Should this be moved to the TRD?
-    return processTransition(VOID, null, DocumentTypeCode.SHI, id, shippingInstructionReference);
+    return processTransition(VOID, null, DocumentTypeCode.SHI);
   }
 
   public void lockVersion(OffsetDateTime lockTime) {
@@ -287,11 +287,11 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     this.shippingInstructionUpdatedDateTime = OffsetDateTime.now();
   }
 
-  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode, UUID documentID, String documentReference) {
-    return processTransition(status, reason, documentTypeCode, documentID, documentReference, OffsetDateTime.now());
+  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode) {
+    return processTransition(status, reason, documentTypeCode, OffsetDateTime.now());
   }
 
-  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode, UUID documentID, String documentReference, OffsetDateTime updateTime) {
+  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode, OffsetDateTime updateTime) {
     transitionTo(status);
     this.documentStatus = status;
     this.shippingInstructionUpdatedDateTime = updateTime;
@@ -306,8 +306,8 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
       shippingInstructionReference = UUID.randomUUID().toString();
     }
     return ShipmentEvent.builder()
-      .documentID(documentID)
-      .documentReference(documentReference)
+      .documentID(id)
+      .documentReference(shippingInstructionReference)
       .documentTypeCode(documentTypeCode)
       .shipmentEventTypeCode(status.asShipmentEventTypeCode())
       .reason(reason)

@@ -42,7 +42,8 @@ public class ShippingInstructionService {
       ShippingInstructionTO shippingInstructionTO) {
     // TODO: Verify the mapping (DDT-1296) and add positive + negative postman tests
 
-    ShippingInstruction shippingInstruction = toDAOBuilder(shippingInstructionTO).build();
+    ShippingInstruction shippingInstruction = toDAOBuilder(shippingInstructionTO)
+      .build();
     shipmentEventRepository.save(shippingInstruction.receive());
 
     shippingInstruction = shippingInstructionRepository.save(shippingInstruction);
