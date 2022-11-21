@@ -17,7 +17,7 @@ import java.time.OffsetDateTime;
 
 public record TransportTO(
     @Valid @NotNull(message = "The attribute transportPlanStageCode is required.")
-    TransportPlanStageCode transportPlanStageCode,
+    TransportPlanStageCode transportPlanStage,
     @NotNull(message = "The attribute transportPlanStageSequenceNumber is required.")
         Integer transportPlanStageSequenceNumber,
     @Valid

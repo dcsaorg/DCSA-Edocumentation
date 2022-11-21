@@ -33,5 +33,8 @@ public interface TransportMapper {
   @Mapping(
     source = "transport.dischargeTransportCall.location",
     target = "dischargeLocation")
+  @Mapping(
+    source = "transportPlanStageCode",
+    target = "transportPlanStage")
   TransportTO shipmentTransportToTransportTO(ShipmentTransport shipmentTransport);
 }
