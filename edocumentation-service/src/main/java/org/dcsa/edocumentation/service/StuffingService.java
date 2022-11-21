@@ -11,10 +11,9 @@ import org.dcsa.edocumentation.transferobjects.ConsignmentItemTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ public class StuffingService {
   private final ConsignementItemRepository consignementItemRepository;
   private final CargoItemMapper cargoItemMapper;
 
+  @Transactional(Transactional.TxType.MANDATORY)
   public void createStuffing(
       ShippingInstruction shippingInstruction,
       Map<String, UtilizedTransportEquipment> savedTransportEquipments,
