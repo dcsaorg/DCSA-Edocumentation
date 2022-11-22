@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum ShipmentEventTypeCode {
   RECE("Indicates that a document is received by the carrier or shipper"),
@@ -25,6 +26,5 @@ public enum ShipmentEventTypeCode {
   CANC("A status indicator to be used when the booking is cancelled by the Shipper"),
   ;
 
-  @Getter
-  private String description;
+  private final String description;
 }

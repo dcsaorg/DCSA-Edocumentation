@@ -3,17 +3,19 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.VolumeUnit;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-@Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
+@Getter
 @Entity
 @Table(name = "consignment_item")
 public class ConsignmentItem {
@@ -67,4 +69,17 @@ public class ConsignmentItem {
   // Since the cargoItem.id is generated it can happen that two cargoItems have the same values and
   // therefore cannot be added to the set
   private List<CargoItem> cargoItems;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    ConsignmentItem that = (ConsignmentItem) o;
+    return id != null && Objects.equals(id, that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
+  }
 }
