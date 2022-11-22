@@ -1,5 +1,8 @@
 package org.dcsa.edocumentation.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.j2objc.annotations.AutoreleasePool;
 import org.dcsa.edocumentation.service.ShippingInstructionService;
 import org.dcsa.edocumentation.transferobjects.*;
 import org.dcsa.edocumentation.transferobjects.enums.*;
@@ -20,6 +23,8 @@ class ShippingInstructionControllerTest {
   @Autowired ShippingInstructionService shippingInstructionService;
 
   @Autowired private TransactionTemplate transactionTemplate;
+
+  @Autowired private ObjectMapper objectMapper;
 
   @Test
   void test() {
@@ -89,6 +94,12 @@ class ShippingInstructionControllerTest {
       .documentParties(List.of(documentPartyTO))
       .references(List.of(referenceTO))
       .build();
+
+    try {
+      System.out.println(objectMapper.writeValueAsString(siTO));
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
 
     transactionTemplate.execute(
         status -> {

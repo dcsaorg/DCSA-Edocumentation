@@ -12,7 +12,6 @@ import org.dcsa.skernel.infrastructure.services.LocationService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,25 +39,30 @@ public class ShippingInstructionService {
   @Transactional
   public ShippingInstructionRefStatusTO createShippingInstruction(
       ShippingInstructionTO shippingInstructionTO) {
-    // TODO: Verify the mapping (DDT-1296) and add positive + negative postman tests
 
-    ShippingInstruction shippingInstruction = toDAOBuilder(shippingInstructionTO)
-      .build();
+    ShippingInstruction shippingInstruction = toDAOBuilder(shippingInstructionTO).build();
     shipmentEventRepository.save(shippingInstruction.receive());
 
-    shippingInstruction = shippingInstructionRepository.save(shippingInstruction);
-    documentPartyService.createDocumentParties(shippingInstructionTO.documentParties(), shippingInstruction);
-    referenceService.createReferences(shippingInstructionTO.references(), shippingInstruction);
-    Map<String, UtilizedTransportEquipment> savedUtilizedTransportEquipments = utilizedTransportEquipmentService.createUtilizedTransportEquipment(shippingInstructionTO.utilizedTransportEquipments());
-    stuffingService.createStuffing(shippingInstruction, savedUtilizedTransportEquipments, shippingInstructionTO.consignmentItems());
-    return shippingInstructionMapper.toStatusDTO(shippingInstruction);
+    ShippingInstruction updatedShippingInstruction =
+        shippingInstructionRepository.save(shippingInstruction);
+    documentPartyService.createDocumentParties(
+        shippingInstructionTO.documentParties(), updatedShippingInstruction);
+    referenceService.createReferences(
+        shippingInstructionTO.references(), updatedShippingInstruction);
+    Map<String, UtilizedTransportEquipment> savedUtilizedTransportEquipments =
+        utilizedTransportEquipmentService.createUtilizedTransportEquipment(
+            shippingInstructionTO.utilizedTransportEquipments());
+    stuffingService.createStuffing(
+        updatedShippingInstruction,
+        savedUtilizedTransportEquipments,
+        shippingInstructionTO.consignmentItems());
+    return shippingInstructionMapper.toStatusDTO(updatedShippingInstruction);
   }
 
   // Return a builder because PUT will need to copy in some extra fields.
   private ShippingInstruction.ShippingInstructionBuilder toDAOBuilder(
       ShippingInstructionTO shippingInstructionTO) {
-    // TODO: Verify this stub (DDT-1296)
     return shippingInstructionMapper.toDAO(shippingInstructionTO).toBuilder()
-      .placeOfIssue(locationService.ensureResolvable(shippingInstructionTO.placeOfIssue()));
+        .placeOfIssue(locationService.ensureResolvable(shippingInstructionTO.placeOfIssue()));
   }
 }

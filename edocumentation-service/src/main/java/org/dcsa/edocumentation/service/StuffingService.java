@@ -66,18 +66,23 @@ public class StuffingService {
 
     return cargoItems.stream()
         .map(
-            cargoItemTO -> {
-              UtilizedTransportEquipment ute =
-                  savedTransportEquipments.get(cargoItemTO.equipmentReference());
-              if (ute == null) {
-                throw ConcreteRequestErrorMessageException.invalidInput(
-                    "Could not find utilizedTransportEquipments for this cargoItems, based on equipmentReference: "
-                        + cargoItemTO.equipmentReference());
-              }
-              return cargoItemMapper.toDAO(cargoItemTO).toBuilder()
-                  .utilizedTransportEquipment(ute)
-                  .build();
-            })
+            cargoItemTO ->
+                cargoItemMapper.toDAO(cargoItemTO).toBuilder()
+                    .utilizedTransportEquipment(
+                        findSavedUtilizedTransportEquipmentViaCargoItem(
+                            savedTransportEquipments, cargoItemTO))
+                    .build())
         .toList();
+  }
+
+  private UtilizedTransportEquipment findSavedUtilizedTransportEquipmentViaCargoItem(
+      Map<String, UtilizedTransportEquipment> savedTransportEquipments, CargoItemTO cargoItemTO) {
+    UtilizedTransportEquipment ute = savedTransportEquipments.get(cargoItemTO.equipmentReference());
+    if (ute == null) {
+      throw ConcreteRequestErrorMessageException.invalidInput(
+          "Could not find utilizedTransportEquipments for this cargoItems, based on equipmentReference: "
+              + cargoItemTO.equipmentReference());
+    }
+    return ute;
   }
 }

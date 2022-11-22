@@ -2,7 +2,8 @@
 	"info": {
 		"_postman_id": "73895517-68f1-4546-beb4-53587eb38185",
 		"name": "DCSA-EDocumentation",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18186286"
 	},
 	"item": [
 		{
@@ -3160,6 +3161,265 @@
 					]
 				}
 			]
+		},
+		{
+			"name": "Post Shipping instruction",
+			"item": [
+				{
+					"name": "Positive test cases",
+					"item": [
+						{
+							"name": "Create Shipping instruction",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const parsedBody = pm.response.json();\r",
+											"pm.collectionVariables.set(\"SHIPPING_INSTRUCTION_REFERENCE\", parsedBody.shippingInstructionReference);\r",
+											"\r",
+											"pm.test(\"Status code is 201\", () => {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"documentStatus is RECE\", () => {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.documentStatus).to.eql(\"RECE\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"isShippedOnBoardType\": true,\r\n    \"isElectronic\": true,\r\n    \"isToOrder\": true,\r\n    \"consignmentItems\": [\r\n        {\r\n            \"HSCode\": \"411510\",\r\n            \"carrierBookingReference\": \"cbr-b83765166707812c8ff4\",\r\n            \"weight\": 120.4,\r\n            \"weightUnit\": \"KGM\",\r\n            \"descriptionOfGoods\": \"description\",\r\n            \"cargoItems\": [\r\n                {\r\n                    \"equipmentReference\": \"eq_ref_01\",\r\n                    \"numberOfPackages\": 1,\r\n                    \"weight\": 120.3,\r\n                    \"weightUnit\": \"KGM\",\r\n                    \"packageCode\": \"123\",\r\n                    \"cargoLineItems\": [\r\n                        {\r\n                            \"cargoLineItemID\": \"Foo\",\r\n                            \"shippingMarks\": \"bar\"\r\n                        }\r\n                    ]\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"utilizedTransportEquipments\": [\r\n        {\r\n            \"equipment\": {\r\n                \"equipmentReference\": \"eq_ref_01\"\r\n            },\r\n            \"cargoGrossWeight\": 120.3,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"isShipperOwned\": false,\r\n            \"seals\": [\r\n                {\r\n                    \"sealNumber\": \"12345\",\r\n                    \"sealSource\": \"CAR\",\r\n                    \"sealType\": \"BLT\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"foo party\",\r\n                \"address\": {\r\n                    \"name\": \"foo address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"EBL\",\r\n            \"displayedAddress\": [\r\n                \"foo\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"foo reference\"\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verify saved shipping instruction",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const shippingInstructionReference = pm.collectionVariables.get(\"SHIPPING_INSTRUCTION_REFERENCE\");\r",
+											"\r",
+											"pm.collectionVariables.unset(\"SHIPPING_INSTRUCTION_REFERENCE\");\r",
+											"\r",
+											"pm.test(\"Status code is 200\", () => {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response contains updated values\", () => {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.shippingInstructionReference).to.eql(shippingInstructionReference);\r",
+											"\r",
+											"    // Posting a new bookign should put us in \"RECE\".\r",
+											"    pm.expect(jsonData.documentStatus).to.eql(\"RECE\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions/{{SHIPPING_INSTRUCTION_REFERENCE}}",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions",
+										"{{SHIPPING_INSTRUCTION_REFERENCE}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"SHIPPING_INSTRUCTION_RESPONSE_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"// We do not valid return codes here because create booking is a 201 and cancel is a 200.",
+									"// (which we could probably do a generic check for here, but we would still need a more",
+									"// precise check in the individual tests anyway).",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});",
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Negative test cases",
+					"item": [
+						{
+							"name": "Create Shipping instruction invalid utilizedTransportEquipment",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error reason is invalidInput\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].reason).to.contain(\"utilizedTransportEquipments\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"must be a valid UtilizedTransportEquipment\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"isShippedOnBoardType\": true,\r\n    \"isElectronic\": true,\r\n    \"isToOrder\": true,\r\n    \"consignmentItems\": [\r\n        {\r\n            \"HSCode\": \"411510\",\r\n            \"carrierBookingReference\": \"cbr-b83765166707812c8ff4\",\r\n            \"weight\": 120.4,\r\n            \"weightUnit\": \"KGM\",\r\n            \"descriptionOfGoods\": \"description\",\r\n            \"cargoItems\": [\r\n                {\r\n                    \"equipmentReference\": \"eq_ref_01\",\r\n                    \"numberOfPackages\": 1,\r\n                    \"weight\": 120.3,\r\n                    \"weightUnit\": \"KGM\",\r\n                    \"packageCode\": \"123\",\r\n                    \"cargoLineItems\": [\r\n                        {\r\n                            \"cargoLineItemID\": \"Foo\",\r\n                            \"shippingMarks\": \"bar\"\r\n                        }\r\n                    ]\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"utilizedTransportEquipments\": [\r\n        {\r\n            \"equipment\": {\r\n                \"equipmentReference\": \"eq_ref_01\"\r\n            },\r\n            \"cargoGrossWeight\": 120.3,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"isShipperOwned\": true,\r\n            \"seals\": [\r\n                {\r\n                    \"sealNumber\": \"12345\",\r\n                    \"sealSource\": \"CAR\",\r\n                    \"sealType\": \"BLT\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"foo party\",\r\n                \"address\": {\r\n                    \"name\": \"foo address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"EBL\",\r\n            \"displayedAddress\": [\r\n                \"foo\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"foo reference\"\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Shipping instruction invalid no consignmentItems",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error reason is invalidInput\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].reason).to.contain(\"consignmentItems\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"consignmentItems are required.\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"isShippedOnBoardType\": true,\r\n    \"isElectronic\": true,\r\n    \"isToOrder\": true,\r\n    \"utilizedTransportEquipments\": [\r\n        {\r\n            \"equipment\": {\r\n                \"equipmentReference\": \"eq_ref_01\"\r\n            },\r\n            \"cargoGrossWeight\": 120.3,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"isShipperOwned\": false,\r\n            \"seals\": [\r\n                {\r\n                    \"sealNumber\": \"12345\",\r\n                    \"sealSource\": \"CAR\",\r\n                    \"sealType\": \"BLT\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"foo party\",\r\n                \"address\": {\r\n                    \"name\": \"foo address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"EBL\",\r\n            \"displayedAddress\": [\r\n                \"foo\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"foo reference\"\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions",
+									"host": [
+										"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+									],
+									"path": [
+										"shipping-instructions"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const schema = pm.collectionVariables.get(\"ERROR_SCHEMA\");",
+									"const schemaObject = JSON.parse(schema);",
+									"",
+									"pm.test('Schema is valid', () => {",
+									"    pm.response.to.have.jsonSchema(schemaObject);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
 		}
 	],
 	"event": [
@@ -3235,6 +3495,11 @@
 			"key": "BOOKING_RESPONSE_SCHEMA",
 			"value": "{\"required\":[\"bookingRequestCreatedDateTime\",\"bookingRequestUpdatedDateTime\",\"carrierBookingRequestReference\",\"documentStatus\"],\"type\":\"object\",\"description\":\"The `carrierBookingRequestReference` along with the `documentStatus` is returned\\n\",\"properties\":{\"carrierBookingRequestReference\":{\"type\":\"string\",\"description\":\"A reference to the booking during the booking request phase\\n\"},\"documentStatus\":{\"type\":\"string\",\"description\":\"The status of the booking. Possible values are:\\n- RECE (Received)\\n- PENU (Pending Update)\\n- PENC (Pending Confirmation)\\n- CONF (Confirmed)\\n- REJE (Rejected)\\n- CANC (Cancelled)\\n- CMPL (Completed)\\n\\nMore details can be found on <a href=\\\"https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv\\\">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.\\n\",\"enum\":[\"RECE\",\"PENU\",\"PENC\",\"CONF\",\"REJE\",\"CANC\",\"CMPL\"]},\"bookingRequestCreatedDateTime\":{\"type\":\"string\",\"description\":\"The date and time when the booking request was created\\n\",\"format\":\"date-time\"},\"bookingRequestUpdatedDateTime\":{\"type\":\"string\",\"description\":\"Last date and time when the booking request was updated\\n\",\"format\":\"date-time\"}}}",
 			"type": "default"
+		},
+		{
+			"key": "SHIPPING_INSTRUCTION_RESPONSE_SCHEMA",
+			"value": "{\"required\":[\"documentStatus\",\"shippingInstructionCreatedDateTime\",\"shippingInstructionReference\",\"shippingInstructionUpdatedDateTime\"],\"type\":\"object\",\"description\":\"The `shippingInstructionReference` along with the `documentStatus`, created and updated timestamps is returned\\n\",\"properties\":{\"shippingInstructionReference\":{\"maxLength\":100,\"type\":\"string\",\"description\":\"The identifier for a shipping instruction provided by the carrier for system purposes.\\n\"},\"documentStatus\":{\"type\":\"string\",\"description\":\"The status of the Bill of Lading. Possible values are:\\n- RECE (Received)\\n- PENU (Pending Update)\\n- DRFT (Draft)\\n- PENA (Pending Approval)\\n- APPR (Approved)\\n- ISSU (Issued)\\n- SURR (Surrendered)\\n- VOID (Void)\\n\\nMore details can be found on <a href=\\\"https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv\\\">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.\\n\",\"enum\":[\"RECE\",\"PENU\",\"DRFT\",\"PENA\",\"APPR\",\"ISSU\",\"SURR\",\"VOID\"]},\"shippingInstructionCreatedDateTime\":{\"type\":\"string\",\"description\":\"Date and time when the ShippingInstruction was created\\n\",\"format\":\"date-time\"},\"shippingInstructionUpdatedDateTime\":{\"type\":\"string\",\"description\":\"Date and time when the ShippingInstruction was updated\\n\",\"format\":\"date-time\"}}}",
+			"type": "string"
 		}
 	]
 }
