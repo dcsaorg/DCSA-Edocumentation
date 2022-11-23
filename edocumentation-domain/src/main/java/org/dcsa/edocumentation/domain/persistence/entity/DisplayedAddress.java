@@ -27,7 +27,7 @@ public class DisplayedAddress {
   @JoinColumn(name = "document_party_id")
   private DocumentParty documentParty;
 
-  @Size(max = 250)
+  @Size(max = 35)
   @Column(name = "address_line_text")
   private String addressLine;
 
