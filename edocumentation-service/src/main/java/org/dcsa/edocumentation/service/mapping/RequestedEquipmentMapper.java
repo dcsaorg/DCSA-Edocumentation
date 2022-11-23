@@ -11,11 +11,13 @@ import org.mapstruct.Mapping;
 public interface RequestedEquipmentMapper {
   @Mapping(source = "booking", target = "booking")
   @Mapping(source = "booking.id", target = "id", ignore = true)
+  @Mapping(source = "requestedEquipment.isoEquipmentCode", target = "sizeType") //ToDo needs to be adjusted in DDT-1333
   RequestedEquipment toDAO(RequestedEquipmentTO requestedEquipment, Booking booking);
 
   @Mapping(
     source = "equipments",
     target = "equipmentReferences")
+  @Mapping(source = "sizeType", target = "isoEquipmentCode")
   RequestedEquipmentTO toTO(RequestedEquipment requestedEquipment);
 
   default String mapEquipmentToEquipmentReference(Equipment equipment) {

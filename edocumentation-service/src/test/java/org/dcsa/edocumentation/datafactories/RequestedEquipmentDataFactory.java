@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipment;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
+import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.edocumentation.transferobjects.RequestedEquipmentTO;
 
 import java.util.List;
@@ -31,16 +32,23 @@ public class RequestedEquipmentDataFactory {
   }
 
   public static List<RequestedEquipmentTO> requestedEquipmentTOList() {
+    EquipmentTO equipmentTO1 = EquipmentTO.builder()
+      .equipmentReference("Equipment_Ref_01")
+      .build();
+
+    EquipmentTO equipmentTO2 = EquipmentTO.builder()
+      .equipmentReference("Equipment_Ref_02")
+      .build();
     return List.of(
       RequestedEquipmentTO.builder()
-        .equipmentReferences(List.of("Equipment_Ref_01"))
-        .sizeType("size Type 1")
+        .equipmentReferences(List.of(equipmentTO1))
+        .isoEquipmentCode("GP22")
         .units(1)
         .isShipperOwned(true)
         .build(),
       RequestedEquipmentTO.builder()
-        .equipmentReferences(List.of("Equipment_Ref_02"))
-        .sizeType("size Type 2")
+        .equipmentReferences(List.of(equipmentTO2))
+        .isoEquipmentCode("GP22")
         .units(1)
         .isShipperOwned(false)
         .build()
@@ -53,13 +61,13 @@ public class RequestedEquipmentDataFactory {
     return List.of(
       RequestedEquipment.builder()
         .isShipperOwned(true)
-        .sizeType("size Type 1")
+        .sizeType("GP22")
         .units(1)
         .equipments(Set.of(equipments.get(0)))
         .build(),
       RequestedEquipment.builder()
         .isShipperOwned(false)
-        .sizeType("size Type 2")
+        .sizeType("GP22")
         .units(1)
         .equipments(Set.of(equipments.get(1)))
         .build()

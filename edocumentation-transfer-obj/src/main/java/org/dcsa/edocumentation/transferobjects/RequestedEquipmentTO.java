@@ -1,6 +1,8 @@
 package org.dcsa.edocumentation.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -9,15 +11,25 @@ import java.util.List;
 
 public record RequestedEquipmentTO(
   @NotBlank @Size(max = 4)
-  String sizeType,
+  @JsonProperty("ISOEquipmentCode")
+  String isoEquipmentCode,
+
+  Float tareWeight,
+
+  WeightUnit tareWeightUnit,
 
   @NotNull
   Integer units,
 
-  List<@NotBlank @Size(max = 15) String> equipmentReferences,
+  List<EquipmentTO> equipmentReferences,
 
   @NotNull
-  Boolean isShipperOwned
+  Boolean isShipperOwned,
+
+  @Size(max = 100)
+  String commodityRequestedEquipmentLink,
+
+  BookingActiveReeferSettingsTO activeReeferSettings
 ) {
   @Builder(toBuilder = true)
   public RequestedEquipmentTO { }
