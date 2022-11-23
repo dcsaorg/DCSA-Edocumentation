@@ -5,6 +5,7 @@ import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
+import org.dcsa.skernel.infrastructure.validation.RequiredIfFalse;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -14,6 +15,15 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredIfFalse(
+  ifFalse = "isElectronic",
+  thenNotNull = {
+    "numberOfCopiesWithCharges",
+    "numberOfCopiesWithoutCharges",
+    "numberOfOriginalsWithCharges",
+    "numberOfOriginalsWithoutCharges"
+  }
+)
 public record ShippingInstructionTO(
   @Size(max = 35)
   String carrierBookingReference,
