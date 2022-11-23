@@ -100,19 +100,16 @@ public class BookingService {
   @Transactional
   public Optional<BookingRefStatusTO> cancelBooking(String carrierBookingRequestReference,
                                                     String reason) {
-    BookingTO bookingTO = this.getBooking(carrierBookingRequestReference).orElse(null);
-    if (bookingTO == null) {
+    Booking booking = bookingRepository.findBookingByCarrierBookingRequestReference(
+      carrierBookingRequestReference
+    ).orElse(null);
+    if (booking == null) {
       return Optional.empty();
     }
-    Booking existingBooking = this.bookingRepository.findBookingByCarrierBookingRequestReference(carrierBookingRequestReference)
-      .orElse(null);
-    assert existingBooking != null;
     OffsetDateTime updateTime = OffsetDateTime.now();
-    existingBooking.lockVersion(updateTime);
-    bookingRepository.saveAndFlush(existingBooking);
-    Booking booking = toDAOBuilder(bookingTO).build();
+    // This works because we do not need to support versioning/rollback
     ShipmentEvent event = booking.cancel(reason, updateTime);
-    booking = saveBooking(booking, bookingTO);
+    booking = bookingRepository.save(booking);
     shipmentEventRepository.save(event);
     return Optional.of(bookingMapper.toStatusDTO(booking));
   }
