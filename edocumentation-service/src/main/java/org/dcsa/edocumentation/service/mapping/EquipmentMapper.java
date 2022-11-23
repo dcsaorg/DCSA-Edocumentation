@@ -15,7 +15,7 @@ public interface EquipmentMapper {
     return reference == null ? null : EquipmentTO.builder().equipmentReference(reference).build();
   }
 
-  default Stream<EquipmentTO> toNonNullableDTOStream(List<String> references) {
-    return references == null ? Stream.empty() : references.stream().map(this::toDTO);
+  default Stream<EquipmentTO> toNonNullableDTOStream(List<EquipmentTO> equipments) {
+    return equipments == null ? Stream.empty() : equipments.stream();
   }
 }
