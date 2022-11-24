@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum AirExchangeUnit {
   MQH("Cubic metre per hour"),
-  TWO_K("Cubic foot per hour");
+  FQH("Cubic foot per hour");
 
   private final String value;
 }
