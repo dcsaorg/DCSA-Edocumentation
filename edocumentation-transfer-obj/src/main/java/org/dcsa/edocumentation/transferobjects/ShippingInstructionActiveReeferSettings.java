@@ -31,10 +31,10 @@ public sealed interface ShippingInstructionActiveReeferSettings permits EblFreez
     String productName,
 
     @NotNull
-    boolean isTracingRequired,
+    Boolean isTracingRequired,
 
     @NotNull
-    boolean isMonitoringRequired,
+    Boolean isMonitoringRequired,
 
     @Size(max = 500)
     String extraMaterial,
@@ -56,22 +56,22 @@ public sealed interface ShippingInstructionActiveReeferSettings permits EblFreez
     String productName,
 
     @NotNull
-    boolean isCargoProbe1Required,
+    Boolean isCargoProbe1Required,
 
     @NotNull
-    boolean isCargoProbe2Required,
+    Boolean isCargoProbe2Required,
 
     @NotNull
-    boolean isCargoProbe3Required,
+    Boolean isCargoProbe3Required,
 
     @NotNull
-    boolean isCargoProbe4Required,
+    Boolean isCargoProbe4Required,
 
     @NotNull
-    boolean isTracingRequired,
+    Boolean isTracingRequired,
 
     @NotNull
-    boolean isMonitoringRequired,
+    Boolean isMonitoringRequired,
 
     @Size(max = 500)
     String extraMaterial,
@@ -93,31 +93,31 @@ public sealed interface ShippingInstructionActiveReeferSettings permits EblFreez
     String productName,
 
     @NotNull
-    boolean isVentilationOpen,
+    Boolean isVentilationOpen,
 
     @NotNull
-    boolean isCargoProbe1Required,
+    Boolean isCargoProbe1Required,
 
     @NotNull
-    boolean isCargoProbe2Required,
+    Boolean isCargoProbe2Required,
 
     @NotNull
-    boolean isCargoProbe3Required,
+    Boolean isCargoProbe3Required,
 
     @NotNull
-    boolean isCargoProbe4Required,
+    Boolean isCargoProbe4Required,
 
     @NotNull
-    boolean isDrainholesOpen,
+    Boolean isDrainholesOpen,
 
     @NotNull
-    boolean isBulbMode,
+    Boolean isBulbMode,
 
     @NotNull
-    boolean isTracingRequired,
+    Boolean isTracingRequired,
 
     @NotNull
-    boolean isMonitoringRequired,
+    Boolean isMonitoringRequired,
 
     @Size(max = 500)
     String extraMaterial,
@@ -136,22 +136,22 @@ public sealed interface ShippingInstructionActiveReeferSettings permits EblFreez
     String productName,
 
     @NotNull
-    boolean isCargoProbe1Required,
+    Boolean isCargoProbe1Required,
 
     @NotNull
-    boolean isCargoProbe2Required,
+    Boolean isCargoProbe2Required,
 
     @NotNull
-    boolean isCargoProbe3Required,
+    Boolean isCargoProbe3Required,
 
     @NotNull
-    boolean isCargoProbe4Required,
+    Boolean isCargoProbe4Required,
 
     @NotNull
-    boolean isTracingRequired,
+    Boolean isTracingRequired,
 
     @NotNull
-    boolean isMonitoringRequired,
+    Boolean isMonitoringRequired,
 
     @Size(max = 500)
     String extraMaterial,

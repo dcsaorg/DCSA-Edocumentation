@@ -31,25 +31,25 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
     String productName,
 
     @NotNull
-    boolean isGeneratorSetRequired,
+    Boolean isGeneratorSetRequired,
 
     @NotNull
-    boolean isPreCoolingRequired,
+    Boolean isPreCoolingRequired,
 
     @NotNull
-    boolean isColdTreatmentRequired,
+    Boolean isColdTreatmentRequired,
 
     @NotNull
-    boolean isHotStuffingAllowed,
+    Boolean isHotStuffingAllowed,
 
     @NotNull
-    boolean isHighValueCargo,
+    Boolean isHighValueCargo,
 
     @NotNull
-    boolean isTracingRequired,
+    Boolean isTracingRequired,
 
     @NotNull
-    boolean isMonitoringRequired,
+    Boolean isMonitoringRequired,
 
     @Size(max = 500)
     String extraMaterial,
@@ -72,37 +72,37 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
     String productName,
 
     @NotNull
-    boolean isGeneratorSetRequired,
+    Boolean isGeneratorSetRequired,
 
     @NotNull
-    boolean isPreCoolingRequired,
+    Boolean isPreCoolingRequired,
 
     @NotNull
-    boolean isColdTreatmentRequired,
+    Boolean isColdTreatmentRequired,
 
     @NotNull
-    boolean isHotStuffingAllowed,
+    Boolean isHotStuffingAllowed,
 
     @NotNull
-    boolean isHighValueCargo,
+    Boolean isHighValueCargo,
 
     @NotNull
-    boolean isCargoProbe1Required,
+    Boolean isCargoProbe1Required,
 
     @NotNull
-    boolean isCargoProbe2Required,
+    Boolean isCargoProbe2Required,
 
     @NotNull
-    boolean isCargoProbe3Required,
+    Boolean isCargoProbe3Required,
 
     @NotNull
-    boolean isCargoProbe4Required,
+    Boolean isCargoProbe4Required,
 
     @NotNull
-    boolean isTracingRequired,
+    Boolean isTracingRequired,
 
     @NotNull
-    boolean isMonitoringRequired,
+    Boolean isMonitoringRequired,
 
     @Size(max = 500)
     String extraMaterial,
@@ -125,46 +125,46 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
     String productName,
 
     @NotNull
-    boolean isGeneratorSetRequired,
+    Boolean isGeneratorSetRequired,
 
     @NotNull
-    boolean isPreCoolingRequired,
+    Boolean isPreCoolingRequired,
 
     @NotNull
-    boolean isColdTreatmentRequired,
+    Boolean isColdTreatmentRequired,
 
     @NotNull
-    boolean isHotStuffingAllowed,
+    Boolean isHotStuffingAllowed,
 
     @NotNull
-    boolean isHighValueCargo,
+    Boolean isHighValueCargo,
 
     @NotNull
-    boolean isVentilationOpen,
+    Boolean isVentilationOpen,
 
     @NotNull
-    boolean isCargoProbe1Required,
+    Boolean isCargoProbe1Required,
 
     @NotNull
-    boolean isCargoProbe2Required,
+    Boolean isCargoProbe2Required,
 
     @NotNull
-    boolean isCargoProbe3Required,
+    Boolean isCargoProbe3Required,
 
     @NotNull
-    boolean isCargoProbe4Required,
+    Boolean isCargoProbe4Required,
 
     @NotNull
-    boolean isDrainholesOpen,
+    Boolean isDrainholesOpen,
 
     @NotNull
-    boolean isBulbMode,
+    Boolean isBulbMode,
 
     @NotNull
-    boolean isTracingRequired,
+    Boolean isTracingRequired,
 
     @NotNull
-    boolean isMonitoringRequired,
+    Boolean isMonitoringRequired,
 
     @Size(max = 500)
     String extraMaterial,
@@ -184,37 +184,37 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
     String productName,
 
     @NotNull
-    boolean isGeneratorSetRequired,
+    Boolean isGeneratorSetRequired,
 
     @NotNull
-    boolean isPreCoolingRequired,
+    Boolean isPreCoolingRequired,
 
     @NotNull
-    boolean isColdTreatmentRequired,
+    Boolean isColdTreatmentRequired,
 
     @NotNull
-    boolean isHotStuffingAllowed,
+    Boolean isHotStuffingAllowed,
 
     @NotNull
-    boolean isHighValueCargo,
+    Boolean isHighValueCargo,
 
     @NotNull
-    boolean isCargoProbe1Required,
+    Boolean isCargoProbe1Required,
 
     @NotNull
-    boolean isCargoProbe2Required,
+    Boolean isCargoProbe2Required,
 
     @NotNull
-    boolean isCargoProbe3Required,
+    Boolean isCargoProbe3Required,
 
     @NotNull
-    boolean isCargoProbe4Required,
+    Boolean isCargoProbe4Required,
 
     @NotNull
-    boolean isTracingRequired,
+    Boolean isTracingRequired,
 
     @NotNull
-    boolean isMonitoringRequired,
+    Boolean isMonitoringRequired,
 
     @Size(max = 500)
     String extraMaterial,
