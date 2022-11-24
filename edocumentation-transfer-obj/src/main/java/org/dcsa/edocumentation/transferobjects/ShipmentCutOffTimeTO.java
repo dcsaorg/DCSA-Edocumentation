@@ -8,7 +8,7 @@ import org.dcsa.edocumentation.transferobjects.enums.CutOffDateTimeCode;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 
-public record ShipmentCutOffTime(
+public record ShipmentCutOffTimeTO(
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         @NotNull(message = "The attribute cutOffDateTimeCode is required.")
@@ -19,5 +19,5 @@ public record ShipmentCutOffTime(
         OffsetDateTime cutOffDateTime) {
 
   @Builder(toBuilder = true)
-  public ShipmentCutOffTime {}
+  public ShipmentCutOffTimeTO {}
 }

@@ -25,9 +25,9 @@ public record ShipmentTO(
     String termsAndConditions,
     @NotNull @Valid BookingTO booking,
     @NotNull @Valid List<TransportTO> transports,
-    @Valid List<ShipmentCutOffTime> shipmentCutOffTimes,
+    @Valid List<ShipmentCutOffTimeTO> shipmentCutOffTimes,
     @Valid List<ShipmentLocationTO> shipmentLocations,
-    @Valid List<ConfirmedEquipment> confirmedEquipments,
+    @Valid List<ConfirmedEquipmentTO> confirmedEquipments,
     @Valid List<ChargeTO> charges,
     @Valid List<CarrierClauseTO> carrierClauses) {
 
