@@ -5,14 +5,25 @@ import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
+import org.dcsa.skernel.infrastructure.validation.RequiredIfFalse;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredIfFalse(
+  ifFalse = "isElectronic",
+  thenNotNull = {
+    "numberOfCopiesWithCharges",
+    "numberOfCopiesWithoutCharges",
+    "numberOfOriginalsWithCharges",
+    "numberOfOriginalsWithoutCharges"
+  }
+)
 public record ShippingInstructionTO(
   @Size(max = 35)
   String carrierBookingReference,
@@ -69,11 +80,11 @@ public record ShippingInstructionTO(
   UUID amendmentToTransportDocument,
 
   @Valid
-  @NotNull(message = "consigmentItems are required.")
+  @NotEmpty(message = "consignmentItems are required.")
   List<ConsignmentItemTO>consignmentItems,
 
   @Valid
-  @NotNull(message = "utilizedTransportEquipments are required.")
+  @NotEmpty(message = "utilizedTransportEquipments are required.")
   List<UtilizedTransportEquipmentTO> utilizedTransportEquipments,
 
   @Valid
