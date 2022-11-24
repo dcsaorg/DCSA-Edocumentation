@@ -35,7 +35,7 @@ public record UtilizedTransportEquipmentTO(
   List<SealTO> seals,
 
   @Valid
-  ActiveReeferSettingsTO activeReeferSettings
+  ShippingInstructionActiveReeferSettings activeReeferSettings
 ) {
   @Builder
   public UtilizedTransportEquipmentTO{}

@@ -3,6 +3,7 @@ package org.dcsa.edocumentation.transferobjects;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Builder;
+import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettings.*;
 import org.dcsa.edocumentation.transferobjects.enums.ReeferType;
 import org.dcsa.edocumentation.transferobjects.enums.TemperatureUnit;
 import org.dcsa.skernel.infrastructure.validation.EnumSubset;
@@ -10,40 +11,24 @@ import org.dcsa.skernel.infrastructure.validation.EnumSubset;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.*;
 import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME,  property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = BkgFreezerTO.class, name = "FREZ"),
-  @JsonSubTypes.Type(value = BkgSuperFreezerTO.class, name = "SUPR"),
-  @JsonSubTypes.Type(value = BkgRefrigeratedTO.class, name = "REFR"),
-  @JsonSubTypes.Type(value = BkgControlledAtmosphereTO.class, name = "CONA")
+  @JsonSubTypes.Type(value = EblFreezerTO.class, name = "FREZ"),
+  @JsonSubTypes.Type(value = EblSuperFreezerTO.class, name = "SUPR"),
+  @JsonSubTypes.Type(value = EblRefrigeratedTO.class, name = "REFR"),
+  @JsonSubTypes.Type(value = EblControlledAtmosphereTO.class, name = "CONA")
 }
 )
-public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgSuperFreezerTO, BkgControlledAtmosphereTO, BkgRefrigeratedTO {
+public sealed interface ShippingInstructionActiveReeferSettings permits EblFreezerTO, EblSuperFreezerTO, EblRefrigeratedTO, EblControlledAtmosphereTO{
 
-  record BkgFreezerTO(
+  record EblFreezerTO(
     @EnumSubset(anyOf = "FREZ")
     ReeferType type,
 
     @Size(max = 500)
     String productName,
-
-    @NotNull
-    boolean isGeneratorSetRequired,
-
-    @NotNull
-    boolean isPreCoolingRequired,
-
-    @NotNull
-    boolean isColdTreatmentRequired,
-
-    @NotNull
-    boolean isHotStuffingAllowed,
-
-    @NotNull
-    boolean isHighValueCargo,
 
     @NotNull
     boolean isTracingRequired,
@@ -59,32 +44,16 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
 
     @NotNull
     TemperatureUnit temperatureUnit
-  ) implements BookingActiveReeferSettingsTO {
-    @Builder
-    public BkgFreezerTO {}
+  ) implements ShippingInstructionActiveReeferSettings {
+    @Builder public EblFreezerTO{}
   }
 
-  record BkgSuperFreezerTO(
+  record EblSuperFreezerTO(
     @EnumSubset(anyOf = "SUPR")
     ReeferType type,
 
     @Size(max = 500)
     String productName,
-
-    @NotNull
-    boolean isGeneratorSetRequired,
-
-    @NotNull
-    boolean isPreCoolingRequired,
-
-    @NotNull
-    boolean isColdTreatmentRequired,
-
-    @NotNull
-    boolean isHotStuffingAllowed,
-
-    @NotNull
-    boolean isHighValueCargo,
 
     @NotNull
     boolean isCargoProbe1Required,
@@ -112,32 +81,16 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
 
     @NotNull
     TemperatureUnit temperatureUnit
-  ) implements BookingActiveReeferSettingsTO {
-    @Builder
-    public BkgSuperFreezerTO {}
+  ) implements ShippingInstructionActiveReeferSettings {
+    @Builder public EblSuperFreezerTO{}
   }
 
-  record BkgRefrigeratedTO(
+  record EblRefrigeratedTO(
     @EnumSubset(anyOf = "REFR")
     ReeferType type,
 
     @Size(max = 500)
     String productName,
-
-    @NotNull
-    boolean isGeneratorSetRequired,
-
-    @NotNull
-    boolean isPreCoolingRequired,
-
-    @NotNull
-    boolean isColdTreatmentRequired,
-
-    @NotNull
-    boolean isHotStuffingAllowed,
-
-    @NotNull
-    boolean isHighValueCargo,
 
     @NotNull
     boolean isVentilationOpen,
@@ -171,32 +124,16 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
 
     @NotEmpty
     List<TemperatureSetPointTO> setpoints
-  ) implements BookingActiveReeferSettingsTO {
-    @Builder
-    public BkgRefrigeratedTO {}
+  ) implements ShippingInstructionActiveReeferSettings {
+    @Builder public EblRefrigeratedTO{}
   }
 
-  record BkgControlledAtmosphereTO(
+  record EblControlledAtmosphereTO(
     @EnumSubset(anyOf = "CONA")
     ReeferType type,
 
     @Size(max = 500)
     String productName,
-
-    @NotNull
-    boolean isGeneratorSetRequired,
-
-    @NotNull
-    boolean isPreCoolingRequired,
-
-    @NotNull
-    boolean isColdTreatmentRequired,
-
-    @NotNull
-    boolean isHotStuffingAllowed,
-
-    @NotNull
-    boolean isHighValueCargo,
 
     @NotNull
     boolean isCargoProbe1Required,
@@ -221,10 +158,7 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
 
     @NotEmpty
     List<ControlledAtmosphereSetPointTO> setpoints
-  ) implements BookingActiveReeferSettingsTO {}
-
+  ) implements ShippingInstructionActiveReeferSettings {
+    @Builder public EblControlledAtmosphereTO{}
+  }
 }
-
-
-
-
