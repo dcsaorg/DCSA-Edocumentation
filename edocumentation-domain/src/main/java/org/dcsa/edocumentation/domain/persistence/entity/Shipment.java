@@ -5,12 +5,33 @@ import org.dcsa.skernel.domain.persistence.entity.Carrier;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @NamedEntityGraph(
     name = "graph.shipment-summary",
     attributeNodes = {@NamedAttributeNode("booking")})
+@NamedEntityGraph(
+    name = "graph.shipment",
+    attributeNodes = {
+      @NamedAttributeNode("booking"),
+      @NamedAttributeNode("carrier"),
+      @NamedAttributeNode(value = "shipmentLocations", subgraph = "subgraph.shipmentLocations"),
+      @NamedAttributeNode(value = "shipmentTransports", subgraph = "subgraph.shipmentTransports"),
+      @NamedAttributeNode("shipmentCutOffTimes"),
+      @NamedAttributeNode("carrierClauses"),
+      @NamedAttributeNode("confirmedEquipments"),
+      @NamedAttributeNode("charges")
+    },
+    subgraphs = {
+      @NamedSubgraph(
+          name = "subgraph.shipmentLocations",
+          attributeNodes = {@NamedAttributeNode("location")}),
+      @NamedSubgraph(
+          name = "subgraph.shipmentTransports",
+          attributeNodes = {@NamedAttributeNode("transport")}),
+    })
 @Data
 @Builder
 @NoArgsConstructor
@@ -48,9 +69,41 @@ public class Shipment {
   @Column(name = "terms_and_conditions", length = 35)
   private String termsAndConditions;
 
-  @Column(name = "confirmation_datetime", length = 35)
+  @Column(name = "confirmation_datetime")
   private OffsetDateTime shipmentCreatedDateTime;
 
-  @Column(name = "updated_date_time", length = 35)
+  @Column(name = "updated_date_time")
   private OffsetDateTime shipmentUpdatedDateTime;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "shipmentID")
+  private Set<ShipmentTransport> shipmentTransports = new LinkedHashSet<>();
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "shipmentID")
+  private Set<ShipmentLocation> shipmentLocations = new LinkedHashSet<>();
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "shipmentID")
+  private Set<ShipmentCutOffTime> shipmentCutOffTimes = new LinkedHashSet<>();
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "shipmentID")
+  private Set<RequestedEquipment> confirmedEquipments = new LinkedHashSet<>();
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany
+  @JoinTable(
+      name = "shipment_carrier_clauses",
+      joinColumns = {@JoinColumn(name = "shipment_id", referencedColumnName = "id")},
+      inverseJoinColumns = {@JoinColumn(name = "carrier_clause_id", referencedColumnName = "id")})
+  private Set<CarrierClause> carrierClauses = new LinkedHashSet<>();
+
+  @OneToMany(mappedBy = "shipmentID")
+  private Set<Charge> charges = new LinkedHashSet<>();
 }

@@ -38,6 +38,9 @@ public class RequestedEquipment {
   @Column(name = "is_shipper_owned")
   private Boolean isShipperOwned = false;
 
+  @Column(name = "shipment_id")
+  private UUID shipmentID;
+
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
