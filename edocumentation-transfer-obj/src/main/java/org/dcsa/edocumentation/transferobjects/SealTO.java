@@ -14,7 +14,6 @@ public record SealTO(
 
   SealSourceCode sealSource,
 
-  @NotNull(message = "Seal type is required.")
   SealTypeCode sealType
 ) {
   @Builder
