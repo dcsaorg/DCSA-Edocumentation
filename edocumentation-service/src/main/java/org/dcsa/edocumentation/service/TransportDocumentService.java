@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentSpecification;
+import org.dcsa.edocumentation.domain.persistence.repository.specification.TransportDocumentSpecification;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentSummaryMapper;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
-import static org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentSpecification.withFilters;
+import static org.dcsa.edocumentation.domain.persistence.repository.specification.TransportDocumentSpecification.withFilters;
 
 @RequiredArgsConstructor
 @Service

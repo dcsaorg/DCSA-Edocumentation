@@ -92,8 +92,9 @@ public class Shipment {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipmentID")
-  private Set<RequestedEquipment> confirmedEquipments = new LinkedHashSet<>();
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipment_id")
+  private Set<RequestedEquipmentGroup> confirmedEquipments = new LinkedHashSet<>();
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

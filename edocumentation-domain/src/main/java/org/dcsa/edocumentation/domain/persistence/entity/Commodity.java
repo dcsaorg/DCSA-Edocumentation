@@ -1,11 +1,17 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.VolumeUnit;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -29,11 +35,10 @@ public class Commodity {
   @JoinColumn(name = "booking_id")
   private Booking booking;
 
-  @Column(name = "commodity_type")
-  @Size(max = 550)
+  @Column(name = "commodity_type", nullable = false, length = 550)
   private String commodityType;
 
-  @Column(name = "hs_code") // we need an enum for this
+  @Column(name = "hs_code", length = 10) // we need an enum for this
   private String hsCode;
 
   @Column(name = "cargo_gross_weight")
@@ -58,4 +63,10 @@ public class Commodity {
 
   @Column(name = "export_license_expiry_date")
   private LocalDate exportLicenseExpiryDate;
+
+  /**
+   * Note commodity is linked to requested_equipment_group via join table requested_equipment_commodity.
+   * This is currently implemented on RequestedEquipmentGroup on the assumptions that that is the direction we would
+   * need it. Move/Copy to here if needed in the other direction.
+   */
 }

@@ -4,9 +4,15 @@ import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.ModeOfTransport;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.CommunicationChannelCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.IncoTerms;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.ReceiptDeliveryType;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
-import org.dcsa.skernel.domain.persistence.entity.enums.DimensionUnit;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -218,7 +224,7 @@ public class BookingDataFactory {
         .valueAddedServiceRequests(
             Set.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequest()))
         .references(Set.of(ReferenceDataFactory.singleReference()))
-        .requestedEquipments(Set.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
+        // .requestedEquipments(Set.of(RequestedEquipmentDataFactory.singleRequestedEquipment())) // TODO fix this
         .documentParties(Set.of(DocumentPartyDataFactory.singleDocumentParty()))
         .shipmentLocations(Set.of(ShipmentLocationDataFactory.singleShipmentLocation()))
         .build();

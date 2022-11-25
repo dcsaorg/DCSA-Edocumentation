@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
     uses = {
       LocationMapper.class,
       DisplayedAddressMapper.class,
-      RequestedEquipmentMapper.class
+      RequestedEquipmentGroupMapper.class
     }
 )
 public interface BookingMapper {

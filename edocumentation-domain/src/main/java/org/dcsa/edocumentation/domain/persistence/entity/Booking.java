@@ -202,7 +202,7 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "booking")
-  private Set<RequestedEquipment> requestedEquipments;
+  private Set<RequestedEquipmentGroup> requestedEquipments;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
