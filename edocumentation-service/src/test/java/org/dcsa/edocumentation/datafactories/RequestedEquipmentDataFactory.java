@@ -1,19 +1,15 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
-import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipment;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.edocumentation.transferobjects.RequestedEquipmentTO;
 
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @UtilityClass
 public class RequestedEquipmentDataFactory {
 
+  /* TODO fix
   public static RequestedEquipment singleRequestedEquipment() {
     return RequestedEquipment.builder()
         .id(UUID.randomUUID())
@@ -30,6 +26,7 @@ public class RequestedEquipmentDataFactory {
                     .build()))
         .build();
   }
+   */
 
   public static List<RequestedEquipmentTO> requestedEquipmentTOList() {
     EquipmentTO equipmentTO1 = EquipmentTO.builder()
@@ -55,7 +52,7 @@ public class RequestedEquipmentDataFactory {
     );
   }
 
-
+  /* TODO fix
   public static List<RequestedEquipment> requestedEquipmentList() {
     List<Equipment> equipments = EquipmentDataFactory.equipmentList();
     return List.of(
@@ -73,4 +70,5 @@ public class RequestedEquipmentDataFactory {
         .build()
     );
   }
+   */
 }

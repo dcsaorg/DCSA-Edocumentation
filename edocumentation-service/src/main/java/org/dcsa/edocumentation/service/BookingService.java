@@ -25,7 +25,7 @@ public class BookingService {
   private final VesselService vesselService;
   private final CommodityService commodityService;
   private final ValueAddedServiceRequestService valueAddedServiceRequestService;
-  private final RequestedEquipmentService requestedEquipmentService;
+  private final RequestedEquipmentGroupService requestedEquipmentGroupService;
   private final ReferenceService referenceService;
   private final DocumentPartyService documentPartyService;
   private final ShipmentLocationService shipmentLocationService;
@@ -92,7 +92,7 @@ public class BookingService {
     commodityService.createCommodities(bookingRequest.commodities(), booking);
     valueAddedServiceRequestService.createValueAddedServiceRequests(bookingRequest.valueAddedServiceRequests(), booking);
     referenceService.createReferences(bookingRequest.references(), booking);
-    requestedEquipmentService.createRequestedEquipments(bookingRequest.requestedEquipments(), booking);
+    requestedEquipmentGroupService.createRequestedEquipments(bookingRequest.requestedEquipments(), booking);
     documentPartyService.createDocumentParties(bookingRequest.documentParties(), booking);
     shipmentLocationService.createShipmentLocations(bookingRequest.shipmentLocations(), booking);
   }
