@@ -26,11 +26,8 @@ public class ActiveReeferSettings {
   @Column(name = "id", nullable = false)
   private UUID id;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "reefer_type_code", nullable = false)
-  private ReeferType reeferType;
+  @Column(name = "reefer_type_code", nullable = false)
+  private String type;
 
   @Column(name = "is_cargo_probe_1_required", nullable = false)
   private Boolean isCargoProbe1Required;
