@@ -70,11 +70,7 @@ public class RequestedEquipmentGroup {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany
-  @JoinTable(
-    name = "requested_equipment_commodity",
-    joinColumns = @JoinColumn(name = "requested_equipment_id", referencedColumnName = "id"),
-    inverseJoinColumns = @JoinColumn(name = "commodity_id", referencedColumnName = "id")
-  )
-  private Set<Commodity> commodities;
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "commodity_requested_equipment_link_id", nullable = false)
+  private CommodityRequestedEquipmentLink commodityRequestedEquipmentLink;
 }

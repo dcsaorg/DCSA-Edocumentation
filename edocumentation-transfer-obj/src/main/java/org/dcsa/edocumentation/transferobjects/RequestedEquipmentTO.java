@@ -21,7 +21,7 @@ public record RequestedEquipmentTO(
   @NotNull
   Integer units,
 
-  List<EquipmentTO> equipmentReferences,
+  List<@NotBlank @Size(max = 15) String> equipmentReferences,
 
   @NotNull
   Boolean isShipperOwned,

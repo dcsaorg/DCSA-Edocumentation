@@ -19,13 +19,13 @@ public class ActiveReeferSettingsService {
   @Transactional(Transactional.TxType.MANDATORY)
   public ActiveReeferSettings createBookingActiveReeferSettings(
       BookingActiveReeferSettingsTO activeReeferSettingsTOS) {
-    return saveActiveReeferSettings(mapper.toDAO(activeReeferSettingsTOS));
+    return activeReeferSettingsTOS == null ? null : saveActiveReeferSettings(mapper.toDAO(activeReeferSettingsTOS));
   }
 
   @Transactional(Transactional.TxType.MANDATORY)
   public ActiveReeferSettings createShippingInstructionActiveReeferSettings(
       ShippingInstructionActiveReeferSettingsTO activeReeferSettingsTOS) {
-    return saveActiveReeferSettings(mapper.toDAO(activeReeferSettingsTOS));
+    return activeReeferSettingsTOS == null ? null : saveActiveReeferSettings(mapper.toDAO(activeReeferSettingsTOS));
   }
 
   private ActiveReeferSettings saveActiveReeferSettings(ActiveReeferSettings activeReeferSettings) {

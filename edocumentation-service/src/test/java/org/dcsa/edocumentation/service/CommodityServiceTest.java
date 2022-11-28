@@ -13,13 +13,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
-
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
+
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class CommodityServiceTest {
@@ -35,17 +38,17 @@ public class CommodityServiceTest {
 
   @Test
   public void testCreateNull() {
-    commodityService.createCommodities(null, null);
+    commodityService.createCommodities(null, null, null);
 
     verify(commodityRepository, never()).saveAll(any());
-    verify(commodityMapper, never()).toDAO(any(), any());
+    verify(commodityMapper, never()).toDAO(any(), any(), any());
   }
 
   @Test
   public void testCreateEmpty() {
-    commodityService.createCommodities(Collections.emptyList(), null);
+    commodityService.createCommodities(Collections.emptyList(), null, null);
 
-    verify(commodityMapper, never()).toDAO(any(), any());
+    verify(commodityMapper, never()).toDAO(any(), any(), any());
     verify(commodityRepository, never()).saveAll(any());
   }
 
@@ -57,7 +60,7 @@ public class CommodityServiceTest {
     Commodity commodity = CommodityDataFactory.singleCommodityWithoutId();
 
     // Execute
-    commodityService.createCommodities(List.of(commodityTO), booking);
+    commodityService.createCommodities(List.of(commodityTO), booking, Collections.emptyMap());
 
     // Verify
     verify(commodityRepository).saveAll(List.of(commodity));
