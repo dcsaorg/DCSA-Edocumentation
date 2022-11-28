@@ -221,7 +221,10 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
 
     @NotEmpty
     List<ControlledAtmosphereSetPointTO> setpoints
-  ) implements BookingActiveReeferSettingsTO {}
+  ) implements BookingActiveReeferSettingsTO {
+    @Builder
+    public BkgControlledAtmosphereTO{}
+  }
 
 }
 

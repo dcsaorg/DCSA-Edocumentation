@@ -1,8 +1,8 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.AirExchangeUnit;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TemperatureUnit;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.VolumeUnit;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -36,7 +36,7 @@ public class Setpoint {
 
   @Column(name = "air_exchange_unit")
   @Enumerated(EnumType.STRING)
-  private VolumeUnit airExchangeUnit;
+  private AirExchangeUnit airExchangeUnit;
 
   @Column(name = "o2")
   private Float o2;

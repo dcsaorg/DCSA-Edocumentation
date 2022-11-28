@@ -2,12 +2,12 @@ package org.dcsa.edocumentation.transferobjects.validation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettings;
+import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettingsTO;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ShippingInstructionActiveReeferSettingsTest {
+class ShippingInstructionActiveReeferSettingsTOTest {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
@@ -24,8 +24,8 @@ class ShippingInstructionActiveReeferSettingsTest {
       }
       """;
 
-    ShippingInstructionActiveReeferSettings freezerTO = objectMapper.readValue(freezer, ShippingInstructionActiveReeferSettings.class);
-    assertTrue(freezerTO instanceof ShippingInstructionActiveReeferSettings.EblFreezerTO);
+    ShippingInstructionActiveReeferSettingsTO freezerTO = objectMapper.readValue(freezer, ShippingInstructionActiveReeferSettingsTO.class);
+    assertTrue(freezerTO instanceof ShippingInstructionActiveReeferSettingsTO.EblFreezerTO);
   }
 
   @Test
@@ -46,8 +46,8 @@ class ShippingInstructionActiveReeferSettingsTest {
       }
       """;
 
-    ShippingInstructionActiveReeferSettings superFreezerTO = objectMapper.readValue(superFreezer, ShippingInstructionActiveReeferSettings.class);
-    assertTrue(superFreezerTO instanceof ShippingInstructionActiveReeferSettings.EblSuperFreezerTO);
+    ShippingInstructionActiveReeferSettingsTO superFreezerTO = objectMapper.readValue(superFreezer, ShippingInstructionActiveReeferSettingsTO.class);
+    assertTrue(superFreezerTO instanceof ShippingInstructionActiveReeferSettingsTO.EblSuperFreezerTO);
   }
 
   @Test
@@ -72,8 +72,8 @@ class ShippingInstructionActiveReeferSettingsTest {
       }
       """;
 
-    ShippingInstructionActiveReeferSettings refrigeratedTO = objectMapper.readValue(refrigerated, ShippingInstructionActiveReeferSettings.class);
-    assertTrue(refrigeratedTO instanceof ShippingInstructionActiveReeferSettings.EblRefrigeratedTO);
+    ShippingInstructionActiveReeferSettingsTO refrigeratedTO = objectMapper.readValue(refrigerated, ShippingInstructionActiveReeferSettingsTO.class);
+    assertTrue(refrigeratedTO instanceof ShippingInstructionActiveReeferSettingsTO.EblRefrigeratedTO);
   }
 
   @Test
@@ -95,7 +95,7 @@ class ShippingInstructionActiveReeferSettingsTest {
       }
       """;
 
-    ShippingInstructionActiveReeferSettings controlledAtmosphereTO = objectMapper.readValue(controlledAtmosphere, ShippingInstructionActiveReeferSettings.class);
-    assertTrue(controlledAtmosphereTO instanceof ShippingInstructionActiveReeferSettings.EblControlledAtmosphereTO);
+    ShippingInstructionActiveReeferSettingsTO controlledAtmosphereTO = objectMapper.readValue(controlledAtmosphere, ShippingInstructionActiveReeferSettingsTO.class);
+    assertTrue(controlledAtmosphereTO instanceof ShippingInstructionActiveReeferSettingsTO.EblControlledAtmosphereTO);
   }
 }

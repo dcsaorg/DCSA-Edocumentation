@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.transferobjects;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettings.*;
+import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettingsTO.*;
 import org.dcsa.edocumentation.transferobjects.enums.ReeferType;
 import org.dcsa.edocumentation.transferobjects.enums.TemperatureUnit;
 import org.dcsa.skernel.infrastructure.validation.EnumSubset;
@@ -21,7 +21,7 @@ import java.util.List;
   @JsonSubTypes.Type(value = EblControlledAtmosphereTO.class, name = "CONA")
 }
 )
-public sealed interface ShippingInstructionActiveReeferSettings permits EblFreezerTO, EblSuperFreezerTO, EblRefrigeratedTO, EblControlledAtmosphereTO{
+public sealed interface ShippingInstructionActiveReeferSettingsTO permits EblFreezerTO, EblSuperFreezerTO, EblRefrigeratedTO, EblControlledAtmosphereTO{
 
   record EblFreezerTO(
     @EnumSubset(anyOf = "FREZ")
@@ -44,7 +44,7 @@ public sealed interface ShippingInstructionActiveReeferSettings permits EblFreez
 
     @NotNull
     TemperatureUnit temperatureUnit
-  ) implements ShippingInstructionActiveReeferSettings {
+  ) implements ShippingInstructionActiveReeferSettingsTO {
     @Builder public EblFreezerTO{}
   }
 
@@ -81,7 +81,7 @@ public sealed interface ShippingInstructionActiveReeferSettings permits EblFreez
 
     @NotNull
     TemperatureUnit temperatureUnit
-  ) implements ShippingInstructionActiveReeferSettings {
+  ) implements ShippingInstructionActiveReeferSettingsTO {
     @Builder public EblSuperFreezerTO{}
   }
 
@@ -124,7 +124,7 @@ public sealed interface ShippingInstructionActiveReeferSettings permits EblFreez
 
     @NotEmpty
     List<TemperatureSetPointTO> setpoints
-  ) implements ShippingInstructionActiveReeferSettings {
+  ) implements ShippingInstructionActiveReeferSettingsTO {
     @Builder public EblRefrigeratedTO{}
   }
 
@@ -158,7 +158,7 @@ public sealed interface ShippingInstructionActiveReeferSettings permits EblFreez
 
     @NotEmpty
     List<ControlledAtmosphereSetPointTO> setpoints
-  ) implements ShippingInstructionActiveReeferSettings {
+  ) implements ShippingInstructionActiveReeferSettingsTO {
     @Builder public EblControlledAtmosphereTO{}
   }
 }
