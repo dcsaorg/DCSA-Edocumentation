@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.transferobjects.EquipmentTO;
+import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
 import org.dcsa.edocumentation.transferobjects.RequestedEquipmentTO;
 
 import java.util.List;
@@ -29,46 +29,45 @@ public class RequestedEquipmentDataFactory {
    */
 
   public static List<RequestedEquipmentTO> requestedEquipmentTOList() {
-    EquipmentTO equipmentTO1 = EquipmentTO.builder()
-      .equipmentReference("Equipment_Ref_01")
-      .build();
-
-    EquipmentTO equipmentTO2 = EquipmentTO.builder()
-      .equipmentReference("Equipment_Ref_02")
-      .build();
-    return List.of(
-      RequestedEquipmentTO.builder()
-        .equipmentReferences(List.of(equipmentTO1))
-        .isoEquipmentCode("GP22")
-        .units(1)
-        .isShipperOwned(true)
-        .build(),
-      RequestedEquipmentTO.builder()
-        .equipmentReferences(List.of(equipmentTO2))
-        .isoEquipmentCode("GP22")
-        .units(1)
-        .isShipperOwned(false)
-        .build()
-    );
+    return List.of(requestedEquipmentTORef1(), requestedEquipmentTORef2());
   }
 
-  /* TODO fix
-  public static List<RequestedEquipment> requestedEquipmentList() {
-    List<Equipment> equipments = EquipmentDataFactory.equipmentList();
-    return List.of(
-      RequestedEquipment.builder()
-        .isShipperOwned(true)
-        .sizeType("GP22")
-        .units(1)
-        .equipments(Set.of(equipments.get(0)))
-        .build(),
-      RequestedEquipment.builder()
-        .isShipperOwned(false)
-        .sizeType("GP22")
-        .units(1)
-        .equipments(Set.of(equipments.get(1)))
-        .build()
-    );
+  public static RequestedEquipmentTO requestedEquipmentTORef1() {
+    return RequestedEquipmentTO.builder()
+      .equipmentReferences(List.of("Equipment_Ref_01"))
+      .isoEquipmentCode("GP22")
+      .units(1)
+      .isShipperOwned(true)
+      .activeReeferSettings(BookingActiveReeferSettingsDataFactory.bkgFreezer())
+      .build();
   }
-   */
+
+  public static RequestedEquipmentTO requestedEquipmentTORef2() {
+    return RequestedEquipmentTO.builder()
+      .equipmentReferences(List.of("Equipment_Ref_02"))
+      .isoEquipmentCode("GP22")
+      .units(1)
+      .isShipperOwned(false)
+      .build();
+  }
+
+  public static List<RequestedEquipmentGroup> requestedEquipmentList() {
+    return List.of(requestedEquipmentRef1(), requestedEquipmentRef2());
+  }
+
+  public static RequestedEquipmentGroup requestedEquipmentRef1() {
+    return RequestedEquipmentGroup.builder()
+      .isShipperOwned(true)
+      .requestedEquipmentIsoEquipmentCode("GP22")
+      .requestedEquipmentUnits(1)
+      .build();
+  }
+
+  public static RequestedEquipmentGroup requestedEquipmentRef2() {
+    return RequestedEquipmentGroup.builder()
+      .isShipperOwned(false)
+      .requestedEquipmentIsoEquipmentCode("GP22")
+      .requestedEquipmentUnits(1)
+      .build();
+  }
 }

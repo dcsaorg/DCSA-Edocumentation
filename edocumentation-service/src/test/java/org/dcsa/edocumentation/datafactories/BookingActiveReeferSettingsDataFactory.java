@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
+import org.dcsa.edocumentation.domain.persistence.entity.ActiveReeferSettings;
 import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.BkgControlledAtmosphereTO;
 import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.BkgFreezerTO;
 import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.BkgRefrigeratedTO;
@@ -31,6 +32,19 @@ public class BookingActiveReeferSettingsDataFactory {
         .temperatureSetpoint(-10)
         .temperatureUnit(TemperatureUnit.CEL)
         .build();
+  }
+
+  public ActiveReeferSettings bkgFreezerEntity() {
+    return ActiveReeferSettings.builder()
+      .productName("DCSA Freezer product")
+      .isPreCoolingRequired(true)
+      .isColdTreatmentRequired(true)
+      .isHotStuffingAllowed(true)
+      .isHighValueCargo(true)
+      .isTracingRequired(true)
+      .isMonitoringRequired(true)
+      .extraMaterial("extra material")
+      .build();
   }
 
   public BkgSuperFreezerTO bkgSuperFreezer() {

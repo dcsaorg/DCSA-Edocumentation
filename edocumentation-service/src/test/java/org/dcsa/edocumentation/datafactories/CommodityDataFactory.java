@@ -46,6 +46,7 @@ public class CommodityDataFactory {
       .exportLicenseExpiryDate(LocalDate.now().plusMonths(6))
       .numberOfPackages(1)
       .hsCode("123")
+      .commodityRequestedEquipmentLink("commodityRequestedEquipmentLink")
       .build();
   }
 }

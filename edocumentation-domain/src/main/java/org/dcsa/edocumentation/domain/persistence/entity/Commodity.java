@@ -64,9 +64,9 @@ public class Commodity {
   @Column(name = "export_license_expiry_date")
   private LocalDate exportLicenseExpiryDate;
 
-  /**
-   * Note commodity is linked to requested_equipment_group via join table requested_equipment_commodity.
-   * This is currently implemented on RequestedEquipmentGroup on the assumptions that that is the direction we would
-   * need it. Move/Copy to here if needed in the other direction.
-   */
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "commodity_requested_equipment_link_id", nullable = false)
+  private CommodityRequestedEquipmentLink commodityRequestedEquipmentLink;
 }
