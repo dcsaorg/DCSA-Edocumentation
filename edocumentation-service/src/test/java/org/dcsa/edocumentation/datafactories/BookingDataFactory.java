@@ -224,7 +224,7 @@ public class BookingDataFactory {
         .valueAddedServiceRequests(
             Set.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequest()))
         .references(Set.of(ReferenceDataFactory.singleReference()))
-        // .requestedEquipments(Set.of(RequestedEquipmentDataFactory.singleRequestedEquipment())) // TODO fix this
+        .requestedEquipments(Set.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
         .documentParties(Set.of(DocumentPartyDataFactory.singleDocumentParty()))
         .shipmentLocations(Set.of(ShipmentLocationDataFactory.singleShipmentLocation()))
         .build();

@@ -3,10 +3,11 @@ package org.dcsa.edocumentation.transferobjects;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettingsTO.*;
-import org.dcsa.edocumentation.transferobjects.enums.ReeferType;
+import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettingsTO.EblControlledAtmosphereTO;
+import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettingsTO.EblFreezerTO;
+import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettingsTO.EblRefrigeratedTO;
+import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettingsTO.EblSuperFreezerTO;
 import org.dcsa.edocumentation.transferobjects.enums.TemperatureUnit;
-import org.dcsa.skernel.infrastructure.validation.EnumSubset;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -24,9 +25,6 @@ import java.util.List;
 public sealed interface ShippingInstructionActiveReeferSettingsTO permits EblFreezerTO, EblSuperFreezerTO, EblRefrigeratedTO, EblControlledAtmosphereTO{
 
   record EblFreezerTO(
-    @EnumSubset(anyOf = "FREZ")
-    ReeferType type,
-
     @Size(max = 500)
     String productName,
 
@@ -40,7 +38,7 @@ public sealed interface ShippingInstructionActiveReeferSettingsTO permits EblFre
     String extraMaterial,
 
     @NotNull
-    Integer temperatureSetpoint,
+    Float temperatureSetpoint,
 
     @NotNull
     TemperatureUnit temperatureUnit
@@ -49,9 +47,6 @@ public sealed interface ShippingInstructionActiveReeferSettingsTO permits EblFre
   }
 
   record EblSuperFreezerTO(
-    @EnumSubset(anyOf = "SUPR")
-    ReeferType type,
-
     @Size(max = 500)
     String productName,
 
@@ -77,7 +72,7 @@ public sealed interface ShippingInstructionActiveReeferSettingsTO permits EblFre
     String extraMaterial,
 
     @NotNull
-    Integer temperatureSetpoint,
+    Float temperatureSetpoint,
 
     @NotNull
     TemperatureUnit temperatureUnit
@@ -86,9 +81,6 @@ public sealed interface ShippingInstructionActiveReeferSettingsTO permits EblFre
   }
 
   record EblRefrigeratedTO(
-    @EnumSubset(anyOf = "REFR")
-    ReeferType type,
-
     @Size(max = 500)
     String productName,
 
@@ -129,9 +121,6 @@ public sealed interface ShippingInstructionActiveReeferSettingsTO permits EblFre
   }
 
   record EblControlledAtmosphereTO(
-    @EnumSubset(anyOf = "CONA")
-    ReeferType type,
-
     @Size(max = 500)
     String productName,
 

@@ -14,6 +14,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventTypeCode;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
+import org.dcsa.edocumentation.service.mapping.ActiveReeferSettingsMapper;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
 import org.dcsa.edocumentation.service.mapping.CommodityRequestedEquipmentLinkMapper;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
@@ -61,6 +62,7 @@ class BookingServiceTest {
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
     @Spy private CommodityRequestedEquipmentLinkMapper commodityRequestedEquipmentLinkMapper = new CommodityRequestedEquipmentLinkMapper();
+    @Spy private ActiveReeferSettingsMapper activeReeferSettingsMapper = Mappers.getMapper(ActiveReeferSettingsMapper.class);
 
     @InjectMocks private BookingService service;
 
@@ -72,9 +74,9 @@ class BookingServiceTest {
       ReflectionTestUtils.setField(bookingMapper, "displayedAddressMapper", displayedAddressMapper);
       ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
       ReflectionTestUtils.setField(bookingMapper, "commodityRequestedEquipmentLinkMapper", commodityRequestedEquipmentLinkMapper);
+      ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
     }
 
-    /* TODO fix this
     @Test
     void bookingServiceTest_testGetFullBooking() {
       when(repository.findBookingByCarrierBookingRequestReference(any()))
@@ -91,7 +93,6 @@ class BookingServiceTest {
       assertFalse(bookingResult.requestedEquipments().isEmpty());
       assertFalse(bookingResult.shipmentLocations().isEmpty());
     }
-     */
 
     @Test
     void bookingServiceTest_testGetMinimalBooking() {

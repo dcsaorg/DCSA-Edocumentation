@@ -17,19 +17,17 @@ import java.util.List;
 public class ShippingInstructionActiveReeferSettingsDataFactory {
   public EblFreezerTO eblFreezer() {
     return EblFreezerTO.builder()
-      .type(ReeferType.FREZ)
       .productName("DCSA Freezer")
       .isTracingRequired(false)
       .isMonitoringRequired(false)
       .extraMaterial("extra material")
-      .temperatureSetpoint(-5)
+      .temperatureSetpoint(-5f)
       .temperatureUnit(TemperatureUnit.CEL)
       .build();
   }
 
   public EblSuperFreezerTO eblSuperFreezer() {
     return EblSuperFreezerTO.builder()
-      .type(ReeferType.SUPR)
       .productName("DCSA Super Freezer")
       .isCargoProbe1Required(false)
       .isCargoProbe2Required(false)
@@ -38,14 +36,13 @@ public class ShippingInstructionActiveReeferSettingsDataFactory {
       .isTracingRequired(false)
       .isMonitoringRequired(false)
       .extraMaterial("extra material")
-      .temperatureSetpoint(-70)
+      .temperatureSetpoint(-70f)
       .temperatureUnit(TemperatureUnit.CEL)
       .build();
   }
 
   public EblRefrigeratedTO eblRefrigerated() {
     return EblRefrigeratedTO.builder()
-      .type(ReeferType.REFR)
       .productName("DCSA refrigerated")
       .isVentilationOpen(true)
       .isCargoProbe1Required(false)
@@ -58,7 +55,7 @@ public class ShippingInstructionActiveReeferSettingsDataFactory {
       .isMonitoringRequired(false)
       .extraMaterial("extra material")
       .setpoints(List.of(TemperatureSetPointTO.builder()
-          .temperature(5)
+          .temperature(5f)
           .temperatureUnit(TemperatureUnit.CEL)
           .humidity(40F)
           .airExchangeUnit(AirExchangeUnit.MQH)
@@ -70,7 +67,6 @@ public class ShippingInstructionActiveReeferSettingsDataFactory {
 
   public EblControlledAtmosphereTO eblControlledAtmosphere() {
     return EblControlledAtmosphereTO.builder()
-      .type(ReeferType.CONA)
       .productName("DCSA Controlled Atmosphere")
       .isCargoProbe1Required(false)
       .isCargoProbe2Required(false)
@@ -80,7 +76,7 @@ public class ShippingInstructionActiveReeferSettingsDataFactory {
       .isMonitoringRequired(false)
       .extraMaterial("extra material")
       .setpoints(List.of(ControlledAtmosphereSetPointTO.builder()
-          .temperature(11)
+          .temperature(11f)
           .temperatureUnit(TemperatureUnit.CEL)
           .o2(12F)
           .co2(43F)

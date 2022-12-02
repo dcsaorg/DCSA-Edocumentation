@@ -5,28 +5,20 @@ import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup
 import org.dcsa.edocumentation.transferobjects.RequestedEquipmentTO;
 
 import java.util.List;
+import java.util.UUID;
 
 @UtilityClass
 public class RequestedEquipmentDataFactory {
 
-  /* TODO fix
-  public static RequestedEquipment singleRequestedEquipment() {
-    return RequestedEquipment.builder()
+  public static RequestedEquipmentGroup singleRequestedEquipment() {
+    return RequestedEquipmentGroup.builder()
         .id(UUID.randomUUID())
-        .confirmedEquipmentSizetype("confirmed size type")
+        .confirmedEquipmentIsoEquipmentCode("confirmed size type")
         .isShipperOwned(true)
-        .sizeType("size Type")
-        .units(1)
-        .equipments(
-            Set.of(
-                Equipment.builder()
-                    .equipmentReference("Equipment_Ref_01")
-                    .tareWeight(100F)
-                    .weightUnit(WeightUnit.KGM)
-                    .build()))
+        .requestedEquipmentIsoEquipmentCode("size Type")
+        .requestedEquipmentUnits(1)
         .build();
   }
-   */
 
   public static List<RequestedEquipmentTO> requestedEquipmentTOList() {
     return List.of(requestedEquipmentTORef1(), requestedEquipmentTORef2());
