@@ -49,7 +49,7 @@ public class EquipmentServiceTest {
   public void testNull() {
     assertTrue(equipmentService.resolveEquipments(null, null, null).isEmpty());
 
-    verify(equipmentRepository, never()).findByEquipmentReferences(any());
+    verify(equipmentRepository, never()).findByEquipmentReferenceIn(any());
     verify(equipmentRepository, never()).save(any());
     verify(equipmentMapper, never()).toDAO(any());
   }
@@ -58,7 +58,7 @@ public class EquipmentServiceTest {
   public void testEmpty() {
     assertTrue(equipmentService.resolveEquipments(Collections.emptyList(), null, null).isEmpty());
 
-    verify(equipmentRepository, never()).findByEquipmentReferences(any());
+    verify(equipmentRepository, never()).findByEquipmentReferenceIn(any());
     verify(equipmentRepository, never()).save(any());
     verify(equipmentMapper, never()).toDAO(any());
   }
@@ -68,7 +68,7 @@ public class EquipmentServiceTest {
     // Setup
     List<RequestedEquipmentTO> requestedEquipmentTOS = RequestedEquipmentDataFactory.requestedEquipmentTOList();
     List<Equipment> equipments = EquipmentDataFactory.equipmentList();
-    when(equipmentRepository.findByEquipmentReferences(any())).thenReturn(equipments);
+    when(equipmentRepository.findByEquipmentReferenceIn(any())).thenReturn(equipments);
 
     // Execute
     Map<String, Equipment> actual = equipmentService.resolveEquipments(requestedEquipmentTOS, RequestedEquipmentTO::isShipperOwned,
@@ -76,7 +76,7 @@ public class EquipmentServiceTest {
 
     // Verify
     assertEquals(EquipmentDataFactory.equipmentMap(), actual);
-    verify(equipmentRepository).findByEquipmentReferences(EquipmentDataFactory.equipmentReferenceList());
+    verify(equipmentRepository).findByEquipmentReferenceIn(EquipmentDataFactory.equipmentReferenceList());
     verify(equipmentRepository, never()).save(any());
   }
 
@@ -100,7 +100,7 @@ public class EquipmentServiceTest {
     Map<String, Equipment> expected = EquipmentDataFactory.equipmentMap();
     expected.put(extraEquipment.getEquipmentReference(), extraEquipment);
 
-    when(equipmentRepository.findByEquipmentReferences(any())).thenReturn(EquipmentDataFactory.equipmentList());
+    when(equipmentRepository.findByEquipmentReferenceIn(any())).thenReturn(EquipmentDataFactory.equipmentList());
     when(equipmentRepository.save(any())).thenReturn(extraEquipment);
 
     // Execute
@@ -109,7 +109,7 @@ public class EquipmentServiceTest {
 
     // Verify
     assertEquals(expected, actual);
-    verify(equipmentRepository).findByEquipmentReferences(setPlusMore(EquipmentDataFactory.equipmentReferenceList(), "notExist"));
+    verify(equipmentRepository).findByEquipmentReferenceIn(setPlusMore(EquipmentDataFactory.equipmentReferenceList(), "notExist"));
     verify(equipmentRepository).save(extraEquipment);
   }
 
@@ -126,7 +126,7 @@ public class EquipmentServiceTest {
     List<RequestedEquipmentTO> requestedEquipmentTOS =
       listPlusMore(RequestedEquipmentDataFactory.requestedEquipmentTOList(), extraRequestedEquipmentTO);
 
-    when(equipmentRepository.findByEquipmentReferences(any())).thenReturn(EquipmentDataFactory.equipmentList());
+    when(equipmentRepository.findByEquipmentReferenceIn(any())).thenReturn(EquipmentDataFactory.equipmentList());
 
     // Execute
     NotFoundException exception = assertThrows(NotFoundException.class, () ->
@@ -134,8 +134,8 @@ public class EquipmentServiceTest {
       re -> equipmentMapper.toNonNullableDTOStream(re)));
 
     // Verify
-    assertEquals("Could not find the following equipmentReferences in equipments: [notExist]", exception.getMessage());
-    verify(equipmentRepository).findByEquipmentReferences(setPlusMore(EquipmentDataFactory.equipmentReferenceList(), "notExist"));
+    assertEquals("Could not find the following equipments in equipments: [notExist]", exception.getMessage());
+    verify(equipmentRepository).findByEquipmentReferenceIn(setPlusMore(EquipmentDataFactory.equipmentReferenceList(), "notExist"));
     verify(equipmentRepository, never()).save(any());
   }
 
@@ -159,7 +159,7 @@ public class EquipmentServiceTest {
 
     // Verify
     assertEquals("equipmentReference = 'Equipment_Ref_01' is used more than once in List<RequestedEquipmentTO>", exception.getMessage());
-    verify(equipmentRepository, never()).findByEquipmentReferences(any());
+    verify(equipmentRepository, never()).findByEquipmentReferenceIn(any());
     verify(equipmentRepository, never()).save(any());
   }
 

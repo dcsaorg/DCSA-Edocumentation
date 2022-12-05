@@ -53,7 +53,7 @@ class BookingStateMachineTest {
       Assertions.assertThrows(ConflictException.class, booking::complete);
     }
     Booking booking = Booking.builder().documentStatus(PENU).build();
-    Assertions.assertThrows(ConflictException.class, booking::confirm);
+    Assertions.assertThrows(ConflictException.class, () -> booking.confirm(now));
     Assertions.assertThrows(ConflictException.class, booking::complete);
   }
 }
