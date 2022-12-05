@@ -1,7 +1,9 @@
 package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
+import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
+import org.dcsa.edocumentation.domain.persistence.repository.RequestedEquipmentGroupRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.UtilizedTransportEquipmentRepository;
 import org.dcsa.edocumentation.service.mapping.UtilizedTransportEquipmentMapper;
 import org.dcsa.edocumentation.transferobjects.UtilizedTransportEquipmentTO;
@@ -17,9 +19,13 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class UtilizedTransportEquipmentService {
 
-  private final UtilizedTransportEquipmentMapper utilizedTransportEquipmentMapper;
-  private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
   private final EquipmentService equipmentService;
+  private final ActiveReeferSettingsService activeReeferSettingsService;
+
+  private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
+  private final RequestedEquipmentGroupRepository requestedEquipmentGroupRepository;
+
+  private final UtilizedTransportEquipmentMapper utilizedTransportEquipmentMapper;
 
   @Transactional(Transactional.TxType.MANDATORY)
   public Map<String, UtilizedTransportEquipment> createUtilizedTransportEquipment(
@@ -30,7 +36,7 @@ public class UtilizedTransportEquipmentService {
     return utilizedTransportEquipmentRepository
         .saveAll(
             utilizedTransportEquipmentTOs.stream()
-                .map(utilizedTransportEquipmentMapper::toDAO)
+                .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, createRequestedEquipmentGroup(ute)))
                 .toList())
         .stream()
         .collect(
@@ -38,5 +44,19 @@ public class UtilizedTransportEquipmentService {
                 utilizedTransportEquipment ->
                     utilizedTransportEquipment.getEquipment().getEquipmentReference(),
                 utilizedTransportEquipment -> utilizedTransportEquipment));
+  }
+
+  private RequestedEquipmentGroup createRequestedEquipmentGroup(UtilizedTransportEquipmentTO uteTO) {
+    if (uteTO == null || uteTO.activeReeferSettings() == null) {
+      return null;
+    }
+
+    return requestedEquipmentGroupRepository.save(
+      RequestedEquipmentGroup.builder()
+        .confirmedEquipmentIsoEquipmentCode(uteTO.equipment().isoEquipmentCode())
+        .confirmedEquipmentUnits(uteTO.equipment().isoEquipmentCode() != null ? 1 : null)
+        .isShipperOwned(uteTO.isShipperOwned())
+        .activeReeferSettings(activeReeferSettingsService.createShippingInstructionActiveReeferSettings(uteTO.activeReeferSettings()))
+        .build());
   }
 }

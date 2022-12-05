@@ -54,7 +54,7 @@ class StuffingServiceTest {
     shippingInstruction = ShippingInstructionDataFactory.singleShallowShippingInstruction();
     savedUtilizedTransportEquipments =
         UtilizedTransportEquipmentEquipmentDataFactory.multipleCarrierOwned().stream()
-            .map(utilizedTransportEquipmentMapper::toDAO)
+            .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, null))
             .collect(
                 Collectors.toMap(
                     utilizedTransportEquipment ->
@@ -127,7 +127,7 @@ class StuffingServiceTest {
       .thenReturn(Optional.of(shipment));
 
     savedUtilizedTransportEquipments = UtilizedTransportEquipmentEquipmentDataFactory.multipleShipperOwned().stream()
-      .map(utilizedTransportEquipmentMapper::toDAO)
+      .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, null))
       .collect(
         Collectors.toMap(
           utilizedTransportEquipment ->
