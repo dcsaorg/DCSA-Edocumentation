@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ReeferType;
 
 import javax.persistence.*;
@@ -92,7 +93,7 @@ public class ActiveReeferSettings {
   @Column(name = "extra_material", length = 500)
   private String extraMaterial;
 
-  // @ToString.Exclude
+  @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "active_reefer_settings_id", nullable = false, referencedColumnName = "id")
