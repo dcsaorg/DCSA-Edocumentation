@@ -61,13 +61,13 @@ public class EquipmentService {
     }
 
     Map<String, Equipment> equipments =
-      equipmentRepository.findByEquipmentReferences(allEquipmentTOs.keySet()).stream()
+      equipmentRepository.findByEquipmentReferenceIn(allEquipmentTOs.keySet()).stream()
         .collect(Collectors.toMap(Equipment::getEquipmentReference, Function.identity()));
 
     mustExist.removeAll(equipments.keySet());
     if (!mustExist.isEmpty()) {
       throw ConcreteRequestErrorMessageException.notFound(
-        "Could not find the following equipmentReferences in equipments: " + mustExist);
+        "Could not find the following equipments in equipments: " + mustExist);
     }
 
     mustResolve.removeAll(equipments.keySet());

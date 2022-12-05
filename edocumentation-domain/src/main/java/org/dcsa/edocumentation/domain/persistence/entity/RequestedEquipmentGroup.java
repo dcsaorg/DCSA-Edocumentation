@@ -73,4 +73,16 @@ public class RequestedEquipmentGroup {
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "commodity_requested_equipment_link_id", nullable = false)
   private CommodityRequestedEquipmentLink commodityRequestedEquipmentLink;
+
+  public void equipmentProvidedForShipment(Shipment shipment) {
+    this.shipment = shipment;
+  }
+
+  public String getMatchKey() {
+    String reeferKey = "<NONE>";
+    if (activeReeferSettings != null) {
+      reeferKey = activeReeferSettings.getType().name();
+    }
+    return requestedEquipmentIsoEquipmentCode + "/" + reeferKey;
+  }
 }

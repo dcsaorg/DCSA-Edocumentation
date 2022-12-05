@@ -274,8 +274,8 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  public ShipmentEvent confirm() {
-    return processTransition(CONF, null);
+  public ShipmentEvent confirm(OffsetDateTime confirmationTime) {
+    return processTransition(CONF, null, confirmationTime);
   }
 
   /**
