@@ -36,8 +36,11 @@ public record CommodityTO(
 
   LocalDate exportLicenseIssueDate,
 
-  LocalDate exportLicenseExpiryDate
-) {
+  LocalDate exportLicenseExpiryDate,
+
+  @Size(max = 100)
+  String commodityRequestedEquipmentLink
+  ) {
   @Builder(toBuilder = true)
   public CommodityTO { }
 }

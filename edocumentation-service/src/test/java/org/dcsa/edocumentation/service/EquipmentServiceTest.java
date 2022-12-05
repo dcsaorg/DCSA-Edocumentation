@@ -5,10 +5,7 @@ import org.dcsa.edocumentation.datafactories.RequestedEquipmentDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.repository.EquipmentRepository;
 import org.dcsa.edocumentation.service.mapping.EquipmentMapper;
-import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.edocumentation.transferobjects.RequestedEquipmentTO;
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.dcsa.skernel.errors.exceptions.BadRequestException;
 import org.dcsa.skernel.errors.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -72,7 +72,7 @@ public class EquipmentServiceTest {
 
     // Execute
     Map<String, Equipment> actual = equipmentService.resolveEquipments(requestedEquipmentTOS, RequestedEquipmentTO::isShipperOwned,
-      re -> equipmentMapper.toNonNullableDTOStream(re.equipmentReferences().stream().toList()));
+      re -> equipmentMapper.toNonNullableDTOStream(re));
 
     // Verify
     assertEquals(EquipmentDataFactory.equipmentMap(), actual);
@@ -83,17 +83,16 @@ public class EquipmentServiceTest {
   @Test
   public void testCreate_CreateOne() {
     // Setup
-
-    EquipmentTO equipmentTO = EquipmentTO.builder()
-      .equipmentReference("notExist")
-      .build();
     RequestedEquipmentTO extraRequestedEquipmentTO = RequestedEquipmentTO.builder()
-      .equipmentReferences(List.of(equipmentTO))
+      .equipmentReferences(List.of("notExist"))
       .isoEquipmentCode("GP22")
       .units(1)
       .isShipperOwned(true)
       .build();
-    Equipment extraEquipment = Equipment.builder().equipmentReference("notExist").build();
+    Equipment extraEquipment = Equipment.builder()
+      .equipmentReference("notExist")
+      .isoEquipmentCode("GP22")
+      .build();
 
     List<RequestedEquipmentTO> requestedEquipmentTOS =
       listPlusMore(RequestedEquipmentDataFactory.requestedEquipmentTOList(), extraRequestedEquipmentTO);
@@ -106,7 +105,7 @@ public class EquipmentServiceTest {
 
     // Execute
     Map<String, Equipment> actual = equipmentService.resolveEquipments(requestedEquipmentTOS, RequestedEquipmentTO::isShipperOwned,
-      re -> equipmentMapper.toNonNullableDTOStream(re.equipmentReferences().stream().toList()));
+      re -> equipmentMapper.toNonNullableDTOStream(re));
 
     // Verify
     assertEquals(expected, actual);
@@ -117,11 +116,8 @@ public class EquipmentServiceTest {
   @Test
   public void testCreate_NotFound() {
     // Setup
-    EquipmentTO equipmentTO = EquipmentTO.builder()
-      .equipmentReference("notExist")
-      .build();
     RequestedEquipmentTO extraRequestedEquipmentTO = RequestedEquipmentTO.builder()
-      .equipmentReferences(List.of(equipmentTO))
+      .equipmentReferences(List.of("notExist"))
       .isoEquipmentCode("GP22")
       .units(1)
       .isShipperOwned(false)
@@ -135,7 +131,7 @@ public class EquipmentServiceTest {
     // Execute
     NotFoundException exception = assertThrows(NotFoundException.class, () ->
       equipmentService.resolveEquipments(requestedEquipmentTOS, RequestedEquipmentTO::isShipperOwned,
-      re -> equipmentMapper.toNonNullableDTOStream(re.equipmentReferences().stream().toList())));
+      re -> equipmentMapper.toNonNullableDTOStream(re)));
 
     // Verify
     assertEquals("Could not find the following equipmentReferences in equipments: [notExist]", exception.getMessage());
@@ -146,11 +142,8 @@ public class EquipmentServiceTest {
   @Test
   public void testCreate_OverlappingReferences() {
     // Setup
-    EquipmentTO equipmentTO = EquipmentTO.builder()
-      .equipmentReference("Equipment_Ref_01")
-      .build();
     RequestedEquipmentTO extraRequestedEquipmentTO = RequestedEquipmentTO.builder()
-      .equipmentReferences(List.of(equipmentTO))
+      .equipmentReferences(List.of("Equipment_Ref_01"))
       .isoEquipmentCode("GP22")
       .units(1)
       .isShipperOwned(false)
@@ -162,7 +155,7 @@ public class EquipmentServiceTest {
     // Execute
     BadRequestException exception = assertThrows(BadRequestException.class, () ->
       equipmentService.resolveEquipments(requestedEquipmentTOS, RequestedEquipmentTO::isShipperOwned,
-        re -> equipmentMapper.toNonNullableDTOStream(re.equipmentReferences().stream().toList())));
+        re -> equipmentMapper.toNonNullableDTOStream(re)));
 
     // Verify
     assertEquals("equipmentReference = 'Equipment_Ref_01' is used more than once in List<RequestedEquipmentTO>", exception.getMessage());

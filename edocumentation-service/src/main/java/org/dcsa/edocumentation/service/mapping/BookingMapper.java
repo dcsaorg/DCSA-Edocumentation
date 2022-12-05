@@ -12,10 +12,15 @@ import org.mapstruct.Mapping;
     uses = {
       LocationMapper.class,
       DisplayedAddressMapper.class,
-      RequestedEquipmentMapper.class
+      RequestedEquipmentGroupMapper.class,
+      CommodityMapper.class,
+      CommodityRequestedEquipmentLinkMapper.class
     }
 )
 public interface BookingMapper {
+
+  @Mapping(source = "requestedEquipments", target = "requestedEquipments", ignore = true)
+  @Mapping(source = "commodities", target = "commodities", ignore = true)
   @Mapping(source = "documentParties", target = "documentParties", ignore = true)
   Booking toDAO(BookingTO bookingTO);
 

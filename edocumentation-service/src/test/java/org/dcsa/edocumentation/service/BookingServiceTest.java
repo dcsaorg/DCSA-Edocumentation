@@ -14,7 +14,12 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventTypeCode;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
-import org.dcsa.edocumentation.service.mapping.*;
+import org.dcsa.edocumentation.service.mapping.ActiveReeferSettingsMapper;
+import org.dcsa.edocumentation.service.mapping.BookingMapper;
+import org.dcsa.edocumentation.service.mapping.CommodityRequestedEquipmentLinkMapper;
+import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
+import org.dcsa.edocumentation.service.mapping.ModeOfTransportMapper;
+import org.dcsa.edocumentation.service.mapping.RequestedEquipmentGroupMapper;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.skernel.domain.persistence.entity.Location;
@@ -36,7 +41,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
@@ -52,7 +60,9 @@ class BookingServiceTest {
 
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
-    @Spy private RequestedEquipmentMapper requestedEquipmentMapper = Mappers.getMapper(RequestedEquipmentMapper.class);
+    @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
+    @Spy private CommodityRequestedEquipmentLinkMapper commodityRequestedEquipmentLinkMapper = new CommodityRequestedEquipmentLinkMapper();
+    @Spy private ActiveReeferSettingsMapper activeReeferSettingsMapper = Mappers.getMapper(ActiveReeferSettingsMapper.class);
 
     @InjectMocks private BookingService service;
 
@@ -62,7 +72,9 @@ class BookingServiceTest {
       DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
       ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
       ReflectionTestUtils.setField(bookingMapper, "displayedAddressMapper", displayedAddressMapper);
-      ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentMapper", requestedEquipmentMapper);
+      ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
+      ReflectionTestUtils.setField(bookingMapper, "commodityRequestedEquipmentLinkMapper", commodityRequestedEquipmentLinkMapper);
+      ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
     }
 
     @Test
@@ -119,11 +131,12 @@ class BookingServiceTest {
     @Mock private VesselService vesselService;
     @Mock private CommodityService commodityService;
     @Mock private ValueAddedServiceRequestService valueAddedServiceRequestService;
-    @Mock private RequestedEquipmentService requestedEquipmentService;
+    @Mock private RequestedEquipmentGroupService requestedEquipmentGroupService;
     @Mock private ReferenceService referenceService;
     @Mock private DocumentPartyService documentPartyService;
     @Mock private ShipmentLocationService shipmentLocationService;
     @Mock private ModeOfTransportService modeOfTransportService;
+    @Mock private CommodityRequestedEquipmentLinkService commodityRequestedEquipmentLinkService;
 
     @Mock private BookingRepository bookingRepository;
     @Mock private ShipmentEventRepository shipmentEventRepository;
@@ -135,8 +148,8 @@ class BookingServiceTest {
     @BeforeEach
     public void resetMocks() {
       reset(locationService, voyageService, vesselService, commodityService, valueAddedServiceRequestService,
-        requestedEquipmentService, referenceService, documentPartyService, shipmentLocationService,
-        bookingRepository, shipmentEventRepository);
+        requestedEquipmentGroupService, referenceService, documentPartyService, shipmentLocationService,
+        commodityRequestedEquipmentLinkService, bookingRepository, shipmentEventRepository);
     }
 
     @Test
@@ -186,10 +199,10 @@ class BookingServiceTest {
       verify(locationService, times(2)).ensureResolvable(bookingRequest.invoicePayableAt());
       verify(bookingRepository).save(bookingArgumentCaptor.capture());
       verify(shipmentEventRepository).save(shipmentEventArgumentCaptor.capture());
-      verify(commodityService).createCommodities(eq(bookingRequest.commodities()), any(Booking.class));
+      verify(commodityService).createCommodities(eq(bookingRequest.commodities()), any(Booking.class), any());
       verify(valueAddedServiceRequestService).createValueAddedServiceRequests(eq(bookingRequest.valueAddedServiceRequests()), any(Booking.class));
       verify(referenceService).createReferences(eq(bookingRequest.references()), any(Booking.class));
-      verify(requestedEquipmentService).createRequestedEquipments(eq(bookingRequest.requestedEquipments()), any(Booking.class));
+      verify(requestedEquipmentGroupService).createRequestedEquipments(eq(bookingRequest.requestedEquipments()), any(Booking.class), any());
       verify(documentPartyService).createDocumentParties(eq(bookingRequest.documentParties()), any(Booking.class));
       verify(shipmentLocationService).createShipmentLocations(eq(bookingRequest.shipmentLocations()), any(Booking.class));
 

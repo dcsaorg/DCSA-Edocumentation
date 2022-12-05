@@ -3,14 +3,15 @@ package org.dcsa.edocumentation.transferobjects;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.ReeferType;
+import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.BkgControlledAtmosphereTO;
+import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.BkgFreezerTO;
+import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.BkgRefrigeratedTO;
+import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.BkgSuperFreezerTO;
 import org.dcsa.edocumentation.transferobjects.enums.TemperatureUnit;
-import org.dcsa.skernel.infrastructure.validation.EnumSubset;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.*;
 import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME,  property = "type")
@@ -24,9 +25,6 @@ import java.util.List;
 public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgSuperFreezerTO, BkgControlledAtmosphereTO, BkgRefrigeratedTO {
 
   record BkgFreezerTO(
-    @EnumSubset(anyOf = "FREZ")
-    ReeferType type,
-
     @Size(max = 500)
     String productName,
 
@@ -55,7 +53,7 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
     String extraMaterial,
 
     @NotNull
-    Integer temperatureSetpoint,
+    Float temperatureSetpoint,
 
     @NotNull
     TemperatureUnit temperatureUnit
@@ -65,9 +63,6 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
   }
 
   record BkgSuperFreezerTO(
-    @EnumSubset(anyOf = "SUPR")
-    ReeferType type,
-
     @Size(max = 500)
     String productName,
 
@@ -108,7 +103,7 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
     String extraMaterial,
 
     @NotNull
-    Integer temperatureSetpoint,
+    Float temperatureSetpoint,
 
     @NotNull
     TemperatureUnit temperatureUnit
@@ -118,9 +113,6 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
   }
 
   record BkgRefrigeratedTO(
-    @EnumSubset(anyOf = "REFR")
-    ReeferType type,
-
     @Size(max = 500)
     String productName,
 
@@ -177,9 +169,6 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
   }
 
   record BkgControlledAtmosphereTO(
-    @EnumSubset(anyOf = "CONA")
-    ReeferType type,
-
     @Size(max = 500)
     String productName,
 
@@ -221,8 +210,10 @@ public sealed interface BookingActiveReeferSettingsTO permits BkgFreezerTO, BkgS
 
     @NotEmpty
     List<ControlledAtmosphereSetPointTO> setpoints
-  ) implements BookingActiveReeferSettingsTO {}
-
+  ) implements BookingActiveReeferSettingsTO {
+    @Builder
+    public BkgControlledAtmosphereTO{}
+  }
 }
 
 

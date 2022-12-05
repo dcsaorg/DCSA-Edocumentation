@@ -2,6 +2,7 @@ package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.CommodityRequestedEquipmentLink;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -25,11 +27,12 @@ public class BookingService {
   private final VesselService vesselService;
   private final CommodityService commodityService;
   private final ValueAddedServiceRequestService valueAddedServiceRequestService;
-  private final RequestedEquipmentService requestedEquipmentService;
+  private final RequestedEquipmentGroupService requestedEquipmentGroupService;
   private final ReferenceService referenceService;
   private final DocumentPartyService documentPartyService;
   private final ShipmentLocationService shipmentLocationService;
   private final ModeOfTransportService modeOfTransportService;
+  private final CommodityRequestedEquipmentLinkService commodityRequestedEquipmentLinkService;
 
   private final BookingRepository bookingRepository;
   private final ShipmentEventRepository shipmentEventRepository;
@@ -89,10 +92,12 @@ public class BookingService {
   }
 
   private void createDeepObjectsForBooking(BookingTO bookingRequest, Booking booking) {
-    commodityService.createCommodities(bookingRequest.commodities(), booking);
+    Map<String, CommodityRequestedEquipmentLink> commodityRequestedEquipmentLinkMap =
+      commodityRequestedEquipmentLinkService.createCommodityRequestedEquipmentLinks(bookingRequest);
+    commodityService.createCommodities(bookingRequest.commodities(), booking, commodityRequestedEquipmentLinkMap);
     valueAddedServiceRequestService.createValueAddedServiceRequests(bookingRequest.valueAddedServiceRequests(), booking);
     referenceService.createReferences(bookingRequest.references(), booking);
-    requestedEquipmentService.createRequestedEquipments(bookingRequest.requestedEquipments(), booking);
+    requestedEquipmentGroupService.createRequestedEquipments(bookingRequest.requestedEquipments(), booking, commodityRequestedEquipmentLinkMap);
     documentPartyService.createDocumentParties(bookingRequest.documentParties(), booking);
     shipmentLocationService.createShipmentLocations(bookingRequest.shipmentLocations(), booking);
   }

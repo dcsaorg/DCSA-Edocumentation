@@ -1,4 +1,4 @@
-package org.dcsa.edocumentation.domain.persistence.repository;
+package org.dcsa.edocumentation.domain.persistence.repository.specification;
 
 import lombok.AccessLevel;
 import lombok.Builder;

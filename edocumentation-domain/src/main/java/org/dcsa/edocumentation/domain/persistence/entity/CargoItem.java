@@ -42,6 +42,9 @@ public class CargoItem {
   @Column(name = "package_code")
   private String packageCode;
 
+  @Column(name = "package_name_on_bl")
+  private String packageNameOnBl;
+
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(cascade = CascadeType.ALL)
