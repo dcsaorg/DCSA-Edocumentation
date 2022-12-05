@@ -9,7 +9,6 @@ import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO.Bkg
 import org.dcsa.edocumentation.transferobjects.ControlledAtmosphereSetPointTO;
 import org.dcsa.edocumentation.transferobjects.TemperatureSetPointTO;
 import org.dcsa.edocumentation.transferobjects.enums.AirExchangeUnit;
-import org.dcsa.edocumentation.transferobjects.enums.ReeferType;
 import org.dcsa.edocumentation.transferobjects.enums.TemperatureUnit;
 
 import java.util.List;
@@ -19,7 +18,6 @@ public class BookingActiveReeferSettingsDataFactory {
 
   public BkgFreezerTO bkgFreezer() {
     return BkgFreezerTO.builder()
-        .type(ReeferType.FREZ)
         .productName("DCSA Freezer product")
         .isGeneratorSetRequired(true)
         .isPreCoolingRequired(true)
@@ -29,7 +27,7 @@ public class BookingActiveReeferSettingsDataFactory {
         .isTracingRequired(true)
         .isMonitoringRequired(true)
         .extraMaterial("extra material")
-        .temperatureSetpoint(-10)
+        .temperatureSetpoint(-10f)
         .temperatureUnit(TemperatureUnit.CEL)
         .build();
   }
@@ -49,7 +47,6 @@ public class BookingActiveReeferSettingsDataFactory {
 
   public BkgSuperFreezerTO bkgSuperFreezer() {
     return BkgSuperFreezerTO.builder()
-      .type(ReeferType.SUPR)
       .productName("DCSA Super Freezer product")
       .isGeneratorSetRequired(true)
       .isPreCoolingRequired(true)
@@ -63,14 +60,13 @@ public class BookingActiveReeferSettingsDataFactory {
       .isTracingRequired(true)
       .isMonitoringRequired(true)
       .extraMaterial("extra material")
-      .temperatureSetpoint(-40)
+      .temperatureSetpoint(-40f)
       .temperatureUnit(TemperatureUnit.CEL)
       .build();
   }
 
   public BkgRefrigeratedTO bkgRefrigerated() {
     return BkgRefrigeratedTO.builder()
-        .type(ReeferType.REFR)
         .productName("DCSA refrigerated product")
         .isGeneratorSetRequired(false)
         .isPreCoolingRequired(true)
@@ -91,7 +87,7 @@ public class BookingActiveReeferSettingsDataFactory {
             .airExchange(10.2F)
             .airExchangeUnit(AirExchangeUnit.MQH)
             .humidity(65.4F)
-            .temperature(6)
+            .temperature(6f)
             .temperatureUnit(TemperatureUnit.CEL)
             .daysPriorToDischarge(10F)
           .build()))
@@ -100,7 +96,6 @@ public class BookingActiveReeferSettingsDataFactory {
 
   public BkgControlledAtmosphereTO bkgControlledAtmosphere() {
     return BkgControlledAtmosphereTO.builder()
-      .type(ReeferType.CONA)
       .productName("DCSA controlled atmosphere product")
       .isGeneratorSetRequired(true)
       .isPreCoolingRequired(false)
@@ -120,7 +115,7 @@ public class BookingActiveReeferSettingsDataFactory {
           .humidity(54F)
           .co2(32.4F)
           .o2(23F)
-          .temperature(23)
+          .temperature(23f)
           .temperatureUnit(TemperatureUnit.CEL)
           .daysPriorToDischarge(12.3F)
         .build()))

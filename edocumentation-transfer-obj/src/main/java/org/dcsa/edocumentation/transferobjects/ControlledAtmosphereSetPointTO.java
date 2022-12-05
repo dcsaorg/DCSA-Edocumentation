@@ -5,7 +5,7 @@ import org.dcsa.edocumentation.transferobjects.enums.AirExchangeUnit;
 import org.dcsa.edocumentation.transferobjects.enums.TemperatureUnit;
 
 public record ControlledAtmosphereSetPointTO(
-  Integer temperature,
+  Float temperature,
   TemperatureUnit temperatureUnit,
   Float o2,
   Float co2,

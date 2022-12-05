@@ -11,7 +11,13 @@ import org.mapstruct.Mapping;
 
 import java.util.Map;
 
-@Mapper(componentModel = "spring", uses = CommodityRequestedEquipmentLinkMapper.class)
+@Mapper(
+  componentModel = "spring",
+  uses = {
+    CommodityRequestedEquipmentLinkMapper.class,
+    ActiveReeferSettingsMapper.class
+  }
+)
 public interface RequestedEquipmentGroupMapper {
   @Mapping(source = "booking", target = "booking")
   @Mapping(source = "booking.id", target = "id", ignore = true)
@@ -32,13 +38,10 @@ public interface RequestedEquipmentGroupMapper {
     return commodityRequestedEquipmentLink == null ? null : links.get(commodityRequestedEquipmentLink);
   }
 
-  // TODO figure this one out
-  // @Mapping(
-  //  source = "equipments",
-  //  target = "equipmentReferences")
+  @Mapping(source = "requestedEquipmentUnits", target = "units")
   @Mapping(source = "requestedEquipmentIsoEquipmentCode", target = "isoEquipmentCode")
   @Mapping(source = "requestedEquipment.commodityRequestedEquipmentLink.commodityRequestedEquipmentLink", target = "commodityRequestedEquipmentLink")
-  @Mapping(source = "activeReeferSettings", target = "activeReeferSettings", ignore = true) // TODO figure this one out
+  @Mapping(target = "activeReeferSettings", qualifiedByName = "toBookingActiveReeferSettingsTO")
   RequestedEquipmentTO toTO(RequestedEquipmentGroup requestedEquipment);
 
   default String mapEquipmentToEquipmentReference(Equipment equipment) {
