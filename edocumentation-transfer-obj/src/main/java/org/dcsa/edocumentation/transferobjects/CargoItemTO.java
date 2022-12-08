@@ -33,6 +33,9 @@ public record CargoItemTO(
   @NotNull
   String packageCode,
 
+  @Size(max = 50)
+  String packageNameOnBL,
+
   @Valid
   List<CargoLineItemTO> cargoLineItems
 ) {
