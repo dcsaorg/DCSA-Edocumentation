@@ -9,6 +9,7 @@ import org.dcsa.edocumentation.domain.persistence.repository.ConsignementItemRep
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
 import org.dcsa.edocumentation.service.mapping.CargoItemMapper;
 import org.dcsa.edocumentation.service.mapping.ConsignmentItemMapper;
+import org.dcsa.edocumentation.service.mapping.EquipmentMapper;
 import org.dcsa.edocumentation.service.mapping.UtilizedTransportEquipmentMapper;
 import org.dcsa.edocumentation.transferobjects.ConsignmentItemTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +38,7 @@ class StuffingServiceTest {
       Mappers.getMapper(ConsignmentItemMapper.class);
 
   @Spy private CargoItemMapper cargoItemMapper = Mappers.getMapper(CargoItemMapper.class);
+  @Spy private EquipmentMapper equipmentMapper = Mappers.getMapper(EquipmentMapper.class);
 
   @InjectMocks private StuffingService stuffingService;
 
@@ -51,6 +54,7 @@ class StuffingServiceTest {
 
   @BeforeEach
   void init() {
+    ReflectionTestUtils.setField(utilizedTransportEquipmentMapper, "equipmentMapper", equipmentMapper);
     shippingInstruction = ShippingInstructionDataFactory.singleShallowShippingInstruction();
     savedUtilizedTransportEquipments =
         UtilizedTransportEquipmentEquipmentDataFactory.multipleCarrierOwned().stream()

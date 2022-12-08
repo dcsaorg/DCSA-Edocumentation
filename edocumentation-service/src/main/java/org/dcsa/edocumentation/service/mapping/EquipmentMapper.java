@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 public interface EquipmentMapper {
   Equipment toDAO(EquipmentTO equipmentTO);
 
+  EquipmentTO toDTO(Equipment equipment);
+
   default Stream<EquipmentTO> toNonNullableDTOStream(RequestedEquipmentTO requestedEquipmentTO) {
     if (requestedEquipmentTO == null || requestedEquipmentTO.equipmentReferences() == null) {
       return Stream.empty();

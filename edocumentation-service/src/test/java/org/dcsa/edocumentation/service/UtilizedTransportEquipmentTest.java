@@ -6,11 +6,13 @@ import org.dcsa.edocumentation.service.mapping.EquipmentMapper;
 import org.dcsa.edocumentation.service.mapping.UtilizedTransportEquipmentMapper;
 import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.edocumentation.transferobjects.UtilizedTransportEquipmentTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +39,11 @@ class UtilizedTransportEquipmentTest {
   @InjectMocks UtilizedTransportEquipmentService utilizedTransportEquipmentService;
 
   @Captor ArgumentCaptor<Collection<UtilizedTransportEquipmentTO>> utilizedTransportEquipmentsToCapture;
+
+  @BeforeEach
+  void setup() {
+    ReflectionTestUtils.setField(utilizedTransportEquipmentMapper, "equipmentMapper", equipmentMapper);
+  }
 
   @Test
   void utilizedTransportEquipmentTest_oneShipperOwnedEquipment() {

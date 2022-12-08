@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface SealMapper {
 
   Seal toDAO(SealTO sealTO, UUID utilizedTransportEquipmentID);
+
+  SealTO toDTO(Seal seal);
 }
