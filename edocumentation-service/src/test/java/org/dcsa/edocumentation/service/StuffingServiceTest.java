@@ -5,6 +5,7 @@ import org.dcsa.edocumentation.datafactories.ShipmentDataFactory;
 import org.dcsa.edocumentation.datafactories.ShippingInstructionDataFactory;
 import org.dcsa.edocumentation.datafactories.UtilizedTransportEquipmentEquipmentDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
+import org.dcsa.edocumentation.domain.persistence.repository.CommodityRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ConsignementItemRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
 import org.dcsa.edocumentation.service.mapping.CargoItemMapper;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class StuffingServiceTest {
   @Mock private ShipmentRepository shipmentRepository;
+  @Mock private CommodityRepository commodityRepository;
   @Mock private ConsignementItemRepository consignementItemRepository;
 
   @Spy

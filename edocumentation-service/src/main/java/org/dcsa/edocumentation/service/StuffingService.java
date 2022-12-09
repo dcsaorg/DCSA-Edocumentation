@@ -2,6 +2,7 @@ package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
+import org.dcsa.edocumentation.domain.persistence.repository.CommodityRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ConsignementItemRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
 import org.dcsa.edocumentation.service.mapping.CargoItemMapper;
@@ -23,6 +24,7 @@ public class StuffingService {
   private final ConsignmentItemMapper consignmentItemMapper;
   private final ConsignementItemRepository consignementItemRepository;
   private final CargoItemMapper cargoItemMapper;
+  private final CommodityRepository commodityRepository;
 
   @Transactional(Transactional.TxType.MANDATORY)
   public void createStuffing(
@@ -35,8 +37,16 @@ public class StuffingService {
             .map(
                 consignmentItemTO -> {
                   ConsignmentItem consignmentItem = consignmentItemMapper.toDAO(consignmentItemTO);
+                  Shipment shipment = addShipment(consignmentItemTO.carrierBookingReference());
+                  Commodity commodity = commodityRepository.save(Commodity.builder()
+                    .booking(shipment.getBooking())
+                    .commodityType(consignmentItem.getDescriptionOfGoods())
+                    .hsCode(consignmentItemTO.hsCode())
+                    .build()
+                  );
                   return consignmentItem.toBuilder()
-                      .shipment(addShipment(consignmentItemTO.carrierBookingReference()))
+                      .commodity(commodity)
+                      .shipment(shipment)
                       .shippingInstruction(shippingInstruction)
                       .cargoItems(
                           addCargoItems(consignmentItemTO.cargoItems(), savedTransportEquipments))
