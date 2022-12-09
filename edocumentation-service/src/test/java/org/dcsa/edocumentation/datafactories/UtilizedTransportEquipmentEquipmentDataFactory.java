@@ -86,9 +86,9 @@ public class UtilizedTransportEquipmentEquipmentDataFactory {
         .cargoGrossWeight(100.3)
         .cargoGrossWeightUnit(WeightUnit.KGM)
         .seals(List.of(SealTO.builder()
-            .sealNumber("12345")
-            .sealType(SealTypeCode.BLT)
-            .sealSource(SealSourceCode.CAR)
+            .number("12345")
+            .type(SealTypeCode.BLT)
+            .source(SealSourceCode.CAR)
           .build()))
         .build();
   }

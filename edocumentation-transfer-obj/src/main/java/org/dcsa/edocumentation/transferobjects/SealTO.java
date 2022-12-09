@@ -10,11 +10,11 @@ import javax.validation.constraints.Size;
 public record SealTO(
   @Size(max = 15)
   @NotNull(message = "Seal number is required.")
-  String sealNumber,
+  String number,
 
-  SealSourceCode sealSource,
+  SealSourceCode source,
 
-  SealTypeCode sealType
+  SealTypeCode type
 ) {
   @Builder
   public SealTO { }

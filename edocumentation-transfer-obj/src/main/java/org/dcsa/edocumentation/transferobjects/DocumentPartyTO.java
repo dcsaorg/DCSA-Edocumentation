@@ -15,7 +15,7 @@ public record DocumentPartyTO(
   @NotNull
   PartyFunction partyFunction,
 
-  @Size(max = 6)
+  @Size(max = 5)
   List<@Size(max = 35) String> displayedAddress,
 
   @NotNull
