@@ -21,8 +21,7 @@ public interface ConsignmentItemMapper {
   }
 
   default String mapCommodityToHsCode(Commodity commodity) {
-    // Work around broken test data
-    return commodity != null ? commodity.getHsCode() : null;
+    return commodity.getHsCode();
   }
 
 
