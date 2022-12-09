@@ -24,14 +24,14 @@ public class Seal {
   @Column(name = "seal_number")
   @Size(max = 15)
   @NotNull
-  private String sealNumber;
+  private String number;
 
   @Column(name = "seal_source_code")
   @Size(max = 5)
-  private String sealSource;
+  private String source;
 
   @Column(name = "seal_type_code")
   @Size(max = 5)
   @NotNull
-  private String sealType;
+  private String type;
 }
