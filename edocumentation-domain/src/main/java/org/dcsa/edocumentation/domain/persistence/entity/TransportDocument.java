@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.DRFT;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
 @Getter
 @Setter
@@ -86,7 +86,55 @@ public class TransportDocument implements Persistable<UUID> {
 
   /** Transition the document into its {@link EblDocumentStatus#DRFT} state. */
   public ShipmentEvent draft() {
-    return shippingInstruction.processTransition(DRFT, null, this::shipmentEventTRDBuilder);
+    return processTransition(DRFT, null);
+  }
+
+
+  /**
+   * Transition the document into its {@link EblDocumentStatus#PENA} state.
+   *
+   * <p>This state is not supported in all EBL flows. E.g., it is not reachable in the Amendment
+   * flow.
+   */
+  public ShipmentEvent pendingApproval(String reason) {
+    // TODO: Should this be moved to the TRD?
+    return processTransition(PENA, reason);
+  }
+
+  /**
+   * Check whether the flow supports the {@link EblDocumentStatus#PENA} state.
+   *
+   * <p>This state is not supported in all EBL flows. This will return false when the EBL flow does
+   * not support this state at all. I.e., calling {@link #pendingApproval(String)} will trigger an
+   * exception causing an internal server error status.
+   */
+  public boolean isPendingApprovalSupported() {
+    return shippingInstruction.supportsState(PENA);
+  }
+
+  /** Transition the document into its {@link EblDocumentStatus#APPR} state. */
+  public ShipmentEvent approve() {
+    return processTransition(APPR, null);
+  }
+
+  /** Transition the document into its {@link EblDocumentStatus#ISSU} state. */
+  public ShipmentEvent issue() {
+    return processTransition(ISSU, null);
+  }
+
+  /** Transition the document into its {@link EblDocumentStatus#SURR} state. */
+  public ShipmentEvent surrender() {
+    return processTransition(SURR, null);
+  }
+
+  /** Transition the document into its {@link EblDocumentStatus#VOID} state. */
+  // "void" is a keyword and cannot be used as a method name.
+  public ShipmentEvent voidDocument() {
+    return processTransition(VOID, null);
+  }
+
+  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason) {
+    return shippingInstruction.processTransition(status, reason, this::shipmentEventTRDBuilder);
   }
 
   protected ShipmentEvent.ShipmentEventBuilder<?, ?> shipmentEventTRDBuilder(OffsetDateTime updateTime) {

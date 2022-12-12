@@ -203,54 +203,6 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return supportsState(PENU);
   }
 
-  /**
-   * Transition the document into its {@link EblDocumentStatus#PENA} state.
-   *
-   * <p>This state is not supported in all EBL flows. E.g., it is not reachable in the Amendment
-   * flow.
-   */
-  public ShipmentEvent pendingApproval(String reason) {
-    // TODO: Should this be moved to the TRD?
-    return processTransition(PENA, reason);
-  }
-
-  /**
-   * Check whether the flow supports the {@link EblDocumentStatus#PENA} state.
-   *
-   * <p>This state is not supported in all EBL flows. This will return false when the EBL flow does
-   * not support this state at all. I.e., calling {@link #pendingApproval(String)} will trigger an
-   * exception causing an internal server error status.
-   */
-  public boolean isPendingApprovalSupported() {
-    // TODO: Move to the TRD if pendingApproval moves.
-    return supportsState(PENA);
-  }
-
-  /** Transition the document into its {@link EblDocumentStatus#APPR} state. */
-  public ShipmentEvent approve() {
-    // TODO: Should this be moved to the TRD?
-    return processTransition(APPR, null);
-  }
-
-  /** Transition the document into its {@link EblDocumentStatus#ISSU} state. */
-  public void issue() {
-    // TODO: Should this be moved to the TRD?
-    processTransition(ISSU, null);
-  }
-
-  /** Transition the document into its {@link EblDocumentStatus#SURR} state. */
-  public ShipmentEvent surrender() {
-    // TODO: Should this be moved to the TRD?
-    return processTransition(SURR, null);
-  }
-
-  /** Transition the document into its {@link EblDocumentStatus#VOID} state. */
-  // "void" is a keyword and cannot be used as a method name.
-  public ShipmentEvent voidDocument() {
-    // TODO: Should this be moved to the TRD?
-    return processTransition(VOID, null);
-  }
-
   public void lockVersion(OffsetDateTime lockTime) {
     if (isNew()) {
       throw new IllegalStateException("Cannot lock a \"new\" version of the booking entity!");
@@ -278,6 +230,13 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     this.shippingInstructionUpdatedDateTime = OffsetDateTime.now();
   }
 
+  // Re-defined to make it visible to TransportDocument (protected also works like "package-private",
+  // so we can keep it "non-public").
+  @Override
+  protected boolean supportsState(EblDocumentStatus state) {
+    return super.supportsState(state);
+  }
+
   protected ShipmentEvent processTransition(EblDocumentStatus status, String reason) {
     return processTransition(status, reason, this::shipmentEventSHIBuilder);
   }
@@ -296,6 +255,9 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
       OffsetDateTime updateTime,
       Function<OffsetDateTime, ShipmentEvent.ShipmentEventBuilder<C, B>> eventBuilder
       ) {
+    if (validUntil != null) {
+      throw ConcreteRequestErrorMessageException.conflict("Cannot change state of locked document (the SI is locked)", null);
+    }
     transitionTo(status);
     this.documentStatus = status;
     if (this.shippingInstructionCreatedDateTime == null) {
