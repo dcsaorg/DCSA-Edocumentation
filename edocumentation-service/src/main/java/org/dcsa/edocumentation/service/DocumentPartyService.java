@@ -23,16 +23,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DocumentPartyService {
-  private final AddressService addressService;
 
   private final DocumentPartyRepository documentPartyRepository;
-  private final PartyRepository partyRepository;
-  private final PartyContactDetailsRepository partyContactDetailsRepository;
   private final DisplayedAddressRepository displayedAddressRepository;
-  private final PartyIdentifyingCodeRepository partyIdentifyingCodeRepository;
 
   private final DocumentPartyMapper documentPartyMapper;
   private final DisplayedAddressMapper displayedAddressMapper;
+  private final PartyService partyService;
 
   @Transactional(TxType.MANDATORY)
   public void createDocumentParties(Collection<DocumentPartyTO> documentParties, Booking booking) {
@@ -51,7 +48,7 @@ public class DocumentPartyService {
                   documentPartyTO.displayedAddress(),
                   documentPartyMapper.toDAO(documentPartyTO).toBuilder()
                       .shippingInstructionID(shippingInstruction.getId())
-                      .party(createParty(documentPartyTO.party()))
+                      .party(partyService.createParty(documentPartyTO.party()))
                       .build()));
     }
   }
@@ -60,7 +57,7 @@ public class DocumentPartyService {
   private void createDocumentParty(DocumentPartyTO documentPartyTO, Booking booking) {
     DocumentParty documentPartyWithBooking =
         documentPartyMapper.toDAO(documentPartyTO, booking).toBuilder()
-            .party(createParty(documentPartyTO.party()))
+            .party(partyService.createParty(documentPartyTO.party()))
             .build();
 
     createDocumentPartyAndDisplayedAddress(
@@ -76,31 +73,4 @@ public class DocumentPartyService {
     }
   }
 
-  private Party createParty(PartyTO partyTO) {
-    Party party =
-        partyRepository.save(
-            documentPartyMapper.toDAO(partyTO).toBuilder()
-                .address(addressService.ensureResolvable(partyTO.address()))
-                .build());
-
-    List<PartyContactDetailsTO> partyContactDetails = partyTO.partyContactDetails();
-    if (partyContactDetails != null && !partyContactDetails.isEmpty()) {
-      partyContactDetailsRepository.saveAll(
-          partyContactDetails.stream()
-              .map(partyContactDetailsTO -> documentPartyMapper.toDAO(partyContactDetailsTO, party))
-              .toList());
-    }
-
-    List<PartyIdentifyingCodeTO> identifyingCodes = partyTO.identifyingCodes();
-    if (identifyingCodes != null && !identifyingCodes.isEmpty()) {
-      partyIdentifyingCodeRepository.saveAll(
-          identifyingCodes.stream()
-              .map(
-                  partyIdentifyingCodeTO ->
-                      documentPartyMapper.toDAO(partyIdentifyingCodeTO, party))
-              .toList());
-    }
-
-    return party;
-  }
 }

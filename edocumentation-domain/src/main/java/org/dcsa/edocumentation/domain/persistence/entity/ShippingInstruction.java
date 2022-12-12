@@ -9,9 +9,9 @@ import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
@@ -179,7 +179,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   /** Transition the document into its {@link EblDocumentStatus#RECE} state. */
   public ShipmentEvent receive() {
-    return processTransition(RECE, null, DocumentTypeCode.SHI);
+    return processTransition(RECE, null);
   }
 
   /**
@@ -189,7 +189,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    * flow.
    */
   public ShipmentEvent pendingUpdate(String reason) {
-    return processTransition(PENU, reason, DocumentTypeCode.SHI);
+    return processTransition(PENU, reason);
   }
 
   /**
@@ -203,12 +203,6 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return supportsState(PENU);
   }
 
-  /** Transition the document into its {@link EblDocumentStatus#DRFT} state. */
-  public ShipmentEvent draft() {
-    // TODO: Should this be moved to the TRD?
-    return processTransition(DRFT, null, DocumentTypeCode.SHI);
-  }
-
   /**
    * Transition the document into its {@link EblDocumentStatus#PENA} state.
    *
@@ -217,7 +211,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    */
   public ShipmentEvent pendingApproval(String reason) {
     // TODO: Should this be moved to the TRD?
-    return processTransition(PENA, reason, DocumentTypeCode.SHI);
+    return processTransition(PENA, reason);
   }
 
   /**
@@ -235,26 +229,26 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   /** Transition the document into its {@link EblDocumentStatus#APPR} state. */
   public ShipmentEvent approve() {
     // TODO: Should this be moved to the TRD?
-    return processTransition(APPR, null, DocumentTypeCode.SHI);
+    return processTransition(APPR, null);
   }
 
   /** Transition the document into its {@link EblDocumentStatus#ISSU} state. */
   public void issue() {
     // TODO: Should this be moved to the TRD?
-    processTransition(ISSU, null, DocumentTypeCode.SHI);
+    processTransition(ISSU, null);
   }
 
   /** Transition the document into its {@link EblDocumentStatus#SURR} state. */
   public ShipmentEvent surrender() {
     // TODO: Should this be moved to the TRD?
-    return processTransition(SURR, null, DocumentTypeCode.SHI);
+    return processTransition(SURR, null);
   }
 
   /** Transition the document into its {@link EblDocumentStatus#VOID} state. */
   // "void" is a keyword and cannot be used as a method name.
   public ShipmentEvent voidDocument() {
     // TODO: Should this be moved to the TRD?
-    return processTransition(VOID, null, DocumentTypeCode.SHI);
+    return processTransition(VOID, null);
   }
 
   public void lockVersion(OffsetDateTime lockTime) {
@@ -284,21 +278,29 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     this.shippingInstructionUpdatedDateTime = OffsetDateTime.now();
   }
 
-  protected ShipmentEvent processTransition(
-      EblDocumentStatus status, String reason, DocumentTypeCode documentTypeCode) {
-    return processTransition(status, reason, documentTypeCode, OffsetDateTime.now());
+  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason) {
+    return processTransition(status, reason, this::shipmentEventSHIBuilder);
   }
 
-  protected ShipmentEvent processTransition(
+  protected <C extends ShipmentEvent, B extends ShipmentEvent.ShipmentEventBuilder<C, B>> ShipmentEvent processTransition(
+    EblDocumentStatus status,
+    String reason,
+    Function<OffsetDateTime, ShipmentEvent.ShipmentEventBuilder<C, B>> eventBuilder
+  ) {
+    return processTransition(status, reason, OffsetDateTime.now(), eventBuilder);
+  }
+
+  protected <C extends ShipmentEvent, B extends ShipmentEvent.ShipmentEventBuilder<C, B>> ShipmentEvent processTransition(
       EblDocumentStatus status,
       String reason,
-      DocumentTypeCode documentTypeCode,
-      OffsetDateTime updateTime) {
+      OffsetDateTime updateTime,
+      Function<OffsetDateTime, ShipmentEvent.ShipmentEventBuilder<C, B>> eventBuilder
+      ) {
     transitionTo(status);
     this.documentStatus = status;
-    this.shippingInstructionUpdatedDateTime = updateTime;
     if (this.shippingInstructionCreatedDateTime == null) {
       this.shippingInstructionCreatedDateTime = updateTime;
+      this.shippingInstructionUpdatedDateTime = updateTime;
     }
     if (id == null) {
       id = UUID.randomUUID();
@@ -307,16 +309,21 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     if (shippingInstructionReference == null) {
       shippingInstructionReference = UUID.randomUUID().toString();
     }
-    return ShipmentEvent.builder()
-        .documentID(id)
-        .documentReference(shippingInstructionReference)
-        .documentTypeCode(documentTypeCode)
+    return eventBuilder.apply(updateTime)
         .shipmentEventTypeCode(status.asShipmentEventTypeCode())
         .reason(reason)
         .eventClassifierCode(EventClassifierCode.ACT)
         .eventDateTime(updateTime)
         .eventCreatedDateTime(updateTime)
         .build();
+  }
+
+  protected ShipmentEvent.ShipmentEventBuilder<?, ?> shipmentEventSHIBuilder(OffsetDateTime updateTime) {
+    this.shippingInstructionUpdatedDateTime = updateTime;
+    return ShipmentEvent.builder()
+      .documentID(id)
+      .documentReference(shippingInstructionReference)
+      .documentTypeCode(DocumentTypeCode.SHI);
   }
 
   @Override
