@@ -1,9 +1,8 @@
 package org.dcsa.edocumentation.controller.unofficial;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.service.ShippingInstructionService;
 import org.dcsa.edocumentation.service.unofficial.UnofficialShippingInstructionService;
-import org.dcsa.edocumentation.transferobjects.ChangeShippingInstructionStatusRequestTO;
+import org.dcsa.edocumentation.transferobjects.unofficial.ChangeEBLDocumentStatusRequestTO;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.http.HttpStatus;
@@ -30,11 +29,11 @@ public class UnofficialShippingInstructionController {
     @NotBlank @Size(max = 100)
     String shippingInstructionReference,
     @Valid @RequestBody
-    ChangeShippingInstructionStatusRequestTO changeShippingInstructionStatusRequestTO) {
+    ChangeEBLDocumentStatusRequestTO changeEBLDocumentStatusRequestTO) {
 
     return service.changeState(shippingInstructionReference,
-        changeShippingInstructionStatusRequestTO.documentStatus(),
-        changeShippingInstructionStatusRequestTO.reason())
+        changeEBLDocumentStatusRequestTO.documentStatus(),
+        changeEBLDocumentStatusRequestTO.reason())
       .orElseThrow(() ->
         ConcreteRequestErrorMessageException.notFound(
           "No shipping instruction found with shippingInstructionReference: "

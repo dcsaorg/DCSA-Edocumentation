@@ -2,12 +2,14 @@ package org.dcsa.edocumentation.service.unofficial;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
 import org.dcsa.edocumentation.service.PartyService;
+import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
 import org.dcsa.edocumentation.transferobjects.PartyTO;
@@ -35,6 +37,8 @@ public class UnofficialTransportDocumentService {
   private final PartyService partyService;
   private final TransportDocumentMapper transportDocumentMapper;
   private final TransportDocumentRepository transportDocumentRepository;
+
+  private final DocumentStatusMapper documentStatusMapper;
 
   @Transactional
   public Optional<TransportDocumentRefStatusTO> issueDraft(DraftTransportDocumentRequestTO transportDocumentRequestTO) {
@@ -82,5 +86,31 @@ public class UnofficialTransportDocumentService {
       throw ConcreteRequestErrorMessageException.invalidInput("issuingParty must have exactly ONE SMDG party code with codeListName set to LCL");
     }
     return partyCode;
+  }
+
+  public Optional<TransportDocumentRefStatusTO> changeState(
+    String transportDocumentReference,
+    org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus status,
+    String reason
+  ) {
+    TransportDocument transportDocument = transportDocumentRepository.findByTransportDocumentReferenceAndValidUntilIsNull(transportDocumentReference)
+      .orElse(null);
+    if (transportDocument == null) {
+      return Optional.empty();
+    }
+    ShipmentEvent event = switch (documentStatusMapper.toDomainEblDocumentStatus(status)) {
+      case APPR -> transportDocument.approve();
+      case PENA -> transportDocument.pendingApproval(reason);
+      case ISSU -> transportDocument.issue();
+      case SURR -> transportDocument.surrender();
+      case VOID -> transportDocument.voidDocument();
+      case DRFT -> throw ConcreteRequestErrorMessageException.invalidInput("Please use the issueDraft endpoint instead!");
+      default -> throw ConcreteRequestErrorMessageException.invalidInput("Cannot go to state " + status);
+    };
+
+    shipmentEventRepository.save(event);
+    // Note this only works for cases where we can update the documentStatus in-place.
+    transportDocument = transportDocumentRepository.save(transportDocument);
+    return Optional.of(transportDocumentMapper.toStatusDTO(transportDocument));
   }
 }

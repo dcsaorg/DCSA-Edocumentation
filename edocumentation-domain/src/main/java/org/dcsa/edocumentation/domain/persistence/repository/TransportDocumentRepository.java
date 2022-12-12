@@ -5,8 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface TransportDocumentRepository
-    extends JpaRepository<TransportDocument, UUID>, JpaSpecificationExecutor<TransportDocument> {}
+    extends JpaRepository<TransportDocument, UUID>, JpaSpecificationExecutor<TransportDocument> {
+
+  Optional<TransportDocument> findByTransportDocumentReferenceAndValidUntilIsNull(String reference);
+}

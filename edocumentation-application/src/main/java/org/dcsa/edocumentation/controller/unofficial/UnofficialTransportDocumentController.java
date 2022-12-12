@@ -1,10 +1,8 @@
 package org.dcsa.edocumentation.controller.unofficial;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.service.unofficial.UnofficialShippingInstructionService;
 import org.dcsa.edocumentation.service.unofficial.UnofficialTransportDocumentService;
-import org.dcsa.edocumentation.transferobjects.ChangeShippingInstructionStatusRequestTO;
-import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.unofficial.ChangeEBLDocumentStatusRequestTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.DraftTransportDocumentRequestTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.TransportDocumentRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
@@ -36,5 +34,24 @@ public class UnofficialTransportDocumentController {
         ConcreteRequestErrorMessageException.notFound(
           "No shipping instruction found with shippingInstructionReference: "
             + draftTransportDocumentRequestTO.shippingInstructionReference()));
+  }
+
+  @PostMapping(path = "/unofficial${spring.application.ebl-context-path}/transport-documents/{transportDocumentReference}/change-state")
+  @ResponseStatus(HttpStatus.OK)
+  public TransportDocumentRefStatusTO changeState(
+    @PathVariable("transportDocumentReference")
+    @NotBlank @Size(max = 20)
+    String transportDocumentReference,
+    @Valid @RequestBody
+    ChangeEBLDocumentStatusRequestTO changeEBLDocumentStatusRequestTO) {
+
+    return service.changeState(
+        transportDocumentReference,
+        changeEBLDocumentStatusRequestTO.documentStatus(),
+        changeEBLDocumentStatusRequestTO.reason()
+      ).orElseThrow(() ->
+        ConcreteRequestErrorMessageException.notFound(
+          "No transport document with transportDocumentReference: "
+            + transportDocumentReference));
   }
 }

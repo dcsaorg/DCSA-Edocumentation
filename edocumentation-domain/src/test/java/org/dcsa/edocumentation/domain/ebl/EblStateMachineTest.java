@@ -33,13 +33,14 @@ class EblStateMachineTest {
 
     // Verify resume
     shippingInstruction = ShippingInstruction.builder().documentStatus(DRFT).build();
+    transportDocument = TransportDocument.builder().shippingInstruction(shippingInstruction).build();
     Assertions.assertEquals(DRFT, shippingInstruction.getDocumentStatus());
-    Assertions.assertTrue(shippingInstruction.isPendingApprovalSupported());
-    shippingInstruction.pendingApproval("We have provided foo, please approve the draft TRD");
+    Assertions.assertTrue(transportDocument.isPendingApprovalSupported());
+    transportDocument.pendingApproval("We have provided foo, please approve the draft TRD");
     Assertions.assertEquals(PENA, shippingInstruction.getDocumentStatus());
-    shippingInstruction.approve();
+    transportDocument.approve();
     Assertions.assertEquals(APPR, shippingInstruction.getDocumentStatus());
-    shippingInstruction.issue();
+    transportDocument.issue();
     Assertions.assertEquals(ISSU, shippingInstruction.getDocumentStatus());
   }
 
@@ -52,16 +53,17 @@ class EblStateMachineTest {
     Assertions.assertEquals(RECE, shippingInstruction.getDocumentStatus());
     transportDocument.draft();
     Assertions.assertEquals(DRFT, shippingInstruction.getDocumentStatus());
-    shippingInstruction.approve();
+    transportDocument.approve();
     Assertions.assertEquals(APPR, shippingInstruction.getDocumentStatus());
-    shippingInstruction.issue();
+    transportDocument.issue();
     Assertions.assertEquals(ISSU, shippingInstruction.getDocumentStatus());
 
     shippingInstruction = ShippingInstruction.builder().amendmentToTransportDocument(UUID.randomUUID())
       .documentStatus(DRFT)
       .build();
+    transportDocument = TransportDocument.builder().shippingInstruction(shippingInstruction).build();
     Assertions.assertEquals(DRFT, shippingInstruction.getDocumentStatus());
-    shippingInstruction.approve();
+    transportDocument.approve();
     Assertions.assertEquals(APPR, shippingInstruction.getDocumentStatus());
   }
 
@@ -83,8 +85,8 @@ class EblStateMachineTest {
 
     transportDocument.draft();
     // DRFT must go directly to APPR in the amendment flow.
-    Assertions.assertFalse(shippingInstruction.isPendingApprovalSupported());
-    Assertions.assertThrows(InternalServerErrorException.class, () -> shippingInstruction.pendingApproval("Not possible"));
+    Assertions.assertFalse(transportDocument.isPendingApprovalSupported());
+    Assertions.assertThrows(InternalServerErrorException.class, () -> transportDocument.pendingApproval("Not possible"));
     // Again, it retains the current state on invalid transitions.
     Assertions.assertEquals(DRFT, shippingInstruction.getDocumentStatus());
 
@@ -93,8 +95,8 @@ class EblStateMachineTest {
       .documentStatus(DRFT)
       .build();
     // DRFT must go directly to APPR in the amendment flow - even after resume
-    Assertions.assertFalse(amendmentStateMachine.isPendingApprovalSupported());
-    Assertions.assertThrows(InternalServerErrorException.class, () -> amendmentStateMachine.pendingApproval("Not possible"));
+    Assertions.assertFalse(transportDocument.isPendingApprovalSupported());
+    Assertions.assertThrows(InternalServerErrorException.class, () -> transportDocument.pendingApproval("Not possible"));
     // Again, it retains the current state on invalid transitions.
     Assertions.assertEquals(DRFT, amendmentStateMachine.getDocumentStatus());
   }
@@ -114,16 +116,15 @@ class EblStateMachineTest {
       ShippingInstruction stateMachine = initializer.apply(VOID);
       Assertions.assertThrows(ConflictException.class, stateMachine::receive);
       Assertions.assertThrows(ConflictException.class, () -> stateMachine.pendingUpdate("Should throw"));
-
+    }
+    for (var initializer : trdInitializers) {
+      TransportDocument stateMachine = initializer.apply(VOID);
+      Assertions.assertThrows(ConflictException.class, stateMachine::draft);
       Assertions.assertThrows(ConflictException.class, () -> stateMachine.pendingApproval("Should throw"));
       Assertions.assertThrows(ConflictException.class, stateMachine::approve);
       Assertions.assertThrows(ConflictException.class, stateMachine::issue);
       Assertions.assertThrows(ConflictException.class, stateMachine::surrender);
       Assertions.assertThrows(ConflictException.class, stateMachine::voidDocument);
-    }
-    for (var initializer : trdInitializers) {
-      TransportDocument stateMachine = initializer.apply(VOID);
-      Assertions.assertThrows(ConflictException.class, stateMachine::draft);
     }
   }
 }
