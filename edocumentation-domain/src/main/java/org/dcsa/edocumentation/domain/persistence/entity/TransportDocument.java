@@ -2,11 +2,11 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -14,13 +14,16 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.DRFT;
+
 @Getter
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "transport_document")
-public class TransportDocument {
+public class TransportDocument implements Persistable<UUID> {
 
   @Id
   @Column(name = "id")
@@ -72,4 +75,35 @@ public class TransportDocument {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "issuing_party_id")
   private Party issuingParty;
+
+
+  @Transient private boolean isNew;
+
+  public boolean isNew() {
+    return id == null || isNew;
+  }
+
+
+  /** Transition the document into its {@link EblDocumentStatus#DRFT} state. */
+  public ShipmentEvent draft() {
+    return shippingInstruction.processTransition(DRFT, null, this::shipmentEventTRDBuilder);
+  }
+
+  protected ShipmentEvent.ShipmentEventBuilder<?, ?> shipmentEventTRDBuilder(OffsetDateTime updateTime) {
+    this.transportDocumentUpdatedDateTime = updateTime;
+    if (this.transportDocumentCreatedDateTime == null) {
+      this.transportDocumentCreatedDateTime = updateTime;
+    }
+    if (id == null) {
+      id = UUID.randomUUID();
+      isNew = true;
+    }
+    if (transportDocumentReference == null) {
+      transportDocumentReference = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+    }
+    return ShipmentEvent.builder()
+      .documentID(id)
+      .documentReference(transportDocumentReference)
+      .documentTypeCode(DocumentTypeCode.TRD);
+  }
 }

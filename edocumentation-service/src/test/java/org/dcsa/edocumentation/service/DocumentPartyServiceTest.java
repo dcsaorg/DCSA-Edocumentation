@@ -10,6 +10,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentPartyMapper;
+import org.dcsa.edocumentation.service.mapping.PartyMapper;
 import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
 import org.dcsa.edocumentation.transferobjects.PartyContactDetailsTO;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
@@ -39,9 +40,13 @@ class DocumentPartyServiceTest {
   @Mock private PartyContactDetailsRepository partyContactDetailsRepository;
   @Mock private DisplayedAddressRepository displayedAddressRepository;
   @Mock private PartyIdentifyingCodeRepository partyIdentifyingCodeRepository;
+  @Mock private PartyService partyService;
 
   @Spy
   private DocumentPartyMapper documentPartyMapper = Mappers.getMapper(DocumentPartyMapper.class);
+
+  @Spy
+  private PartyMapper partyMapper = Mappers.getMapper(PartyMapper.class);
 
   @Spy private DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
 
@@ -67,9 +72,9 @@ class DocumentPartyServiceTest {
     verify(addressService, never()).ensureResolvable(any());
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyTO.class));
+    verify(partyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
+    verify(partyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
+    verify(partyMapper, never()).toDAO(any(PartyTO.class));
     verify(addressService, never()).ensureResolvable(any());
     verify(partyContactDetailsRepository, never()).saveAll(any());
     verify(partyIdentifyingCodeRepository, never()).saveAll(any());
@@ -82,9 +87,9 @@ class DocumentPartyServiceTest {
     verify(addressService, never()).ensureResolvable(any());
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyTO.class));
+    verify(partyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
+    verify(partyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
+    verify(partyMapper, never()).toDAO(any(PartyTO.class));
     verify(addressService, never()).ensureResolvable(any());
     verify(partyContactDetailsRepository, never()).saveAll(any());
     verify(partyIdentifyingCodeRepository, never()).saveAll(any());
@@ -97,9 +102,9 @@ class DocumentPartyServiceTest {
     verify(addressService, never()).ensureResolvable(any());
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyTO.class));
+    verify(partyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
+    verify(partyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
+    verify(partyMapper, never()).toDAO(any(PartyTO.class));
     verify(addressService, never()).ensureResolvable(any());
     verify(partyContactDetailsRepository, never()).saveAll(any());
     verify(partyIdentifyingCodeRepository, never()).saveAll(any());
@@ -112,9 +117,9 @@ class DocumentPartyServiceTest {
     verify(addressService, never()).ensureResolvable(any());
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
-    verify(documentPartyMapper, never()).toDAO(any(PartyTO.class));
+    verify(partyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
+    verify(partyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
+    verify(partyMapper, never()).toDAO(any(PartyTO.class));
     verify(addressService, never()).ensureResolvable(any());
     verify(partyContactDetailsRepository, never()).saveAll(any());
     verify(partyIdentifyingCodeRepository, never()).saveAll(any());
@@ -128,20 +133,14 @@ class DocumentPartyServiceTest {
     Party party = DocumentPartyDataFactory.partialParty();
     DocumentParty documentParty = DocumentPartyDataFactory.partialDocumentParty(party);
 
-    when(addressService.ensureResolvable(any())).thenReturn(party.getAddress());
-    when(partyRepository.save(any())).thenReturn(party);
+    when(partyService.createParty(any())).thenReturn(party);
     when(documentPartyRepository.save(any())).thenReturn(documentParty);
 
     // Execute
     documentPartyService.createDocumentParties(List.of(documentPartyTO), booking);
 
     // Verify
-    verify(addressService).ensureResolvable(documentPartyTO.party().address());
-    verify(partyRepository).save(party);
-    verify(partyContactDetailsRepository)
-        .saveAll(List.of(DocumentPartyDataFactory.partyContactDetails(party)));
-    verify(partyIdentifyingCodeRepository)
-        .saveAll(List.of(DocumentPartyDataFactory.partyIdentifyingCode(party)));
+    verify(partyService).createParty(documentPartyTO.party());
     verify(documentPartyRepository).save(documentParty);
     verify(displayedAddressRepository)
         .saveAll(DocumentPartyDataFactory.displayedAddresses(documentParty));
@@ -159,20 +158,14 @@ class DocumentPartyServiceTest {
             .shippingInstructionID(shippingInstruction.getId())
             .build();
 
-    when(addressService.ensureResolvable(any())).thenReturn(party.getAddress());
-    when(partyRepository.save(any())).thenReturn(party);
+    when(partyService.createParty(any())).thenReturn(party);
     when(documentPartyRepository.save(any())).thenReturn(documentParty);
 
     // Execute
     documentPartyService.createDocumentParties(List.of(documentPartyTO), shippingInstruction);
 
     // Verify
-    verify(addressService).ensureResolvable(documentPartyTO.party().address());
-    verify(partyRepository).save(party);
-    verify(partyContactDetailsRepository)
-        .saveAll(List.of(DocumentPartyDataFactory.partyContactDetails(party)));
-    verify(partyIdentifyingCodeRepository)
-        .saveAll(List.of(DocumentPartyDataFactory.partyIdentifyingCode(party)));
+    verify(partyService).createParty(documentPartyTO.party());
     verify(documentPartyRepository).save(documentParty);
     verify(displayedAddressRepository)
         .saveAll(DocumentPartyDataFactory.displayedAddresses(documentParty));
