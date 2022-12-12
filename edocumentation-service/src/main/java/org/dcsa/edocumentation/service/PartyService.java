@@ -12,6 +12,7 @@ import org.dcsa.edocumentation.transferobjects.PartyTO;
 import org.dcsa.skernel.infrastructure.services.AddressService;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class PartyService {
   private final PartyContactDetailsRepository partyContactDetailsRepository;
   private final PartyIdentifyingCodeRepository partyIdentifyingCodeRepository;
 
+  @Transactional
   public Party createParty(PartyTO partyTO) {
     Party party =
       partyRepository.save(

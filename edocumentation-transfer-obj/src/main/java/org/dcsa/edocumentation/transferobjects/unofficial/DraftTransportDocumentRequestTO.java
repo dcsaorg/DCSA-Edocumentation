@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public record DraftTransportDocumentRequestTO(
 
 
+  @Size(max = 100)
   @NotBlank
   String shippingInstructionReference,
 
