@@ -181,7 +181,7 @@ class BookingServiceTest {
       when(vesselService.resolveVessel(any())).thenReturn(vessel);
       when(locationService.ensureResolvable(any())).thenReturn(location);
       when(bookingRepository.save(any())).thenReturn(bookingSaved);
-      when(modeOfTransportService.resolveModeOfTransport(any())).thenReturn(modeOfTransport);
+      when(modeOfTransportService.resolveModeOfTransport((DCSATransportType) any())).thenReturn(modeOfTransport);
 
        // Execute
       BookingRefStatusTO result = bookingService.createBooking(bookingRequest);

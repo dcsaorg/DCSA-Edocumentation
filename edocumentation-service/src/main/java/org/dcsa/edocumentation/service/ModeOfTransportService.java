@@ -23,4 +23,14 @@ public class ModeOfTransportService {
     }
     return null;
   }
+
+  @Transactional
+  public ModeOfTransport resolveModeOfTransport(String modeOfTransportCode) {
+    if (modeOfTransportCode != null) {
+      return modeOfTransportRepository.findByCode(modeOfTransportCode)
+        .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound(
+          "No ModeOfTransport found for mode of transport code = '" + modeOfTransportCode + "'"));
+    }
+    return null;
+  }
 }

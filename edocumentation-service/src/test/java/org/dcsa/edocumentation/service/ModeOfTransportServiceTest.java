@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ModeOfTransportServiceTest {
+class ModeOfTransportServiceTest {
   @Mock private ModeOfTransportRepository modeOfTransportRepository;
 
   @InjectMocks private ModeOfTransportService modeOfTransportService;
@@ -34,16 +34,16 @@ public class ModeOfTransportServiceTest {
   }
 
   @Test
-  public void resolveModeOfTransport_null() {
+  void resolveModeOfTransport_null() {
     // Execute
-    assertNull(modeOfTransportService.resolveModeOfTransport(null));
+    assertNull(modeOfTransportService.resolveModeOfTransport((DCSATransportType) null));
 
     // Verify
     verify(modeOfTransportRepository, never()).findByDcsaTransportType(any());
   }
 
   @Test
-  public void resolveModeOfTransport_unknown() {
+  void resolveModeOfTransport_unknown() {
     // Setup
     when(modeOfTransportRepository.findByDcsaTransportType(any())).thenReturn(Optional.empty());
 
@@ -57,7 +57,7 @@ public class ModeOfTransportServiceTest {
   }
 
   @Test
-  public void resolveModeOfTransport_known() {
+  void resolveModeOfTransport_known() {
     // Setup
     ModeOfTransport expected = ModeOfTransport.builder()
       .dcsaTransportType(DCSATransportType.VESSEL)
@@ -70,5 +70,21 @@ public class ModeOfTransportServiceTest {
     // Verify
     assertEquals(expected, actual);
     verify(modeOfTransportRepository).findByDcsaTransportType(DCSATransportType.VESSEL);
+  }
+
+  @Test
+  void resolveModeOfTransport_knowTransportCode() {
+    ModeOfTransport expected = ModeOfTransport.builder()
+      .dcsaTransportType(DCSATransportType.VESSEL)
+      .code("test_code")
+      .build();
+    when(modeOfTransportRepository.findByCode(any())).thenReturn(Optional.of(expected));
+
+    // Execute
+    ModeOfTransport actual = modeOfTransportService.resolveModeOfTransport("test_code");
+
+    // Verify
+    assertEquals(expected, actual);
+    verify(modeOfTransportRepository).findByCode("test_code");
   }
 }

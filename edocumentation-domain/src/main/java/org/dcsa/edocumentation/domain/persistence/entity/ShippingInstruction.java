@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
+@EqualsAndHashCode(callSuper = true)
 @NamedEntityGraph(
     name = "graph.shipping-instruction-summary",
     attributeNodes = {@NamedAttributeNode("consignmentItems")})
@@ -169,6 +170,19 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
             .count();
 
     return distinctBookingCount == 1;
+  }
+
+  // certain characteristics like the transport plan, are share among all shipments in the shipping
+  // instruction, so it is beneficial to be able to retrieve one
+  public Shipment retrieveOneShipment() {
+    return this.consignmentItems.stream()
+        .map(ConsignmentItem::getShipment)
+        .findAny()
+        .orElseThrow(
+            () ->
+                ConcreteRequestErrorMessageException.notFound(
+                    "No shipment found in Shipping instruction with shipping instruction reference: "
+                        + shippingInstructionReference));
   }
 
   @Transient private boolean isNew;

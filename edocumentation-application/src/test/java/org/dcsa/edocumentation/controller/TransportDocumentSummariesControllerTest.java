@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.controller;
 
 import org.dcsa.edocumentation.datafactories.TransportDocumentSummaryDataFactory;
-import org.dcsa.edocumentation.service.TransportDocumentService;
+import org.dcsa.edocumentation.service.TransportDocumentSummaryService;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentSummaryTO;
 import org.dcsa.skernel.errors.infrastructure.ConcreteRequestErrorMessageExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.FallbackExceptionHandler;
@@ -50,9 +50,9 @@ class TransportDocumentSummariesControllerTest {
   private static final String PATH = "/ebl/v2/transport-document-summaries";
 
   @Autowired private MockMvc mockMvc;
-  @MockBean private TransportDocumentService transportDocumentService;
+  @MockBean private TransportDocumentSummaryService transportDocumentSummaryService;
 
-  @Captor ArgumentCaptor<TransportDocumentService.Filters> filterCaptor;
+  @Captor ArgumentCaptor<TransportDocumentSummaryService.Filters> filterCaptor;
 
   @Test
   void getTransportDocumentSummariesShouldReturnTOsOnValidRequest() throws Exception {
@@ -62,7 +62,7 @@ class TransportDocumentSummariesControllerTest {
 
     Page<TransportDocumentSummaryTO> tdPageMock = new PageImpl<>(tdSummariesTOs);
 
-    when(transportDocumentService.getTransportDocumentSummaries(any()))
+    when(transportDocumentSummaryService.getTransportDocumentSummaries(any()))
         .thenReturn(new PagedResult<>(tdPageMock));
 
     mockMvc
@@ -89,7 +89,7 @@ class TransportDocumentSummariesControllerTest {
 
     Page<TransportDocumentSummaryTO> tdPageMock = new PageImpl<>(tdSummariesTOs);
 
-    when(transportDocumentService.getTransportDocumentSummaries(any()))
+    when(transportDocumentSummaryService.getTransportDocumentSummaries(any()))
         .thenReturn(new PagedResult<>(tdPageMock));
 
     mockMvc
@@ -110,8 +110,8 @@ class TransportDocumentSummariesControllerTest {
                 .value(Matchers.greaterThanOrEqualTo(1)))
         .andExpect(jsonPath("$.[0].carrierBookingReferences.[0]").value("D659FDB7E33C"));
 
-    Mockito.verify(transportDocumentService).getTransportDocumentSummaries(filterCaptor.capture());
-    TransportDocumentService.Filters filters = filterCaptor.getValue();
+    Mockito.verify(transportDocumentSummaryService).getTransportDocumentSummaries(filterCaptor.capture());
+    TransportDocumentSummaryService.Filters filters = filterCaptor.getValue();
 
     assertEquals("D659FDB7E33C", filters.getCarrierBookingReference());
   }
@@ -125,7 +125,7 @@ class TransportDocumentSummariesControllerTest {
 
     Page<TransportDocumentSummaryTO> tdPageMock = new PageImpl<>(tdSummariesTOs);
 
-    when(transportDocumentService.getTransportDocumentSummaries(any()))
+    when(transportDocumentSummaryService.getTransportDocumentSummaries(any()))
         .thenReturn(new PagedResult<>(tdPageMock));
 
     mockMvc
@@ -143,8 +143,8 @@ class TransportDocumentSummariesControllerTest {
             jsonPath("$.[0].carrierBookingReferences.[0]")
                 .value(tdSummariesTOs.get(0).carrierBookingReferences().get(0)));
 
-    Mockito.verify(transportDocumentService).getTransportDocumentSummaries(filterCaptor.capture());
-    TransportDocumentService.Filters filters = filterCaptor.getValue();
+    Mockito.verify(transportDocumentSummaryService).getTransportDocumentSummaries(filterCaptor.capture());
+    TransportDocumentSummaryService.Filters filters = filterCaptor.getValue();
 
     assertEquals("APPR", filters.getDocumentStatus().toString());
   }

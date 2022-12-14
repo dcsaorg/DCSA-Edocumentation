@@ -12,9 +12,15 @@ import java.util.UUID;
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
 @Entity
-@Table(name = "shipment_transport")
+@Table(
+  name = "shipment_transport",
+  uniqueConstraints = {
+    @UniqueConstraint(
+      columnNames = {"shipment_id", "transport_id", "transport_plan_stage_sequence_number"})
+  })
 public class ShipmentTransport {
 
+  @GeneratedValue
   @Id private UUID id;
 
   @Column(name = "shipment_id")
@@ -33,9 +39,12 @@ public class ShipmentTransport {
   @Enumerated(EnumType.STRING)
   private TransportPlanStageCode transportPlanStageCode;
 
-  @Column(name = "commercial_voyage_id")
-  private UUID commercialVoyageID;
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JoinColumn(name = "commercial_voyage_id")
+  private CommercialVoyage commercialVoyage;
 
   @Column(name = "is_under_shippers_responsibility")
-  private Boolean isUnderShippersResponsibility;
+  private boolean isUnderShippersResponsibility;
 }
