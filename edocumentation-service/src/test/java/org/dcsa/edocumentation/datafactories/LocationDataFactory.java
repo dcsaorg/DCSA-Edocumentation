@@ -3,24 +3,21 @@ package org.dcsa.edocumentation.datafactories;
 import lombok.experimental.UtilityClass;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO.AddressLocationTO;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO.FacilityLocationTO;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO.UNLocationLocationTO;
 import org.dcsa.skernel.infrastructure.transferobject.enums.FacilityCodeListProvider;
 
 import java.util.UUID;
 
 @UtilityClass
 public class LocationDataFactory {
-  public static AddressLocationTO addressLocationTO() {
-    return LocationTO.addressLocationBuilder()
+  public static LocationTO addressLocationTO() {
+    return LocationTO.builder()
       .locationName("Asseco DK office")
       .address(AddressDataFactory.addressTO())
       .build();
   }
 
-  public static FacilityLocationTO facilityLocationTO() {
-    return LocationTO.facilityLocationBuilder()
+  public static LocationTO facilityLocationTO() {
+    return LocationTO.builder()
       .locationName(FacilityDataFactory.NAME)
       .UNLocationCode(FacilityDataFactory.UNLOCATION_CODE)
       .facilityCode(FacilityDataFactory.SMDG_CODE)
@@ -28,8 +25,8 @@ public class LocationDataFactory {
       .build();
   }
 
-  public static UNLocationLocationTO unLocationLocationTO() {
-    return LocationTO.unLocationLocationBuilder()
+  public static LocationTO unLocationLocationTO() {
+    return LocationTO.builder()
       .locationName("Rotterdam UNLocation")
       .UNLocationCode("NLRTM")
       .build();

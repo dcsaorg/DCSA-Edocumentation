@@ -6,7 +6,8 @@ import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
 import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
-import org.dcsa.skernel.infrastructure.validation.RequireType;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.LocationType;
+import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
 import javax.validation.Valid;
@@ -18,28 +19,18 @@ import java.time.OffsetDateTime;
 public record TransportTO(
     @Valid @NotNull(message = "The attribute transportPlanStageCode is required.")
     TransportPlanStageCode transportPlanStage,
+
     @NotNull(message = "The attribute transportPlanStageSequenceNumber is required.")
-        Integer transportPlanStageSequenceNumber,
-    @Valid
-        @NotNull
-        @RequireType(
-            value = {
-              LocationTO.AddressLocationTO.class,
-              LocationTO.UNLocationLocationTO.class,
-              LocationTO.FacilityLocationTO.class
-            },
-            message = "must be an AddressLocation, FacilityLocation or an UNLocationLocation")
-        LocationTO loadLocation,
-    @Valid
-        @NotNull
-        @RequireType(
-            value = {
-              LocationTO.AddressLocationTO.class,
-              LocationTO.UNLocationLocationTO.class,
-              LocationTO.FacilityLocationTO.class
-            },
-            message = "must be an AddressLocation, FacilityLocation or an UNLocationLocation")
-        LocationTO dischargeLocation,
+    Integer transportPlanStageSequenceNumber,
+
+    @Valid @NotNull
+    @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION, LocationType.FACILITY})
+    LocationTO loadLocation,
+
+    @Valid @NotNull
+    @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION, LocationType.FACILITY})
+    LocationTO dischargeLocation,
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
         @JsonFormat(pattern = "yyyy-MM-dd")
         @NotNull(message = "The attribute plannedDepartureDate is required.")
