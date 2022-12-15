@@ -18,8 +18,7 @@ public enum PartyFunction {
   DDS("Consignee's freight forwarder"),
   HE("Carrier booking office(\"transportation office\")"),
   SCO("Service contract owner -Defined by DCSA"),
-  BA("Booking Agency"),
-  EBL("EBL Solution Provider")
+  BA("Booking Agency")
   ;
 
   @Getter

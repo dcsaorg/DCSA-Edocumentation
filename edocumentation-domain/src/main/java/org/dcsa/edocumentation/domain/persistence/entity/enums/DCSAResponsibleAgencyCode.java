@@ -21,6 +21,7 @@ public enum DCSAResponsibleAgencyCode {
   DCSA("Digital Container Shipping Association"),
   DID("Decentralized Identifier"),
   LEI("Legal Entity Identifier"),
+  EPI("EBL Platform Identifier"),
   ZZZ("Mutually defined"),
   ;
 

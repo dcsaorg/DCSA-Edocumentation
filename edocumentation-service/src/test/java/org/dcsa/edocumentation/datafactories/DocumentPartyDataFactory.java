@@ -25,7 +25,7 @@ public class DocumentPartyDataFactory {
         .id(UUID.randomUUID())
         .party(PartyDataFactory.singleParty())
         .isToBeNotified(true)
-        .partyFunction(PartyFunction.EBL)
+        .partyFunction(PartyFunction.CN)
         .displayedAddress(
             Set.of(
                 DisplayedAddress.builder()
