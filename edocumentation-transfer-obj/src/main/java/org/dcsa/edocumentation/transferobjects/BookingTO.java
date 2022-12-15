@@ -11,13 +11,12 @@ import org.dcsa.edocumentation.transferobjects.enums.PaymentTerm;
 import org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO.AddressLocationTO;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO.UNLocationLocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO.LocationType;
 import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 import org.dcsa.skernel.infrastructure.validation.AtLeast;
 import org.dcsa.skernel.infrastructure.validation.DateRange;
-import org.dcsa.skernel.infrastructure.validation.RequireType;
 import org.dcsa.skernel.infrastructure.validation.RequiredIfTrue;
+import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
 import javax.validation.Valid;
@@ -140,11 +139,11 @@ public record BookingTO(
   DCSATransportType preCarriageModeOfTransportCode,
 
   @Valid
-  @RequireType(value = {AddressLocationTO.class, UNLocationLocationTO.class}, message = "must be an AddressLocation or an UNLocationLocation")
+  @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION})
   LocationTO invoicePayableAt,
 
   @Valid
-  @RequireType(value = {AddressLocationTO.class, UNLocationLocationTO.class}, message = "must be an AddressLocation or an UNLocationLocation")
+  @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION})
   LocationTO placeOfBLIssue,
 
   @NotEmpty @Valid
