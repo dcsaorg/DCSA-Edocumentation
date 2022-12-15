@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface ModeOfTransportRepository extends JpaRepository<ModeOfTransport, String> {
   Optional<ModeOfTransport> findByDcsaTransportType(DCSATransportType dcsaTransportType);
+  Optional<ModeOfTransport> findByCode(String code);
 }

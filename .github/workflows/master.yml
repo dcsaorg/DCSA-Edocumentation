@@ -33,11 +33,6 @@ jobs:
       - name: Build Edocumentation
         run: cd DCSA-Edocumentation && mvn clean -U -B package -Ddcsa.artifacttype=-SNAPSHOT
 
-      - name: Run Integration Tests
-        run: |
-          cd DCSA-Edocumentation
-          mvn verify -DskipUnitTests
-
       - name: Build and run the microservices
         run: cd DCSA-Edocumentation && docker-compose -f docker-compose.yml --env-file=.github/.env up -d -V --build
 

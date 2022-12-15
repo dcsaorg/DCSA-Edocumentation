@@ -41,13 +41,13 @@ public record TransportTO(
             message = "must be an AddressLocation, FacilityLocation or an UNLocationLocation")
         LocationTO dischargeLocation,
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        @JsonFormat(pattern = "yyyy-MM-dd")
         @NotNull(message = "The attribute plannedDepartureDate is required.")
         OffsetDateTime plannedDepartureDate,
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        @JsonFormat(pattern = "yyyy-MM-dd")
         @NotNull(message = "The attribute plannedArrivalDate is required.")
-        OffsetDateTime plannedArrivalDate,
+    OffsetDateTime plannedArrivalDate,
     DCSATransportType modeOfTransport,
     @Size(max = 35, message = "The attribute vesselName has a max size of 35.") String vesselName,
     @ValidVesselIMONumber(allowNull = true, message = "The attribute vesselIMONumber is invalid.")

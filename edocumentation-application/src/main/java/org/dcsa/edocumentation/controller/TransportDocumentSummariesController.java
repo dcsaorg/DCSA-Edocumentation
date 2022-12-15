@@ -6,7 +6,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.Shipment_;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction_;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument_;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
-import org.dcsa.edocumentation.service.TransportDocumentService;
+import org.dcsa.edocumentation.service.TransportDocumentSummaryService;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.Pagination;
 import org.dcsa.skernel.infrastructure.sorting.Sorter;
@@ -29,7 +29,7 @@ import java.util.List;
     produces = {MediaType.APPLICATION_JSON_VALUE})
 public class TransportDocumentSummariesController {
 
-  private final TransportDocumentService transportDocumentService;
+  private final TransportDocumentSummaryService transportDocumentSummaryService;
   private final List<Sort.Order> defaultSort =
       List.of(
           new Sort.Order(
@@ -74,8 +74,8 @@ public class TransportDocumentSummariesController {
         .sortBy(sort, defaultSort, sortableFields)
         .paginate(
             pageRequest ->
-                transportDocumentService.getTransportDocumentSummaries(
-                    TransportDocumentService.Filters.builder()
+                transportDocumentSummaryService.getTransportDocumentSummaries(
+                    TransportDocumentSummaryService.Filters.builder()
                         .carrierBookingReference(carrierBookingReference)
                         .documentStatus(documentStatus)
                         .pageRequest(pageRequest)

@@ -7,17 +7,20 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.springframework.data.domain.Persistable;
+import org.dcsa.skernel.domain.persistence.entity.Location;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
 @Getter
-@Setter
+@Setter(AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -55,7 +58,7 @@ public class TransportDocument implements Persistable<UUID> {
   @Column(name = "number_of_originals")
   private Integer numberOfOriginals;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_id")
   private Carrier carrier;
 
@@ -69,13 +72,26 @@ public class TransportDocument implements Persistable<UUID> {
   @Column(name = "valid_until")
   private OffsetDateTime validUntil;
 
-  @Column(name = "place_of_issue_id")
-  private UUID placeOfIssue;
+  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JoinColumn(name = "place_of_issue_id")
+  private Location placeOfIssue;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "issuing_party_id")
   private Party issuingParty;
 
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "transport_document_id", referencedColumnName = "id")
+  private Set<Charge> charges;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany
+  @JoinTable(
+    name = "shipment_carrier_clauses",
+    joinColumns = {@JoinColumn(name = "transport_document_id", referencedColumnName = "id")},
+    inverseJoinColumns = {@JoinColumn(name = "carrier_clause_id", referencedColumnName = "id")})
+  private Set<CarrierClause> carrierClauses = new LinkedHashSet<>();
 
   @Transient private boolean isNew;
 
@@ -154,4 +170,5 @@ public class TransportDocument implements Persistable<UUID> {
       .documentReference(transportDocumentReference)
       .documentTypeCode(DocumentTypeCode.TRD);
   }
+
 }

@@ -2,19 +2,20 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.dcsa.skernel.domain.persistence.entity.base.BaseTransportCall;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-@Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
+@Getter
 @Setter(AccessLevel.PRIVATE)
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Entity
 public class TransportCall extends BaseTransportCall {
   @ToString.Exclude
