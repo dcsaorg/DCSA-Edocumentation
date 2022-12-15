@@ -13,9 +13,8 @@ public enum PartyFunction {
   DDS,
   HE,
   SCO,
-  BA,
-  EBL;
+  BA;
 
   /** The values allowed when used in eBL or Booking. */
-  public static final String DOCUMENTATION_PARTY_FUNCTION_CODES = "OS,CN,COW,COX,MS,N1,N2,NI,DDR,DDS,HE,SCO,BA,EBL";
+  public static final String DOCUMENTATION_PARTY_FUNCTION_CODES = "OS,CN,COW,COX,MS,N1,N2,NI,DDR,DDS,HE,SCO,BA";
 }

@@ -1,11 +1,6 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventTypeCode;
@@ -19,6 +14,7 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @SuperBuilder
+@AllArgsConstructor
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @ToString(callSuper = true)
