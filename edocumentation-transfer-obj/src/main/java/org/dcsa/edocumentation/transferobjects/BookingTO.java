@@ -17,6 +17,7 @@ import org.dcsa.skernel.infrastructure.validation.AtLeast;
 import org.dcsa.skernel.infrastructure.validation.DateRange;
 import org.dcsa.skernel.infrastructure.validation.RequiredIfTrue;
 import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
+import org.dcsa.skernel.infrastructure.validation.UniversalServiceReference;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
 import javax.validation.Valid;
@@ -81,6 +82,12 @@ public record BookingTO(
 
   @Pattern(regexp = "\\d{2}[0-9A-Z]{2}[NEWS]", message = "Not a valid voyage reference")
   String universalExportVoyageReference,
+
+  @Size(max = 5)
+  String carrierServiceCode,
+
+  @UniversalServiceReference
+  String universalServiceReference,
 
   Float declaredValue,
 

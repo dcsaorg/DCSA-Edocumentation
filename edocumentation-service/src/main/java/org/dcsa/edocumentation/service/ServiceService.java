@@ -1,24 +1,37 @@
 package org.dcsa.edocumentation.service;
 
 import lombok.AllArgsConstructor;
+import org.dcsa.edocumentation.domain.persistence.entity.Service;
 import org.dcsa.edocumentation.domain.persistence.repository.ServiceRepository;
-import org.dcsa.edocumentation.service.mapping.ServiceMapper;
-import org.dcsa.edocumentation.transferobjects.ServiceTO;
-import org.springframework.stereotype.Service;
+import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.data.domain.Example;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
-@Service
+@org.springframework.stereotype.Service
 @AllArgsConstructor
 public class ServiceService {
   private final ServiceRepository serviceRepository;
-  private final ServiceMapper serviceMapper;
 
   @Transactional
-  public List<ServiceTO> findAll() {
-    return serviceRepository.findAll().stream()
-      .map(serviceMapper::toDTO)
-      .toList();
+  public Service resolveService(BookingTO bookingRequest) {
+    String carrierServiceCode = bookingRequest.carrierServiceCode();
+    String universalServiceReference = bookingRequest.universalServiceReference();
+
+    if (carrierServiceCode == null && universalServiceReference == null) {
+      return null;
+    }
+
+    Service example = Service.builder()
+      .carrierServiceCode(carrierServiceCode)
+      .universalServiceReference(universalServiceReference)
+      .build();
+
+    return serviceRepository.findAll(Example.of(example)).stream()
+      .findFirst()
+      .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound(
+        "No services that match carrierServiceCode '" + carrierServiceCode
+          + "' and universalServiceReference '" + universalServiceReference + "'"));
   }
 }
