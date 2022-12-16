@@ -55,9 +55,6 @@ public class TransportDocument implements Persistable<UUID> {
   @Column(name = "received_for_shipment_date")
   private LocalDate receivedForShipmentDate;
 
-  @Column(name = "number_of_originals")
-  private Integer numberOfOriginals;
-
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_id")
   private Carrier carrier;
