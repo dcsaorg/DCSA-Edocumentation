@@ -17,8 +17,6 @@ public record TransportDocumentTO(
   LocalDate issueDate,
   LocalDate shippedOnBoardDate,
   LocalDate receivedForShipmentDate,
-  Integer numberOfOriginalsWithCharges,
-  Integer numberOfOriginalsWithoutCharges,
   String carrierCode,
   CarrierCodeListProvider carrierCodeListProvider,
   PartyTO issuingParty,
