@@ -32,10 +32,7 @@ public record UtilizedTransportEquipmentTO(
   Boolean isShipperOwned,
 
   @Valid
-  List<SealTO> seals,
-
-  @Valid
-  ShippingInstructionActiveReeferSettingsTO activeReeferSettings
+  List<SealTO> seals
 ) {
   @Builder
   public UtilizedTransportEquipmentTO{}

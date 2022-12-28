@@ -20,10 +20,8 @@ import java.util.stream.Stream;
 public class UtilizedTransportEquipmentService {
 
   private final EquipmentService equipmentService;
-  private final ActiveReeferSettingsService activeReeferSettingsService;
 
   private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
-  private final RequestedEquipmentGroupRepository requestedEquipmentGroupRepository;
 
   private final UtilizedTransportEquipmentMapper utilizedTransportEquipmentMapper;
 
@@ -36,7 +34,7 @@ public class UtilizedTransportEquipmentService {
     return utilizedTransportEquipmentRepository
         .saveAll(
             utilizedTransportEquipmentTOs.stream()
-                .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, createRequestedEquipmentGroup(ute)))
+                .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, null))
                 .toList())
         .stream()
         .collect(
@@ -46,17 +44,4 @@ public class UtilizedTransportEquipmentService {
                 utilizedTransportEquipment -> utilizedTransportEquipment));
   }
 
-  private RequestedEquipmentGroup createRequestedEquipmentGroup(UtilizedTransportEquipmentTO uteTO) {
-    if (uteTO == null || uteTO.activeReeferSettings() == null) {
-      return null;
-    }
-
-    return requestedEquipmentGroupRepository.save(
-      RequestedEquipmentGroup.builder()
-        .confirmedEquipmentIsoEquipmentCode(uteTO.equipment().isoEquipmentCode())
-        .confirmedEquipmentUnits(uteTO.equipment().isoEquipmentCode() != null ? 1 : null)
-        .isShipperOwned(uteTO.isShipperOwned())
-        .activeReeferSettings(activeReeferSettingsService.createShippingInstructionActiveReeferSettings(uteTO.activeReeferSettings()))
-        .build());
-  }
 }

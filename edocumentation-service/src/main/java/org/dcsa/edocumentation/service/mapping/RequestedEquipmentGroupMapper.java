@@ -21,7 +21,6 @@ import java.util.Map;
 public interface RequestedEquipmentGroupMapper {
   @Mapping(source = "booking", target = "booking")
   @Mapping(source = "booking.id", target = "id", ignore = true)
-  @Mapping(source = "activeReeferSettings", target = "activeReeferSettings")
   @Mapping(source = "requestedEquipment.isoEquipmentCode", target = "requestedEquipmentIsoEquipmentCode")
   @Mapping(source = "requestedEquipment.units", target = "requestedEquipmentUnits")
   @Mapping(expression = "java(mapCommodityRequestedEquipmentLink(links, requestedEquipment.commodityRequestedEquipmentLink()))", target = "commodityRequestedEquipmentLink")
@@ -41,7 +40,6 @@ public interface RequestedEquipmentGroupMapper {
   @Mapping(source = "requestedEquipmentUnits", target = "units")
   @Mapping(source = "requestedEquipmentIsoEquipmentCode", target = "isoEquipmentCode")
   @Mapping(source = "requestedEquipment.commodityRequestedEquipmentLink.commodityRequestedEquipmentLink", target = "commodityRequestedEquipmentLink")
-  @Mapping(target = "activeReeferSettings", qualifiedByName = "toBookingActiveReeferSettingsTO")
   RequestedEquipmentTO toTO(RequestedEquipmentGroup requestedEquipment);
 
   default String mapEquipmentToEquipmentReference(Equipment equipment) {

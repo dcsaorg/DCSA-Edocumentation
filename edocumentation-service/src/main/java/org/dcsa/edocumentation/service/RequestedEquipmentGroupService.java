@@ -51,7 +51,7 @@ public class RequestedEquipmentGroupService {
           requestedEquipmentGroupMapper.toDAO(
             re,
             booking,
-            activeReeferSettingsService.createBookingActiveReeferSettings(re.activeReeferSettings()),
+            activeReeferSettingsService.createBookingActiveReeferSettings(null),
             links
           )
         );
