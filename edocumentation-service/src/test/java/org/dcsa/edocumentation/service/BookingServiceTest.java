@@ -62,7 +62,6 @@ class BookingServiceTest {
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
     @Spy private CommodityRequestedEquipmentLinkMapper commodityRequestedEquipmentLinkMapper = new CommodityRequestedEquipmentLinkMapper();
-    @Spy private ActiveReeferSettingsMapper activeReeferSettingsMapper = Mappers.getMapper(ActiveReeferSettingsMapper.class);
 
     @InjectMocks private BookingService service;
 
@@ -74,7 +73,6 @@ class BookingServiceTest {
       ReflectionTestUtils.setField(bookingMapper, "displayedAddressMapper", displayedAddressMapper);
       ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
       ReflectionTestUtils.setField(bookingMapper, "commodityRequestedEquipmentLinkMapper", commodityRequestedEquipmentLinkMapper);
-      ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
     }
 
     @Test

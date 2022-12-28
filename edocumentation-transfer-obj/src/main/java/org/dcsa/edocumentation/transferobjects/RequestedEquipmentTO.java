@@ -27,9 +27,8 @@ public record RequestedEquipmentTO(
   Boolean isShipperOwned,
 
   @Size(max = 100)
-  String commodityRequestedEquipmentLink,
+  String commodityRequestedEquipmentLink
 
-  BookingActiveReeferSettingsTO activeReeferSettings
 ) {
   @Builder(toBuilder = true)
   public RequestedEquipmentTO { }
