@@ -3,7 +3,6 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
@@ -21,17 +20,23 @@ public class DisplayedAddress {
   @Column(name = "id", nullable = false)
   private UUID id;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "document_party_id")
-  private DocumentParty documentParty;
+  @Size(max = 35)
+  @Column(name = "address_line_1")
+  private String addressLine1;
 
   @Size(max = 35)
-  @Column(name = "address_line_text")
-  private String addressLine;
+  @Column(name = "address_line_2")
+  private String addressLine2;
 
-  @NotNull
-  @Column(name = "address_line_number")
-  private Integer addressLineNumber;
+  @Size(max = 35)
+  @Column(name = "address_line_3")
+  private String addressLine3;
+
+  @Size(max = 35)
+  @Column(name = "address_line_4")
+  private String addressLine4;
+
+  @Size(max = 35)
+  @Column(name = "address_line_5")
+  private String addressLine5;
 }

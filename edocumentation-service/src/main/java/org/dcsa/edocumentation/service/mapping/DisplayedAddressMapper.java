@@ -1,32 +1,60 @@
 package org.dcsa.edocumentation.service.mapping;
 
+import lombok.SneakyThrows;
 import org.dcsa.edocumentation.domain.persistence.entity.DisplayedAddress;
-import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component
 public class DisplayedAddressMapper {
 
-  List<String> toDTO(Set<DisplayedAddress> displayedAddresses) {
-    return displayedAddresses.stream()
-        .sorted(Comparator.comparingInt(DisplayedAddress::getAddressLineNumber))
-        .map(DisplayedAddress::getAddressLine)
-        .toList();
+  List<String> toDTO(DisplayedAddress displayedAddresses) {
+    if(displayedAddresses == null) {
+      return Collections.emptyList();
+    }
+
+    return getAddressLines(displayedAddresses);
   }
 
-  public Set<DisplayedAddress> toDAO(List<String> displayedAddresses, DocumentParty documentParty) {
-    return IntStream.range(0, displayedAddresses.size())
-      .mapToObj(index -> DisplayedAddress.builder()
-        .addressLineNumber(index + 1)
-        .addressLine(displayedAddresses.get(index))
-        .documentParty(documentParty)
-        .build())
-      .collect(Collectors.toSet());
+  public DisplayedAddress toDAO(List<String> displayedAddresses) {
+
+    DisplayedAddress.DisplayedAddressBuilder builder = DisplayedAddress.builder();
+
+    IntStream.range(0, displayedAddresses.size())
+      .forEach(index -> setAddressLine(index, displayedAddresses.get(index), builder));
+
+    return builder.build();
+  }
+
+  private DisplayedAddress.DisplayedAddressBuilder setAddressLine(Integer index, String addressLine, DisplayedAddress.DisplayedAddressBuilder builder) {
+    return switch (index + 1) {
+      case 1 -> builder.addressLine1(addressLine);
+      case 2 -> builder.addressLine2(addressLine);
+      case 3 -> builder.addressLine3(addressLine);
+      case 4 -> builder.addressLine4(addressLine);
+      case 5 -> builder.addressLine5(addressLine);
+      default -> throw ConcreteRequestErrorMessageException.invalidInput("Display Address must be max five lines.");
+    };
+  }
+
+  @SneakyThrows
+  private List<String> getAddressLines(DisplayedAddress displayedAddress) {
+    List<String> addressLines = new ArrayList<>();
+    for (Method m : displayedAddress.getClass().getMethods()) {
+      if (m.getName().startsWith("getAddressLine") && m.getParameterTypes().length == 0) {
+        final String addressLine = (String) m.invoke(displayedAddress);
+        if(addressLine == null) {
+          break;
+        }
+        addressLines.add(addressLine);
+      }
+    }
+    return addressLines;
   }
 }

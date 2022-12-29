@@ -3,16 +3,11 @@ package org.dcsa.edocumentation.service;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
-import org.dcsa.edocumentation.domain.persistence.entity.Party;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
-import org.dcsa.edocumentation.domain.persistence.repository.*;
+import org.dcsa.edocumentation.domain.persistence.repository.DocumentPartyRepository;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentPartyMapper;
 import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
-import org.dcsa.edocumentation.transferobjects.PartyContactDetailsTO;
-import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
-import org.dcsa.edocumentation.transferobjects.PartyTO;
-import org.dcsa.skernel.infrastructure.services.AddressService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,7 +20,6 @@ import java.util.List;
 public class DocumentPartyService {
 
   private final DocumentPartyRepository documentPartyRepository;
-  private final DisplayedAddressRepository displayedAddressRepository;
 
   private final DocumentPartyMapper documentPartyMapper;
   private final DisplayedAddressMapper displayedAddressMapper;
@@ -53,24 +47,24 @@ public class DocumentPartyService {
     }
   }
 
-
   private void createDocumentParty(DocumentPartyTO documentPartyTO, Booking booking) {
     DocumentParty documentPartyWithBooking =
         documentPartyMapper.toDAO(documentPartyTO, booking).toBuilder()
             .party(partyService.createParty(documentPartyTO.party()))
+            .displayedAddress(displayedAddressMapper.toDAO(documentPartyTO.displayedAddress()))
             .build();
 
-    createDocumentPartyAndDisplayedAddress(
-        documentPartyTO.displayedAddress(), documentPartyWithBooking);
+    documentPartyRepository.save(documentPartyWithBooking);
+//    createDocumentPartyAndDisplayedAddress(
+//        documentPartyTO.displayedAddress(), documentPartyWithBooking);
   }
 
   private void createDocumentPartyAndDisplayedAddress(
       List<String> displayedAddress, DocumentParty documentParty) {
-    DocumentParty savedDocumentParty = documentPartyRepository.save(documentParty);
-    if (displayedAddress != null && !displayedAddress.isEmpty()) {
-      displayedAddressRepository.saveAll(
-          displayedAddressMapper.toDAO(displayedAddress, savedDocumentParty));
-    }
-  }
 
+    documentPartyRepository.save(
+        documentParty.toBuilder()
+            .displayedAddress(displayedAddressMapper.toDAO(displayedAddress))
+            .build());
+  }
 }

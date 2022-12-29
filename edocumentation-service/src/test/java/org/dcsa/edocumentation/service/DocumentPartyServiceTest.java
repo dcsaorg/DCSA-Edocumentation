@@ -142,8 +142,6 @@ class DocumentPartyServiceTest {
     // Verify
     verify(partyService).createParty(documentPartyTO.party());
     verify(documentPartyRepository).save(documentParty);
-    verify(displayedAddressRepository)
-        .saveAll(DocumentPartyDataFactory.displayedAddresses(documentParty));
   }
 
   @Test
@@ -167,7 +165,5 @@ class DocumentPartyServiceTest {
     // Verify
     verify(partyService).createParty(documentPartyTO.party());
     verify(documentPartyRepository).save(documentParty);
-    verify(displayedAddressRepository)
-        .saveAll(DocumentPartyDataFactory.displayedAddresses(documentParty));
   }
 }
