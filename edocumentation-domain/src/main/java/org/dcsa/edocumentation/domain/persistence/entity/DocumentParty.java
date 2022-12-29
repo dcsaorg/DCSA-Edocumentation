@@ -33,8 +33,8 @@ public class DocumentParty {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "documentParty")
-  private Set<DisplayedAddress> displayedAddress;
+  @OneToOne(cascade = CascadeType.ALL)
+  private DisplayedAddress displayedAddress;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

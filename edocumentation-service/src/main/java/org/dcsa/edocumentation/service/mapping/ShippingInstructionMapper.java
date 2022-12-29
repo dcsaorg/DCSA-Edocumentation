@@ -24,7 +24,8 @@ import java.util.Set;
     DisplayedAddressMapper.class,
     ReferenceMapper.class,
     DocumentPartyMapper.class,
-    ConsignmentItemMapper.class
+    ConsignmentItemMapper.class,
+    DisplayedAddressMapper.class
   })
 public abstract class ShippingInstructionMapper {
 
