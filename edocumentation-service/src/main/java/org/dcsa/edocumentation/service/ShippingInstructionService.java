@@ -5,6 +5,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
+import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionTO;
@@ -27,10 +28,10 @@ public class ShippingInstructionService {
   private final ReferenceService referenceService;
   private final UtilizedTransportEquipmentService utilizedTransportEquipmentService;
   private final StuffingService stuffingService;
+  private final DisplayedAddressMapper displayedAddressMapper;
 
   @Transactional
   public Optional<ShippingInstructionTO> findByReference(String shippingInstructionReference) {
-    // TODO: Verify the mapping (DDT-1296) and add positive postman tests with schema validation
     return shippingInstructionRepository
         .findByShippingInstructionReferenceAndValidUntilIsNull(shippingInstructionReference)
         .map(shippingInstructionMapper::toDTO);
@@ -63,6 +64,14 @@ public class ShippingInstructionService {
   private ShippingInstruction.ShippingInstructionBuilder toDAOBuilder(
       ShippingInstructionTO shippingInstructionTO) {
     return shippingInstructionMapper.toDAO(shippingInstructionTO).toBuilder()
-        .placeOfIssue(locationService.ensureResolvable(shippingInstructionTO.placeOfIssue()));
+        .placeOfIssue(locationService.ensureResolvable(shippingInstructionTO.placeOfIssue()))
+        .displayedNameForPlaceOfReceipt(
+            displayedAddressMapper.toDAO(shippingInstructionTO.displayedNameForPlaceOfReceipt()))
+        .displayedNameForPortOfLoad(
+            displayedAddressMapper.toDAO(shippingInstructionTO.displayedNameForPortOfLoad()))
+        .displayedNameForPlaceOfDelivery(
+            displayedAddressMapper.toDAO(shippingInstructionTO.displayedNameForPlaceOfDelivery()))
+        .displayedNameForPortOfDischarge(
+            displayedAddressMapper.toDAO(shippingInstructionTO.displayedNameForPortOfDischarge()));
   }
 }

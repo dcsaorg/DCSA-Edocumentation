@@ -6,7 +6,9 @@ import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+    componentModel = "spring",
+    uses = {DisplayedAddressMapper.class})
 public interface ShippingInstructionSummaryMapper {
   @Mapping(
     source = "consignmentItems",

@@ -112,17 +112,29 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @Column(name = "transport_document_type_code")
   private TransportDocumentTypeCode transportDocumentTypeCode;
 
-  @Column(name = "displayed_name_for_place_of_receipt")
-  private String displayedNameForPlaceOfReceipt;
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "displayed_name_for_place_of_receipt")
+  private DisplayedAddress displayedNameForPlaceOfReceipt;
 
-  @Column(name = "displayed_name_for_port_of_load")
-  private String displayedNameForPortOfLoad;
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "displayed_name_for_port_of_load")
+  private DisplayedAddress displayedNameForPortOfLoad;
 
-  @Column(name = "displayed_name_for_port_of_discharge")
-  private String displayedNameForPortOfDischarge;
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "displayed_name_for_port_of_discharge")
+  private DisplayedAddress displayedNameForPortOfDischarge;
 
-  @Column(name = "displayed_name_for_place_of_delivery")
-  private String displayedNameForPlaceOfDelivery;
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "displayed_name_for_place_of_delivery")
+  private DisplayedAddress displayedNameForPlaceOfDelivery;
 
   @Column(name = "amendment_to_transport_document_id")
   private UUID amendmentToTransportDocument;

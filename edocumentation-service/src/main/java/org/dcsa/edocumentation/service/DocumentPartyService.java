@@ -55,8 +55,6 @@ public class DocumentPartyService {
             .build();
 
     documentPartyRepository.save(documentPartyWithBooking);
-//    createDocumentPartyAndDisplayedAddress(
-//        documentPartyTO.displayedAddress(), documentPartyWithBooking);
   }
 
   private void createDocumentPartyAndDisplayedAddress(

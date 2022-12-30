@@ -26,10 +26,10 @@ public class ShippingInstructionSummaryDataFactory {
         .isToOrder(true)
         .areChargesDisplayedOnOriginals(false)
         .areChargesDisplayedOnOriginals(false)
-        .displayedNameForPlaceOfDelivery("Amsterdam")
-        .displayedNameForPlaceOfReceipt("Singapore")
-        .displayedNameForPortOfLoad("Port of Singapore")
-        .displayedNameForPortOfDischarge("Port of Rotterdam")
+        .displayedNameForPlaceOfDelivery(List.of("Amsterdam"))
+        .displayedNameForPlaceOfReceipt(List.of("Singapore"))
+        .displayedNameForPortOfLoad(List.of("Port of Singapore"))
+        .displayedNameForPortOfDischarge(List.of("Port of Rotterdam"))
         .build();
   }
 
@@ -47,10 +47,10 @@ public class ShippingInstructionSummaryDataFactory {
       .isToOrder(true)
       .areChargesDisplayedOnOriginals(false)
       .areChargesDisplayedOnOriginals(false)
-      .displayedNameForPlaceOfDelivery("Los Angeles")
-      .displayedNameForPlaceOfReceipt("Hong Kong")
-      .displayedNameForPortOfLoad("Port of Hong Kong")
-      .displayedNameForPortOfDischarge("Port of Long Beach")
+      .displayedNameForPlaceOfDelivery(List.of("Los Angeles"))
+      .displayedNameForPlaceOfReceipt(List.of("Hong Kong"))
+      .displayedNameForPortOfLoad(List.of("Port of Hong Kong"))
+      .displayedNameForPortOfDischarge(List.of("Port of Long Beach"))
       .build();
 
     return List.of(shippingInstructionSummaryTO, singleShippingInstructionSummaryTO());
