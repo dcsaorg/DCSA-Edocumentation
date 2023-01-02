@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 class ShippingInstructionSummaryControllerTest {
 
-  private final String path = "/ebl/v2/shipping-instructions-summaries";
+  private final String path = "/ebl/v3/shipping-instructions-summaries";
   @Autowired MockMvc mockMvc;
   @MockBean ShippingInstructionSummaryService shippingInstructionSummaryService;
 

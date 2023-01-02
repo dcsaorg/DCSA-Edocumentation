@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
   ConcreteRequestErrorMessageExceptionHandler.class
 })
 class ShipmentSummaryControllerTest {
-  private final String path = "/bkg/v1/shipment-summaries";
+  private final String path = "/bkg/v2/shipment-summaries";
   @Autowired MockMvc mockMvc;
   @MockBean ShipmentSummaryService shipmentSummaryService;
 
