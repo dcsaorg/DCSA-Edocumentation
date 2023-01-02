@@ -2,6 +2,7 @@ package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
+import org.dcsa.edocumentation.domain.persistence.entity.DisplayedAddress;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
@@ -33,10 +34,21 @@ public class ShippingInstructionDataFactory {
       .isElectronic(false)
       .isToOrder(true)
       .transportDocumentTypeCode(TransportDocumentTypeCode.BOL)
-      .displayedNameForPlaceOfReceipt("Amsterdam")
-      .displayedNameForPlaceOfDelivery("Singapore")
-      .displayedNameForPortOfLoad("Port of Rotterdam")
-      .displayedNameForPortOfDischarge("Port of Singapore")
+      .displayedNameForPlaceOfReceipt(DisplayedAddress.builder()
+        .addressLine1("Amsterdam")
+        .build())
+      .displayedNameForPlaceOfDelivery(
+        DisplayedAddress.builder()
+          .addressLine1("Singapore")
+          .build())
+      .displayedNameForPortOfLoad(
+        DisplayedAddress.builder()
+          .addressLine1("Port of Rotterdam")
+          .build())
+      .displayedNameForPortOfDischarge(
+        DisplayedAddress.builder()
+          .addressLine1("Port of Singapore")
+          .build())
       .build();
   }
 
@@ -79,10 +91,22 @@ public class ShippingInstructionDataFactory {
       .isToOrder(true)
       .placeOfIssue(placeOfIssue)
       .transportDocumentTypeCode(TransportDocumentTypeCode.BOL)
-      .displayedNameForPlaceOfReceipt("Los Angeles")
-      .displayedNameForPlaceOfDelivery("Hong Kong")
-      .displayedNameForPortOfLoad("Port of Long Beach")
-      .displayedNameForPortOfDischarge("Port of Hong Kong")
+      .displayedNameForPlaceOfReceipt(
+        DisplayedAddress.builder()
+          .addressLine1("Los Angeles")
+          .build())
+      .displayedNameForPlaceOfDelivery(
+        DisplayedAddress.builder()
+          .addressLine1("Hong Kong")
+          .build())
+      .displayedNameForPortOfLoad(
+        DisplayedAddress.builder()
+          .addressLine1("Port of Long Beach")
+          .build())
+      .displayedNameForPortOfDischarge(
+        DisplayedAddress.builder()
+          .addressLine1("Port of Hong Kong")
+          .build())
       .consignmentItems(consignmentItems)
       .build();
   }
@@ -126,10 +150,22 @@ public class ShippingInstructionDataFactory {
       .isToOrder(false)
       .placeOfIssue(placeOfIssue)
       .transportDocumentTypeCode(TransportDocumentTypeCode.BOL)
-      .displayedNameForPlaceOfReceipt("Amsterdam")
-      .displayedNameForPlaceOfDelivery("Singapore")
-      .displayedNameForPortOfLoad("Port of Rotterdam")
-      .displayedNameForPortOfDischarge("Port of Singapore")
+      .displayedNameForPlaceOfReceipt(
+        DisplayedAddress.builder()
+          .addressLine1("Amsterdam")
+          .build())
+      .displayedNameForPlaceOfDelivery(
+        DisplayedAddress.builder()
+          .addressLine1("Singapore")
+          .build())
+      .displayedNameForPortOfLoad(
+        DisplayedAddress.builder()
+          .addressLine1("Port of Rotterdam")
+          .build())
+      .displayedNameForPortOfDischarge(
+        DisplayedAddress.builder()
+          .addressLine1("Port of Singapore")
+          .build())
       .consignmentItems(consignmentItems)
       .build(), singleShallowShippingInstructionWithPlaceOfIssueAndShipments());
   }

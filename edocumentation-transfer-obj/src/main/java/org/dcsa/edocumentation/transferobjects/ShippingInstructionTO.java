@@ -65,17 +65,17 @@ public record ShippingInstructionTO(
 
   TransportDocumentTypeCode transportDocumentTypeCode,
 
-  @Size(max = 250)
-  String displayedNameForPlaceOfReceipt,
+  @Size(max = 5)
+  List<@Size(max = 35) String> displayedNameForPlaceOfReceipt,
 
-  @Size(max = 250)
-  String displayedNameForPortOfLoad,
+  @Size(max = 5)
+  List<@Size(max = 35) String> displayedNameForPortOfLoad,
 
-  @Size(max = 250)
-  String displayedNameForPortOfDischarge,
+  @Size(max = 5)
+  List<@Size(max = 35) String> displayedNameForPortOfDischarge,
 
-  @Size(max = 250)
-  String displayedNameForPlaceOfDelivery,
+  @Size(max = 5)
+  List<@Size(max = 35) String> displayedNameForPlaceOfDelivery,
 
   UUID amendmentToTransportDocument,
 

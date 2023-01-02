@@ -1,11 +1,9 @@
 package org.dcsa.edocumentation.service.mapping;
 
-import lombok.SneakyThrows;
 import org.dcsa.edocumentation.domain.persistence.entity.DisplayedAddress;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.stream.IntStream;
 @Component
 public class DisplayedAddressMapper {
 
-  List<String> toDTO(DisplayedAddress displayedAddresses) {
+  public List<String> toDTO(DisplayedAddress displayedAddresses) {
     if(displayedAddresses == null) {
       return Collections.emptyList();
     }
@@ -23,6 +21,10 @@ public class DisplayedAddressMapper {
   }
 
   public DisplayedAddress toDAO(List<String> displayedAddresses) {
+
+    if(displayedAddresses == null || displayedAddresses.isEmpty()) {
+      return null;
+    }
 
     DisplayedAddress.DisplayedAddressBuilder builder = DisplayedAddress.builder();
 
@@ -43,18 +45,24 @@ public class DisplayedAddressMapper {
     };
   }
 
-  @SneakyThrows
   private List<String> getAddressLines(DisplayedAddress displayedAddress) {
-    List<String> addressLines = new ArrayList<>();
-    for (Method m : displayedAddress.getClass().getMethods()) {
-      if (m.getName().startsWith("getAddressLine") && m.getParameterTypes().length == 0) {
-        final String addressLine = (String) m.invoke(displayedAddress);
-        if(addressLine == null) {
-          break;
-        }
-        addressLines.add(addressLine);
-      }
+    List<String> displayedAddresses = new ArrayList<>();
+    if(displayedAddress.getAddressLine1() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine1());
     }
-    return addressLines;
+    if(displayedAddress.getAddressLine2() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine2());
+    }
+    if(displayedAddress.getAddressLine3() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine3());
+    }
+    if(displayedAddress.getAddressLine4() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine4());
+    }
+    if(displayedAddress.getAddressLine5() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine5());
+    }
+
+    return displayedAddresses;
   }
 }

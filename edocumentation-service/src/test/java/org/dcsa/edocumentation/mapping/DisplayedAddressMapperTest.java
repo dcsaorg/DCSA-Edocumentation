@@ -42,4 +42,23 @@ class DisplayedAddressMapperTest {
     Exception exception = assertThrows(ConcreteRequestErrorMessageException.class, () -> mapper.toDAO(displayedAddresses));
     assertEquals("Display Address must be max five lines.", exception.getMessage());
   }
+
+  @Test
+  void displayAddressMapper_testToDTOManyLines() {
+    DisplayedAddress displayedAddress = DisplayedAddress.builder()
+      .addressLine1("line1")
+      .addressLine2("line2")
+      .addressLine3("line3")
+      .addressLine4("line4")
+      .addressLine5("line5")
+      .build();
+
+    List<String> result = mapper.toDTO(displayedAddress);
+    assertEquals(5, result.size());
+    assertEquals("line1", result.get(0));
+    assertEquals("line2", result.get(1));
+    assertEquals("line3", result.get(2));
+    assertEquals("line4", result.get(3));
+    assertEquals("line5", result.get(4));
+  }
 }

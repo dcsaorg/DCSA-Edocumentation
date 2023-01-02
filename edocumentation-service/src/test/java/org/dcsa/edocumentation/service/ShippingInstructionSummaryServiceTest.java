@@ -4,10 +4,13 @@ import org.dcsa.edocumentation.datafactories.ShippingInstructionDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
+import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionSummaryMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
+import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +48,12 @@ class ShippingInstructionSummaryServiceTest {
   @InjectMocks private ShippingInstructionSummaryService service;
 
   private final PageRequest mockPageRequest = PageRequest.of(1, 1);
+
+  @BeforeEach
+  void setupMappers() {
+    DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
+    ReflectionTestUtils.setField(shippingInstructionSummaryMapper, "displayedAddressMapper", displayedAddressMapper);
+  }
 
   @Test
   void testShippingInstructionSummary_singleShallowResult() {

@@ -12,6 +12,7 @@ import org.mapstruct.Mapping;
     uses = {
       LocationMapper.class,
       DisplayedAddressMapper.class,
+      DocumentPartyMapper.class,
       RequestedEquipmentGroupMapper.class,
       CommodityMapper.class,
       CommodityRequestedEquipmentLinkMapper.class

@@ -57,17 +57,17 @@ public record ShippingInstructionSummaryTO(
 
   boolean areChargesDisplayedOnOriginals,
 
-  @Size(max = 250, message = "The attribute displayedNameForPlaceOfReceipt has a max size of 250.")
-  String displayedNameForPlaceOfReceipt,
+  @Size(max = 5)
+  List<@Size(max = 35) String> displayedNameForPlaceOfReceipt,
 
-  @Size(max = 250, message = "The attribute displayedNameForPortOfLoad has a max size of 250.")
-  String displayedNameForPortOfLoad,
+  @Size(max = 5)
+  List<@Size(max = 35) String> displayedNameForPortOfLoad,
 
-  @Size(max = 250, message = "The attribute displayedNameForPortOfDischarge has a max size of 250.")
-  String displayedNameForPortOfDischarge,
+  @Size(max = 5)
+  List<@Size(max = 35) String>displayedNameForPortOfDischarge,
 
-  @Size(max = 250, message = "The attribute displayedNameForPlaceOfDelivery has a max size of 250.")
-  String displayedNameForPlaceOfDelivery,
+  @Size(max = 5)
+  List<@Size(max = 35) String> displayedNameForPlaceOfDelivery,
 
   List<@Size(max = 100, message = "The attribute carrierBookingReference has a max size of 100.") String> carrierBookingReferences
 ) {

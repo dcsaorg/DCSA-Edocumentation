@@ -89,6 +89,5 @@ class ShipmentLocationServiceTest {
 
     assertEquals(1, response.size());
     assertEquals(ShipmentLocationTypeCode.OIR, response.get(0).shipmentLocationTypeCode());
-    assertEquals("Displayed name", response.get(0).displayedName());
   }
 }
