@@ -74,7 +74,6 @@ class TransportDocumentServiceTest {
     assertTrue(transportDocumentTOOptional.isPresent());
     TransportDocumentTO transportDocumentTO = transportDocumentTOOptional.get();
     assertEquals(1, transportDocumentTO.transports().get(0).transportPlanStageSequenceNumber());
-    assertEquals("Displayed name", transportDocumentTO.shipmentLocations().get(0).displayedName());
   }
 
   @Test
