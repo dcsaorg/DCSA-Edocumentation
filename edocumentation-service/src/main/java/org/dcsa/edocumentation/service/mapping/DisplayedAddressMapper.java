@@ -1,14 +1,13 @@
 package org.dcsa.edocumentation.service.mapping;
 
-import lombok.SneakyThrows;
 import org.dcsa.edocumentation.domain.persistence.entity.DisplayedAddress;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Component
 public class DisplayedAddressMapper {
@@ -46,24 +45,24 @@ public class DisplayedAddressMapper {
     };
   }
 
-  @SneakyThrows
   private List<String> getAddressLines(DisplayedAddress displayedAddress) {
-    Map<Integer, String> addressLineMaps = new HashMap();
-    for (Method m : displayedAddress.getClass().getMethods()) {
-      if (m.getName().startsWith("getAddressLine") && m.getParameterTypes().length == 0) {
-
-        final String addressLine = (String) m.invoke(displayedAddress);
-        if(addressLine == null) {
-          continue;
-        }
-        Integer index = Integer.valueOf(m.getName().substring(m.getName().length() - 1));
-        addressLineMaps.put(index, addressLine);
-      }
+    List<String> displayedAddresses = new ArrayList<>();
+    if(displayedAddress.getAddressLine1() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine1());
     }
-    return Stream.of(addressLineMaps)
-      .map(TreeMap::new)
-      .map(TreeMap::values)
-      .flatMap(Collection::stream)
-      .toList();
+    if(displayedAddress.getAddressLine2() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine2());
+    }
+    if(displayedAddress.getAddressLine3() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine3());
+    }
+    if(displayedAddress.getAddressLine4() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine4());
+    }
+    if(displayedAddress.getAddressLine5() != null) {
+      displayedAddresses.add(displayedAddress.getAddressLine5());
+    }
+
+    return displayedAddresses;
   }
 }

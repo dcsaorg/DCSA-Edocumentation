@@ -29,9 +29,6 @@ public class ShipmentLocation {
   @Enumerated(EnumType.STRING)
   private LocationType shipmentLocationTypeCode;
 
-  @Column(name = "displayed_name")
-  private String displayedName;
-
   @Column(name = "event_date_time")
   private OffsetDateTime eventDateTime;
 
