@@ -1,9 +1,8 @@
 {
 	"info": {
-		"_postman_id": "ea3b9579-0bda-4f39-827a-5a60f8fd7b76",
+		"_postman_id": "a961559d-4fc9-40ae-94e0-57a940265bd4",
 		"name": "DCSA-EDocumentation",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "18186286"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -3929,11 +3928,11 @@
 		},
 		{
 			"key": "BKG_CONTEXT_PATH",
-			"value": "/bkg/v1"
+			"value": "/bkg/v2"
 		},
 		{
 			"key": "EBL_CONTEXT_PATH",
-			"value": "/ebl/v2"
+			"value": "/ebl/v3"
 		},
 		{
 			"key": "BOOKING_SCHEMA",
@@ -3942,12 +3941,12 @@
 		},
 		{
 			"key": "BKG_SPEC_VERSION",
-			"value": "1.0",
+			"value": "2.0",
 			"type": "default"
 		},
 		{
 			"key": "EBL_SPEC_VERSION",
-			"value": "2.0",
+			"value": "3.0",
 			"type": "default"
 		},
 		{

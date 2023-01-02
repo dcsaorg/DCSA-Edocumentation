@@ -42,7 +42,7 @@ class BookingSummaryControllerTest {
 
   @Autowired MockMvc mockMvc;
   @MockBean BookingSummaryService bookingSummaryService;
-  private final String path = "/bkg/v1/booking-summaries";
+  private final String path = "/bkg/v2/booking-summaries";
 
   @Test
   void testBookingSummaryController_getBookingSummariesSingleResult() throws Exception {

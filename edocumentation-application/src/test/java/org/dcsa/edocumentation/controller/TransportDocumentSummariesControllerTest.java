@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Tests for Transport Document Summaries Controller")
 class TransportDocumentSummariesControllerTest {
 
-  private static final String PATH = "/ebl/v2/transport-document-summaries";
+  private static final String PATH = "/ebl/v3/transport-document-summaries";
 
   @Autowired private MockMvc mockMvc;
   @MockBean private TransportDocumentSummaryService transportDocumentSummaryService;

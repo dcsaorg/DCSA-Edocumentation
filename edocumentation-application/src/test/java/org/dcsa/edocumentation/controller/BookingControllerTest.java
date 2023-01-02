@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BookingControllerTest {
   @Autowired MockMvc mockMvc;
   @MockBean BookingService bookingService;
-  private final String path = "/bkg/v1/bookings";
+  private final String path = "/bkg/v2/bookings";
 
   @Test
   void testBookingController_getBookingSingleResult() throws Exception {
