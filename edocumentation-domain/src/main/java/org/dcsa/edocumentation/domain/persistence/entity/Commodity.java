@@ -13,6 +13,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -66,7 +67,6 @@ public class Commodity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "commodity_requested_equipment_link_id", nullable = false)
-  private CommodityRequestedEquipmentLink commodityRequestedEquipmentLink;
+  @OneToMany(mappedBy = "commodity")
+  private Set<RequestedEquipmentGroup> requestedEquipments;
 }

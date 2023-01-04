@@ -44,7 +44,7 @@ public class RequestedEquipmentGroup {
   private String requestedEquipmentIsoEquipmentCode;
 
   @Column(name = "requested_equipment_units", nullable = false)
-  private Integer requestedEquipmentUnits;
+  private Float requestedEquipmentUnits;
 
   @Column(name = "confirmed_equipment_iso_equipment_code")
   @Size(max = 4)
@@ -71,8 +71,8 @@ public class RequestedEquipmentGroup {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "commodity_requested_equipment_link_id", nullable = false)
-  private CommodityRequestedEquipmentLink commodityRequestedEquipmentLink;
+  @JoinColumn(name = "commodity_id")
+  private Commodity commodity;
 
   public void equipmentProvidedForShipment(Shipment shipment) {
     this.shipment = shipment;

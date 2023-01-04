@@ -16,7 +16,6 @@ import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.service.mapping.ActiveReeferSettingsMapper;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
-import org.dcsa.edocumentation.service.mapping.CommodityRequestedEquipmentLinkMapper;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.ModeOfTransportMapper;
 import org.dcsa.edocumentation.service.mapping.RequestedEquipmentGroupMapper;
@@ -61,7 +60,6 @@ class BookingServiceTest {
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
-    @Spy private CommodityRequestedEquipmentLinkMapper commodityRequestedEquipmentLinkMapper = new CommodityRequestedEquipmentLinkMapper();
     @Spy private ActiveReeferSettingsMapper activeReeferSettingsMapper = Mappers.getMapper(ActiveReeferSettingsMapper.class);
 
     @InjectMocks private BookingService service;
@@ -73,7 +71,6 @@ class BookingServiceTest {
       ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
       ReflectionTestUtils.setField(bookingMapper, "displayedAddressMapper", displayedAddressMapper);
       ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
-      ReflectionTestUtils.setField(bookingMapper, "commodityRequestedEquipmentLinkMapper", commodityRequestedEquipmentLinkMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
     }
 
@@ -90,7 +87,6 @@ class BookingServiceTest {
       assertFalse(bookingResult.commodities().isEmpty());
       assertFalse(bookingResult.valueAddedServiceRequests().isEmpty());
       assertFalse(bookingResult.references().isEmpty());
-      assertFalse(bookingResult.requestedEquipments().isEmpty());
       assertFalse(bookingResult.shipmentLocations().isEmpty());
     }
 
@@ -136,7 +132,6 @@ class BookingServiceTest {
     @Mock private DocumentPartyService documentPartyService;
     @Mock private ShipmentLocationService shipmentLocationService;
     @Mock private ModeOfTransportService modeOfTransportService;
-    @Mock private CommodityRequestedEquipmentLinkService commodityRequestedEquipmentLinkService;
 
     @Mock private BookingRepository bookingRepository;
     @Mock private ShipmentEventRepository shipmentEventRepository;
@@ -149,7 +144,7 @@ class BookingServiceTest {
     public void resetMocks() {
       reset(locationService, voyageService, vesselService, commodityService, valueAddedServiceRequestService,
         requestedEquipmentGroupService, referenceService, documentPartyService, shipmentLocationService,
-        commodityRequestedEquipmentLinkService, bookingRepository, shipmentEventRepository);
+        bookingRepository, shipmentEventRepository);
     }
 
     @Test
@@ -199,10 +194,9 @@ class BookingServiceTest {
       verify(locationService, times(2)).ensureResolvable(bookingRequest.invoicePayableAt());
       verify(bookingRepository).save(bookingArgumentCaptor.capture());
       verify(shipmentEventRepository).save(shipmentEventArgumentCaptor.capture());
-      verify(commodityService).createCommodities(eq(bookingRequest.commodities()), any(Booking.class), any());
+      verify(commodityService).createCommodities(eq(bookingRequest.commodities()), any(Booking.class));
       verify(valueAddedServiceRequestService).createValueAddedServiceRequests(eq(bookingRequest.valueAddedServiceRequests()), any(Booking.class));
       verify(referenceService).createReferences(eq(bookingRequest.references()), any(Booking.class));
-      verify(requestedEquipmentGroupService).createRequestedEquipments(eq(bookingRequest.requestedEquipments()), any(Booking.class), any());
       verify(documentPartyService).createDocumentParties(eq(bookingRequest.documentParties()), any(Booking.class));
       verify(shipmentLocationService).createShipmentLocations(eq(bookingRequest.shipmentLocations()), any(Booking.class));
 

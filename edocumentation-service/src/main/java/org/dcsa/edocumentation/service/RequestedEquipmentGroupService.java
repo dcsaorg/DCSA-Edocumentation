@@ -2,7 +2,7 @@ package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.CommodityRequestedEquipmentLink;
+import org.dcsa.edocumentation.domain.persistence.entity.Commodity;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
@@ -35,7 +35,7 @@ public class RequestedEquipmentGroupService {
   public void createRequestedEquipments(
     Collection<RequestedEquipmentTO> requestedEquipments,
     Booking booking,
-    Map<String, CommodityRequestedEquipmentLink> links
+    Commodity commodity
   ) {
     if (requestedEquipments != null && !requestedEquipments.isEmpty()) {
       // Load all Equipments
@@ -52,7 +52,7 @@ public class RequestedEquipmentGroupService {
             re,
             booking,
             activeReeferSettingsService.createBookingActiveReeferSettings(re.activeReeferSettings()),
-            links
+            commodity
           )
         );
 

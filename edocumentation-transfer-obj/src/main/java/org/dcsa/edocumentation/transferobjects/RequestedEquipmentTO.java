@@ -19,7 +19,7 @@ public record RequestedEquipmentTO(
   WeightUnit tareWeightUnit,
 
   @NotNull
-  Integer units,
+  Float units,
 
   List<@NotBlank @Size(max = 15) String> equipmentReferences,
 

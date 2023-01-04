@@ -1,9 +1,11 @@
 package org.dcsa.edocumentation.service;
 
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
+import org.dcsa.edocumentation.datafactories.CommodityDataFactory;
 import org.dcsa.edocumentation.datafactories.EquipmentDataFactory;
 import org.dcsa.edocumentation.datafactories.RequestedEquipmentDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.Commodity;
 import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
 import org.dcsa.edocumentation.domain.persistence.repository.RequestedEquipmentGroupRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.UtilizedTransportEquipmentRepository;
@@ -67,13 +69,14 @@ public class RequestedEquipmentGroupServiceTest {
   public void testCreate_WithEquipmentReferences() {
     // Setup
     Booking booking = BookingDataFactory.singleMinimalBooking();
+    Commodity commodity = CommodityDataFactory.singleCommodity();
     RequestedEquipmentTO requestedEquipmentTO = RequestedEquipmentDataFactory.requestedEquipmentTORef1();
     RequestedEquipmentGroup expectedGroup = RequestedEquipmentDataFactory.requestedEquipmentRef1();
     when(equipmentService.resolveEquipments(any(), any(), any())).thenReturn(EquipmentDataFactory.equipmentMap());
     when(requestedEquipmentGroupRepository.save(any())).thenReturn(RequestedEquipmentDataFactory.requestedEquipmentRef1());
 
     // Execute
-    requestedEquipmentGroupService.createRequestedEquipments(List.of(requestedEquipmentTO), booking, Collections.emptyMap());
+    requestedEquipmentGroupService.createRequestedEquipments(List.of(requestedEquipmentTO), booking, commodity);
 
     // Verify
     verify(equipmentService).resolveEquipments(eq(List.of(requestedEquipmentTO)), any(), any());

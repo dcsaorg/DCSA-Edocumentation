@@ -163,9 +163,6 @@ public record BookingTO(
   List<ReferenceTO> references,
 
   @Valid
-  List<RequestedEquipmentTO> requestedEquipments,
-
-  @Valid
   List<DocumentPartyTO> documentParties,
 
   @Valid
