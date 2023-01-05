@@ -155,10 +155,10 @@ public class Shipment {
   private void performAssign(List<AssignedEquipment> assignments, List<Equipment> equipments, List<RequestedEquipmentGroup> groups) {
     int nextEquipmentIndex = equipments.size();
     for (RequestedEquipmentGroup requestedEquipmentGroup : groups) {
-      var missingUnits =  requestedEquipmentGroup.getRequestedEquipmentUnits();
+      int missingUnits = (int) Math.ceil(requestedEquipmentGroup.getRequestedEquipmentUnits());
       assert missingUnits < nextEquipmentIndex;
-      var endIndex = nextEquipmentIndex;
-      var startIndex = endIndex - missingUnits;
+      int endIndex = nextEquipmentIndex;
+      int startIndex = endIndex - missingUnits;
       nextEquipmentIndex -= startIndex;
 
       assignments.add(

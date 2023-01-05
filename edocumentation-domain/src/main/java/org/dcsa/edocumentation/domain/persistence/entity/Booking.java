@@ -28,10 +28,9 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumen
       @NamedAttributeNode("modeOfTransport"),
       @NamedAttributeNode("placeOfIssue"),
       @NamedAttributeNode("invoicePayableAt"),
-      @NamedAttributeNode("commodities"),
+      @NamedAttributeNode(value = "commodities", subgraph = "graph.commodities"),
       @NamedAttributeNode("valueAddedServiceRequests"),
       @NamedAttributeNode("references"),
-      @NamedAttributeNode("requestedEquipments"),
       @NamedAttributeNode(value = "documentParties", subgraph = "graph.documentParties"),
       @NamedAttributeNode("shipmentLocations")
     },
@@ -44,7 +43,12 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumen
           }),
       @NamedSubgraph(
           name = "graph.party",
-          attributeNodes = {@NamedAttributeNode("partyContactDetails")})
+          attributeNodes = {@NamedAttributeNode("partyContactDetails")}),
+      @NamedSubgraph(
+        name = "graph.commodities",
+        attributeNodes = {
+          @NamedAttributeNode("requestedEquipments")
+        })
     })
 @Data
 @Builder(toBuilder = true)

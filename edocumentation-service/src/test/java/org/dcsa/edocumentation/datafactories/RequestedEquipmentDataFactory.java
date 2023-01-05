@@ -16,7 +16,7 @@ public class RequestedEquipmentDataFactory {
         .confirmedEquipmentIsoEquipmentCode("confirmed size type")
         .isShipperOwned(true)
         .requestedEquipmentIsoEquipmentCode("size Type")
-        .requestedEquipmentUnits(1)
+        .requestedEquipmentUnits(1f)
         .build();
   }
 
@@ -28,7 +28,7 @@ public class RequestedEquipmentDataFactory {
     return RequestedEquipmentTO.builder()
       .equipmentReferences(List.of("Equipment_Ref_01"))
       .isoEquipmentCode("GP22")
-      .units(1)
+      .units(1f)
       .isShipperOwned(true)
       .activeReeferSettings(BookingActiveReeferSettingsDataFactory.bkgFreezer())
       .build();
@@ -38,7 +38,7 @@ public class RequestedEquipmentDataFactory {
     return RequestedEquipmentTO.builder()
       .equipmentReferences(List.of("Equipment_Ref_02"))
       .isoEquipmentCode("GP22")
-      .units(1)
+      .units(1f)
       .isShipperOwned(false)
       .build();
   }
@@ -51,7 +51,7 @@ public class RequestedEquipmentDataFactory {
     return RequestedEquipmentGroup.builder()
       .isShipperOwned(true)
       .requestedEquipmentIsoEquipmentCode("GP22")
-      .requestedEquipmentUnits(1)
+      .requestedEquipmentUnits(1f)
       .build();
   }
 
@@ -59,7 +59,7 @@ public class RequestedEquipmentDataFactory {
     return RequestedEquipmentGroup.builder()
       .isShipperOwned(false)
       .requestedEquipmentIsoEquipmentCode("GP22")
-      .requestedEquipmentUnits(1)
+      .requestedEquipmentUnits(1f)
       .build();
   }
 }

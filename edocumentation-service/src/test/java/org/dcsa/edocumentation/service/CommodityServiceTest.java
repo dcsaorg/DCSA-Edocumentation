@@ -23,9 +23,11 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CommodityServiceTest {
+  @Mock private RequestedEquipmentGroupService requestedEquipmentGroupService;
   @Mock private CommodityRepository commodityRepository;
   @Spy private CommodityMapper commodityMapper = Mappers.getMapper(CommodityMapper.class);
 
@@ -33,23 +35,23 @@ public class CommodityServiceTest {
 
   @BeforeEach
   public void resetMocks() {
-    reset(commodityRepository);
+    reset(requestedEquipmentGroupService, commodityRepository);
   }
 
   @Test
   public void testCreateNull() {
-    commodityService.createCommodities(null, null, null);
+    commodityService.createCommodities(null, null);
 
-    verify(commodityRepository, never()).saveAll(any());
-    verify(commodityMapper, never()).toDAO(any(), any(), any());
+    verify(commodityRepository, never()).save(any());
+    verify(commodityMapper, never()).toDAO(any(), any());
   }
 
   @Test
   public void testCreateEmpty() {
-    commodityService.createCommodities(Collections.emptyList(), null, null);
+    commodityService.createCommodities(Collections.emptyList(), null);
 
-    verify(commodityMapper, never()).toDAO(any(), any(), any());
-    verify(commodityRepository, never()).saveAll(any());
+    verify(commodityMapper, never()).toDAO(any(), any());
+    verify(commodityRepository, never()).save(any());
   }
 
   @Test
@@ -58,11 +60,13 @@ public class CommodityServiceTest {
     Booking booking = BookingDataFactory.singleMinimalBooking();
     CommodityTO commodityTO = CommodityDataFactory.singleCommodityTO();
     Commodity commodity = CommodityDataFactory.singleCommodityWithoutId();
+    when(commodityRepository.save(commodity)).thenReturn(commodity);
 
     // Execute
-    commodityService.createCommodities(List.of(commodityTO), booking, Collections.emptyMap());
+    commodityService.createCommodities(List.of(commodityTO), booking);
 
     // Verify
-    verify(commodityRepository).saveAll(List.of(commodity));
+    verify(commodityRepository).save(commodity);
+    verify(requestedEquipmentGroupService).createRequestedEquipments(commodityTO.requestedEquipments(), booking, commodity);
   }
 }

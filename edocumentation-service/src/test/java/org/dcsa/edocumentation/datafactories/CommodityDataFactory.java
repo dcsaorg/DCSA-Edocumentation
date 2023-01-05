@@ -7,6 +7,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 import org.dcsa.edocumentation.transferobjects.CommodityTO;
 
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 @UtilityClass
@@ -32,6 +33,7 @@ public class CommodityDataFactory {
       .exportLicenseIssueDate(LocalDate.now())
       .exportLicenseExpiryDate(LocalDate.now().plusMonths(6))
       .numberOfPackages(1)
+      .requestedEquipments(Set.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
       .hsCode("123");
   }
 
@@ -47,6 +49,7 @@ public class CommodityDataFactory {
       .numberOfPackages(1)
       .hsCode("123")
       .commodityRequestedEquipmentLink("commodityRequestedEquipmentLink")
+      .requestedEquipments(RequestedEquipmentDataFactory.requestedEquipmentTOList())
       .build();
   }
 }

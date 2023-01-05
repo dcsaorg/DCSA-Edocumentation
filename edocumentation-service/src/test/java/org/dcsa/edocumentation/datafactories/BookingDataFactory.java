@@ -224,7 +224,6 @@ public class BookingDataFactory {
         .valueAddedServiceRequests(
             Set.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequest()))
         .references(Set.of(ReferenceDataFactory.singleReference()))
-        .requestedEquipments(Set.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
         .documentParties(Set.of(DocumentPartyDataFactory.singleDocumentParty()))
         .shipmentLocations(Set.of(ShipmentLocationDataFactory.singleShipmentLocation()))
         .build();
@@ -285,7 +284,6 @@ public class BookingDataFactory {
       .commodities(List.of(CommodityDataFactory.singleCommodityTO()))
       .valueAddedServiceRequests(List.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestTO()))
       .references(List.of(ReferenceDataFactory.singleReferenceTO()))
-      .requestedEquipments(RequestedEquipmentDataFactory.requestedEquipmentTOList())
       .documentParties(List.of(DocumentPartyDataFactory.fullDocumentPartyTO()))
       .shipmentLocations(List.of(ShipmentLocationDataFactory.shipmentLocationTO()))
       .build();
