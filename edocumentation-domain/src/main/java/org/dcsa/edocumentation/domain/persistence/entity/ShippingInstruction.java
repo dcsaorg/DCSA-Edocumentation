@@ -5,6 +5,7 @@ import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
@@ -17,8 +18,26 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumen
 
 @EqualsAndHashCode(callSuper = true)
 @NamedEntityGraph(
-    name = "graph.shipping-instruction-summary",
-    attributeNodes = {@NamedAttributeNode("consignmentItems")})
+  name = "graph.shippingInstructionSummary",
+
+  attributeNodes = {
+    @NamedAttributeNode(
+      value = "consignmentItems",
+      subgraph = "graph.shippingInstructionSummary.consignmentItem"
+    ),
+    @NamedAttributeNode("displayedNameForPlaceOfReceipt"),
+    @NamedAttributeNode("displayedNameForPortOfLoad"),
+    @NamedAttributeNode("displayedNameForPortOfDischarge"),
+    @NamedAttributeNode("displayedNameForPlaceOfDelivery")
+  },
+  subgraphs = {
+    @NamedSubgraph(
+      name = "graph.shippingInstructionSummary.consignmentItem",
+      attributeNodes = {
+        @NamedAttributeNode("shipment")
+      })
+  }
+)
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor

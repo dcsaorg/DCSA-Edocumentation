@@ -62,6 +62,8 @@ class ShippingInstructionSummaryServiceTest {
     Page<ShippingInstruction> pagedResult = new PageImpl<>(List.of(mockShippingInstruction));
     when(shippingInstructionRepository.findAll(any(Specification.class), any(Pageable.class)))
         .thenReturn(pagedResult);
+    when(shippingInstructionRepository.findAllById(any(List.class)))
+      .thenReturn(List.of(mockShippingInstruction));
 
     PagedResult<ShippingInstructionSummaryTO> result =
         service.findShippingInstructionSummaries(mockPageRequest, null, null);
@@ -82,6 +84,8 @@ class ShippingInstructionSummaryServiceTest {
     Page<ShippingInstruction> pagedResult = new PageImpl<>(List.of(mockShippingInstruction));
     when(shippingInstructionRepository.findAll(any(Specification.class), any(Pageable.class)))
       .thenReturn(pagedResult);
+    when(shippingInstructionRepository.findAllById(any(List.class)))
+      .thenReturn(List.of(mockShippingInstruction));
 
     PagedResult<ShippingInstructionSummaryTO> result =
       service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECE, null);
@@ -103,6 +107,8 @@ class ShippingInstructionSummaryServiceTest {
     Page<ShippingInstruction> pagedResult = new PageImpl<>(List.of(mockShippingInstruction));
     when(shippingInstructionRepository.findAll(any(Specification.class), any(Pageable.class)))
         .thenReturn(pagedResult);
+    when(shippingInstructionRepository.findAllById(any(List.class)))
+      .thenReturn(List.of(mockShippingInstruction));
 
     PagedResult<ShippingInstructionSummaryTO> result =
         service.findShippingInstructionSummaries(mockPageRequest, null, null);
@@ -130,6 +136,8 @@ class ShippingInstructionSummaryServiceTest {
     Page<ShippingInstruction> pagedResult = new PageImpl<>(List.of(mockShippingInstruction));
     when(shippingInstructionRepository.findAll(any(Specification.class), any(Pageable.class)))
       .thenReturn(pagedResult);
+    when(shippingInstructionRepository.findAllById(any(List.class)))
+      .thenReturn(List.of(mockShippingInstruction));
 
     PagedResult<ShippingInstructionSummaryTO> result =
       service.findShippingInstructionSummaries(mockPageRequest, null, UUID.randomUUID().toString());
@@ -157,6 +165,8 @@ class ShippingInstructionSummaryServiceTest {
     Page<ShippingInstruction> pagedResult = new PageImpl<>(List.of(mockShippingInstruction));
     when(shippingInstructionRepository.findAll(any(Specification.class), any(Pageable.class)))
       .thenReturn(pagedResult);
+    when(shippingInstructionRepository.findAllById(any(List.class)))
+      .thenReturn(List.of(mockShippingInstruction));
 
     PagedResult<ShippingInstructionSummaryTO> result =
       service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECE, UUID.randomUUID().toString());
@@ -178,24 +188,26 @@ class ShippingInstructionSummaryServiceTest {
 
   @Test
   void testShippingInstructionSummary_multipleShallowResultsWithShipment() {
-    List<ShippingInstruction> mockShippingInstruction =
+    List<ShippingInstruction> mockShippingInstructions =
       ShippingInstructionDataFactory
         .multipleShallowShippingInstructionWithPlaceOfIssueAndShipments();
-    Page<ShippingInstruction> pagedResult = new PageImpl<>(mockShippingInstruction);
+    Page<ShippingInstruction> pagedResult = new PageImpl<>(mockShippingInstructions);
     when(shippingInstructionRepository.findAll(any(Specification.class), any(Pageable.class)))
       .thenReturn(pagedResult);
+    when(shippingInstructionRepository.findAllById(any(List.class)))
+      .thenReturn(mockShippingInstructions);
 
     PagedResult<ShippingInstructionSummaryTO> result =
       service.findShippingInstructionSummaries(mockPageRequest, null, null);
     assertEquals(1, result.totalPages());
     assertEquals(
-      mockShippingInstruction.get(0).getShippingInstructionReference(),
+      mockShippingInstructions.get(0).getShippingInstructionReference(),
       result.content().get(0).shippingInstructionReference());
     assertEquals(
-      mockShippingInstruction.get(0).getShippingInstructionCreatedDateTime(),
+      mockShippingInstructions.get(0).getShippingInstructionCreatedDateTime(),
       result.content().get(0).shippingInstructionCreatedDateTime());
     assertEquals(
-      mockShippingInstruction.get(0).getConsignmentItems().stream()
+      mockShippingInstructions.get(0).getConsignmentItems().stream()
         .toList()
         .get(0)
         .getShipment()
