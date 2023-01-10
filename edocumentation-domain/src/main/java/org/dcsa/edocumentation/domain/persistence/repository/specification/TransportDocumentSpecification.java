@@ -13,6 +13,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TransportDocumentSpecification {
@@ -29,27 +30,31 @@ public class TransportDocumentSpecification {
     return (root, query, builder) -> {
       Join<TransportDocument, ShippingInstruction> tdSiJoin =
           root.join(TransportDocument_.SHIPPING_INSTRUCTION, JoinType.LEFT);
-      Join<ShippingInstruction, ConsignmentItem> siCiJoin =
-          tdSiJoin.join(ShippingInstruction_.CONSIGNMENT_ITEMS, JoinType.LEFT);
-      Join<ConsignmentItem, Shipment> ciSiJoin =
-          siCiJoin.join(ConsignmentItem_.SHIPMENT, JoinType.LEFT);
 
       List<Predicate> predicates = new ArrayList<>();
 
-      if (null != filters.carrierBookingReference) {
-        Predicate carrierBkgRefPredicate =
-            builder
-                .in(ciSiJoin.get(Shipment_.CARRIER_BOOKING_REFERENCE))
-                .value(filters.carrierBookingReference);
-        predicates.add(carrierBkgRefPredicate);
-        query.distinct(true);
-      }
+
 
       if (null != filters.documentStatus) {
         Predicate docStatusPredicate =
-            builder.equal(
-                tdSiJoin.get(ShippingInstruction_.DOCUMENT_STATUS), filters.documentStatus);
+          builder.equal(
+            tdSiJoin.get(ShippingInstruction_.DOCUMENT_STATUS), filters.documentStatus);
         predicates.add(docStatusPredicate);
+      }
+
+      if (null != filters.carrierBookingReference) {
+        var subquery = query.subquery(UUID.class);
+        var subqueryRoot = subquery.from(ShippingInstruction.class);
+        var consignmentItemRoot = subqueryRoot.join(ShippingInstruction_.CONSIGNMENT_ITEMS);
+        var consignmentItemShipmentJoin = consignmentItemRoot.join(ConsignmentItem_.SHIPMENT, JoinType.LEFT);
+        subquery.select(subqueryRoot.get(ShippingInstruction_.ID));
+        subquery.where(builder
+          .in(consignmentItemShipmentJoin.get(Shipment_.CARRIER_BOOKING_REFERENCE))
+          .value(filters.carrierBookingReference));
+        Predicate predicate = builder.in(
+          root.get(TransportDocument_.SHIPPING_INSTRUCTION).get(ShippingInstruction_.ID)
+        ).value(subquery);
+        predicates.add(predicate);
       }
 
       return builder.and(predicates.toArray(Predicate[]::new));

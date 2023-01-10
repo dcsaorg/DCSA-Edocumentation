@@ -7,11 +7,10 @@ import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @UtilityClass
@@ -23,22 +22,26 @@ public class ShippingInstructionSpecification {
     public ShippingInstructionFilters {}
   }
 
-  public static Specification<ShippingInstructionSpecification> withFilters(
+  public static Specification<ShippingInstruction> withFilters(
       final ShippingInstructionFilters filters) {
 
     return (root, query, builder) -> {
-      Join<ShippingInstruction, ConsignmentItem> shippingInstructionConsignmentItemJoin = root.join(ShippingInstruction_.CONSIGNMENT_ITEMS, JoinType.LEFT);
-      Join<ConsignmentItem, Shipment> consignmentItemShipmentJoin = shippingInstructionConsignmentItemJoin.join(ConsignmentItem_.SHIPMENT, JoinType.LEFT);
       List<Predicate> predicates = new ArrayList<>();
+
       if (null != filters.documentStatus) {
-        Predicate predicate = builder.equal(root.get("documentStatus"), filters.documentStatus);
+        Predicate predicate = builder.equal(root.get(ShippingInstruction_.DOCUMENT_STATUS), filters.documentStatus);
         predicates.add(predicate);
       }
       if (null != filters.carrierBookingReference && !filters.carrierBookingReference.isEmpty()) {
-        Predicate predicate =
-            builder
-                .in(consignmentItemShipmentJoin.get("carrierBookingReference"))
-                .value(filters.carrierBookingReference);
+        var subquery = query.subquery(UUID.class);
+        var subqueryRoot = subquery.from(ShippingInstruction.class);
+        var consignmentItemRoot = subqueryRoot.join(ShippingInstruction_.CONSIGNMENT_ITEMS);
+        var consignmentItemShipmentJoin = consignmentItemRoot.join(ConsignmentItem_.SHIPMENT, JoinType.LEFT);
+        subquery.select(subqueryRoot.get(ShippingInstruction_.ID));
+        subquery.where(builder
+          .in(consignmentItemShipmentJoin.get(Shipment_.CARRIER_BOOKING_REFERENCE))
+          .value(filters.carrierBookingReference));
+        Predicate predicate = builder.in(root.get(ShippingInstruction_.ID)).value(subquery);
         predicates.add(predicate);
       }
       return builder.and(predicates.toArray(Predicate[]::new));

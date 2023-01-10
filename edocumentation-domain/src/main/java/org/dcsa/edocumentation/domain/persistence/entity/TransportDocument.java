@@ -19,6 +19,42 @@ import java.util.UUID;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
+@NamedEntityGraph(
+  name = "graph.transportDocumentSummary",
+
+  attributeNodes = {
+    @NamedAttributeNode(
+      value = "shippingInstruction",
+      // Defined in ShippingInstruction, pulls a bit more data than what we need,
+      // but saves us from maintaining the sub-graphs here.
+      subgraph = "graph.transportDocumentSummary.shippingInstruction"
+    ),
+    @NamedAttributeNode("carrier"),
+    @NamedAttributeNode("issuingParty")
+  },
+
+  subgraphs = {
+    @NamedSubgraph(
+      name = "graph.transportDocumentSummary.shippingInstruction",
+      attributeNodes = {
+        @NamedAttributeNode(
+          value = "consignmentItems",
+          subgraph = "graph.transportDocumentSummary.consignmentItem"
+        )
+      }),
+    @NamedSubgraph(
+      name = "graph.transportDocumentSummary.consignmentItem",
+      attributeNodes = {
+        @NamedAttributeNode("shipment")
+      }),
+    @NamedSubgraph(
+      name = "graph.transportDocumentSummary.issuingParty",
+      attributeNodes = {
+        @NamedAttributeNode("address")
+      }),
+
+  }
+)
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @RequiredArgsConstructor
