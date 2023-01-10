@@ -3,9 +3,9 @@ package org.dcsa.edocumentation.transferobjects;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.PartyFunction;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record DocumentPartyTO(

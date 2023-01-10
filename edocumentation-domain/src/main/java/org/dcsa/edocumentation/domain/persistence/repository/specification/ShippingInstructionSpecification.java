@@ -7,7 +7,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.*;
+import jakarta.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

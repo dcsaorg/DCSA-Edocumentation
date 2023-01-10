@@ -9,7 +9,7 @@ import org.dcsa.edocumentation.service.mapping.UtilizedTransportEquipmentMapper;
 import org.dcsa.edocumentation.transferobjects.UtilizedTransportEquipmentTO;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;

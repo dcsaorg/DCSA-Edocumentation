@@ -1,12 +1,11 @@
 package org.dcsa.edocumentation.transferobjects.unofficial;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dcsa.edocumentation.transferobjects.PartyTO;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record DraftTransportDocumentRequestTO(

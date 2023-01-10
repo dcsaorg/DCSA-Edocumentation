@@ -10,7 +10,7 @@ import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Set;

@@ -11,7 +11,7 @@ import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
 import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;

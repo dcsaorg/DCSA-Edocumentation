@@ -10,7 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ReeferType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Set;
 import java.util.UUID;
 

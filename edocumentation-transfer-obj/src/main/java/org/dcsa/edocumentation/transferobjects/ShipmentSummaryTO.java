@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 
 public record ShipmentSummaryTO(

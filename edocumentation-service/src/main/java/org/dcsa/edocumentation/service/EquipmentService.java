@@ -8,7 +8,7 @@ import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;

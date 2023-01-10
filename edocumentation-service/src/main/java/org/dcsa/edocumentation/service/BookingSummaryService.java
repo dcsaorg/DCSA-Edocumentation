@@ -6,12 +6,11 @@ import org.dcsa.edocumentation.service.mapping.BookingSummaryMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
 import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
-import org.dcsa.skernel.infrastructure.pagination.Cursor;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 
 @Service

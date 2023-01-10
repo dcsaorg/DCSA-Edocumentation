@@ -4,7 +4,7 @@ import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.VesselType;
 import org.dcsa.skernel.domain.persistence.entity.enums.DimensionUnit;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Data

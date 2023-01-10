@@ -10,7 +10,7 @@ import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventReposi
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Set;

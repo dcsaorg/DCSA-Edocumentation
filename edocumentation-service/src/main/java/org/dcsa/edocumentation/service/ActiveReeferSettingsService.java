@@ -8,7 +8,7 @@ import org.dcsa.edocumentation.transferobjects.BookingActiveReeferSettingsTO;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettingsTO;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 @Service
 @AllArgsConstructor

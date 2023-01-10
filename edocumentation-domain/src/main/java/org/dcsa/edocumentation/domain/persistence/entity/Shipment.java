@@ -6,7 +6,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.unofficial.EquipmentAss
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.*;
 

@@ -21,7 +21,7 @@ import org.dcsa.skernel.domain.persistence.repository.CarrierRepository;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 

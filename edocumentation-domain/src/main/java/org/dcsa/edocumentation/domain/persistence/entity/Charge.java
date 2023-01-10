@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Data

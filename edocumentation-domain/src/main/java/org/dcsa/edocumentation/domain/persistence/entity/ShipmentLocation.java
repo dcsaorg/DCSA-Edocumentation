@@ -4,7 +4,7 @@ import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

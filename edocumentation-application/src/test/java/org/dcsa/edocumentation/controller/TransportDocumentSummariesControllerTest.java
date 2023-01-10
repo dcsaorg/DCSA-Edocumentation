@@ -5,7 +5,7 @@ import org.dcsa.edocumentation.service.TransportDocumentSummaryService;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentSummaryTO;
 import org.dcsa.skernel.errors.infrastructure.ConcreteRequestErrorMessageExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.FallbackExceptionHandler;
-import org.dcsa.skernel.errors.infrastructure.JavaxValidationExceptionHandler;
+import org.dcsa.skernel.errors.infrastructure.JakartaValidationExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.SpringExceptionHandler;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
 import org.dcsa.skernel.infrastructure.pagination.Paginator;
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {TransportDocumentSummariesController.class})
 @Import({
   SpringExceptionHandler.class,
-  JavaxValidationExceptionHandler.class,
+  JakartaValidationExceptionHandler.class,
   FallbackExceptionHandler.class,
   ConcreteRequestErrorMessageExceptionHandler.class,
   Paginator.class

@@ -3,9 +3,9 @@ package org.dcsa.edocumentation.transferobjects;
 import lombok.Builder;
 import org.dcsa.skernel.infrastructure.transferobject.AddressTO;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record PartyTO(

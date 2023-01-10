@@ -3,8 +3,8 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.PartyFunction;
 
-import javax.persistence.*;
-import java.util.Set;
+import jakarta.persistence.*;
+
 import java.util.UUID;
 
 @Data

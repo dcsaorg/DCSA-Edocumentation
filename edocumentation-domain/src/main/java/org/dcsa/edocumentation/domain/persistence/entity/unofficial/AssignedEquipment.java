@@ -3,9 +3,8 @@ package org.dcsa.edocumentation.domain.persistence.entity.unofficial;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
-import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Set;
 import java.util.UUID;
 

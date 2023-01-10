@@ -10,7 +10,7 @@ import org.dcsa.skernel.infrastructure.pagination.PagedResult;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 
 @Service

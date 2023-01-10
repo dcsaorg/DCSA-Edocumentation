@@ -4,8 +4,8 @@ import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.skernel.infrastructure.validation.EnumSubset;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public record ChangeEBLDocumentStatusRequestTO(
   @NotNull
