@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.transferobjects;
 import lombok.Builder;
 import org.dcsa.skernel.infrastructure.validation.UniversalServiceReference;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 public record ServiceTO(
   @Size(max = 5)

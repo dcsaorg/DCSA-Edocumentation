@@ -2,7 +2,7 @@ package org.dcsa.edocumentation.transferobjects;
 
 import lombok.Builder;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public record CargoLineItemTO(
 

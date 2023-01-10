@@ -6,7 +6,7 @@ import org.dcsa.edocumentation.transferobjects.ShipmentSummaryTO;
 import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.skernel.errors.infrastructure.ConcreteRequestErrorMessageExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.FallbackExceptionHandler;
-import org.dcsa.skernel.errors.infrastructure.JavaxValidationExceptionHandler;
+import org.dcsa.skernel.errors.infrastructure.JakartaValidationExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.SpringExceptionHandler;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {ShipmentSummaryController.class})
 @Import({
   SpringExceptionHandler.class,
-  JavaxValidationExceptionHandler.class,
+  JakartaValidationExceptionHandler.class,
   FallbackExceptionHandler.class,
   ConcreteRequestErrorMessageExceptionHandler.class
 })

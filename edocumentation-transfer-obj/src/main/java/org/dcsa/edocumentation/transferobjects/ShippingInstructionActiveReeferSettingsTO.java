@@ -9,9 +9,9 @@ import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSe
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionActiveReeferSettingsTO.EblSuperFreezerTO;
 import org.dcsa.edocumentation.transferobjects.enums.TemperatureUnit;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME,  property = "type")

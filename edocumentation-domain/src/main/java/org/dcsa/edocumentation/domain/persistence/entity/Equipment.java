@@ -3,13 +3,13 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.Size;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 
 @Data
 @Builder

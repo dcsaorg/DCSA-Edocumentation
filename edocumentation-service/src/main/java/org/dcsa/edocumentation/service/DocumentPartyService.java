@@ -10,8 +10,8 @@ import org.dcsa.edocumentation.service.mapping.DocumentPartyMapper;
 import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
+import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional.TxType;
 import java.util.Collection;
 import java.util.List;
 

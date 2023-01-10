@@ -2,7 +2,7 @@ package org.dcsa.edocumentation.domain.dfa;
 
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
-import javax.persistence.Transient;
+import jakarta.persistence.Transient;
 
 public abstract class AbstractStateMachine<S extends Enum<S>> {
 

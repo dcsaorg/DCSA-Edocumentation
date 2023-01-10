@@ -4,7 +4,7 @@ import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.AirExchangeUnit;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TemperatureUnit;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Data

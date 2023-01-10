@@ -1,6 +1,6 @@
 package org.dcsa.edocumentation.service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;

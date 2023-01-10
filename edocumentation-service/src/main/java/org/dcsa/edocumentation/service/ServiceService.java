@@ -7,7 +7,7 @@ import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Example;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 @org.springframework.stereotype.Service
 @AllArgsConstructor

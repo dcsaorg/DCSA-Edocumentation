@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.transferobjects;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.ValueAddedServiceCode;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public record ValueAddedServiceRequestTO(
   @NotNull

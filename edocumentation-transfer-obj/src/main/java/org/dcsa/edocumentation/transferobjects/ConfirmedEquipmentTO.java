@@ -2,8 +2,8 @@ package org.dcsa.edocumentation.transferobjects;
 
 import lombok.Builder;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public record ConfirmedEquipmentTO(
     @NotBlank(message = "The attribute confirmedEquipmentSizeType is required.")

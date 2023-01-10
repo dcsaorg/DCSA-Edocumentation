@@ -6,8 +6,8 @@ import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
 import org.dcsa.edocumentation.transferobjects.validation.ValidUtilizedTransportEquipment;
 import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @ValidUtilizedTransportEquipment

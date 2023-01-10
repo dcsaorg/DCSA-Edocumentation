@@ -12,7 +12,7 @@ import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.skernel.infrastructure.services.LocationService;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Optional;

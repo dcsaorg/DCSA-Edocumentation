@@ -9,8 +9,8 @@ import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.springframework.data.domain.Persistable;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;

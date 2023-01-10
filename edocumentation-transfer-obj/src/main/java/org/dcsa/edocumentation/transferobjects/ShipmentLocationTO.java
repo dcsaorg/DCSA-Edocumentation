@@ -6,8 +6,8 @@ import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO.LocationType;
 import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 
 public record ShipmentLocationTO(

@@ -12,7 +12,7 @@ import org.dcsa.edocumentation.transferobjects.PartyTO;
 import org.dcsa.skernel.infrastructure.services.AddressService;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.List;
 
 @RequiredArgsConstructor

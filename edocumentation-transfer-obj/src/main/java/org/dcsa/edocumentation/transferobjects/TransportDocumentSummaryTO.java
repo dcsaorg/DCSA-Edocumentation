@@ -7,7 +7,7 @@ import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 
 public record ShippingInstructionRefStatusTO(
