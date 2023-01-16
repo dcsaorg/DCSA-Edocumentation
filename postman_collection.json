@@ -3940,12 +3940,12 @@
 		},
 		{
 			"key": "BKG_SPEC_VERSION",
-			"value": "2.0",
+			"value": "2.0.0",
 			"type": "default"
 		},
 		{
 			"key": "EBL_SPEC_VERSION",
-			"value": "3.0",
+			"value": "3.0.0",
 			"type": "default"
 		},
 		{
