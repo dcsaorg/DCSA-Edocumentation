@@ -17,6 +17,7 @@ import java.time.OffsetDateTime;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Entity
+@Table(name = "transport_call")
 public class TransportCall extends BaseTransportCall {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
