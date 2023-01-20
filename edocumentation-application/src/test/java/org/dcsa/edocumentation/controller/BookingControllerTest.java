@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BookingControllerTest {
   @Autowired MockMvc mockMvc;
   @MockBean BookingService bookingService;
+  @MockBean org.dcsa.edocumentation.service.decoupled.BookingService decoupledBookingService;
   private final String path = "/bkg/v2/bookings";
 
   @Test

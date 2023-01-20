@@ -19,27 +19,23 @@ import jakarta.validation.constraints.Size;
 
 @Validated
 @RestController
+@RequestMapping("${spring.application.bkg-context-path}")
 @RequiredArgsConstructor
 public class BookingController {
   private final BookingService bookingService;
+  private final org.dcsa.edocumentation.service.decoupled.BookingService decoupledBookingService;
 
   @GetMapping(
-    path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}",
+    path = "/bookings/{carrierBookingRequestReference}",
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   @ResponseStatus(HttpStatus.OK)
   public BookingTO getBooking(@PathVariable("carrierBookingRequestReference") @NotBlank @Size(max = 100)
                               String carrierBookingRequestReference) {
-    return bookingService
-      .getBooking(carrierBookingRequestReference)
-      .orElseThrow(
-        () ->
-          ConcreteRequestErrorMessageException.notFound(
-            "No booking found with carrierBookingRequestReference: "
-              + carrierBookingRequestReference));
+    return decoupledBookingService.getBooking(carrierBookingRequestReference);
   }
 
-  @PostMapping(path = "${spring.application.bkg-context-path}/bookings")
+  @PostMapping(path = "/bookings")
   @ResponseStatus(HttpStatus.CREATED)
   public BookingRefStatusTO createBooking(@Valid @RequestBody BookingTO bookingRequest) {
     if (bookingRequest.carrierBookingRequestReference() != null
@@ -50,10 +46,10 @@ public class BookingController {
         "carrierBookingRequestReference, documentStatus, bookingRequestCreatedDateTime and"
           + " bookingRequestUpdatedDateTime are not allowed when creating a booking");
     }
-    return bookingService.createBooking(bookingRequest);
+    return decoupledBookingService.createBooking(bookingRequest);
   }
 
-  @PutMapping(path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}")
+  @PutMapping(path = "/bookings/{carrierBookingRequestReference}")
   @ResponseStatus(HttpStatus.OK)
   public BookingRefStatusTO updateBooking(
     @PathVariable("carrierBookingRequestReference")
@@ -74,16 +70,11 @@ public class BookingController {
         "documentStatus, bookingRequestCreatedDateTime and"
           + " bookingRequestUpdatedDateTime are not allowed when updating a booking");
     }
-    return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest)
-      .orElseThrow(
-        () ->
-          ConcreteRequestErrorMessageException.notFound(
-            "No booking found with carrierBookingRequestReference: "
-              + carrierBookingRequestReference));
+    return decoupledBookingService.updateBooking(carrierBookingRequestReference, bookingRequest);
   }
 
   @PatchMapping(
-    path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}",
+    path = "/bookings/{carrierBookingRequestReference}",
     produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public BookingRefStatusTO cancelBooking(
@@ -95,11 +86,6 @@ public class BookingController {
     if (bookingCancelRequestTO.documentStatus() != BkgDocumentStatus.CANC) {
       throw ConcreteRequestErrorMessageException.invalidInput("documentStatus must be CANC");
     }
-    return bookingService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO.reason())
-      .orElseThrow(
-        () ->
-          ConcreteRequestErrorMessageException.notFound(
-            "No booking found with carrierBookingRequestReference: "
-              + carrierBookingRequestReference));
+    return decoupledBookingService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO.reason());
   }
 }

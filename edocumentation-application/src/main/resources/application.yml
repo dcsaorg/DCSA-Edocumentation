@@ -25,9 +25,6 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate.ddl-auto: validate
-    properties:
-      hibernate:
-        default_schema: dcsa_im_v3_0
   security:
     oauth2:
       resourceserver:
