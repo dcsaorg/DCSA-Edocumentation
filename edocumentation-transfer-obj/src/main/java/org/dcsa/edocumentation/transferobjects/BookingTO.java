@@ -83,7 +83,7 @@ public record BookingTO(
   @Pattern(regexp = "\\d{2}[0-9A-Z]{2}[NEWS]", message = "Not a valid voyage reference")
   String universalExportVoyageReference,
 
-  @Size(max = 5)
+  @Size(max = 11)
   String carrierServiceCode,
 
   @UniversalServiceReference

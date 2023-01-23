@@ -6,7 +6,7 @@ import org.dcsa.skernel.infrastructure.validation.UniversalServiceReference;
 import jakarta.validation.constraints.Size;
 
 public record ServiceTO(
-  @Size(max = 5)
+  @Size(max = 11)
   String carrierServiceCode,
 
   @Size(max = 50)
