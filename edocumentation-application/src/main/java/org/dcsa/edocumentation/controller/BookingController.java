@@ -23,7 +23,6 @@ import jakarta.validation.constraints.Size;
 @RequiredArgsConstructor
 public class BookingController {
   private final BookingService bookingService;
-  private final org.dcsa.edocumentation.service.decoupled.BookingService decoupledBookingService;
 
   @GetMapping(
     path = "/bookings/{carrierBookingRequestReference}",
@@ -32,7 +31,7 @@ public class BookingController {
   @ResponseStatus(HttpStatus.OK)
   public BookingTO getBooking(@PathVariable("carrierBookingRequestReference") @NotBlank @Size(max = 100)
                               String carrierBookingRequestReference) {
-    return decoupledBookingService.getBooking(carrierBookingRequestReference);
+    return bookingService.getBooking(carrierBookingRequestReference);
   }
 
   @PostMapping(path = "/bookings")
@@ -46,7 +45,7 @@ public class BookingController {
         "carrierBookingRequestReference, documentStatus, bookingRequestCreatedDateTime and"
           + " bookingRequestUpdatedDateTime are not allowed when creating a booking");
     }
-    return decoupledBookingService.createBooking(bookingRequest);
+    return bookingService.createBooking(bookingRequest);
   }
 
   @PutMapping(path = "/bookings/{carrierBookingRequestReference}")
@@ -70,7 +69,7 @@ public class BookingController {
         "documentStatus, bookingRequestCreatedDateTime and"
           + " bookingRequestUpdatedDateTime are not allowed when updating a booking");
     }
-    return decoupledBookingService.updateBooking(carrierBookingRequestReference, bookingRequest);
+    return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest);
   }
 
   @PatchMapping(
@@ -86,6 +85,6 @@ public class BookingController {
     if (bookingCancelRequestTO.documentStatus() != BkgDocumentStatus.CANC) {
       throw ConcreteRequestErrorMessageException.invalidInput("documentStatus must be CANC");
     }
-    return decoupledBookingService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO.reason());
+    return bookingService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO.reason());
   }
 }

@@ -19,7 +19,7 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,7 +30,7 @@ public abstract class Event {
   @Id
   @GeneratedValue
   @Column(name = "event_id", nullable = false)
-  private UUID eventID;
+  private UUID eventId;
 
   @Column(name = "event_date_time", nullable = false)
   private OffsetDateTime eventDateTime;

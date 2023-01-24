@@ -1,4 +1,4 @@
-package org.dcsa.edocumentation.service.decoupled;
+package org.dcsa.edocumentation.service.util;
 
 import lombok.AllArgsConstructor;
 import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
@@ -26,17 +26,17 @@ public class BookingStateMachine extends AbstractStateMachine<BkgDocumentStatus>
     .terminalStates(CANC, CMPL, REJE)
     .build();
 
-    private BkgDocumentStatus documentStatus;
+  private BkgDocumentStatus documentStatus;
 
-    @Override
-    protected DFADefinition<BkgDocumentStatus> getDfaDefinition() {
-      return BOOKING_DFA_DEFINITION;
-    }
+  @Override
+  protected DFADefinition<BkgDocumentStatus> getDfaDefinition() {
+    return BOOKING_DFA_DEFINITION;
+  }
 
-    @Override
-    protected BkgDocumentStatus getResumeFromState() {
-      return documentStatus;
-    }
+  @Override
+  protected BkgDocumentStatus getResumeFromState() {
+    return documentStatus;
+  }
 
   public static void validateTransition(BkgDocumentStatus from, BkgDocumentStatus to) {
     new BookingStateMachine(from).transitionTo(to);

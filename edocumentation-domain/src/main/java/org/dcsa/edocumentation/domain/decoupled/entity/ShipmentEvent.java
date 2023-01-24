@@ -19,7 +19,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventType
 import java.util.UUID;
 
 @NoArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @Getter
 @Setter(AccessLevel.PRIVATE)
