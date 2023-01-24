@@ -34,6 +34,7 @@ public class DocumentParty {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "displayed_address_id")
   private DisplayedAddress displayedAddress;
 
   @ToString.Exclude

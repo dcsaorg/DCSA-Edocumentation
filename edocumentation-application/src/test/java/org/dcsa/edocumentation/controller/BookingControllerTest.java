@@ -15,10 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
-
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -42,7 +39,7 @@ class BookingControllerTest {
   void testBookingController_getBookingSingleResult() throws Exception {
 
     BookingTO mockBookingTO = BookingTO.builder().carrierBookingRequestReference("1234").build();
-    when(bookingService.getBooking("1234")).thenReturn(Optional.of(mockBookingTO));
+    when(bookingService.getBooking("1234")).thenReturn(mockBookingTO);
 
     mockMvc
         .perform(get(path + "/1234").accept(MediaType.APPLICATION_JSON))
@@ -65,14 +62,5 @@ class BookingControllerTest {
                 .value(
                     containsString(
                         "getBooking.carrierBookingRequestReference size must be between 0 and 100")));
-  }
-
-  @Test
-  void testBookingController_getBookingNotFound() throws Exception {
-    when(bookingService.getBooking(any())).thenReturn(Optional.empty());
-    mockMvc
-        .perform(get(path + "/IdoNotExist").accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isNotFound());
   }
 }

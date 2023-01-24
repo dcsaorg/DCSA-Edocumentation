@@ -1,6 +1,10 @@
 package org.dcsa.edocumentation.transferobjects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.CargoMovementType;
@@ -20,11 +24,6 @@ import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 import org.dcsa.skernel.infrastructure.validation.UniversalServiceReference;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -53,13 +52,10 @@ public record BookingTO(
   @Size(max = 100)
   String carrierBookingRequestReference,
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   BkgDocumentStatus documentStatus,
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   OffsetDateTime bookingRequestCreatedDateTime,
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   OffsetDateTime bookingRequestUpdatedDateTime,
 
   @NotNull

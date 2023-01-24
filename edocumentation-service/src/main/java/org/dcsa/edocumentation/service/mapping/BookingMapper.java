@@ -3,6 +3,7 @@ package org.dcsa.edocumentation.service.mapping;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -33,5 +34,7 @@ public interface BookingMapper {
   BookingTO toDTO(Booking booking);
 
   BookingRefStatusTO toStatusDTO(Booking booking);
+  BookingRefStatusTO toStatusDTO(BookingTO bookingTO);
+  org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus toDAO(BkgDocumentStatus bkgDocumentStatus);
 }
 
