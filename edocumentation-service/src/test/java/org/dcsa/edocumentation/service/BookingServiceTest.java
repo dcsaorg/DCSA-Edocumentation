@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -44,14 +45,15 @@ class BookingServiceTest {
   @InjectMocks private BookingService bookingService;
 
   @BeforeEach
-  public void resetMocks() {
+  public void setup() {
     reset(bookingRepository, shipmentEventRepository);
+    ReflectionTestUtils.setField(bookingMapper, "objectMapper", objectMapper);
   }
 
   @Test
   public void testGetBooking() {
     BookingTO bookingTO = BookingDataFactory.singleFullBookingRequestTO();
-    Booking booking = bookingFromTO(bookingTO);
+    Booking booking = bookingMapper.toDAO(bookingTO);
     when(bookingRepository.findByCarrierBookingRequestReference(any())).thenReturn(Optional.of(booking));
 
     BookingTO actual = bookingService.getBooking("something");
@@ -127,17 +129,6 @@ class BookingServiceTest {
       .shipmentLocations(bookingTO.shipmentLocations().stream()
         .map(shipmentLocation -> shipmentLocation.toBuilder().eventDateTime(null).build())
         .toList())
-      .build();
-  }
-
-  @SneakyThrows
-  private Booking bookingFromTO(BookingTO bookingTO) {
-    return Booking.builder()
-      .carrierBookingRequestReference(bookingTO.carrierBookingRequestReference())
-      .documentStatus(bookingMapper.toDAO(bookingTO.documentStatus()))
-      .content(objectMapper.writeValueAsString(bookingTO))
-      .bookingRequestCreatedDateTime(bookingTO.bookingRequestCreatedDateTime())
-      .bookingRequestUpdatedDateTime(bookingTO.bookingRequestUpdatedDateTime())
       .build();
   }
 }

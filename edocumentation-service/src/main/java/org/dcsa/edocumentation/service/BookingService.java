@@ -1,16 +1,14 @@
 package org.dcsa.edocumentation.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.dcsa.edocumentation.domain.decoupled.entity.Booking;
 import org.dcsa.edocumentation.domain.decoupled.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.decoupled.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.decoupled.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EventClassifierCode;
-import org.dcsa.edocumentation.service.util.BookingStateMachine;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
+import org.dcsa.edocumentation.service.util.BookingStateMachine;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
@@ -29,11 +27,10 @@ public class BookingService {
   private final BookingRepository bookingRepository;
   private final ShipmentEventRepository shipmentEventRepository;
   private final BookingMapper bookingMapper;
-  private final ObjectMapper objectMapper;
 
   @Transactional(transactionManager = "decoupledTransactionManager")
   public BookingTO getBooking(String carrierBookingRequestReference) {
-    return deserializeTOFromBooking(getBookingOrThrow(carrierBookingRequestReference));
+    return bookingMapper.toDTO(getBookingOrThrow(carrierBookingRequestReference));
   }
 
   @Transactional(transactionManager = "decoupledTransactionManager")
@@ -54,7 +51,7 @@ public class BookingService {
 
   @Transactional(transactionManager = "decoupledTransactionManager")
   public BookingRefStatusTO updateBookingStatus(String carrierBookingRequestReference, BkgDocumentStatus documentStatus, String reason) {
-    return updateExistingBooking(carrierBookingRequestReference, this::deserializeTOFromBooking, documentStatus, reason);
+    return updateExistingBooking(carrierBookingRequestReference, bookingMapper::toDTO, documentStatus, reason);
   }
 
   private BookingRefStatusTO updateExistingBooking(String carrierBookingRequestReference, Function<Booking, BookingTO> bookingTOSupplier, BkgDocumentStatus documentStatus, String reason) {
@@ -70,7 +67,7 @@ public class BookingService {
 
   private BookingRefStatusTO saveBookingAndEvent(BookingTO bookingTO, BkgDocumentStatus documentStatus, OffsetDateTime createTime, OffsetDateTime updateTime, String reason) {
     BookingTO updatedRequest = updateRequest(bookingTO, documentStatus, createTime, updateTime);
-    Booking booking = bookingRepository.save(bookingFromTO(updatedRequest));
+    Booking booking = bookingRepository.save(bookingMapper.toDAO(updatedRequest));
     shipmentEventRepository.save(shipmentEventFromBooking(booking, reason));
     return bookingMapper.toStatusDTO(updatedRequest);
   }
@@ -91,22 +88,6 @@ public class BookingService {
       .bookingRequestUpdatedDateTime(updateTime)
       .documentStatus(documentStatus)
       .build();
-  }
-
-  @SneakyThrows
-  private Booking bookingFromTO(BookingTO bookingTO) {
-    return Booking.builder()
-      .carrierBookingRequestReference(bookingTO.carrierBookingRequestReference())
-      .documentStatus(bookingMapper.toDAO(bookingTO.documentStatus()))
-      .content(objectMapper.writeValueAsString(bookingTO))
-      .bookingRequestCreatedDateTime(bookingTO.bookingRequestCreatedDateTime())
-      .bookingRequestUpdatedDateTime(bookingTO.bookingRequestUpdatedDateTime())
-      .build();
-  }
-
-  @SneakyThrows
-  private BookingTO deserializeTOFromBooking(Booking booking) {
-    return objectMapper.readValue(booking.getContent(), BookingTO.class);
   }
 
   private ShipmentEvent shipmentEventFromBooking(Booking booking, String reason) {
