@@ -63,3 +63,15 @@ insert into shipment_event_type (shipment_event_type_code, shipment_event_type_n
     ('RELS','Released','"A status indicator that can be used with a number of activity identifiers to denote that a container or shipment has been released i.e. allowed to move from depot or terminal by authorities or service provider."'),
     ('CANC','Cancelled',' "A status indicator to be used when the booking is cancelled by the Shipper"')
 ;
+
+
+CREATE TABLE transport_document_type (
+    transport_document_type_code varchar(3) PRIMARY KEY,
+    transport_document_type_name varchar(20) NULL,
+    transport_document_type_description varchar(500) NULL
+);
+insert into transport_document_type (transport_document_type_code, transport_document_type_name, transport_document_type_description)
+  values
+    ('BOL','Bill of Lading','Contractual document issued to the shipper which confirms the carrier''s receipt of the cargo, acknowledging goods being shipped or received for shipment and specifying the terms of delivery (as one of the evidences of the contract of carriage). The Bill of Lading is usually prepared based on shipping instructions, including cargo description, given by the shipper on forms issued by the carrier and is the title to the goods and can be a negotiable document."'),
+    ('SWB','Sea Waybill','"A separate specific transport document type which is non-negotiable, does not transfer title, but which evidences the contract of carriage and receipt of the goods. It must be issued to a named consignee and can be both in a physical or digital format. Goods can be released at destination without presenting the original sea waybill as proof of ownership."')
+;

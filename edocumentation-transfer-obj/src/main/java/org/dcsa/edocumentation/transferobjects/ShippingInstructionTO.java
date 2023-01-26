@@ -1,16 +1,15 @@
 package org.dcsa.edocumentation.transferobjects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.dcsa.skernel.infrastructure.validation.RequiredIfFalse;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -29,16 +28,12 @@ public record ShippingInstructionTO(
   String carrierBookingReference,
 
   @Size(max = 100)
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   String shippingInstructionReference,
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   EblDocumentStatus documentStatus,
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   OffsetDateTime shippingInstructionCreatedDateTime,
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   OffsetDateTime shippingInstructionUpdatedDateTime,
 
   @NotNull(message = "isShippedOnBoardType is required.")
@@ -92,6 +87,6 @@ public record ShippingInstructionTO(
 
   List<ReferenceTO> references
 ) {
-  @Builder
+  @Builder(toBuilder = true)
   public ShippingInstructionTO{}
 }

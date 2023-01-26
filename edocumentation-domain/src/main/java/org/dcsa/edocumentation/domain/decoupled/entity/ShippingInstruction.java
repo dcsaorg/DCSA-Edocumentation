@@ -13,7 +13,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -26,19 +27,23 @@ import java.util.UUID;
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
 @Entity
-@Table(name = "booking")
-public class Booking {
+@Table(name = "shipping_instruction")
+public class ShippingInstruction {
   @Id
   @GeneratedValue
   @Column(name = "id", nullable = false)
   private UUID id;
 
-  @Column(name = "carrier_booking_request_reference", length = 100, nullable = false)
-  private String carrierBookingRequestReference;
+  @Column(name = "shipping_instruction_reference", length = 100, nullable = false)
+  private String shippingInstructionReference;
 
   @Column(name = "document_status", nullable = false)
   @Enumerated(EnumType.STRING)
-  private BkgDocumentStatus documentStatus;
+  private EblDocumentStatus documentStatus;
+
+  @Column(name = "transport_document_type_code")
+  @Enumerated(EnumType.STRING)
+  private TransportDocumentTypeCode transportDocumentTypeCode;
 
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "content", columnDefinition = "jsonb", nullable = false)
@@ -47,11 +52,11 @@ public class Booking {
   @Column(name = "valid_until")
   private OffsetDateTime validUntil;
 
-  @Column(name = "booking_request_datetime", nullable = false)
-  private OffsetDateTime bookingRequestCreatedDateTime;
+  @Column(name = "created_date_time", nullable = false)
+  private OffsetDateTime createdDateTime;
 
   @Column(name = "updated_date_time", nullable = false)
-  protected OffsetDateTime bookingRequestUpdatedDateTime;
+  protected OffsetDateTime updatedDateTime;
 
   public void lockVersion(OffsetDateTime lockTime) {
     this.validUntil = lockTime;
