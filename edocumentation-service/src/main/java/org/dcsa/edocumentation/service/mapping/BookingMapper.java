@@ -49,5 +49,6 @@ public abstract class BookingMapper {
   @Mapping(source = "voyage.service.universalServiceReference", target = "universalServiceReference")
   @Mapping(source = "vessel.vesselIMONumber", target = "vesselIMONumber")
   @Mapping(source = "modeOfTransport.dcsaTransportType", target = "preCarriageModeOfTransportCode")
+  @Mapping(source = "valueAddedServiceRequests", target = "valueAddedServices")
   public abstract BookingTO toDTO(org.dcsa.edocumentation.domain.persistence.entity.Booking booking);
 }
