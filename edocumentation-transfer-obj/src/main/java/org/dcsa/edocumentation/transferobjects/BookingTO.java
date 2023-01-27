@@ -153,7 +153,7 @@ public record BookingTO(
   List<CommodityTO> commodities,
 
   @Valid
-  List<ValueAddedServiceRequestTO> valueAddedServiceRequests,
+  List<ValueAddedServiceRequestTO> valueAddedServices,
 
   @Valid
   List<ReferenceTO> references,
