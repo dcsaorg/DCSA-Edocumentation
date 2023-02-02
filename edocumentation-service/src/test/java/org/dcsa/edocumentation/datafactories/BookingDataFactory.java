@@ -282,7 +282,7 @@ public class BookingDataFactory {
       .invoicePayableAt(LocationDataFactory.addressLocationTO())
       .placeOfBLIssue(LocationDataFactory.addressLocationTO())
       .commodities(List.of(CommodityDataFactory.singleCommodityTO()))
-      .valueAddedServices(List.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestTO()))
+      .valueAddedServiceRequests(List.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestTO()))
       .references(List.of(ReferenceDataFactory.singleReferenceTO()))
       .documentParties(List.of(DocumentPartyDataFactory.fullDocumentPartyTO()))
       .shipmentLocations(List.of(ShipmentLocationDataFactory.shipmentLocationTO()))

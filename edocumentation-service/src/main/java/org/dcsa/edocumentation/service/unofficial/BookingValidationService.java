@@ -2,15 +2,17 @@ package org.dcsa.edocumentation.service.unofficial;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dcsa.edocumentation.domain.decoupled.repository.ShipmentEventRepository;
-import org.dcsa.edocumentation.service.BookingService;
-import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
-import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
+import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 /**
@@ -20,7 +22,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class BookingValidationService {
-  private final BookingService bookingService;
+  private final BookingRepository bookingRepository;
   private final ShipmentEventRepository shipmentEventRepository;
 
   private final static Set<BkgDocumentStatus> CAN_BE_VALIDATED =
@@ -28,40 +30,45 @@ public class BookingValidationService {
 
   public record ValidationResult(BkgDocumentStatus newStatus, String reason) {}
 
+  @Transactional
   public ValidationResult validateBooking(String carrierBookingRequestReference) {
-    BookingTO bookingTO = bookingService.getBooking(carrierBookingRequestReference);
+    Booking booking = bookingRepository.findBookingByCarrierBookingRequestReference(carrierBookingRequestReference)
+      .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound(
+        "No booking found with carrierBookingRequestReference='" + carrierBookingRequestReference + "'"));
 
-    if (!CAN_BE_VALIDATED.contains(bookingTO.documentStatus())) {
+    if (!CAN_BE_VALIDATED.contains(booking.getDocumentStatus())) {
       throw ConcreteRequestErrorMessageException.conflict(
         "documentStatus must be one of " + CAN_BE_VALIDATED, null);
     }
 
-    String reason = validateBooking(bookingTO);
-    BookingRefStatusTO bookingRefStatusTO = null;
+    ShipmentEvent shipmentEvent;
+    String reason = validateBooking(booking);
     if (reason == null) {
       reason = "Booking passed validation";
-      bookingRefStatusTO = bookingService.updateBookingStatus(carrierBookingRequestReference, BkgDocumentStatus.PENC, reason);
+      shipmentEvent = booking.pendingConfirmation(reason, OffsetDateTime.now());
       log.debug("Booking {} passed validation", carrierBookingRequestReference);
     } else {
-      bookingRefStatusTO = bookingService.updateBookingStatus(carrierBookingRequestReference, BkgDocumentStatus.PENU, reason);
+      shipmentEvent = booking.pendingUpdate(reason, OffsetDateTime.now());
       log.debug("Booking {} failed validation because {}", carrierBookingRequestReference, reason);
     }
-    return new ValidationResult(bookingRefStatusTO.documentStatus(), reason);
+    bookingRepository.save(booking);
+    shipmentEventRepository.save(shipmentEvent);
+    return new ValidationResult(booking.getDocumentStatus(), reason);
   }
 
   /**
    * Subject to change. Reefer will probably change it.
    */
-  private String validateBooking(BookingTO bookingTO) {
+  private String validateBooking(Booking booking) {
     LocalDate today = LocalDate.now();
 
-    if (isInThePast(today, bookingTO.expectedDepartureDate())) {
+    if (isInThePast(today, booking.getExpectedDepartureDate())) {
       return "expectedDepartureDate is in the past";
     }
-    if (isInThePast(today, bookingTO.expectedArrivalAtPlaceOfDeliveryStartDate())) {
+    if (isInThePast(today, booking.getExpectedArrivalAtPlaceOfDeliveryStartDate())) {
       return "expectedArrivalAtPlaceOfDeliveryStartDate is in the past";
     }
-    if (isInThePast(today, bookingTO.expectedArrivalAtPlaceOfDeliveryEndDate())) {
+    if (isInThePast(today, booking.getExpectedArrivalAtPlaceOfDeliveryEndDate())) {
       return "expectedArrivalAtPlaceOfDeliveryEndDate is in the past";
     }
 

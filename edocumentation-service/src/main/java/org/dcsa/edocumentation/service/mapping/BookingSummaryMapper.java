@@ -1,10 +1,16 @@
 package org.dcsa.edocumentation.service.mapping;
 
+import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface BookingSummaryMapper {
-  BookingSummaryTO BookingToBookingSummary(BookingTO bookingTO);
+
+  @Mapping(source = "booking.vessel.vesselIMONumber", target = "vesselIMONumber")
+  @Mapping(
+      source = " booking.modeOfTransport.dcsaTransportType",
+      target = "preCarriageModeOfTransportCode")
+  BookingSummaryTO BookingToBookingSummary(Booking booking);
 }
