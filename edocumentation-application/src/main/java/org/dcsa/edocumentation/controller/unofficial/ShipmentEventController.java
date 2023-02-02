@@ -1,11 +1,11 @@
 package org.dcsa.edocumentation.controller.unofficial;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.decoupled.entity.ShipmentEvent;
-import org.dcsa.edocumentation.domain.decoupled.entity.ShipmentEvent_;
+import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
+import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent_;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventTypeCode;
-import org.dcsa.edocumentation.domain.decoupled.repository.specification.ShipmentEventSpecification.ShipmentEventFilters;
+import org.dcsa.edocumentation.domain.persistence.repository.specification.ShipmentEventSpecification.ShipmentEventFilters;
 import org.dcsa.edocumentation.service.unofficial.ShipmentEventService;
 import org.dcsa.skernel.infrastructure.pagination.Pagination;
 import org.dcsa.skernel.infrastructure.sorting.Sorter.SortableFields;
