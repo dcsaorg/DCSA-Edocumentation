@@ -31,7 +31,6 @@ public interface RequestedEquipmentGroupMapper {
 
   @Mapping(source = "requestedEquipmentUnits", target = "units")
   @Mapping(source = "requestedEquipmentIsoEquipmentCode", target = "isoEquipmentCode")
-  @Mapping(target = "activeReeferSettings", qualifiedByName = "toBookingActiveReeferSettingsTO")
   RequestedEquipmentTO toTO(RequestedEquipmentGroup requestedEquipment);
 
   default String mapEquipmentToEquipmentReference(Equipment equipment) {

@@ -30,7 +30,7 @@ public class RequestedEquipmentDataFactory {
       .isoEquipmentCode("GP22")
       .units(1f)
       .isShipperOwned(true)
-      .activeReeferSettings(BookingActiveReeferSettingsDataFactory.bkgFreezer())
+      .activeReeferSettings(ActiveReeferSettingsDataFactory.activeReeferSettingsTO())
       .build();
   }
 
