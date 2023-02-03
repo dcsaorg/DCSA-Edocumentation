@@ -221,7 +221,7 @@ public class BookingDataFactory {
         .modeOfTransport(mockModeOfTransport)
         .vessel(mockVessel)
         .commodities(Set.of(CommodityDataFactory.singleCommodity()))
-        .valueAddedServiceRequests(
+        .valueAddedServices(
             Set.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequest()))
         .references(Set.of(ReferenceDataFactory.singleReference()))
         .documentParties(Set.of(DocumentPartyDataFactory.singleDocumentParty()))
@@ -282,7 +282,7 @@ public class BookingDataFactory {
       .invoicePayableAt(LocationDataFactory.addressLocationTO())
       .placeOfBLIssue(LocationDataFactory.addressLocationTO())
       .commodities(List.of(CommodityDataFactory.singleCommodityTO()))
-      .valueAddedServiceRequests(List.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestTO()))
+      .valueAddedServices(List.of(ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestTO()))
       .references(List.of(ReferenceDataFactory.singleReferenceTO()))
       .documentParties(List.of(DocumentPartyDataFactory.fullDocumentPartyTO()))
       .shipmentLocations(List.of(ShipmentLocationDataFactory.shipmentLocationTO()))

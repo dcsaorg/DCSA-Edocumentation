@@ -1,30 +1,30 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.domain.persistence.entity.ValueAddedServiceRequest;
+import org.dcsa.edocumentation.domain.persistence.entity.ValueAddedService;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ValueAddedServiceCode;
-import org.dcsa.edocumentation.transferobjects.ValueAddedServiceRequestTO;
+import org.dcsa.edocumentation.transferobjects.ValueAddedServiceTO;
 
 import java.util.UUID;
 
 @UtilityClass
 public class ValueAddedServiceRequestDataFactory {
 
-  public ValueAddedServiceRequest singleValueAddedServiceRequest() {
-    return ValueAddedServiceRequest.builder()
+  public ValueAddedService singleValueAddedServiceRequest() {
+    return ValueAddedService.builder()
         .id(UUID.randomUUID())
         .valueAddedServiceCode(ValueAddedServiceCode.SIOT)
         .build();
   }
 
-  public ValueAddedServiceRequest singleValueAddedServiceRequestWithoutId() {
-    return ValueAddedServiceRequest.builder()
+  public ValueAddedService singleValueAddedServiceRequestWithoutId() {
+    return ValueAddedService.builder()
       .valueAddedServiceCode(ValueAddedServiceCode.SIOT)
       .build();
   }
 
-  public ValueAddedServiceRequestTO singleValueAddedServiceRequestTO() {
-    return ValueAddedServiceRequestTO.builder()
+  public ValueAddedServiceTO singleValueAddedServiceRequestTO() {
+    return ValueAddedServiceTO.builder()
       .valueAddedServiceCode(org.dcsa.edocumentation.transferobjects.enums.ValueAddedServiceCode.SIOT)
       .build();
   }

@@ -90,7 +90,7 @@ public class BookingService {
 
   private void createDeepObjectsForBooking(BookingTO bookingRequest, Booking booking) {
     commodityService.createCommodities(bookingRequest.commodities(), booking);
-    valueAddedServiceRequestService.createValueAddedServiceRequests(bookingRequest.valueAddedServiceRequests(), booking);
+    valueAddedServiceRequestService.createValueAddedServiceRequests(bookingRequest.valueAddedServices(), booking);
     referenceService.createReferences(bookingRequest.references(), booking);
     documentPartyService.createDocumentParties(bookingRequest.documentParties(), booking);
     shipmentLocationService.createShipmentLocations(bookingRequest.shipmentLocations(), booking);

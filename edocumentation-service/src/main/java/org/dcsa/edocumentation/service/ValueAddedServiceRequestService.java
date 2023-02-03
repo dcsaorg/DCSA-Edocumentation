@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.repository.ValueAddedServiceRequestRepository;
 import org.dcsa.edocumentation.service.mapping.ValueAddedServiceRequestMapper;
-import org.dcsa.edocumentation.transferobjects.ValueAddedServiceRequestTO;
+import org.dcsa.edocumentation.transferobjects.ValueAddedServiceTO;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -18,7 +18,7 @@ public class ValueAddedServiceRequestService {
   private final ValueAddedServiceRequestMapper valueAddedServiceRequestMapper;
 
   @Transactional(TxType.MANDATORY)
-  public void createValueAddedServiceRequests(Collection<ValueAddedServiceRequestTO> valueAddedServiceRequests, Booking booking) {
+  public void createValueAddedServiceRequests(Collection<ValueAddedServiceTO> valueAddedServiceRequests, Booking booking) {
     if (valueAddedServiceRequests != null && !valueAddedServiceRequests.isEmpty()) {
       valueAddedServiceRequestRepository.saveAll(
         valueAddedServiceRequests.stream()

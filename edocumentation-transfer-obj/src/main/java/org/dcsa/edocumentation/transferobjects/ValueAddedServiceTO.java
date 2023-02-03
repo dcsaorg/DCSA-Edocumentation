@@ -5,10 +5,10 @@ import org.dcsa.edocumentation.transferobjects.enums.ValueAddedServiceCode;
 
 import jakarta.validation.constraints.NotNull;
 
-public record ValueAddedServiceRequestTO(
+public record ValueAddedServiceTO(
   @NotNull
   ValueAddedServiceCode valueAddedServiceCode
 ) {
   @Builder(toBuilder = true)
-  public ValueAddedServiceRequestTO { }
+  public ValueAddedServiceTO { }
 }

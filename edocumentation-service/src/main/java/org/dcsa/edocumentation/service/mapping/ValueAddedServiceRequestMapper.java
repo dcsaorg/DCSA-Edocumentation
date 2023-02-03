@@ -1,8 +1,8 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.ValueAddedServiceRequest;
-import org.dcsa.edocumentation.transferobjects.ValueAddedServiceRequestTO;
+import org.dcsa.edocumentation.domain.persistence.entity.ValueAddedService;
+import org.dcsa.edocumentation.transferobjects.ValueAddedServiceTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -10,5 +10,5 @@ import org.mapstruct.Mapping;
 public interface ValueAddedServiceRequestMapper {
   @Mapping(source = "booking", target = "booking")
   @Mapping(source = "booking.id", target = "id", ignore = true)
-  ValueAddedServiceRequest toDAO(ValueAddedServiceRequestTO request, Booking booking);
+  ValueAddedService toDAO(ValueAddedServiceTO request, Booking booking);
 }
