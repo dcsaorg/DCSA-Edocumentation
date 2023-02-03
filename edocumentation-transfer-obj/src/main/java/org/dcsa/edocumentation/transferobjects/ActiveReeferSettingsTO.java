@@ -1,5 +1,7 @@
 package org.dcsa.edocumentation.transferobjects;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.AirExchangeUnit;
@@ -32,12 +34,16 @@ public record ActiveReeferSettingsTO(
   @NotNull
   TemperatureUnit temperatureUnit,
 
+  @Min(0) @Max(100)
   Float o2Setpoint,
 
+  @Min(0) @Max(100)
   Float co2Setpoint,
 
+  @Min(0) @Max(100)
   Float humiditySetpoint,
 
+  @Min(0)
   Float airExchangeSetpoint,
 
   AirExchangeUnit airExchangeUnit
