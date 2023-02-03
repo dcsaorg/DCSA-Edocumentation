@@ -3,10 +3,10 @@ package org.dcsa.edocumentation.service;
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.datafactories.ValueAddedServiceRequestDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.ValueAddedServiceRequest;
+import org.dcsa.edocumentation.domain.persistence.entity.ValueAddedService;
 import org.dcsa.edocumentation.domain.persistence.repository.ValueAddedServiceRequestRepository;
 import org.dcsa.edocumentation.service.mapping.ValueAddedServiceRequestMapper;
-import org.dcsa.edocumentation.transferobjects.ValueAddedServiceRequestTO;
+import org.dcsa.edocumentation.transferobjects.ValueAddedServiceTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,15 +59,15 @@ public class ValueAddedServiceRequestServiceTest {
   public void testCreate() {
     // Setup
     Booking booking = BookingDataFactory.singleMinimalBooking();
-    ValueAddedServiceRequestTO ValueAddedServiceRequestTO = ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestTO();
-    ValueAddedServiceRequest ValueAddedServiceRequest = ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestWithoutId();
+    ValueAddedServiceTO ValueAddedServiceTO = ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestTO();
+    ValueAddedService ValueAddedService = ValueAddedServiceRequestDataFactory.singleValueAddedServiceRequestWithoutId();
 
-    when(valueAddedServiceRequestMapper.toDAO(any(ValueAddedServiceRequestTO.class), any(Booking.class))).thenReturn(ValueAddedServiceRequest);
+    when(valueAddedServiceRequestMapper.toDAO(any(ValueAddedServiceTO.class), any(Booking.class))).thenReturn(ValueAddedService);
 
     // Execute
-    valueAddedServiceRequestService.createValueAddedServiceRequests(List.of(ValueAddedServiceRequestTO), booking);
+    valueAddedServiceRequestService.createValueAddedServiceRequests(List.of(ValueAddedServiceTO), booking);
 
     // Verify
-    verify(valueAddedServiceRequestRepository).saveAll(List.of(ValueAddedServiceRequest));
+    verify(valueAddedServiceRequestRepository).saveAll(List.of(ValueAddedService));
   }
 }

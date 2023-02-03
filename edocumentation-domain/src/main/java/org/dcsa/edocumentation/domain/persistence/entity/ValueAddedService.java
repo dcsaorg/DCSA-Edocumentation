@@ -12,8 +12,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
 @Entity
-@Table(name = "value_added_service_request")
-public class ValueAddedServiceRequest {
+@Table(name = "value_added_service")
+public class ValueAddedService {
 
   @Id
   @GeneratedValue

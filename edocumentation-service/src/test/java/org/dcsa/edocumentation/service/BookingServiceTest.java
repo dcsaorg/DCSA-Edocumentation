@@ -85,7 +85,7 @@ class BookingServiceTest {
       BookingTO bookingResult = result.get();
       assertEquals("BOOKING_REQ_REF_01", bookingResult.carrierBookingRequestReference());
       assertFalse(bookingResult.commodities().isEmpty());
-      assertFalse(bookingResult.valueAddedServiceRequests().isEmpty());
+      assertFalse(bookingResult.valueAddedServices().isEmpty());
       assertFalse(bookingResult.references().isEmpty());
       assertFalse(bookingResult.shipmentLocations().isEmpty());
     }
@@ -195,7 +195,7 @@ class BookingServiceTest {
       verify(bookingRepository).save(bookingArgumentCaptor.capture());
       verify(shipmentEventRepository).save(shipmentEventArgumentCaptor.capture());
       verify(commodityService).createCommodities(eq(bookingRequest.commodities()), any(Booking.class));
-      verify(valueAddedServiceRequestService).createValueAddedServiceRequests(eq(bookingRequest.valueAddedServiceRequests()), any(Booking.class));
+      verify(valueAddedServiceRequestService).createValueAddedServiceRequests(eq(bookingRequest.valueAddedServices()), any(Booking.class));
       verify(referenceService).createReferences(eq(bookingRequest.references()), any(Booking.class));
       verify(documentPartyService).createDocumentParties(eq(bookingRequest.documentParties()), any(Booking.class));
       verify(shipmentLocationService).createShipmentLocations(eq(bookingRequest.shipmentLocations()), any(Booking.class));

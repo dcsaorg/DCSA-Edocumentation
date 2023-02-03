@@ -29,7 +29,7 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumen
       @NamedAttributeNode("placeOfIssue"),
       @NamedAttributeNode("invoicePayableAt"),
       @NamedAttributeNode(value = "commodities", subgraph = "graph.commodities"),
-      @NamedAttributeNode("valueAddedServiceRequests"),
+      @NamedAttributeNode("valueAddedServices"),
       @NamedAttributeNode("references"),
       @NamedAttributeNode(value = "documentParties", subgraph = "graph.documentParties"),
       @NamedAttributeNode("shipmentLocations")
@@ -196,7 +196,7 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "booking")
-  private Set<ValueAddedServiceRequest> valueAddedServiceRequests;
+  private Set<ValueAddedService> valueAddedServices;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

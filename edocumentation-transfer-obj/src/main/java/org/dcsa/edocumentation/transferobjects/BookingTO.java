@@ -157,8 +157,7 @@ public record BookingTO(
   List<CommodityTO> commodities,
 
   @Valid
-  @JsonProperty("valueAddedServices")
-  List<ValueAddedServiceRequestTO> valueAddedServiceRequests,
+  List<ValueAddedServiceTO> valueAddedServices,
 
   @Valid
   List<ReferenceTO> references,
