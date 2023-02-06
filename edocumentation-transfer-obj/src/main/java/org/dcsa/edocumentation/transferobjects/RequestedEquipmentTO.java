@@ -2,12 +2,13 @@ package org.dcsa.edocumentation.transferobjects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
-import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
+import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
+import org.dcsa.skernel.infrastructure.validation.ISO6346EquipmentReference;
+
 import java.util.List;
 
 public record RequestedEquipmentTO(
@@ -22,7 +23,7 @@ public record RequestedEquipmentTO(
   @NotNull
   Float units,
 
-  List<@NotBlank @Size(max = 15) String> equipmentReferences,
+  List<@NotBlank @Size(max = 15) @ISO6346EquipmentReference String> equipmentReferences,
 
   @NotNull
   Boolean isShipperOwned,
