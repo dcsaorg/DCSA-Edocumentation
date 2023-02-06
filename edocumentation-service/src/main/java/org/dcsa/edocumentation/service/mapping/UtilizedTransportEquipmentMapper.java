@@ -18,6 +18,6 @@ public interface UtilizedTransportEquipmentMapper {
   @Mapping(source = "requestedEquipmentGroup.id", target = "id", ignore = true)
   UtilizedTransportEquipment toDAO(UtilizedTransportEquipmentTO utilizedTransportEquipmentTO, RequestedEquipmentGroup requestedEquipmentGroup);
 
-  @Mapping(source = "utilizedTransportEquipment.requestedEquipmentGroup.activeReeferSettings", target = "activeReeferSettings", qualifiedByName = "toShippingInstructionActiveReeferSettingsTO")
+  @Mapping(source = "utilizedTransportEquipment.requestedEquipmentGroup.activeReeferSettings", target = "activeReeferSettings")
   UtilizedTransportEquipmentTO toDTO(UtilizedTransportEquipment utilizedTransportEquipment);
 }

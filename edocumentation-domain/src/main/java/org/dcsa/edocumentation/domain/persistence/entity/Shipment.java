@@ -188,7 +188,7 @@ public class Shipment {
         // we assume it can be handled.
         continue;
       }
-      UnfilledRequestedEquipmentGroup unfilledGroup = table.computeIfAbsent(requestedEquipmentGroup.getMatchKey(), k -> new UnfilledRequestedEquipmentGroup());
+      UnfilledRequestedEquipmentGroup unfilledGroup = new UnfilledRequestedEquipmentGroup();
       unfilledGroup.add(requestedEquipmentGroup);
     }
     return table;

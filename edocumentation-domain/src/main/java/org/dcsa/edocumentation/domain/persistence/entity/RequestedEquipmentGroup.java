@@ -77,12 +77,4 @@ public class RequestedEquipmentGroup {
   public void equipmentProvidedForShipment(Shipment shipment) {
     this.shipment = shipment;
   }
-
-  public String getMatchKey() {
-    String reeferKey = "<NONE>";
-    if (activeReeferSettings != null) {
-      reeferKey = activeReeferSettings.getType().name();
-    }
-    return requestedEquipmentIsoEquipmentCode + "/" + reeferKey;
-  }
 }

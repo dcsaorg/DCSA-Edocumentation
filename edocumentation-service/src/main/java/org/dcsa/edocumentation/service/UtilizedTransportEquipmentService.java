@@ -56,7 +56,7 @@ public class UtilizedTransportEquipmentService {
         .confirmedEquipmentIsoEquipmentCode(uteTO.equipment().isoEquipmentCode())
         .confirmedEquipmentUnits(uteTO.equipment().isoEquipmentCode() != null ? 1 : null)
         .isShipperOwned(uteTO.isShipperOwned())
-        .activeReeferSettings(activeReeferSettingsService.createShippingInstructionActiveReeferSettings(uteTO.activeReeferSettings()))
+        .activeReeferSettings(activeReeferSettingsService.createActiveReeferSettings(uteTO.activeReeferSettings()))
         .build());
   }
 }

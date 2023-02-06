@@ -81,7 +81,7 @@ public class RequestedEquipmentGroupServiceTest {
     // Verify
     verify(equipmentService).resolveEquipments(eq(List.of(requestedEquipmentTO)), any(), any());
     verify(requestedEquipmentGroupRepository).save(expectedGroup);
-    verify(activeReeferSettingsService).createBookingActiveReeferSettings(requestedEquipmentTO.activeReeferSettings());
+    verify(activeReeferSettingsService).createActiveReeferSettings(requestedEquipmentTO.activeReeferSettings());
     verify(utilizedTransportEquipmentRepository).saveAll(any());
   }
 }

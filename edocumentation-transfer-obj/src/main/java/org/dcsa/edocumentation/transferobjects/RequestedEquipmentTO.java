@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.transferobjects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
 
@@ -29,7 +30,8 @@ public record RequestedEquipmentTO(
   @Size(max = 100)
   String commodityRequestedEquipmentLink,
 
-  BookingActiveReeferSettingsTO activeReeferSettings
+  @Valid
+  ActiveReeferSettingsTO activeReeferSettings
 ) {
   @Builder(toBuilder = true)
   public RequestedEquipmentTO { }
