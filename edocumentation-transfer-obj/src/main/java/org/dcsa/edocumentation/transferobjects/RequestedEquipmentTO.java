@@ -28,7 +28,7 @@ public record RequestedEquipmentTO(
   @NotNull
   Float units,
 
-  List<@NotBlank @Size(max = 15) @ISO6346EquipmentReference String> equipmentReferences,
+  List<@NotBlank @ISO6346EquipmentReference String> equipmentReferences,
 
   @NotNull
   Boolean isShipperOwned,
