@@ -6,6 +6,11 @@ dcsa:
         version: 3.0.0
       - prefix: /bkg/v2
         version: 2.0.0
+  dataloader:
+    autoload: [reference]
+    sources: classpath:db/dataloader-sources.yml
+    endpoint: /unofficial/dataloader/load
+    sampledata.hostport: ${sampledata_hostport}
 
 spring:
   application:
@@ -14,10 +19,8 @@ spring:
     ebl-context-path: /ebl/v3
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${db_hostname}/dcsa_openapi
+    url: jdbc:postgresql://${db_hostname}/dcsa_edoc
     username: dcsa_db_owner
-    hikari:
-      schema: dcsa_im_v3_0
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate.ddl-auto: validate
@@ -29,8 +32,8 @@ spring:
   profiles:
     active: nosecurity
     group:
-      dev: nosecurity, logsql, localdb
-      test: nosecurity, logsql, localdb
+      dev: nosecurity, logsql, localdb, loadtestdata
+      test: nosecurity, logsql, localdb, loadtestdata
       prod: default
 
 server:
@@ -74,9 +77,25 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${db_hostname:localhost}/dcsa_openapi
+    url: jdbc:postgresql://${db_hostname:localhost}/dcsa_edoc
     username: dcsa_db_owner
     password: 9c072fe8-c59c-11ea-b8d1-7b6577e9f3f5
+
+dcsa:
+  dataloader:
+    sampledata:
+      hostport: ${sampledata_hostport:localhost:9081}
+
+---
+# A profile for autoloading reference and test data
+spring:
+  config:
+    activate:
+      on-profile: loadtestdata
+
+dcsa:
+  dataloader:
+    autoload: [test]
 
 
 ---

@@ -53,7 +53,7 @@ jobs:
           if [[ "$status" != "UP" ]]; then
             curl -v http://localhost:9090/actuator/health || :
             docker ps || :
-            docker logs dcsa-edocumentation_dcsa-edocumentation_1 || :
+            docker logs dcsa_edocumentation || :
             exit 1
           fi
 
