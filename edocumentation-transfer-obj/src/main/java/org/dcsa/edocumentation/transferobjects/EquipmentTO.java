@@ -7,11 +7,12 @@ import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.dcsa.skernel.infrastructure.validation.ISO6346EquipmentReference;
 
 @AllOrNone({"tareWeight", "weightUnit"})
 public record EquipmentTO(
   @NotNull(message = "EquipmentReference is required.")
-  @Size(max = 15)
+  @ISO6346EquipmentReference
   String equipmentReference,
 
   @JsonProperty("ISOEquipmentCode")
