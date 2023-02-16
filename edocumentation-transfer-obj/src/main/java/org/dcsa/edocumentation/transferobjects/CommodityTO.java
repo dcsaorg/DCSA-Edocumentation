@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.transferobjects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.VolumeUnit;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
@@ -20,7 +21,8 @@ public record CommodityTO(
   @NotBlank @Size(max = 550)
   String commodityType,
 
-  @Size(max = 10)
+  @Pattern(regexp = "^[0-9]+$")
+  @Size(min = 6, max = 10)
   @JsonProperty("HSCode")
   String hsCode,
 
