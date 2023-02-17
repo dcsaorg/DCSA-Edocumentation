@@ -1,15 +1,16 @@
 package org.dcsa.edocumentation.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
+import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
 import org.dcsa.edocumentation.domain.persistence.repository.RequestedEquipmentGroupRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.UtilizedTransportEquipmentRepository;
 import org.dcsa.edocumentation.service.mapping.UtilizedTransportEquipmentMapper;
+import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.edocumentation.transferobjects.UtilizedTransportEquipmentTO;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,32 +32,20 @@ public class UtilizedTransportEquipmentService {
   public Map<String, UtilizedTransportEquipment> createUtilizedTransportEquipment(
       Collection<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs) {
 
-    equipmentService.resolveEquipments(utilizedTransportEquipmentTOs, UtilizedTransportEquipmentTO::isShipperOwned, e -> Stream.of(e.equipment()));
+    Map<String, Equipment> equipmentMap = equipmentService.resolveEquipments(
+      utilizedTransportEquipmentTOs, UtilizedTransportEquipmentTO::isShipperOwned, this::extractEquipment);
 
-    return utilizedTransportEquipmentRepository
-        .saveAll(
-            utilizedTransportEquipmentTOs.stream()
-                .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, createRequestedEquipmentGroup(ute)))
-                .toList())
-        .stream()
-        .collect(
-            Collectors.toMap(
-                utilizedTransportEquipment ->
-                    utilizedTransportEquipment.getEquipment().getEquipmentReference(),
-                utilizedTransportEquipment -> utilizedTransportEquipment));
+    return utilizedTransportEquipmentTOs.stream()
+      .collect(Collectors.toMap(UtilizedTransportEquipmentTO::extractEquipmentReference, ute -> saveUTE(ute, equipmentMap)));
   }
 
-  private RequestedEquipmentGroup createRequestedEquipmentGroup(UtilizedTransportEquipmentTO uteTO) {
-    if (uteTO == null || uteTO.activeReeferSettings() == null) {
-      return null;
-    }
+  private UtilizedTransportEquipment saveUTE(UtilizedTransportEquipmentTO to, Map<String, Equipment> equipmentMap) {
+    return utilizedTransportEquipmentRepository.save(utilizedTransportEquipmentMapper.toDAO(to, equipmentMap.get(to.extractEquipmentReference())));
+  }
 
-    return requestedEquipmentGroupRepository.save(
-      RequestedEquipmentGroup.builder()
-        .confirmedEquipmentIsoEquipmentCode(uteTO.equipment().isoEquipmentCode())
-        .confirmedEquipmentUnits(uteTO.equipment().isoEquipmentCode() != null ? 1 : null)
-        .isShipperOwned(uteTO.isShipperOwned())
-        .activeReeferSettings(activeReeferSettingsService.createActiveReeferSettings(uteTO.activeReeferSettings()))
-        .build());
+  private Stream<EquipmentTO> extractEquipment(UtilizedTransportEquipmentTO to) {
+    return Stream.of(to.isShipperOwned() ?
+      to.equipment() :
+      EquipmentTO.builder().equipmentReference(to.equipmentReference()).build());
   }
 }

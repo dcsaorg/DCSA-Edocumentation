@@ -8,14 +8,19 @@ import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.dcsa.skernel.infrastructure.validation.DisallowIfBoolean;
+import org.dcsa.skernel.infrastructure.validation.RequiredIfFalse;
+import org.dcsa.skernel.infrastructure.validation.RequiredIfTrue;
+
 import java.util.List;
 
+@RequiredIfTrue(isFieldReferenceRequired = "isShipperOwned", fieldReference = "equipment")
+@DisallowIfBoolean(ifField = "isShipperOwned", hasValue = false, thenDisallow = "equipment")
+@RequiredIfFalse(ifFalse = "isShipperOwned", thenNotNull = "equipmentReference")
+@DisallowIfBoolean(ifField = "isShipperOwned", hasValue = true, thenDisallow = "equipmentReference")
 @ValidUtilizedTransportEquipment
 @AllOrNone({"cargoGrossVolumeUnit", "cargoGrossVolume"})
 public record UtilizedTransportEquipmentTO(
-
-  @NotNull(message = "Equipment is required.")
-  EquipmentTO equipment,
 
   @NotNull(message = "Cargo gross weight is required.")
   Double cargoGrossWeight,
@@ -31,12 +36,17 @@ public record UtilizedTransportEquipmentTO(
   @NotNull(message = "Is shipper owned is required.")
   Boolean isShipperOwned,
 
+  String equipmentReference,
   @Valid
-  List<SealTO> seals,
+  EquipmentTO equipment,
 
   @Valid
-  ActiveReeferSettingsTO activeReeferSettings
+  List<SealTO> seals
 ) {
   @Builder
   public UtilizedTransportEquipmentTO{}
+
+  public String extractEquipmentReference() {
+    return isShipperOwned ? equipment.equipmentReference() : equipmentReference;
+  }
 }

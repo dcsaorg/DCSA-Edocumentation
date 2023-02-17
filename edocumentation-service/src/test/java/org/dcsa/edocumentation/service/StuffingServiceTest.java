@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,12 +61,11 @@ class StuffingServiceTest {
     shippingInstruction = ShippingInstructionDataFactory.singleShallowShippingInstruction();
     savedUtilizedTransportEquipments =
         UtilizedTransportEquipmentEquipmentDataFactory.multipleCarrierOwned().stream()
-            .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, null))
+            .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, Equipment.builder().equipmentReference(ute.equipmentReference()).build()))
             .collect(
                 Collectors.toMap(
-                    utilizedTransportEquipment ->
-                        utilizedTransportEquipment.getEquipment().getEquipmentReference(),
-                    utilizedTransportEquipment -> utilizedTransportEquipment));
+                    utilizedTransportEquipment -> utilizedTransportEquipment.getEquipment().getEquipmentReference(),
+                    Function.identity()));
 
     consignmentItemTOs = List.of(ConsignmentItemDataFactory.singleConsignmentItem());
     shipment = ShipmentDataFactory.singleShipmentWithBooking();
@@ -133,12 +133,11 @@ class StuffingServiceTest {
       .thenReturn(Optional.of(shipment));
 
     savedUtilizedTransportEquipments = UtilizedTransportEquipmentEquipmentDataFactory.multipleShipperOwned().stream()
-      .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, null))
+      .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, equipmentMapper.toDAO(ute.equipment())))
       .collect(
         Collectors.toMap(
-          utilizedTransportEquipment ->
-            utilizedTransportEquipment.getEquipment().getEquipmentReference(),
-          utilizedTransportEquipment -> utilizedTransportEquipment));
+          utilizedTransportEquipment -> utilizedTransportEquipment.getEquipment().getEquipmentReference(),
+          Function.identity()));
 
     ConcreteRequestErrorMessageException exceptionCaught =
       assertThrows(
