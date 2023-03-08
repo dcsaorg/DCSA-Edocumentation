@@ -10,7 +10,6 @@ dcsa:
     autoload: [reference]
     sources: classpath:db/dataloader-sources.yml
     endpoint: /unofficial/dataloader/load
-    sampledata.hostport: ${sampledata_hostport}
 
 spring:
   application:
@@ -80,11 +79,6 @@ spring:
     url: jdbc:postgresql://${db_hostname:localhost}/dcsa_edoc
     username: dcsa_db_owner
     password: 9c072fe8-c59c-11ea-b8d1-7b6577e9f3f5
-
-dcsa:
-  dataloader:
-    sampledata:
-      hostport: ${sampledata_hostport:localhost:9081}
 
 ---
 # A profile for autoloading reference and test data

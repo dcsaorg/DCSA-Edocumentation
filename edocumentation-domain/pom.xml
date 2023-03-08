@@ -52,4 +52,40 @@
 		</dependency>
 	</dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/sample-data/db</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${maven.multiModuleProjectDirectory}/DCSA-Sample-Data/nginx</directory>
+									<excludes>
+										<exclude>Dockerfile</exclude>
+									</excludes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>${basedir}/target/sample-data</directory>
+			</resource>
+		</resources>
+	</build>
 </project>

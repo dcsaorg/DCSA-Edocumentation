@@ -9,7 +9,6 @@ services:
             - 9090:9090
         environment:
           - "db_hostname=dcsa-test-db"
-          - "sampledata_hostport=dcsa-sample-data:80"
           - "SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-nosecurity}"
           - "SPRING_DATASOURCE_PASSWORD=9c072fe8-c59c-11ea-b8d1-7b6577e9f3f5"
           - "ROOT_LOG_LEVEL=${ROOT_LOG_LEVEL:-INFO}"
@@ -20,17 +19,8 @@ services:
             max-size: 200k
         links:
             - dcsa-test-db:dcsa-test-db
-            - dcsa-sample-data:dcsa-sample-data
         depends_on:
             - dcsa-test-db
-            - dcsa-sample-data
-
-    dcsa-sample-data:
-        container_name: dcsa_sample_data
-        build: DCSA-Sample-Data/nginx/
-        restart: always
-        ports:
-            - 9081:80
 
     dcsa-test-db:
         image: postgres:15-alpine
