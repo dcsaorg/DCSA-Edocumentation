@@ -21,15 +21,15 @@ defaults:
     onChecksumError: REFRESH
 
 sources:
-  - path: http://${dcsa.dataloader.sampledata.hostport}/referencedata.d
+  - path: classpath:db/referencedata.d
     type: csv
     groups: [reference]
 
-  - path: http://${dcsa.dataloader.sampledata.hostport}/samples.d
+  - path: classpath:db/samples.d
     type: csv
     groups: [sample]
 
-  - path: http://${dcsa.dataloader.sampledata.hostport}/implementation-detail-data.d
+  - path: classpath:db/implementation-detail-data.d
     type: csv
     groups: [impl-detail]
     dependsOn: [reference, sample]
