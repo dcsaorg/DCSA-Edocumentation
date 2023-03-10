@@ -26,7 +26,7 @@ OR using **docker-compose**
 docker-compose up -d -V --build
 ```
 
-6) Verify if the application is running,
+4) Verify if the application is running,
 ```
 curl http://localhost:9090/v1/actuator/health
 ```
@@ -35,4 +35,16 @@ curl http://localhost:9090/v1/actuator/health
 
 This reference implementation does not do any authentication/authorization and should not be used
 in production as is. Using this as is in production would expose data for all parties to all other
-parties with out checking weather they should have access.
+parties without checking whether they should have access.
+
+## Testing
+
+DCSA maintains a number of integration tests in the [postman_collection.json](postman_collection.json).
+While they have dependencies on data loading, they may be useful as a starting point of other parties
+that are implementing the standard.  The tests are expected to work out of the box on the reference
+implementation itself.
+
+The tests may be useful to others as a starting point, but you may need to edit the payloads to work with
+your specific test data.
+
+The tests can either be imported in to postman or run via newman `newman run postman_collection.json`.
