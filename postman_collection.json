@@ -304,6 +304,7 @@
 					]
 				}
 			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can request a list of their requested bookings.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification.",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -627,6 +628,7 @@
 					]
 				}
 			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can request a list of confirmed bookings (also called a shipment).\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification.",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1029,6 +1031,7 @@
 					]
 				}
 			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can request a list of their shipping instructions or transport document amendment requests.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification.",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1057,7 +1060,7 @@
 			]
 		},
 		{
-			"name": "Booking request",
+			"name": "GET Booking request",
 			"item": [
 				{
 					"name": "Positive test cases",
@@ -1289,6 +1292,7 @@
 					]
 				}
 			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can request the full details of one of their booking requests.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification.",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1432,6 +1436,7 @@
 					]
 				}
 			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can request the full details of one of their shipping instruction or one of their transport document amendment requests.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification.",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1788,7 +1793,8 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
 							"name": "Cancel Booking not found",
@@ -1892,7 +1898,8 @@
 						}
 					]
 				}
-			]
+			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can cancel a booking request.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification."
 		},
 		{
 			"name": "Put booking",
@@ -2152,7 +2159,8 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "This folder is one test case that requires multiple API requests to complete."
 						}
 					],
 					"event": [
@@ -2503,7 +2511,8 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
 							"name": "Attempt PUT non-existing booking",
@@ -2574,7 +2583,8 @@
 						}
 					]
 				}
-			]
+			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can update/amend the bookings by updating the booking request related to the booking.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification."
 		},
 		{
 			"name": "Post booking",
@@ -2849,7 +2859,8 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "This folder is one test case that requires multiple API requests to complete."
 						}
 					],
 					"event": [
@@ -3143,7 +3154,8 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"description": "This folder is one test case that requires multiple API requests to complete."
 						}
 					],
 					"event": [
@@ -3167,7 +3179,8 @@
 						}
 					]
 				}
-			]
+			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can create a new booking request.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification."
 		},
 		{
 			"name": "Post Shipping instruction",
@@ -3426,7 +3439,8 @@
 						}
 					]
 				}
-			]
+			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can create a new shipping instruction.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification."
 		},
 		{
 			"name": "Get Shipment",
@@ -3615,6 +3629,7 @@
 					]
 				}
 			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can get the full details of their confirmed bookings (shipments).\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification.",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -4017,6 +4032,7 @@
 					]
 				}
 			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can request a list of their transport documents.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification.",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -4253,6 +4269,7 @@
 					]
 				}
 			],
+			"description": "The tests in this folder is about testing that the shipper (or their delegate) can request the details of a transport document.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification.",
 			"event": [
 				{
 					"listen": "prerequest",
