@@ -19,13 +19,6 @@ CREATE TABLE hs_code (
 );
 
 
-CREATE TABLE value_added_service_code (
-    value_added_service_code varchar(5) PRIMARY KEY,
-    value_added_service_name varchar(100) NOT NULL,
-    value_added_service_description varchar(200) NOT NULL
-);
-
-
 CREATE TABLE reference_type (
     reference_type_code varchar(3) PRIMARY KEY,
     reference_type_name varchar(100) NOT NULL,
@@ -406,14 +399,6 @@ CREATE TABLE shipping_instruction (
     displayed_name_for_place_of_delivery uuid NULL REFERENCES displayed_address(id),
     amendment_to_transport_document_id uuid NULL
 );
-
-
-CREATE TABLE value_added_service (
-    booking_id uuid NOT NULL REFERENCES booking(id),
-    value_added_service_code varchar(5) NOT NULL REFERENCES value_added_service_code(value_added_service_code)
-);
-
-CREATE INDEX ON value_added_service (booking_id);
 
 
 CREATE TABLE transport_document (
