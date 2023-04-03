@@ -24,8 +24,6 @@ public class BookingService {
   private final VoyageService voyageService;
   private final VesselService vesselService;
   private final CommodityService commodityService;
-  private final ValueAddedServiceRequestService valueAddedServiceRequestService;
-  private final RequestedEquipmentGroupService requestedEquipmentGroupService;
   private final ReferenceService referenceService;
   private final DocumentPartyService documentPartyService;
   private final ShipmentLocationService shipmentLocationService;
@@ -90,7 +88,6 @@ public class BookingService {
 
   private void createDeepObjectsForBooking(BookingTO bookingRequest, Booking booking) {
     commodityService.createCommodities(bookingRequest.commodities(), booking);
-    valueAddedServiceRequestService.createValueAddedServiceRequests(bookingRequest.valueAddedServices(), booking);
     referenceService.createReferences(bookingRequest.references(), booking);
     documentPartyService.createDocumentParties(bookingRequest.documentParties(), booking);
     shipmentLocationService.createShipmentLocations(bookingRequest.shipmentLocations(), booking);

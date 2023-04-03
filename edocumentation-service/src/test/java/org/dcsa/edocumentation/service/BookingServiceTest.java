@@ -85,7 +85,6 @@ class BookingServiceTest {
       BookingTO bookingResult = result.get();
       assertEquals("BOOKING_REQ_REF_01", bookingResult.carrierBookingRequestReference());
       assertFalse(bookingResult.commodities().isEmpty());
-      assertFalse(bookingResult.valueAddedServices().isEmpty());
       assertFalse(bookingResult.references().isEmpty());
       assertFalse(bookingResult.shipmentLocations().isEmpty());
     }
@@ -126,7 +125,6 @@ class BookingServiceTest {
     @Mock private VoyageService voyageService;
     @Mock private VesselService vesselService;
     @Mock private CommodityService commodityService;
-    @Mock private ValueAddedServiceRequestService valueAddedServiceRequestService;
     @Mock private RequestedEquipmentGroupService requestedEquipmentGroupService;
     @Mock private ReferenceService referenceService;
     @Mock private DocumentPartyService documentPartyService;
@@ -142,7 +140,7 @@ class BookingServiceTest {
 
     @BeforeEach
     public void resetMocks() {
-      reset(locationService, voyageService, vesselService, commodityService, valueAddedServiceRequestService,
+      reset(locationService, voyageService, vesselService, commodityService,
         requestedEquipmentGroupService, referenceService, documentPartyService, shipmentLocationService,
         bookingRepository, shipmentEventRepository);
     }
@@ -195,7 +193,6 @@ class BookingServiceTest {
       verify(bookingRepository).save(bookingArgumentCaptor.capture());
       verify(shipmentEventRepository).save(shipmentEventArgumentCaptor.capture());
       verify(commodityService).createCommodities(eq(bookingRequest.commodities()), any(Booking.class));
-      verify(valueAddedServiceRequestService).createValueAddedServiceRequests(eq(bookingRequest.valueAddedServices()), any(Booking.class));
       verify(referenceService).createReferences(eq(bookingRequest.references()), any(Booking.class));
       verify(documentPartyService).createDocumentParties(eq(bookingRequest.documentParties()), any(Booking.class));
       verify(shipmentLocationService).createShipmentLocations(eq(bookingRequest.shipmentLocations()), any(Booking.class));
