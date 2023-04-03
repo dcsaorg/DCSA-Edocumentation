@@ -24,6 +24,7 @@ sources:
   - path: classpath:db/referencedata.d
     type: csv
     groups: [reference]
+    excludes: [value_added_service_code]
 
   - path: classpath:db/samples.d
     type: csv
