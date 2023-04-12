@@ -168,7 +168,12 @@ public class TransportDocument implements Persistable<UUID> {
 
   /** Transition the document into its {@link EblDocumentStatus#ISSU} state. */
   public ShipmentEvent issue() {
-    return processTransition(ISSU, null);
+    ShipmentEvent event = processTransition(ISSU, null);
+    if (issueDate == null) {
+      // Ensure we have an issue date.
+      this.issueDate = LocalDate.now();
+    }
+    return event;
   }
 
   /** Transition the document into its {@link EblDocumentStatus#SURR} state. */
