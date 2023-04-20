@@ -69,7 +69,7 @@ jobs:
         id: run-newman
         uses: anthonyvscode/newman-action@v1
         with:
-          collection: DCSA-Edocumentation/postman_collection.json
+          collection: DCSA-Edocumentation/DCSA-EDocumentation.postman_collection.json
           reporters: cli
           insecure: true
 
