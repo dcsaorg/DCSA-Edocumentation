@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /** Emulates SMEs asynchronous validation of a booking. */
 @Slf4j
@@ -27,6 +28,13 @@ public class BookingValidationService {
 
   private final static Set<BkgDocumentStatus> CAN_BE_VALIDATED =
     Set.of(BkgDocumentStatus.RECE, BkgDocumentStatus.PENC);
+  private static final Predicate<LocationType> HAS_SOURCE_LOCATION = code ->
+          code == LocationType.PRE || code == LocationType.POL;
+  private static final Predicate<LocationType> HAS_DESTINATION_LOCATION = code ->
+          code == LocationType.POD || code == LocationType.PDE;
+  private static final Predicate<ShipmentLocation> HAS_SOURCE_OR_DESTINATION_LOCATION =
+      sl -> HAS_SOURCE_LOCATION.test(sl.getShipmentLocationTypeCode())
+              || HAS_DESTINATION_LOCATION.test(sl.getShipmentLocationTypeCode());
 
   public record ValidationResult(BkgDocumentStatus newStatus, String reason) {}
 
@@ -83,29 +91,31 @@ public class BookingValidationService {
       return "Invalid booking: Shipment locations should not be empty";
     }
 
-    boolean hasPREorPOL =
+    boolean slHasPREorPOLs =
         shipmentLocations.stream()
             .map(ShipmentLocation::getShipmentLocationTypeCode)
-            .anyMatch(code -> code == LocationType.PRE || code == LocationType.POL);
+            .anyMatch(HAS_SOURCE_LOCATION);
 
-    if (!hasPREorPOL) {
-      return "No ShipmentLocationTypeCode of PRE or POL found in the shipmentLocations, "
-          + "either one should be provided both is allowed";
+    if (!slHasPREorPOLs) {
+      return "No ShipmentLocationTypeCode of PRE or POL found in the shipmentLocations."
+          + " At least one of them should be provided.";
     }
 
-    boolean hasPODorPDE =
+    boolean slHasPODorPDE =
         shipmentLocations.stream()
             .map(ShipmentLocation::getShipmentLocationTypeCode)
-            .anyMatch(code -> code == LocationType.POD || code == LocationType.PDE);
+            .anyMatch(HAS_DESTINATION_LOCATION);
 
-    if (!hasPODorPDE) {
-      return "No ShipmentLocationTypeCode of POD or PDE found in the shipmentLocations, "
-          + "either one should be provided both is allowed";
+    if (!slHasPODorPDE) {
+      return "No ShipmentLocationTypeCode of POD or PDE found in the shipmentLocations."
+          + "At least one of them should be provided.";
     }
+
 
     var filteredByUNLocationCode =
         shipmentLocations.stream()
             .filter(sl -> sl.getLocation().getUNLocationCode() != null)
+            .filter(HAS_SOURCE_OR_DESTINATION_LOCATION)
             .toList();
 
     var filteredByUNLocationCodeCount = filteredByUNLocationCode.size();
@@ -122,19 +132,23 @@ public class BookingValidationService {
     }
 
     var filteredByAddress =
-            shipmentLocations.stream().filter(sl -> sl.getLocation().getAddress() != null).toList();
+        shipmentLocations.stream()
+                .filter(HAS_SOURCE_OR_DESTINATION_LOCATION)
+                .filter(sl -> sl.getLocation().getAddress() != null).toList();
 
-    var filteredByAddressCount =  filteredByAddress.size();
+    var filteredByAddressCount = filteredByAddress.size();
 
     boolean hasUniqueAddresses =
         shipmentLocations.stream()
+                .filter(HAS_SOURCE_OR_DESTINATION_LOCATION)
                 .filter(sl -> sl.getLocation().getAddress() != null)
                 .map(sl -> sl.getLocation().getAddress())
                 .filter(
                     address ->
                         filteredByAddress.stream()
                             .noneMatch(other -> other.getLocation().getAddress().equals(address)))
-                .count() == filteredByAddressCount;
+                .count()
+            == filteredByAddressCount;
 
     if (!hasUniqueAddresses) {
       return "Duplicate addresses found in shipmentLocations";
