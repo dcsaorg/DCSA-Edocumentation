@@ -34,7 +34,7 @@ import java.util.*;
           attributeNodes = {@NamedAttributeNode("transport")}),
     })
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
@@ -127,7 +127,9 @@ public class Shipment {
       if (booking.getRequestedEquipments().isEmpty()) {
         this.assignedEquipments = Set.of();
       }
+      else{
       throw ConcreteRequestErrorMessageException.invalidInput("equipmentAssignments must be non-empty when the booking requires equipments");
+      }
     }
     for (var equipmentAssignment : equipmentAssignments) {
       var unfilledRequestedEquipmentGroup = requestedEquipmentGroupTable.get(equipmentAssignment.getMatchKey());

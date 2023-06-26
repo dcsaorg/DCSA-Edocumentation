@@ -31,13 +31,10 @@ public record TransportTO(
     @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION, LocationType.FACILITY})
     LocationTO dischargeLocation,
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-        @JsonFormat(pattern = "yyyy-MM-dd")
-        @NotNull(message = "The attribute plannedDepartureDate is required.")
-        OffsetDateTime plannedDepartureDate,
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-        @JsonFormat(pattern = "yyyy-MM-dd")
-        @NotNull(message = "The attribute plannedArrivalDate is required.")
+    @NotNull(message = "The attribute plannedDepartureDate is required.")
+    OffsetDateTime plannedDepartureDate,
+
+    @NotNull(message = "The attribute plannedArrivalDate is required.")
     OffsetDateTime plannedArrivalDate,
     DCSATransportType modeOfTransport,
     @Size(max = 35, message = "The attribute vesselName has a max size of 35.") String vesselName,

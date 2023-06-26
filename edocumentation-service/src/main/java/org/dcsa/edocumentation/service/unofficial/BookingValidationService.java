@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -32,42 +33,58 @@ public class BookingValidationService {
           code == LocationType.PRE || code == LocationType.POL;
   private static final Predicate<LocationType> HAS_DESTINATION_LOCATION = code ->
           code == LocationType.POD || code == LocationType.PDE;
-  private static final Predicate<ShipmentLocation> HAS_SOURCE_OR_DESTINATION_LOCATION =
+  public static final Predicate<ShipmentLocation> HAS_SOURCE_OR_DESTINATION_LOCATION =
       sl -> HAS_SOURCE_LOCATION.test(sl.getShipmentLocationTypeCode())
               || HAS_DESTINATION_LOCATION.test(sl.getShipmentLocationTypeCode());
 
-  public record ValidationResult(BkgDocumentStatus newStatus, String reason) {}
+  public record ValidationResult(BkgDocumentStatus newStatus, Optional<String> reason) {}
 
   @Transactional
   public ValidationResult validateBooking(String carrierBookingRequestReference) {
     Booking booking = bookingRepository.findBookingByCarrierBookingRequestReference(carrierBookingRequestReference)
-      .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound(
-        "No booking found with carrierBookingRequestReference='" + carrierBookingRequestReference + "'"));
+            .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound(
+                    "No booking found with carrierBookingRequestReference='" + carrierBookingRequestReference + "'"));
+
+    ValidationResult validationResult = validateBooking(booking);
+
+    if (validationResult.reason().isEmpty()) {
+      ShipmentEvent shipmentEvent = booking.pendingConfirmation("Booking passed validation", OffsetDateTime.now());
+      bookingRepository.save(booking);
+      shipmentEventRepository.save(shipmentEvent);
+    }
+    return validationResult;
+  }
+
+  @Transactional
+  public ValidationResult validateBooking(Booking booking) {
+    var carrierBookingRequestReference = booking.getCarrierBookingRequestReference();
 
     if (!CAN_BE_VALIDATED.contains(booking.getDocumentStatus())) {
       throw ConcreteRequestErrorMessageException.conflict(
-        "documentStatus must be one of " + CAN_BE_VALIDATED, null);
+              "documentStatus must be one of " + CAN_BE_VALIDATED, null);
     }
 
+    String reason = validateBookingReason(booking);
+    ValidationResult validationResult;
     ShipmentEvent shipmentEvent;
-    String reason = validateBooking(booking);
+
     if (reason == null) {
-      reason = "Booking passed validation";
-      shipmentEvent = booking.pendingConfirmation(reason, OffsetDateTime.now());
       log.debug("Booking {} passed validation", carrierBookingRequestReference);
+      validationResult = new ValidationResult(booking.getDocumentStatus(), Optional.empty());
     } else {
       shipmentEvent = booking.pendingUpdate(reason, OffsetDateTime.now());
       log.debug("Booking {} failed validation because {}", carrierBookingRequestReference, reason);
+      bookingRepository.save(booking);
+      shipmentEventRepository.save(shipmentEvent);
+      validationResult = new ValidationResult(booking.getDocumentStatus(), Optional.of(reason));
     }
-    bookingRepository.save(booking);
-    shipmentEventRepository.save(shipmentEvent);
-    return new ValidationResult(booking.getDocumentStatus(), reason);
+    return validationResult;
   }
 
   /**
    * Subject to change. Reefer will probably change it.
    */
-  private String validateBooking(Booking booking) {
+  private String validateBookingReason(Booking booking) {
     LocalDate today = LocalDate.now();
 
     if (isInThePast(today, booking.getExpectedDepartureDate())) {
