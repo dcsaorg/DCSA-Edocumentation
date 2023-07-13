@@ -1,28 +1,21 @@
 package org.dcsa.edocumentation.service;
 
+import jakarta.transaction.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
-import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
-import org.dcsa.edocumentation.transferobjects.TransportTO;
 import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
-import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class TransportDocumentService {
 
   private final TransportDocumentRepository transportDocumentRepository;
-  private final TransportService transportService;
-  private final ShipmentLocationService shipmentLocationService;
   private final TransportDocumentMapper transportDocumentMapper;
 
   @Transactional
@@ -34,11 +27,9 @@ public class TransportDocumentService {
               TransportDocumentTO transportDocumentTO =
                   transportDocumentMapper.toDTO(transportDocument);
 
+              // FIXME: Go through DAO -> TO mapping with new structure
               return resolveCarrierCodeListProvider(
                       transportDocumentTO.toBuilder(), transportDocument.getCarrier())
-                  .transports(getTransports(transportDocument.getShippingInstruction()))
-                  .shipmentLocations(
-                      getShipmentLocations(transportDocument.getShippingInstruction()))
                   .termsAndConditions(
                     getTermsAndConditions(transportDocument))
                   .declaredValue(
@@ -84,34 +75,14 @@ public class TransportDocumentService {
 
   private TransportDocumentTO.TransportDocumentTOBuilder resolveCarrierCodeListProvider(
       TransportDocumentTO.TransportDocumentTOBuilder builder, Carrier carrier) {
-    if (carrier != null) {
-      if (carrier.getSmdgCode() != null) {
-        builder.carrierCodeListProvider(CarrierCodeListProvider.SMDG);
-        builder.carrierCode(carrier.getSmdgCode());
-      } else if (carrier.getNmftaCode() != null) {
-        builder.carrierCodeListProvider(CarrierCodeListProvider.NMFTA);
-        builder.carrierCode(carrier.getNmftaCode());
-      }
-    } else {
-      throw ConcreteRequestErrorMessageException.notFound(
-          "No Carrier found on the transportdocument.");
+    assert carrier != null;
+    if (carrier.getSmdgCode() != null) {
+      builder.carrierCodeListProvider(CarrierCodeListProvider.SMDG);
+      builder.carrierCode(carrier.getSmdgCode());
+    } else if (carrier.getNmftaCode() != null) {
+      builder.carrierCodeListProvider(CarrierCodeListProvider.NMFTA);
+      builder.carrierCode(carrier.getNmftaCode());
     }
     return builder;
-  }
-
-  private List<TransportTO> getTransports(ShippingInstruction shippingInstruction) {
-    if (shippingInstruction == null) {
-      throw ConcreteRequestErrorMessageException.notFound(
-          "No shipping instruction present for this transportDocument.");
-    }
-    return transportService.findTransportByShipmentId(
-        shippingInstruction.retrieveOneShipment().getId());
-  }
-
-  private List<ShipmentLocationTO> getShipmentLocations(ShippingInstruction shippingInstruction) {
-    return shipmentLocationService.getShipmentLocations(
-        shippingInstruction.getConsignmentItems().stream()
-            .map(ConsignmentItem::getShipment)
-            .toList());
   }
 }

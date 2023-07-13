@@ -31,6 +31,9 @@ public class ConsignmentItem {
   @Column(name = "description_of_goods", nullable = false)
   private String descriptionOfGoods;
 
+  @Column(name = "hs_code", nullable = false)
+  private String hsCode;
+
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -61,4 +64,9 @@ public class ConsignmentItem {
   // Since the cargoItem.id is generated it can happen that two cargoItems have the same values and
   // therefore cannot be added to the set
   private List<CargoItem> cargoItems;
+
+  @OrderColumn(name = "list_order")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "consignment_item_id")
+  private List<CustomsReference> customsReferences;
 }

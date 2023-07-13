@@ -1,10 +1,9 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
+import lombok.*;
 
 @Data
 @Builder

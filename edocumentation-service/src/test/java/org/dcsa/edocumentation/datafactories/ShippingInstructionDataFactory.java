@@ -1,19 +1,14 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
-import org.dcsa.edocumentation.domain.persistence.entity.DisplayedAddress;
-import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
-import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.VolumeUnit;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
+import org.dcsa.edocumentation.domain.persistence.entity.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.skernel.domain.persistence.entity.Address;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -63,16 +58,40 @@ public class ShippingInstructionDataFactory {
         .build())
       .build();
 
-    Shipment shipments = Shipment.builder()
-        .carrierBookingReference(UUID.randomUUID().toString())
-        .shipmentCreatedDateTime(OffsetDateTime.now())
-        .shipmentCreatedDateTime(OffsetDateTime.now())
-        .termsAndConditions("dummy terms and conditions")
-        .booking(BookingDataFactory.singleShallowBooking())
-        .carrier(Carrier.builder()
-          .carrierName("dummy carrier")
-          .build())
-      .build();
+    Shipment shipments =
+        Shipment.builder()
+            .carrierBookingReference(UUID.randomUUID().toString())
+            .shipmentCreatedDateTime(OffsetDateTime.now())
+            .shipmentCreatedDateTime(OffsetDateTime.now())
+            .termsAndConditions("dummy terms and conditions")
+            .booking(BookingDataFactory.singleShallowBooking())
+          .shipmentLocations(
+            Set.of(
+              ShipmentLocation.builder()
+                .location(Location.builder().UNLocationCode("DKCPH").build())
+                .shipmentLocationTypeCode(LocationType.POL)
+                .build(),
+              ShipmentLocation.builder()
+                .location(Location.builder().UNLocationCode("DEHAM").build())
+                .shipmentLocationTypeCode(LocationType.POD)
+                .build()
+            ))
+            .shipmentTransports(Set.of(
+              ShipmentTransport.builder()
+                .transport(Transport.builder()
+                  .loadTransportCall(TransportCall.builder()
+                    .eventDateTimeDeparture(OffsetDateTime.of(2020, 1, 1, 1, 1, 1, 0, ZoneOffset.UTC))
+                    .location(Location.builder().UNLocationCode("NLRTM").build())
+                    .build())
+                  .dischargeTransportCall(TransportCall.builder()
+                    .eventDateTimeArrival(OffsetDateTime.of(2020, 1, 8, 1, 1, 1, 0, ZoneOffset.UTC))
+                    .location(Location.builder().UNLocationCode("USMIA").build())
+                    .build())
+                  .build())
+                .build()
+            ))
+            .carrier(Carrier.builder().carrierName("dummy carrier").build())
+            .build();
 
     Set<ConsignmentItem> consignmentItems = Set.of(ConsignmentItem.builder()
       .shipment(shipments)

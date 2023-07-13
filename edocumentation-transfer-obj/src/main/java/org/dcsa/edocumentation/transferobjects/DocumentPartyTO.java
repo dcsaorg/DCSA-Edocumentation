@@ -15,6 +15,8 @@ public record DocumentPartyTO(
   @NotNull
   PartyFunction partyFunction,
 
+  // TODO: Missing partyContactDetails here
+
   @Size(max = 5)
   List<@Size(max = 35) String> displayedAddress,
 

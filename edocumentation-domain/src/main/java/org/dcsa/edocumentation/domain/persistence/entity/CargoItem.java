@@ -22,9 +22,6 @@ public class CargoItem {
   @Column(name = "id", nullable = false)
   private UUID id;
 
-  @Column(name = "number_of_packages")
-  private Integer numberOfPackages;
-
   @Column(name = "weight")
   private Double weight;
 
@@ -38,12 +35,6 @@ public class CargoItem {
   @Column(name = "volume_unit")
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnit;
-
-  @Column(name = "package_code")
-  private String packageCode;
-
-  @Column(name = "package_name_on_bl")
-  private String packageNameOnBl;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

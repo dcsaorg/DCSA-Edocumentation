@@ -1,5 +1,6 @@
 package org.dcsa.edocumentation.transferobjects;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.VolumeUnit;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
@@ -15,10 +16,8 @@ public record CargoItemTO(
 
   @Size(max = 15)
   @NotNull(message = "Equipment reference is required.")
+  @Pattern(regexp = "^\\S+(\\s+\\S+)*$")
   String equipmentReference,
-
-  @NotNull
-  Integer numberOfPackages,
 
   @NotNull Double weight,
 
@@ -29,13 +28,9 @@ public record CargoItemTO(
 
   VolumeUnit volumeUnit,
 
-  @Size(max = 3)
-  @NotNull
-  String packageCode,
+  // TODO: Missing outerPackaging (DG)
 
-  @Size(max = 50)
-  String packageNameOnBL,
-
+  // TODO: cargoLineItems have been replaced by shipping marks.
   @Valid
   List<CargoLineItemTO> cargoLineItems
 ) {

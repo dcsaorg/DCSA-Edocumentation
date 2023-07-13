@@ -3,16 +3,11 @@ package org.dcsa.edocumentation.domain.persistence.entity.enums;
 public enum ReferenceTypeCode {
   FF,
   SI,
-  PO,
-  CR,
+  SPO,
+  CPO,
   AAO,
   ECR,
   CSI,
   BPR,
   BID,
-  EQ,
-  RUC,
-  DUE,
-  CER,
-  AES
 }

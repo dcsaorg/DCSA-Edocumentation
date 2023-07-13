@@ -1,5 +1,3 @@
-
-
 CREATE TABLE shipment_event_type (
     shipment_event_type_code varchar(4) PRIMARY KEY,
     shipment_event_type_name varchar(30) NOT NULL,
@@ -311,6 +309,7 @@ CREATE TABLE active_reefer_settings (
     is_ventilation_open boolean NOT NULL,
     is_drainholes_open boolean NOT NULL,
     is_bulb_mode boolean NOT NULL,
+    is_controlled_atmosphere_required boolean NOT NULL,
     temperature_setpoint real NOT NULL,
     temperature_unit varchar(3) NOT NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (temperature_unit IN ('CEL','FAH')),
     o2_setpoint real NULL,
@@ -374,8 +373,8 @@ CREATE TABLE displayed_address (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     address_line_1 varchar(35),
     address_line_2 varchar(35),
-    address_line_3 varchar(35), 
-    address_line_4 varchar(35), 
+    address_line_3 varchar(35),
+    address_line_4 varchar(35),
     address_line_5 varchar(35)
 );
 
@@ -521,7 +520,8 @@ CREATE TABLE consignment_item (
     description_of_goods text NOT NULL,
     shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
     shipment_id uuid NOT NULL REFERENCES shipment (id),
-    commodity_id uuid NULL REFERENCES commodity (id)
+    commodity_id uuid NULL REFERENCES commodity (id),
+    hs_code varchar(10) NOT NULL REFERENCES hs_code (hs_code) -- TODO: Should be a list
 );
 
 -- Supporting FK constraints
@@ -537,15 +537,11 @@ CREATE TABLE cargo_item (
     volume real NULL,
     weight_unit varchar(3) NOT NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (weight_unit IN ('KGM','LBR')),
     volume_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (volume_unit IN ('MTQ','FTQ')),
-    number_of_packages integer NOT NULL,
-    package_code varchar(3) NOT NULL REFERENCES package_code (package_code),
-    utilized_transport_equipment_id uuid NOT NULL REFERENCES utilized_transport_equipment (id),
-    package_name_on_bl varchar(50) NULL
+    utilized_transport_equipment_id uuid NOT NULL REFERENCES utilized_transport_equipment (id)
 );
 
 -- Supporting FK constraints
 CREATE INDEX ON cargo_item (consignment_item_id);
-CREATE INDEX ON cargo_item (package_code);
 CREATE INDEX ON cargo_item (utilized_transport_equipment_id);
 
 
@@ -571,6 +567,18 @@ CREATE TABLE reference (
 
 CREATE INDEX ON reference (booking_id);
 CREATE INDEX ON reference (consignment_item_id);
+
+
+CREATE TABLE customs_reference (
+  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  shipping_instruction_id uuid NULL REFERENCES shipping_instruction (id),
+  consignment_item_id uuid NULL REFERENCES consignment_item(id),
+  utilized_transport_equipment_id uuid NULL REFERENCES utilized_transport_equipment(id),
+  list_order int NOT NULL default 0,
+  type varchar(50) NOT NULL,
+  country_code varchar(2) NOT NULL CHECK ( country_code ~ '^[A-Z]{2}$' ),
+  value varchar(100) NOT NULL
+);
 
 
 CREATE TABLE seal_source (

@@ -14,11 +14,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventTypeCode;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
-import org.dcsa.edocumentation.service.mapping.ActiveReeferSettingsMapper;
-import org.dcsa.edocumentation.service.mapping.BookingMapper;
-import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
-import org.dcsa.edocumentation.service.mapping.ModeOfTransportMapper;
-import org.dcsa.edocumentation.service.mapping.RequestedEquipmentGroupMapper;
+import org.dcsa.edocumentation.service.mapping.*;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.skernel.domain.persistence.entity.Location;
@@ -59,6 +55,8 @@ class BookingServiceTest {
 
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
+
+    @Spy private DocumentPartyMapper documentPartyMapper = Mappers.getMapper(DocumentPartyMapper.class);
     @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
     @Spy private ActiveReeferSettingsMapper activeReeferSettingsMapper = Mappers.getMapper(ActiveReeferSettingsMapper.class);
 
@@ -69,9 +67,10 @@ class BookingServiceTest {
       LocationMapper locationMapper = new LocationMapper(addressMapper);
       DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
       ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
-      ReflectionTestUtils.setField(bookingMapper, "displayedAddressMapper", displayedAddressMapper);
+      ReflectionTestUtils.setField(bookingMapper, "documentPartyMapper", documentPartyMapper);
       ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
+      ReflectionTestUtils.setField(documentPartyMapper, "displayedAddressMapper", displayedAddressMapper);
     }
 
     @Test
@@ -134,6 +133,7 @@ class BookingServiceTest {
     @Mock private BookingRepository bookingRepository;
     @Mock private ShipmentEventRepository shipmentEventRepository;
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
+    @SuppressWarnings({"unused"}) /* It gets auto-injected */
     @Spy private ModeOfTransportMapper modeOfTransportMapper = Mappers.getMapper(ModeOfTransportMapper.class);
 
     @InjectMocks private BookingService bookingService;

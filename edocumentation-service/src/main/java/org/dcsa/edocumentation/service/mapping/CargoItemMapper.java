@@ -1,7 +1,6 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import org.dcsa.edocumentation.domain.persistence.entity.CargoItem;
-import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
 import org.dcsa.edocumentation.transferobjects.CargoItemTO;
 import org.mapstruct.Mapper;

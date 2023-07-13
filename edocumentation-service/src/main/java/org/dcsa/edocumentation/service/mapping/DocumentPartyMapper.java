@@ -2,12 +2,12 @@ package org.dcsa.edocumentation.service.mapping;
 
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
-import org.dcsa.edocumentation.transferobjects.PartyContactDetailsTO;
-import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {
+  DisplayedAddressMapper.class
+})
 public interface DocumentPartyMapper {
 
   //ToDO can be removed when booking takes the same approach as Shipping instruction for setting the FK
@@ -19,4 +19,9 @@ public interface DocumentPartyMapper {
 
   @Mapping(source = "documentPartyTO.displayedAddress", target = "displayedAddress", ignore = true)
   DocumentParty toDAO(DocumentPartyTO documentPartyTO);
+
+  @Mapping(
+    target = "displayedAddress"
+  )
+  DocumentPartyTO toTO(DocumentParty documentParty);
 }

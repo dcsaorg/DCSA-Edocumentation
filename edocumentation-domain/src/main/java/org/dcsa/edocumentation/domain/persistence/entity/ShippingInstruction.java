@@ -175,6 +175,11 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @OneToMany(mappedBy = "shippingInstructionID")
   private Set<Reference> references;
 
+  @OrderColumn(name = "list_order")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "shipping_instruction_id")
+  private List<CustomsReference> customsReferences;
+
   // Todo consider if it makes sense to move this to a validation annotation
   public Boolean hasOnlyConfirmedBookings() {
 
