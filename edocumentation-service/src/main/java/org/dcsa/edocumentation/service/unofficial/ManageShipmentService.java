@@ -216,9 +216,7 @@ public class ManageShipmentService {
                     || sl.shipmentLocationTypeCode().equals(ShipmentLocationTypeCode.PDE))
             .count();
 
-    if ((countOfPreAndPde == 0 && transportToList.size() < 1)
-            || (countOfPreAndPde == 1 && transportToList.size() < 2)
-            || (countOfPreAndPde == 2 && transportToList.size() < 3)) {
+    if (countOfPreAndPde >= transportToList.size()) {
       throw ConcreteRequestErrorMessageException.invalidInput("Transport plan does not meet the minimum required length.");
     }
     validateTransportStages(transportToList, shipmentLocationTOS, firstOccurrences);
