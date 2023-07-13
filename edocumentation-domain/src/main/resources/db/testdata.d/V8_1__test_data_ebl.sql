@@ -51,11 +51,11 @@ INSERT INTO location (
 ), (
     uuid('286c605e-4043-11eb-9c0b-7b4196cf71fa'),
     'Port of Singapore',
-    'USMIA'
+    'SGSIN'
 ), (
     uuid('770b7624-403d-11eb-b44b-d3f4ad185386'),
     'Port of Rotterdam',
-    'USMIA'
+    'NLRTM'
 ), (
     uuid('770b7624-403d-11eb-b44b-d3f4ad185387'),
     'Genneb',
@@ -66,7 +66,7 @@ INSERT INTO location (
     'USMIA'
 ), (
     uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
-    'The Warehouse',
+    'Port of Miami',
     'USMIA'
 );
 
@@ -409,6 +409,26 @@ INSERT INTO transport_call (
     null,
     (SELECT id FROM voyage WHERE carrier_voyage_number = '3418W'),
     (SELECT id FROM voyage WHERE carrier_voyage_number = '3419E')
+), (
+    '8d8ba2d3-5ef4-457c-a526-45cb4e290e9a'::uuid,
+    'TC-REF-TD-NLRTM',
+    1,
+    'POTE',
+    uuid('770b7624-403d-11eb-b44b-d3f4ad185386'),
+    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'VESSEL'),
+    null,
+    (SELECT id FROM voyage WHERE carrier_voyage_number = '3418W'),
+    (SELECT id FROM voyage WHERE carrier_voyage_number = '3419E')
+), (
+    '1f9afa63-2711-407f-a85e-0a196498367c'::uuid,
+    'TC-REF-TD-NLRTM',
+    1,
+    'POTE',
+    uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
+    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'VESSEL'),
+    null,
+    (SELECT id FROM voyage WHERE carrier_voyage_number = '3418W'),
+    (SELECT id FROM voyage WHERE carrier_voyage_number = '3419E')
 );
 
 INSERT INTO transport (
@@ -435,6 +455,12 @@ INSERT INTO transport (
     'Transport name yy',
     '770b7624-403d-11eb-b44b-d3f4ad185387'::uuid,
     '770b7624-403d-11eb-b44b-d3f4ad185388'::uuid
+), (
+    '561a5606-402e-11eb-b19a-0f3aa4962e3e'::uuid,
+    'transport reference yy',
+    'Transport name yy',
+    '8d8ba2d3-5ef4-457c-a526-45cb4e290e9a'::uuid,
+    '1f9afa63-2711-407f-a85e-0a196498367c'::uuid
 );
 
 INSERT INTO shipment_transport (
@@ -467,17 +493,10 @@ INSERT INTO shipment_transport (
     true
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
-      uuid('561a5606-402e-11eb-b19a-0f3aa4962e3f'),
-      3,
-      'PRC',
-      null,
-      true
-  ), (
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
-    uuid('561a5606-402e-11eb-b19a-0f3aa4962e3f'), 
-    2, 
-    'MNC', 
-    NULL, 
+    uuid('561a5606-402e-11eb-b19a-0f3aa4962e3e'),
+    1,
+    'MNC',
+    NULL,
     true
 );
 
@@ -576,12 +595,17 @@ INSERT INTO shipment_location (
     (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
     'PDE'
-),(
-      (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
-      (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
-      uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
-      'PDE'
-  );
+), (
+   (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
+   (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+   uuid('770b7624-403d-11eb-b44b-d3f4ad185386'),
+   'POL'
+), (
+   (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
+   (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+   uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
+   'POD'
+);
 
 INSERT INTO iso_equipment_code (
     iso_equipment_code,
@@ -816,48 +840,56 @@ INSERT INTO consignment_item (
     shipping_instruction_id,
     shipment_id,
     commodity_id,
+    hs_code,
     description_of_goods
 ) VALUES (
     '10f41e70-0cae-47cd-8eb8-4ee6f05e85c1',
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Expensive Shoes'
 ), (
     'c7104528-66d5-4d11-9b82-7af30e84d664',
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Massive Yacht'
 ), (
     '20e8aca5-4524-4ff9-a258-96c506966388',
     '877ce0f8-3126-45f5-b22e-2d1d27d42d85',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'bca68f1d3b804ff88aaa1e43055432f7'),
     '877ce0f8-3126-45f5-b22e-2d1d27d42d85',
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Leather Jackets'
 ), (
     'ca4ff535-407f-41ab-a009-830ddf06bdba',
     '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
     (SELECT id FROM shipment WHERE carrier_booking_reference = '832deb4bd4ea4b728430b857c59bd057'),
     '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Air ballons'
 ), (
     '83ec9f50-2eab-42f7-892d-cad2d25f3b9e',
     'cb6354c9-1ceb-452c-aed0-3cb25a04647a',
     (SELECT id FROM shipment WHERE carrier_booking_reference = '994f0c2b590347ab86ad34cd1ffba505'),
     'cb6354c9-1ceb-452c-aed0-3cb25a04647a',
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Leather Jackets'
 ), (
     '824e8fed-d181-4079-b6ca-9d9069a2a738',
     '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
     (SELECT id FROM shipment WHERE carrier_booking_reference = '02c965382f5a41feb9f19b24b5fe2906'),
     '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Leather Jackets'
 ), (
     '1829548e-5938-4adc-a08e-3af55d8ccf63',
     '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
     '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Leather Jackets'
 );
 
@@ -1009,57 +1041,41 @@ INSERT INTO cargo_item (
     consignment_item_id,
     weight,
     weight_unit,
-    number_of_packages,
-    package_code,
     utilized_transport_equipment_id
 ) VALUES (
     '10f41e70-0cae-47cd-8eb8-4ee6f05e85c1',
     50.0,
     'KGM',
-    5000,
-    '123',
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 ), (
     'c7104528-66d5-4d11-9b82-7af30e84d664',
     1000.0,
     'KGM',
-    1,
-    '456',
     uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '877ce0f8-3126-45f5-b22e-2d1d27d42d85'),
     23.5,
     'KGM',
-    2500,
-    '789',
     uuid('56812ad8-5d0b-4cbc-afca-e97f2f3c89de')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '877ce0f8-3126-45f5-b22e-2d1d27d42d85'),
     99.9,
     'KGM',
-    99,
-    '234',
     uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '770f11e5-aae2-4ae4-b27e-0c689ed2e333'),
     99.9,
     'KGM',
-    99,
-    '234',
    uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = 'cb6354c9-1ceb-452c-aed0-3cb25a04647a'),
     23.5,
     'KGM',
-    2500,
-    '789',
     uuid('ca030eb6-009b-411c-985c-527ce008b35a')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d'),
     23.5,
     'KGM',
-    2500,
-    '789',
     uuid('ca030eb6-009b-411c-985c-527ce008b35a')
 );
 
@@ -1068,16 +1084,12 @@ INSERT INTO cargo_item (
   consignment_item_id,
   weight,
   weight_unit,
-  number_of_packages,
-  package_code,
   utilized_transport_equipment_id
   ) VALUES (
   '2d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
   (SELECT id FROM consignment_item WHERE shipping_instruction_id = '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d'),
   23.5,
   'KGM',
-  2500,
-  '789',
   uuid('aa030eb6-009b-411c-985c-527ce008b35a')
 );
 
@@ -1382,7 +1394,7 @@ INSERT INTO shipment (
   change_remark
 ) VALUES (
   uuid('2968b966-ee81-46ba-af87-0c5031c641f3'),
-  (SELECT event_classifier_code FROM event_classifier WHERE event_classifier_code = 'PLN'),
+  'PLN',
   '2021-11-28T14:12:56+01:00'::timestamptz,
   '2021-12-01T07:41:00+08:30'::timestamptz,
   'DEPA',
@@ -1391,13 +1403,31 @@ INSERT INTO shipment (
   'Bad weather'
 ), (
     uuid('2968b966-ee81-46ba-af87-0c5031c641f2'),
-    (SELECT event_classifier_code FROM event_classifier WHERE event_classifier_code = 'PLN'),
+    'PLN',
     '2021-11-28T14:12:56+01:00'::timestamptz,
     '2021-12-01T07:41:00+08:30'::timestamptz,
     'ARRI',
     '770b7624-403d-11eb-b44b-d3f4ad185388'::uuid,
     'WEA',
     'Bad weather'
+), (
+    uuid_generate_v4(),
+    'PLN',
+    '2023-01-14T14:12:56+01:00'::timestamptz,
+    '2022-12-01T07:41:00+08:30'::timestamptz,
+    'DEPA',
+    '8d8ba2d3-5ef4-457c-a526-45cb4e290e9a'::uuid,
+    null,
+    null
+), (
+    uuid_generate_v4(),
+    'PLN',
+    '2023-01-01T14:12:56+01:00'::timestamptz,
+    '2022-12-01T07:41:00+08:30'::timestamptz,
+    'ARRI',
+    '1f9afa63-2711-407f-a85e-0a196498367c'::uuid,
+    null,
+    null
 );
 
 INSERT INTO commodity(
@@ -1602,21 +1632,25 @@ INSERT INTO consignment_item (
     id,
     shipping_instruction_id,
     shipment_id,
+    hs_code,
     description_of_goods
 ) VALUES (
     '0e98eef4-6ebd-47eb-bd6e-d3878b341b7f',
     'a1c7b95d-3004-40a5-bae1-e379021b7782',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'E379021B7782'),
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Expensive shoes'
 ), (
     '06c0e716-3128-4172-be09-7f82b7ec02ca',
     'a1c7b95d-3004-40a5-bae1-e379021b7782',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'E379021B7782'),
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Slightly less expensive shoes'
 ), (
     'cf1798fe-9447-4ea8-a4a6-9515de751d5e',
     'a1c7b95d-3004-40a5-bae1-e379021b7782',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Even more expensive shoes'
 );
 
@@ -1715,29 +1749,21 @@ INSERT INTO cargo_item (
     consignment_item_id,
     weight,
     weight_unit,
-    number_of_packages,
-    package_code,
     utilized_transport_equipment_id
 ) VALUES (
     '0e98eef4-6ebd-47eb-bd6e-d3878b341b7f'::uuid,
     50.0,
     'KGM',
-    5000,
-    '123',
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 ), (
     '06c0e716-3128-4172-be09-7f82b7ec02ca'::uuid,
     50.0,
     'KGM',
-    5000,
-    '123',
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 ), (
     'cf1798fe-9447-4ea8-a4a6-9515de751d5e'::uuid,
     50.0,
     'KGM',
-    5000,
-    '123',
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 );
 
@@ -1881,11 +1907,13 @@ INSERT INTO consignment_item (
     id,
     shipping_instruction_id,
     shipment_id,
+    hs_code,
     description_of_goods
 ) VALUES (
     '5d943239-23fc-4d5c-ab70-a33a469f9e59',
     '2c337fcc-2814-42b3-a752-f1847e74cba7',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'D659FDB7E33C'),
+    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Expensive shoes'
 );
 
@@ -1921,39 +1949,36 @@ INSERT INTO cargo_item (
     consignment_item_id,
     weight,
     weight_unit,
-    number_of_packages,
-    package_code,
     utilized_transport_equipment_id
 ) VALUES (
     '5d943239-23fc-4d5c-ab70-a33a469f9e59'::uuid,
     50.0,
     'KGM',
-    5000,
-    '123',
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 );
 
 INSERT INTO charge (
-    id, 
-    transport_document_id, 
-    shipment_id, 
-    charge_type, 
-    currency_amount, 
-    currency_code, 
-    payment_term_code, 
-    calculation_basis, 
-    unit_price, 
+    id,
+    transport_document_id,
+    shipment_id,
+    charge_type,
+    currency_amount,
+    currency_code,
+    payment_term_code,
+    calculation_basis,
+    unit_price,
     quantity
 ) VALUES (
-    '4816e01a-446b-4bc0-812e-a3a447c85668', 
+    '4816e01a-446b-4bc0-812e-a3a447c85668',
     (SELECT id FROM transport_document WHERE transport_document_reference = '9b02401c-b2fb-5009'),
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
-    'TBD', 
-    100.12, 
-    'EUR', 
-    'PRE', 
-    'WHAT', 
-    100.12, 1.0
+    'TBD',
+    100.12,
+    'EUR',
+    'PRE',
+    'WHAT',
+    100.12,
+    1.0
 );
 
 ------------------ Data for ApproveTransportDocument END -----------------

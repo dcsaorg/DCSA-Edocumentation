@@ -9,10 +9,14 @@ import org.dcsa.edocumentation.transferobjects.enums.TemperatureUnit;
 import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 
 @AllOrNone({"airExchangeSetpoint", "airExchangeUnit"})
+//TODO: Split between eBL and BKG
 public record ActiveReeferSettingsTO(
+
+  // TODO: BKG only attribute; must not be present in eBL
   @NotNull
   Boolean isGeneratorSetRequired,
 
+  // TODO: BKG only attribute; must not be present in eBL
   @NotNull
   Boolean isPreCoolingRequired,
 
@@ -27,6 +31,9 @@ public record ActiveReeferSettingsTO(
 
   @NotNull
   Boolean isBulbMode,
+
+  @NotNull
+  Boolean isControlledAtmosphereRequired,
 
   @NotNull
   Float temperatureSetpoint,

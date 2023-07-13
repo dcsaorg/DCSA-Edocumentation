@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.transferobjects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
@@ -44,10 +45,14 @@ public record ShippingInstructionTO(
   @NotNull(message = "isShippedOnBoardType is required.")
   Boolean isShippedOnBoardType,
 
+  @Min(0)
   Integer numberOfCopiesWithCharges,
+  @Min(0)
   Integer numberOfCopiesWithoutCharges,
 
+  @Min(0)
   Integer numberOfOriginalsWithCharges,
+  @Min(0)
   Integer numberOfOriginalsWithoutCharges,
 
   @NotNull(message = "isElectronic is required.")
@@ -81,16 +86,20 @@ public record ShippingInstructionTO(
 
   @Valid
   @NotEmpty(message = "consignmentItems are required.")
-  List<ConsignmentItemTO>consignmentItems,
+  List<@Valid @NotNull ConsignmentItemTO> consignmentItems,
 
   @Valid
   @NotEmpty(message = "utilizedTransportEquipments are required.")
-  List<UtilizedTransportEquipmentTO> utilizedTransportEquipments,
+  List<@Valid @NotNull UtilizedTransportEquipmentTO> utilizedTransportEquipments,
 
   @Valid
-  List<DocumentPartyTO> documentParties,
+  List<@Valid @NotNull DocumentPartyTO> documentParties,
 
-  List<ReferenceTO> references
+  @Valid
+  List<@Valid @NotNull ReferenceTO> references,
+
+  @Valid
+  List<@Valid @NotNull CustomsReferenceTO> customsReferences
 ) {
   @Builder
   public ShippingInstructionTO{}

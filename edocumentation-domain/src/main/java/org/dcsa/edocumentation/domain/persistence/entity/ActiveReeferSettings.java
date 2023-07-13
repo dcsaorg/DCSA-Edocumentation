@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,8 +16,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.AirExchangeUnit;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TemperatureUnit;
-
-import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)
@@ -50,6 +49,10 @@ public class ActiveReeferSettings {
   @Builder.Default
   @Column(name = "is_drainholes_open", nullable = false)
   private Boolean isDrainholesOpen = Boolean.FALSE;
+
+  @Builder.Default
+  @Column(name = "is_controlled_atmosphere_required", nullable = false)
+  private Boolean isControlledAtmosphereRequired = Boolean.FALSE;
 
   @Builder.Default
   @Column(name = "is_bulb_mode", nullable = false)

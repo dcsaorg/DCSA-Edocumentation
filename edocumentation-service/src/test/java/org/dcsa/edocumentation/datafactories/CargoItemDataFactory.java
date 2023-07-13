@@ -18,13 +18,11 @@ public class CargoItemDataFactory {
                     .shippingMarks("shipping marks")
                     .cargoLineItemID("CLI_ID_01")
                     .build()))
-        .numberOfPackages(1)
         .equipmentReference("CARR_EQ_REF_01")
         .weight(10.2)
         .weightUnit(WeightUnit.KGM)
         .volume(234234.3)
         .volumeUnit(VolumeUnit.MTQ)
-        .packageCode("123")
         .build();
   }
 
@@ -38,13 +36,11 @@ public class CargoItemDataFactory {
                         .shippingMarks("shipping marks")
                         .cargoLineItemID("CLI_ID_01")
                         .build()))
-            .numberOfPackages(1)
             .equipmentReference("CARR_EQ_REF_02")
             .weight(10.2)
             .weightUnit(WeightUnit.KGM)
             .volume(234234.3)
             .volumeUnit(VolumeUnit.MTQ)
-            .packageCode("123")
             .build());
   }
 }

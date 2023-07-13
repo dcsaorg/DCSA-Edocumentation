@@ -30,20 +30,24 @@ public record ConsignmentItemTO(
   VolumeUnit volumeUnit,
 
   @NotBlank
+  @Pattern(regexp = "^\\S+(\\s+\\S+)*$")
   String descriptionOfGoods,
 
   @Pattern(regexp = "^[0-9]+$")
   @Size(min = 6, max = 10)
   @JsonProperty("HSCode")
+   // TODO: List in the TD (and probably also in the SI) now.
   String hsCode,
 
-  @NotEmpty
   @Valid
-  List<CargoItemTO> cargoItems,
+  List<@Valid @NotNull ReferenceTO> references,
 
   @Valid
-  List<ReferenceTO> references
-) {
+  List<@Valid @NotNull CustomsReferenceTO> customsReferences,
+  @NotEmpty
+  @Valid
+  List<@Valid @NotNull CargoItemTO> cargoItems
+  ) {
   @Builder
   public ConsignmentItemTO{}
 }

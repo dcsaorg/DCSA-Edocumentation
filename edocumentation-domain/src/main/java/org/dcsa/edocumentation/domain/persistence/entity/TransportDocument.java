@@ -96,7 +96,7 @@ public class TransportDocument implements Persistable<UUID> {
   private Carrier carrier;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "shipping_instruction_id")
+  @JoinColumn(name = "shipping_instruction_id", nullable = false)
   private ShippingInstruction shippingInstruction;
 
   @Column(name = "number_of_rider_pages")

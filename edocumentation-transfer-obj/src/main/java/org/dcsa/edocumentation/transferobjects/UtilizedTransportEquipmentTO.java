@@ -1,5 +1,6 @@
 package org.dcsa.edocumentation.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.VolumeUnit;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
@@ -18,8 +19,10 @@ import java.util.List;
 @DisallowIfBoolean(ifField = "isShipperOwned", hasValue = false, thenDisallow = "equipment")
 @RequiredIfFalse(ifFalse = "isShipperOwned", thenNotNull = "equipmentReference")
 @DisallowIfBoolean(ifField = "isShipperOwned", hasValue = true, thenDisallow = "equipmentReference")
+@DisallowIfBoolean(ifField = "isNonOperatingReefer", hasValue = true, thenDisallow = "activeReeferSettings")
 @ValidUtilizedTransportEquipment
 @AllOrNone({"cargoGrossVolumeUnit", "cargoGrossVolume"})
+// TODO: Split into a Shipper provided and a Carrier provided version
 public record UtilizedTransportEquipmentTO(
 
   @NotNull(message = "Cargo gross weight is required.")
@@ -36,12 +39,27 @@ public record UtilizedTransportEquipmentTO(
   @NotNull(message = "Is shipper owned is required.")
   Boolean isShipperOwned,
 
+  // Carrier Provided only; must not be present in the shipper provided version
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  Boolean isNonOperatingReefer,
+
+  // Carrier Provided only; must not be present in the shipper provided version
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+
+  ActiveReeferSettingsTO activeReeferSettings,
+
   String equipmentReference,
   @Valid
   EquipmentTO equipment,
 
   @Valid
-  List<SealTO> seals
+  List<@Valid @NotNull SealTO> seals,
+
+  @Valid
+  List<@Valid @NotNull ReferenceTO> references,
+
+  @Valid
+  List<@Valid @NotNull CustomsReferenceTO> customsReferences
 ) {
   @Builder
   public UtilizedTransportEquipmentTO{}

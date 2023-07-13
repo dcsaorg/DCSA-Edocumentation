@@ -4,6 +4,8 @@ import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 
 import jakarta.persistence.*;
+
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -46,5 +48,10 @@ public class UtilizedTransportEquipment {
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "utilized_transport_equipment_id", nullable = false)
   private Set<Seal> seals;
+
+  @OrderColumn(name = "list_order")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "utilized_transport_equipment_id")
+  private List<CustomsReference> customsReferences;
 
 }
