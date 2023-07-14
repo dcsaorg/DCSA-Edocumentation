@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
@@ -47,11 +49,39 @@ public class UnofficialTransportDocumentService {
     if (shippingInstruction == null) {
       return Optional.empty();
     }
+    ValidationResult<EblDocumentStatus> validationResult;
+    try {
+      validationResult = shippingInstruction.asyncValidation();
+    } catch (IllegalStateException e) {
+      throw ConcreteRequestErrorMessageException.conflict("SI is not in a state to be DRFT'ed", e);
+    }
+    if (!validationResult.validationErrors().isEmpty()) {
+      var status = validationResult.proposedStatus();
+      var reason = validationResult.presentErrors(5000);
+      ShipmentEvent e;
+      if (status == EblDocumentStatus.REJE) {
+        e = shippingInstruction.rejected(reason);
+      } else {
+        assert status == EblDocumentStatus.PENU;
+        e = shippingInstruction.pendingUpdate(reason);
+      }
+      shippingInstructionRepository.save(shippingInstruction);
+      shipmentEventRepository.save(e);
+
+      throw ConcreteRequestErrorMessageException.conflict(
+        "The SI had validation errors and is now in state " + status.name(),
+        null
+      );
+    }
+
     String carrierSMDGCode = findCarrierSMGCode(transportDocumentRequestTO.issuingParty());
     Carrier carrier = carrierRepository.findBySmdgCode(carrierSMDGCode);
     if (carrier == null) {
       throw ConcreteRequestErrorMessageException.notFound("Unknown carrier SMDG code: " + carrierSMDGCode);
     }
+    // FIXME: We need to "freeze" the transport document such that changes to the SI does *NOT* change
+    //  the transport document. This affects basically any non-trivial object associated with the
+    //  transport document.
     TransportDocument document = TransportDocument.builder()
       .shippingInstruction(shippingInstruction)
       .shippedOnBoardDate(transportDocumentRequestTO.shippedOnBoardDate())

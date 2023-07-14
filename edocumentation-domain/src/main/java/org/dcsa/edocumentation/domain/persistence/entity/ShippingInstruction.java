@@ -3,15 +3,18 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
+import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 
 import jakarta.persistence.*;
+
 import java.time.OffsetDateTime;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
@@ -66,12 +69,13 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
           .nonTerminalState(SURR)
           .successorNodes(VOID)
           .terminalStates(VOID)
+          .unreachableStates(REJE)
           .build();
 
   private static final DFADefinition<EblDocumentStatus> AMENDMENT_EBL_DFA_DEFINITION =
       DFADefinition.builder(RECE)
           .nonTerminalState(RECE)
-          .successorNodes(DRFT)
+          .successorNodes(DRFT, REJE)
           .nonTerminalState(DRFT)
           .successorNodes(APPR)
           .nonTerminalState(APPR)
@@ -80,7 +84,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
           .successorNodes(SURR)
           .nonTerminalState(SURR)
           .successorNodes(VOID)
-          .terminalStates(VOID)
+          .terminalStates(REJE, VOID)
           .unreachableStates(PENU, PENA)
           .build();
 
@@ -228,6 +232,87 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return id == null || isNew;
   }
 
+  public ValidationResult<EblDocumentStatus> asyncValidation() {
+    List<String> validationErrors = new ArrayList<>();
+
+    if (!CAN_BE_VALIDATED.contains(documentStatus)) {
+      throw new IllegalStateException("documentStatus must be one of " + CAN_BE_VALIDATED);
+    }
+
+    validateShipper(validationErrors);
+    if (isToOrder == Boolean.TRUE) {
+      validateNegotiableBL(validationErrors);
+    } else {
+      validateStraightBL(validationErrors);
+    }
+
+    var proposedStatus = validationErrors.isEmpty()
+      ? DRFT
+      : (amendmentToTransportDocument != null ? REJE : PENU)
+      ;
+    return new ValidationResult<>(proposedStatus, validationErrors);
+  }
+
+  private void validateStraightBL(List<String> validationErrors) {
+    if (validateAtLeastOneOfIsPresent(validationErrors, Set.of(PartyFunction.CN, PartyFunction.DDS))) {
+      validateAtMostOncePartyFunction(validationErrors, PartyFunction.CN);
+      validateAtMostOncePartyFunction(validationErrors, PartyFunction.DDS);
+    }
+  }
+
+
+  private void validateAtMostOncePartyFunction(List<String> validationErrors, PartyFunction partyFunction) {
+    validateLimitOnPartyFunction(validationErrors, partyFunction, 1);
+  }
+
+  private void validateLimitOnPartyFunction(List<String> validationErrors, PartyFunction partyFunction, int limit) {
+    var matches = nullSafeStream(documentParties)
+      .filter(p -> p.getPartyFunction() == partyFunction)
+      .count();
+    if (matches > limit) {
+      switch (limit) {
+        case 0 -> validationErrors.add(
+          "The party function " + partyFunction.name() + " cannot be used on this SI.");
+        case 1 -> validationErrors.add(
+          "There can only be at most one party with the partyFunction " + partyFunction.name());
+        default -> validationErrors.add(
+          "There can only be at most " + limit + " parties with the partyFunction " + partyFunction.name());
+      }
+    }
+  }
+
+  private boolean validateAtLeastOneOfIsPresent(List<String> validationErrors,
+                                                Set<PartyFunction> partyFunctions) {
+    var matches = nullSafeStream(documentParties)
+      .filter(p -> partyFunctions.contains(p.getPartyFunction()))
+      .count();
+    if (matches < 1) {
+      validationErrors.add(
+        "This SI requires at least one of the following party functions to be present: " +
+          String.join(", ", partyFunctions.stream().map(Enum::name).toList())
+      );
+      return false;
+    }
+    return true;
+  }
+
+  private void validateNegotiableBL(List<String> validationErrors) {
+    // We cannot tell the cases from each other current.
+    validationErrors.add("Negotiable B/Ls are currently not supported");
+  }
+
+
+  private void validateShipper(List<String> validationErrors) {
+    if (validateAtLeastOneOfIsPresent(validationErrors, Set.of(PartyFunction.OS, PartyFunction.DDR))) {
+      validateAtMostOncePartyFunction(validationErrors, PartyFunction.OS);
+      validateAtMostOncePartyFunction(validationErrors, PartyFunction.DDR);
+    }
+  }
+
+  private <T> Stream<T> nullSafeStream(Collection<T> c) {
+    return c != null ? c.stream() : Stream.of();
+  }
+
   /** Transition the document into its {@link EblDocumentStatus#RECE} state. */
   public ShipmentEvent receive() {
     return processTransition(RECE, null);
@@ -252,6 +337,15 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    */
   public boolean isPendingUpdateSupported() {
     return supportsState(PENU);
+  }
+
+  /**
+   * Transition the document into its {@link EblDocumentStatus#REJE} state.
+   *
+   * <p>This state is only reachable in the Amendment flow.
+   */
+  public ShipmentEvent rejected(String reason) {
+    return processTransition(REJE, reason);
   }
 
   public void lockVersion(OffsetDateTime lockTime) {
