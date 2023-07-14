@@ -2,7 +2,8 @@ package org.dcsa.edocumentation.controller.unofficial;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.service.unofficial.BookingValidationService;
-import org.dcsa.edocumentation.service.unofficial.BookingValidationService.ValidationResult;
+import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.transferobjects.unofficial.ValidationResultTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,10 +25,10 @@ public class BookingValidationController {
 
   @PostMapping(path = "/unofficial${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}/validate")
   @ResponseStatus(HttpStatus.OK)
-  public ValidationResult validateBooking(
+  public ValidationResultTO<BkgDocumentStatus> validateBooking(
     @PathVariable("carrierBookingRequestReference")
     @NotBlank @Size(max = 100)
     String carrierBookingRequestReference) {
-    return bookingValidationService.validateBooking(carrierBookingRequestReference);
+    return bookingValidationService.validateBookingResultTO(carrierBookingRequestReference);
   }
 }

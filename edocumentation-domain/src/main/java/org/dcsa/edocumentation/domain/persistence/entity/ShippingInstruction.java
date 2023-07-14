@@ -47,6 +47,8 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumen
 public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     implements Persistable<UUID> {
 
+  private static final Set<EblDocumentStatus> CAN_BE_VALIDATED = Set.of(EblDocumentStatus.RECE);
+
   private static final DFADefinition<EblDocumentStatus> DEFAULT_EBL_DFA_DEFINITION =
       DFADefinition.builder(RECE)
           .nonTerminalState(RECE)

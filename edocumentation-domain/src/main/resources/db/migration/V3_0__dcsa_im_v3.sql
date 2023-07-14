@@ -748,7 +748,7 @@ CREATE TABLE shipment_event (
     shipment_event_type_code varchar(4) NOT NULL REFERENCES shipment_event_type(shipment_event_type_code),
     document_type_code varchar(3) NOT NULL REFERENCES document_type(document_type_code),
     document_id uuid NOT NULL,
-    reason varchar(250) NULL
+    reason varchar(5000) NULL
 ) INHERITS (event);
 
 ALTER TABLE shipment_event ADD PRIMARY KEY (event_id),

@@ -1,11 +1,17 @@
 package org.dcsa.edocumentation.service.unofficial;
 
 import jakarta.transaction.Transactional;
+import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.EquipmentAssignment;
+import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.EquipmentRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
@@ -26,11 +32,6 @@ import org.dcsa.skernel.domain.persistence.repository.CarrierRepository;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +66,7 @@ public class ManageShipmentService {
         + shipmentRequestTO.carrierSMDGCode() + "\". Note the code may be valid but not loaded into this system.");
     }
     OffsetDateTime confirmationTime = OffsetDateTime.now();
-    BookingValidationService.ValidationResult validationResult = bookingValidationService.validateBooking(booking);
+    ValidationResult<BkgDocumentStatus> validationResult = bookingValidationService.validateBooking(booking);
 
     Shipment shipment = Shipment.builder()
             .booking(booking)
@@ -85,8 +86,8 @@ public class ManageShipmentService {
         .toList()
     );
 
-    if (validationResult.reason().isPresent()) {
-      return shipmentMapper.toStatusDTO(shipment, validationResult.newStatus());
+    if (!validationResult.validationErrors().isEmpty()) {
+      return shipmentMapper.toStatusDTO(shipment, validationResult.proposedStatus());
     }
     Booking validatedBooking = getBooking(shipmentRequestTO);
     shipmentEventRepository.save(validatedBooking.confirm(confirmationTime));
