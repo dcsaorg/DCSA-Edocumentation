@@ -12,7 +12,9 @@ public enum EblDocumentStatus {
   APPR ("Approved", ShipmentEventTypeCode.APPR),
   ISSU ("Issued", ShipmentEventTypeCode.ISSU),
   SURR ("Surrendered", ShipmentEventTypeCode.SURR),
-  VOID ("Void",ShipmentEventTypeCode.VOID);
+  VOID ("Void", ShipmentEventTypeCode.VOID),
+  REJE ("Rejected", ShipmentEventTypeCode.REJE),
+  ;
 
   @Getter
   private final String value;

@@ -13,7 +13,9 @@ public enum EblDocumentStatus {
   APPR ("Approved"),
   ISSU ("Issued"),
   SURR ("Surrendered"),
-  VOID ("Void");
+  VOID ("Void"),
+  REJE ("Rejected"),
+  ;
 
   private final String value;
 }
