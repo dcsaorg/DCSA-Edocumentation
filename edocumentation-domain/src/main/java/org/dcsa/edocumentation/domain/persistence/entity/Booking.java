@@ -6,6 +6,7 @@ import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
 import org.dcsa.edocumentation.domain.dfa.DFADefinition;
 import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
+import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
@@ -13,8 +14,11 @@ import org.springframework.data.domain.Persistable;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
 
@@ -57,6 +61,21 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumen
 @Entity
 @Table(name = "booking")
 public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements Persistable<UUID> {
+
+
+  private static final Set<BkgDocumentStatus> CAN_BE_VALIDATED =
+    Set.of(BkgDocumentStatus.RECE, BkgDocumentStatus.PENC);
+  private static final Predicate<LocationType> IS_SOURCE_LOCATION_TYPE = code ->
+    code == LocationType.PRE || code == LocationType.POL;
+  private static final Predicate<LocationType> IS_DESTINATION_LOCATION_TYPE = code ->
+    code == LocationType.POD || code == LocationType.PDE;
+  private static final Predicate<LocationType> IS_SOURCE_OR_DESTINATION_LOCATION_TYPE =
+    IS_SOURCE_LOCATION_TYPE.or(IS_DESTINATION_LOCATION_TYPE);
+  private static final Predicate<ShipmentLocation> IS_SOURCE_OR_DESTINATION_LOCATION =
+    sl -> IS_SOURCE_OR_DESTINATION_LOCATION_TYPE.test(sl.getShipmentLocationTypeCode());
+  private static Predicate<ShipmentLocation> HAS_ADDRESS = sl -> sl.getLocation().getAddress() != null;
+  private static Predicate<ShipmentLocation> HAS_UNLOCATION_CODE = sl -> sl.getLocation().getUNLocationCode() != null;
+
 
   private static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECE)
     .nonTerminalState(RECE).successorNodes(REJE, CANC, PENU, PENC, CONF)
@@ -231,6 +250,107 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
 
   public boolean isNew() {
     return id == null || isNew;
+  }
+
+
+  /**
+   * Subject to change. Reefer will probably change it.
+   */
+  public ValidationResult<BkgDocumentStatus> asyncValidation() {
+    LocalDate today = LocalDate.now();
+    List<String> validationErrors = new ArrayList<>();
+
+
+    if (!CAN_BE_VALIDATED.contains(documentStatus)) {
+      throw new IllegalStateException("documentStatus must be one of " + CAN_BE_VALIDATED);
+    }
+
+    if (isInThePast(today, expectedDepartureDate)) {
+      validationErrors.add("expectedDepartureDate is in the past");
+    }
+    if (isInThePast(today, expectedArrivalAtPlaceOfDeliveryStartDate)) {
+      validationErrors.add("expectedArrivalAtPlaceOfDeliveryStartDate is in the past");
+    }
+    if (isInThePast(today, expectedArrivalAtPlaceOfDeliveryEndDate)) {
+      validationErrors.add("expectedArrivalAtPlaceOfDeliveryEndDate is in the past");
+    }
+    validateShipmentLocations(shipmentLocations, validationErrors);
+    var proposedStatus = validationErrors.isEmpty()
+      ? PENC
+      : PENU
+      ;
+    return new ValidationResult<>(proposedStatus, validationErrors);
+  }
+
+  private boolean isInThePast(LocalDate today, LocalDate time) {
+    return time != null && today.isAfter(time);
+  }
+
+  private void validateShipmentLocations(Set<ShipmentLocation> shipmentLocations, List<String> validationErrors) {
+    if (shipmentLocations.isEmpty()) {
+      validationErrors.add("Invalid booking: Shipment locations should not be empty");
+    }
+
+    boolean slHasPREorPOLs =
+      shipmentLocations.stream()
+        .map(ShipmentLocation::getShipmentLocationTypeCode)
+        .anyMatch(IS_SOURCE_LOCATION_TYPE);
+
+    if (!slHasPREorPOLs) {
+      validationErrors.add("No ShipmentLocationTypeCode of PRE or POL found in the shipmentLocations."
+        + " At least one of them should be provided.");
+    }
+
+    boolean slHasPODorPDE =
+      shipmentLocations.stream()
+        .map(ShipmentLocation::getShipmentLocationTypeCode)
+        .anyMatch(IS_DESTINATION_LOCATION_TYPE);
+
+    if (!slHasPODorPDE) {
+      validationErrors.add("No ShipmentLocationTypeCode of POD or PDE found in the shipmentLocations."
+        + "At least one of them should be provided.");
+    }
+
+
+    var filteredByUNLocationCode =
+      shipmentLocations.stream()
+        .filter(IS_SOURCE_OR_DESTINATION_LOCATION.and(HAS_UNLOCATION_CODE))
+        .toList();
+
+    var filteredByUNLocationCodeCount = filteredByUNLocationCode.size();
+
+    boolean hasUniqueUNLocationCodes =
+      filteredByUNLocationCode.stream()
+        .map(sl -> sl.getLocation().getUNLocationCode())
+        .distinct()
+        .count()
+        == filteredByUNLocationCodeCount;
+
+    if (!hasUniqueUNLocationCodes) {
+      validationErrors.add("Duplicate UNLocationCodes found in shipmentLocations");
+    }
+
+    var filteredByAddress =
+      shipmentLocations.stream()
+        .filter(IS_SOURCE_OR_DESTINATION_LOCATION.and(HAS_ADDRESS))
+        .toList();
+
+    var filteredByAddressCount = filteredByAddress.size();
+
+    boolean hasUniqueAddresses =
+      shipmentLocations.stream()
+        .filter(IS_SOURCE_OR_DESTINATION_LOCATION.and(HAS_ADDRESS))
+        .map(sl -> sl.getLocation().getAddress())
+        .filter(
+          address ->
+            filteredByAddress.stream()
+              .noneMatch(other -> other.getLocation().getAddress().equals(address)))
+        .count()
+        == filteredByAddressCount;
+
+    if (!hasUniqueAddresses) {
+      validationErrors.add("Duplicate addresses found in shipmentLocations");
+    }
   }
 
 

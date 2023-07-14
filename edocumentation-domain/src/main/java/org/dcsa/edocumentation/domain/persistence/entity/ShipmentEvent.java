@@ -36,6 +36,6 @@ public class ShipmentEvent extends Event {
   @Column(name = "document_reference", nullable = false)
   private String documentReference;
 
-  @Column(name = "reason", length = 100)
+  @Column(name = "reason", length = 5000)
   private String reason;
 }
