@@ -14,6 +14,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -146,7 +147,6 @@ public class TransportDocument implements Persistable<UUID> {
    * flow.
    */
   public ShipmentEvent pendingApproval(String reason) {
-    // TODO: Should this be moved to the TRD?
     return processTransition(PENA, reason);
   }
 
@@ -168,11 +168,32 @@ public class TransportDocument implements Persistable<UUID> {
 
   /** Transition the document into its {@link EblDocumentStatus#ISSU} state. */
   public ShipmentEvent issue() {
+    return issue(null, null);
+  }
+
+  /** Transition the document into its {@link EblDocumentStatus#ISSU} state.
+   *
+   * @param issueDate Use the provided date as issue date. Should be LocalDate.now() or in the past. If null,
+   *                  defaults to LocalDate.now()
+   * @param shipmentDate Use the provided date as the shippedOnBoardDate/receivedForShipmentDate depending on
+   *                     the type of B/L being issued. If null, keep the original value (if present) or
+   *                     use LocalDate.now() (if the original value was absent).
+   */
+  public ShipmentEvent issue(LocalDate issueDate, LocalDate shipmentDate) {
     ShipmentEvent event = processTransition(ISSU, null);
-    if (issueDate == null) {
-      // Ensure we have an issue date.
-      this.issueDate = LocalDate.now();
+
+    if (shippingInstruction.getIsShippedOnBoardType() == Boolean.TRUE) {
+      if (shipmentDate != null || this.shippedOnBoardDate == null) {
+        this.shippedOnBoardDate = Objects.requireNonNullElseGet(shipmentDate, LocalDate::now);
+      }
+    } else {
+      if (shipmentDate != null || this.receivedForShipmentDate == null) {
+        this.receivedForShipmentDate = Objects.requireNonNullElseGet(shipmentDate, LocalDate::now);
+      }
     }
+
+    this.issueDate = Objects.requireNonNullElseGet(issueDate, LocalDate::now);
+
     return event;
   }
 
