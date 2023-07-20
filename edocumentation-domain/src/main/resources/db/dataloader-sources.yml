@@ -24,19 +24,20 @@ sources:
   - path: classpath:db/referencedata.d
     type: csv
     groups: [reference]
-    excludes: [value_added_service_code]
+    excludes:
+      - value_added_service_code
+      - equipment_event_type
+      - operations_event_type
+      - port_call_phase_type
+      - port_call_service_type
+      - port_call_status_type
 
   - path: classpath:db/samples.d
     type: csv
     groups: [sample]
 
-  - path: classpath:db/implementation-detail-data.d
-    type: csv
-    groups: [impl-detail]
-    dependsOn: [reference, sample]
-
   - path: classpath:db/testdata.d
     type: flyway
     historyTable: flyway_testdata_history
     groups: [test]
-    dependsOn: [reference, sample, impl-detail]
+    dependsOn: [reference, sample]

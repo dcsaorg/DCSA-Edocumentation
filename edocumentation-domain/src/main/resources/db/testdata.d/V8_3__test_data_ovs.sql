@@ -28,7 +28,7 @@ INSERT INTO  party (
     tax_reference_2,
     public_key,
     address_id
-) VALUES ( 
+) VALUES (
     'be5bc290-7bac-48bb-a211-f3fa5a3ab3ae',
     'Asseco Denmark',
     'CVR-25645774',
@@ -248,79 +248,5 @@ INSERT INTO transport (
     '7f2d833c-2c7f-4fc5-a71a-e510881da64a'::uuid,
     'b785317a-2340-4db7-8fb3-c8dfb1edfa60'::uuid
 );
-
-INSERT INTO operations_event (
-    event_id,
-    event_classifier_code,
-    event_date_time,
-    event_created_date_time,
-    operations_event_type_code,
-    transport_call_id,
-    delay_reason_code,
-    publisher_role,
-    port_call_service_type_code,
-    event_location_id,
-    facility_type_code,
-    publisher_id
-) VALUES (
-    uuid('a0993e06-a222-42ec-816f-ec1d775cfd10'),
-    'ACT',
-    TO_DATE('2003/05/03 21:02:44', 'yyyy/mm/dd hh24:mi:ss'),
-    '2022-05-08T13:22:53Z',
-    'DEPA',
-    'b785317a-2340-4db7-8fb3-c8dfb1edfa60'::uuid,
-    'ANA',
-    'TR',
-    'BUNK',
-    '06aca2f6-f1d0-48f8-ba46-9a3480adfd23'::uuid,
-    'BRTH',
-    'be5bc290-7bac-48bb-a211-f3fa5a3ab3ae'::uuid
-), (
-    uuid('03482296-ef9c-11eb-9a03-0242ac130003'),
-    'EST',
-    TO_DATE('2003/05/03 21:02:44', 'yyyy/mm/dd hh24:mi:ss'),
-    '2022-02-08T13:22:53Z',
-    'ARRI',
-    '7f2d833c-2c7f-4fc5-a71a-e510881da64a'::uuid,
-    'ANA',
-    'CA',
-    'SAFE',
-    '6748a259-fb7e-4f27-9a88-3669e8b9c5f8'::uuid,
-    'BRTH',
-    'be5bc290-7bac-48bb-a211-f3fa5a3ab3ae'::uuid
-);
-
-INSERT INTO vessel_schedule(
-    vessel_id,
-    service_id
-) VALUES (
-    (SELECT id FROM vessel WHERE vessel_imo_number = '9321483'),
-    (SELECT id FROM service WHERE universal_service_reference = 'SR00001D')
-);
-
-INSERT INTO vessel_schedule(
-    vessel_id,
-    service_id
-) VALUES (
-    (SELECT id FROM vessel WHERE vessel_imo_number = '1234567'),
-    (SELECT id FROM service WHERE universal_service_reference = 'SR00002B')
-);
-
-INSERT INTO vessel_schedule(
-    vessel_id,
-    service_id
-) VALUES (
-    (SELECT id FROM vessel WHERE vessel_imo_number = '9811000'),
-    (SELECT id FROM service WHERE universal_service_reference = 'SR00002B')
-);
-
-INSERT INTO vessel_schedule(
-    vessel_id,
-    service_id
-) VALUES (
-    (SELECT id FROM vessel WHERE vessel_imo_number = '9136307'),
-    (SELECT id FROM service WHERE universal_service_reference = 'SR00003H')
-);
-
 
 -- REMOVE DATA OVERLAPPING WITH 08_02_test_data_tnt.sql

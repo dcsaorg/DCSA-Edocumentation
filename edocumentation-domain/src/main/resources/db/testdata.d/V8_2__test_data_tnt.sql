@@ -431,24 +431,6 @@ INSERT INTO seal (
      'WIR'
 );
 
-INSERT INTO equipment_event (
-    event_id,
-    event_classifier_code,
-    event_date_time,
-    equipment_event_type_code,
-    transport_call_id,
-    equipment_reference,
-    empty_indicator_code
-) VALUES (
-    uuid('5e51e72c-d872-11ea-811c-0f8f10a32ea2'),
-    'ACT',
-    TO_DATE('2003/05/03 21:02:44', 'yyyy/mm/dd hh24:mi:ss'),
-    'LOAD',
-    '8b64d20b-523b-4491-b2e5-32cfa5174eed'::uuid,
-    'equipref3453',
-    'EMPTY'
-);
-
 INSERT INTO transport_event (
     event_id,
     event_classifier_code,
@@ -494,27 +476,6 @@ INSERT INTO transport_event (
      '8b64d20b-523b-4491-b2e5-32cfa5174eed'::uuid,
      'WEA',
      'Bad weather'
-);
-
-
-INSERT INTO equipment_event (
-    event_id,
-    event_classifier_code,
-    event_created_date_time,
-    event_date_time,
-    equipment_event_type_code,
-    transport_call_id,
-    empty_indicator_code,
-    equipment_reference
-) VALUES (
-    uuid('2c645424-a125-4431-9dc4-5aff488173b7'),
-    'EST',
-    '2021-01-09T14:12:56+01:00'::timestamptz,
-    '2019-11-12T07:41:00+08:30'::timestamptz,
-    'LOAD',
-    '8b64d20b-523b-4491-b2e5-32cfa5174eed'::uuid,
-    'EMPTY',
-    'APZU4812090'
 );
 
 INSERT INTO transport_event (
