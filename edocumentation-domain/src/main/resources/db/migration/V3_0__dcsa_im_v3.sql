@@ -697,13 +697,6 @@ CREATE TABLE event_classifier (
 );
 
 
-CREATE TABLE equipment_event_type (
-    equipment_event_type_code varchar(4) PRIMARY KEY,
-    equipment_event_type_name varchar(35) NOT NULL,
-    equipment_event_type_description varchar(300) NOT NULL
-);
-
-
 CREATE TABLE document_type (
     document_type_code varchar(3) PRIMARY KEY,
     document_type_name varchar(100) NOT NULL,
@@ -729,20 +722,6 @@ CREATE TABLE event (
     event_created_date_time timestamp with time zone DEFAULT now() NOT NULL,
     event_date_time timestamp with time zone NOT NULL
 );
-
-
-CREATE TABLE equipment_event (
-    equipment_event_type_code varchar(4) NOT NULL REFERENCES equipment_event_type(equipment_event_type_code),
-    equipment_reference varchar(15) NULL REFERENCES equipment (equipment_reference),
-    empty_indicator_code varchar(5) NULL REFERENCES empty_indicator(empty_indicator_code),
-    transport_call_id uuid NULL REFERENCES transport_call(id),
-    facility_type_code char(4) NULL REFERENCES facility_type (facility_type_code) CONSTRAINT facility_type_code CHECK(facility_type_code IN ('BOCR','CLOC','COFS','OFFD','DEPO','INTE','POTE','RAMP')),
-    is_transshipment_move boolean NOT NULL default false,
-    event_location_id uuid NULL REFERENCES location(id)
-) INHERITS (event);
-
-ALTER TABLE equipment_event ADD PRIMARY KEY (event_id);
-
 
 CREATE TABLE shipment_event (
     shipment_event_type_code varchar(4) NOT NULL REFERENCES shipment_event_type(shipment_event_type_code),
@@ -771,14 +750,6 @@ CREATE TABLE transport_event (
 
 ALTER TABLE transport_event ADD PRIMARY KEY (event_id);
 
-
-CREATE TABLE vessel_sharing_agreement_partner (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    carrier_id uuid NOT NULL REFERENCES carrier(id),
-    vessel_sharing_agreement_id uuid NOT NULL REFERENCES vessel_sharing_agreement(id)
-);
-
-
 CREATE TABLE service_proforma (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     service_proforma_agreed_date_time timestamp with time zone NOT NULL,
@@ -799,45 +770,3 @@ CREATE TABLE commercial_voyage_transport_call (
     transport_call_id uuid NOT NULL REFERENCES transport_call(id),
     commercial_voyage_id uuid NOT NULL REFERENCES commercial_voyage(commercial_voyage_id)
 );
-
-
-CREATE TABLE operations_event_type (
-    operations_event_type_code varchar(4) NOT NULL PRIMARY KEY,
-    operations_event_type_name varchar(30) NOT NULL,
-    operations_event_type_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE port_call_service_type (
-    port_call_service_type_code varchar(4) NOT NULL PRIMARY KEY,
-    port_call_service_type_name varchar(30) NOT NULL,
-    port_call_service_type_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE port_call_phase_type (
-     port_call_phase_type_code varchar(4) NOT NULL PRIMARY KEY,
-     port_call_phase_type_name varchar(30) NOT NULL,
-     port_call_phase_type_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE operations_event (
-    publisher_id uuid NOT NULL REFERENCES party(id),
-    publisher_role varchar(3) NOT NULL REFERENCES party_function(party_function_code) CHECK(publisher_role IN ('CA', 'AG', 'VSL', 'ATH', 'PLT', 'TR', 'TWG', 'BUK', 'LSH', 'SLU', 'SVP', 'MOR')),
-    operations_event_type_code varchar(4) NOT NULL REFERENCES operations_event_type(operations_event_type_code),
-    event_location_id uuid NULL REFERENCES location (id),
-    transport_call_id uuid NOT NULL REFERENCES transport_call(id),
-    port_call_service_type_code varchar(4) NULL REFERENCES port_call_service_type(port_call_service_type_code),
-    facility_type_code varchar(4) NULL REFERENCES facility_type(facility_type_code) CHECK(facility_type_code IN ('PBPL', 'BRTH','ANCH')),
-    delay_reason_code varchar(3) NULL REFERENCES smdg_delay_reason(delay_reason_code),
-    vessel_position_id uuid NULL REFERENCES location (id),
-    remark varchar(500) NULL,
-    port_call_phase_type_code varchar(4) NULL REFERENCES port_call_phase_type(port_call_phase_type_code),
-    vessel_draft real NULL,
-    vessel_draft_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CONSTRAINT vessel_draft_unit CHECK (vessel_draft_unit IN ('FOT','MTR')),
-    miles_to_destination_port real NULL
-) INHERITS (event);
-
-ALTER TABLE operations_event ADD PRIMARY KEY (event_id);
-
