@@ -38,6 +38,9 @@ public class ShipmentLocation {
   @JoinColumn(name = "booking_id")
   private Booking booking;
 
-  @Column(name = "shipment_id")
-  private UUID shipmentID;
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipment_id")
+  private Shipment shipment;
 }

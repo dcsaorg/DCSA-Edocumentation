@@ -1,9 +1,14 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportPlanStageCode;
 
 import jakarta.persistence.*;
+import org.dcsa.skernel.domain.persistence.entity.Location;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -12,25 +17,18 @@ import java.util.UUID;
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
 @Entity
-@Table(
-  name = "shipment_transport",
-  uniqueConstraints = {
-    @UniqueConstraint(
-      columnNames = {"shipment_id", "transport_id", "transport_plan_stage_sequence_number"})
-  })
+@Table(name = "shipment_transport")
+// Note: This is *NOT* a match to the DCSA IM definition for ShipmentTransport
+// In the BKG/eBL, we can manage with a simplified version (consolidating multiple
+// entities into one).
 public class ShipmentTransport {
 
   @GeneratedValue
   @Id private UUID id;
 
-  @Column(name = "shipment_id")
-  private UUID shipmentID;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "transport_id")
-  private Transport transport;
+  @JoinColumn(name = "shipment_id", nullable = false)
+  private Shipment shipment;
 
   @Column(name = "transport_plan_stage_sequence_number")
   private Integer transportPlanStageSequenceNumber;
@@ -39,11 +37,47 @@ public class ShipmentTransport {
   @Enumerated(EnumType.STRING)
   private TransportPlanStageCode transportPlanStageCode;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "commercial_voyage_id")
-  private CommercialVoyage commercialVoyage;
+  @OneToOne
+  @JoinColumn(name = "load_location_id")
+  private Location loadLocation;
+
+  @OneToOne
+  @JoinColumn(name = "discharge_location_id")
+  private Location dischargeLocation;
+
+  @Column(name = "planned_departure_date")
+  private LocalDate plannedDepartureDate;
+
+  @Column(name = "planned_arrival_date")
+  private LocalDate plannedArrivalDate;
+
+  @Column(name = "dcsa_transport_type")
+  @Enumerated(EnumType.STRING)
+  private DCSATransportType modeOfTransport;
+
+  @Column(name = "vessel_imo_number")
+  private String vesselIMONumber;
+
+  @Column(name = "vessel_name")
+  private String vesselName;
+
+  @Column(name = "carrier_import_voyage_number")
+  private String carrierImportVoyageNumber;
+
+  @Column(name = "universal_import_voyage_reference")
+  private String universalImportVoyageReference;
+
+  @Column(name = "carrier_export_voyage_number")
+  private String carrierExportVoyageNumber;
+
+  @Column(name = "universal_export_voyage_reference")
+  private String universalExportVoyageReference;
+
+  @Column(name = "carrier_service_code")
+  private String carrierServiceCode;
+
+  @Column(name = "universal_service_reference")
+  private String universalServiceReference;
 
   @Column(name = "is_under_shippers_responsibility")
   private boolean isUnderShippersResponsibility;

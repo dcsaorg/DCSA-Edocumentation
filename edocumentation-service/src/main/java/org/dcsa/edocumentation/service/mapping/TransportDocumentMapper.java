@@ -23,6 +23,9 @@ public abstract class TransportDocumentMapper {
   @Autowired
   protected LocationMapper locMapper;
 
+  @Autowired
+  protected ModeOfTransportMapper modeOfTransportMapper;
+
   @Mapping(source = "transportDocument.shippingInstruction.documentStatus", target = "documentStatus")
   public abstract TransportDocumentRefStatusTO toStatusDTO(TransportDocument transportDocument);
 
@@ -64,29 +67,24 @@ public abstract class TransportDocumentMapper {
     DCSATransportType preCarriedBy = null;
 
     for (var st : shipmentTransports) {
-      var loadTC = st.getTransport().getLoadTransportCall();
-      var dischargeTC = st.getTransport().getDischargeTransportCall();
-      if (isSameLocation(loadTC.getLocation(), preLoc) || isSameLocation(loadTC.getLocation(), polLoc)) {
-        var date = loadTC.getEventDateTimeDeparture().toLocalDate();
+      var loadLoc = st.getLoadLocation();
+      var dischargeLoc = st.getDischargeLocation();
+      if (isSameLocation(loadLoc, preLoc) || isSameLocation(loadLoc, polLoc)) {
+        var date = st.getPlannedDepartureDate();
         if (departureDate == null || departureDate.isAfter(date)) {
           departureDate = date;
         }
-        if (isSameLocation(loadTC.getLocation(), preLoc)) {
-          // FIXME: DCSATransportType.valueOf(loadTC.getModeOfTransportCode());
-          // modeOfTransportCode is the internal code and
-          preCarriedBy = null;
+        if (isSameLocation(loadLoc, preLoc)) {
+          preCarriedBy = modeOfTransportMapper.toTO(st.getModeOfTransport());
         }
       }
-      if (isSameLocation(dischargeTC.getLocation(), podLoc) || isSameLocation(dischargeTC.getLocation(), pdeLoc)) {
-        var date = dischargeTC.getEventDateTimeArrival().toLocalDate();
+      if (isSameLocation(dischargeLoc, podLoc) || isSameLocation(dischargeLoc, pdeLoc)) {
+        var date = st.getPlannedArrivalDate();
         if (arrivalDate == null || arrivalDate.isBefore(date)) {
           arrivalDate = date;
         }
       }
     }
-
-    // TODO: Compute plannedArrivalDate, plannedDepartureDate and preCarriedBy from
-    //  shipment.getShipmentTransports()
     return TDTransportTO.builder()
         .plannedArrivalDate(arrivalDate)
         .plannedDepartureDate(departureDate)
