@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.transferobjects.unofficial;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.Valid;
 import org.dcsa.edocumentation.transferobjects.PartyTO;
 
 import jakarta.validation.constraints.NotBlank;
@@ -18,18 +19,12 @@ public record DraftTransportDocumentRequestTO(
   // No issue date - the DRFT is never issued.
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-  LocalDate shippedOnBoardDate,
-
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-  LocalDate receivedForShipmentDate,
-
-  Integer numberOfOriginalsWithCharges,
-
-  Integer numberOfOriginalsWithoutCharges,
+  LocalDate shipmentDate,
 
   // No carrierCode/CodeList - we pull it from issuing Party
 
   @NotNull
+  @Valid
   PartyTO issuingParty,
 
   Integer numberOfRiderPages) {
