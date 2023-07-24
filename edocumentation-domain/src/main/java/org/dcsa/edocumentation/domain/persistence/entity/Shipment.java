@@ -31,7 +31,10 @@ import java.util.*;
           attributeNodes = {@NamedAttributeNode("location")}),
       @NamedSubgraph(
           name = "subgraph.shipmentTransports",
-          attributeNodes = {@NamedAttributeNode("transport")}),
+          attributeNodes = {
+            @NamedAttributeNode("loadLocation"),
+            @NamedAttributeNode("dischargeLocation"),
+          }),
     })
 @Data
 @Builder(toBuilder = true)
@@ -78,12 +81,12 @@ public class Shipment {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipmentID")
+  @OneToMany(mappedBy = "shipment")
   private Set<ShipmentTransport> shipmentTransports = new LinkedHashSet<>();
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipmentID")
+  @OneToMany(mappedBy = "shipment")
   private Set<ShipmentLocation> shipmentLocations = new LinkedHashSet<>();
 
   @ToString.Exclude

@@ -1,17 +1,17 @@
 package org.dcsa.edocumentation.datafactories;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.skernel.domain.persistence.entity.Address;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.dcsa.skernel.domain.persistence.entity.Location;
-
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @UtilityClass
 public class ShippingInstructionDataFactory {
@@ -78,16 +78,10 @@ public class ShippingInstructionDataFactory {
             ))
             .shipmentTransports(Set.of(
               ShipmentTransport.builder()
-                .transport(Transport.builder()
-                  .loadTransportCall(TransportCall.builder()
-                    .eventDateTimeDeparture(OffsetDateTime.of(2020, 1, 1, 1, 1, 1, 0, ZoneOffset.UTC))
-                    .location(Location.builder().UNLocationCode("NLRTM").build())
-                    .build())
-                  .dischargeTransportCall(TransportCall.builder()
-                    .eventDateTimeArrival(OffsetDateTime.of(2020, 1, 8, 1, 1, 1, 0, ZoneOffset.UTC))
-                    .location(Location.builder().UNLocationCode("USMIA").build())
-                    .build())
-                  .build())
+                .plannedArrivalDate(LocalDate.of(2020, 1, 1))
+                .plannedDepartureDate(LocalDate.of(2020, 1, 8))
+                .loadLocation(Location.builder().UNLocationCode("NLRTM").build())
+                .dischargeLocation(Location.builder().UNLocationCode("USMIA").build())
                 .build()
             ))
             .carrier(Carrier.builder().carrierName("dummy carrier").build())

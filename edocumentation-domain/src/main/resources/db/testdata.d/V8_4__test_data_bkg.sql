@@ -4,7 +4,7 @@ INSERT INTO shipment_cutoff_time (
     cut_off_time_code,
     cut_off_time
 ) VALUES (
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'ABC123123123'),
+    (SELECT id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
     'AFD',
     DATE '2021-03-09'
 );
@@ -34,7 +34,7 @@ INSERT INTO shipment_cutoff_time (
     cut_off_time_code,
     cut_off_time
 ) VALUES (
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719971'),
+    (SELECT id FROM shipment WHERE carrier_booking_reference = 'E379021B7782'),
     'EFC',
     DATE '2020-01-06'
 );
@@ -103,7 +103,7 @@ INSERT INTO charge (
 ) VALUES (
     'f9d3c9ae-89c1-4394-a5fc-8e73538aaac4'::uuid,
     (SELECT id FROM transport_document WHERE  transport_document_reference = 'be038e58-5365'),
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'ABC123123123'),
+    (SELECT id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
     'TBD',
     12.12,
     'UMB',
@@ -151,7 +151,7 @@ INSERT INTO shipment_carrier_clauses (
     shipment_id
 ) VALUES (
     'b8e312ad-7b00-4026-88ad-9881242ca4f4',
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'ABC123123123')
+    (SELECT id FROM shipment WHERE carrier_booking_reference = 'A379021B7782')
 );
 
 INSERT INTO shipment_carrier_clauses (
@@ -179,11 +179,11 @@ INSERT INTO shipment_carrier_clauses (
 );
 
 INSERT INTO shipment_carrier_clauses (
-    carrier_clause_id, 
-    shipment_id, 
+    carrier_clause_id,
+    shipment_id,
     transport_document_id
 ) VALUES (
-    'b8e312ad-7b00-4026-88ad-9881242ca4f4'::uuid, 
+    'b8e312ad-7b00-4026-88ad-9881242ca4f4'::uuid,
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
     (SELECT id FROM transport_document WHERE transport_document_reference = '9b02401c-b2fb-5009')
 );
@@ -451,7 +451,7 @@ INSERT INTO commodity (
     export_license_expiry_date
     ) VALUES (
     'bf93f6fb-98b8-4268-a4dc-23a40eab95a8'::uuid,
-    (SELECT booking_id FROM shipment WHERE carrier_booking_reference = 'ABC123123123'),
+    (SELECT booking_id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
     'Bloom',
     '720711',
     2000.0,
@@ -493,101 +493,50 @@ INSERT INTO shipment (
     '2022-02-02 02:22:22.000',
     DATE '2022-03-03T12:12:12');
 
-INSERT INTO transport_call (
-    id,
-    transport_call_reference,
-    transport_call_sequence_number,
-    facility_type_code,
-    location_id,
-    mode_of_transport_code,
-    vessel_id,
-    import_voyage_id,
-    export_voyage_id
-) VALUES (
-    'e7b0ae8f-b479-40d8-b3de-56c4c2474211'::uuid,
-    'TC-REF-08_04-A',
-    1,
-    'POTE',
-    'c703277f-84ca-4816-9ccf-fad8e202d3b6'::uuid,
-    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'VESSEL'),
-    (SELECT id FROM vessel WHERE vessel_imo_number = '9321483'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2106W'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2107E')
-), (
-    'af0acf67-604c-4ffa-befe-77878a6a665d'::uuid,
-    'TC-REF-08_04-B',
-    1,
-    'POTE',
-    '01670315-a51f-4a11-b947-ce8e245128eb'::uuid,
-    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'VESSEL'),
-    (SELECT id FROM vessel WHERE vessel_imo_number = '9321483'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2106W'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2107E')
-);
-
-INSERT INTO transport_event (
-    event_id,
-    event_classifier_code,
-    event_created_date_time,
-    event_date_time,
-    transport_event_type_code,
-    transport_call_id,
-    delay_reason_code,
-    change_remark
-) VALUES (
-    uuid('2968b966-ee81-46ba-af87-0c5031c641f4'),
-    (SELECT event_classifier_code FROM event_classifier WHERE event_classifier_code = 'PLN'),
-    '2021-11-28T14:12:56+01:00'::timestamptz,
-    '2021-12-01T07:41:00+08:30'::timestamptz,
-    'ARRI',
-    'e7b0ae8f-b479-40d8-b3de-56c4c2474211'::uuid,
-    'WEA',
-    'Bad weather'
-), (
-    uuid('9d5d0824-b228-4ea8-b2cb-4ebd8da76e15'),
-    (SELECT event_classifier_code FROM event_classifier WHERE event_classifier_code = 'PLN'),
-    '2021-11-29T14:12:56+01:00'::timestamptz,
-    '2021-12-03T07:41:00+08:30'::timestamptz,
-    'DEPA',
-    'af0acf67-604c-4ffa-befe-77878a6a665d'::uuid,
-    'WEA',
-    'Bad weather'
-);
-
-INSERT INTO transport (
-    id,
-    transport_reference,
-    transport_name,
-    load_transport_call_id,
-    discharge_transport_call_id
-) VALUES (
-    uuid('6b14b74d-401a-4e66-a5ad-d3cd42953441'),
-    'not another transport reference',
-    'Transport Name in action',
-    'e7b0ae8f-b479-40d8-b3de-56c4c2474211'::uuid,
-    'af0acf67-604c-4ffa-befe-77878a6a665d'::uuid
-);
-
 INSERT INTO shipment_transport (
-    shipment_id,
-    transport_id,
-    transport_plan_stage_sequence_number,
-    transport_plan_stage_code,
-    commercial_voyage_id,
-    is_under_shippers_responsibility
+  shipment_id,
+  transport_plan_stage_sequence_number,
+  transport_plan_stage_code,
+  load_location_id,
+  discharge_location_id,
+  planned_departure_date,
+  planned_arrival_date,
+  vessel_imo_number,
+  vessel_name,
+  carrier_import_voyage_number,
+  carrier_export_voyage_number,
+  carrier_service_code,
+  dcsa_transport_type,
+  is_under_shippers_responsibility
 ) VALUES (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'DCR987876762'),
-    uuid('6b14b74d-401a-4e66-a5ad-d3cd42953441'),
     1,
-    'PRC',
+    'MNC',
+    'c703277f-84ca-4816-9ccf-fad8e202d3b6'::uuid,
+    '01670315-a51f-4a11-b947-ce8e245128eb'::uuid,
+    '2021-12-01',
+    '2021-12-03',
+    '9321483',
+    'Emma Mærsk',
+    '2106W',
+    '2107E',
     null,
+    'VESSEL',
     false
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'C501576CD94F'),
-    uuid('6b14b74d-401a-4e66-a5ad-d3cd42953441'),
     1,
-    'PRC',
+    'MNC',
+    'c703277f-84ca-4816-9ccf-fad8e202d3b6'::uuid,
+    '01670315-a51f-4a11-b947-ce8e245128eb'::uuid,
+    '2021-12-01',
+    '2021-12-03',
+    '9321483',
+    'Emma Mærsk',
+    '2106W',
+    '2107E',
     null,
+    'VESSEL',
     false
 );
 

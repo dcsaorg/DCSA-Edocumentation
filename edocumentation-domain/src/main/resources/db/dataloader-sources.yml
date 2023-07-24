@@ -28,13 +28,17 @@ sources:
       - value_added_service_code
       - equipment_event_type
       - operations_event_type
+      - transport_event_type
       - port_call_phase_type
       - port_call_service_type
       - port_call_status_type
+      - empty_indicator
 
   - path: classpath:db/samples.d
     type: csv
     groups: [sample]
+    excludes:
+      - smdg_delay_reason
 
   - path: classpath:db/testdata.d
     type: flyway

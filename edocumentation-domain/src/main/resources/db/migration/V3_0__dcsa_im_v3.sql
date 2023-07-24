@@ -471,16 +471,6 @@ CREATE TABLE charge (
 );
 
 
-CREATE TABLE document_version (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    transport_document_id uuid NOT NULL REFERENCES transport_document (id),
-    document_status varchar(4) NOT NULL REFERENCES shipment_event_type (shipment_event_type_code),
-    binary_copy bytea NOT NULL,
-    document_hash text NOT NULL,
-    last_modified_datetime timestamp with time zone NOT NULL
-);
-
-
 CREATE TABLE equipment (
     equipment_reference varchar(15) PRIMARY KEY,    -- The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.
     -- Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard.
@@ -642,51 +632,31 @@ CREATE TABLE port_call_status_type (
 );
 
 
-CREATE TABLE transport_call (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    transport_call_reference varchar(100) NOT NULL DEFAULT uuid_generate_v4(),
-    transport_call_sequence_number integer,
-    facility_type_code char(4) NULL REFERENCES facility_type (facility_type_code),
-    location_id uuid NULL REFERENCES location (id),
-    mode_of_transport_code varchar(3) NULL REFERENCES mode_of_transport (mode_of_transport_code),
-    vessel_id uuid NULL REFERENCES vessel(id),
-    import_voyage_id uuid NULL, -- references on line 800
-    export_voyage_id uuid NULL, -- references on line 800
-    port_call_status_type_code char(4) NULL REFERENCES port_call_status_type (port_call_status_type_code),
-    port_visit_reference varchar(50) NULL
-);
-
-
-CREATE TABLE transport (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    transport_reference varchar(50) NULL,
-    transport_name varchar(100) NULL,
-    load_transport_call_id uuid NOT NULL REFERENCES transport_call(id),
-    discharge_transport_call_id uuid NOT NULL REFERENCES transport_call(id)
-);
-
-
-CREATE TABLE commercial_voyage (
-    commercial_voyage_id uuid PRIMARY KEY,
-    commercial_voyage_name text NOT NULL
-);
-
-
 CREATE TABLE transport_plan_stage_type (
     transport_plan_stage_code varchar(3) PRIMARY KEY,
     transport_plan_stage_name varchar(100) NOT NULL,
     transport_plan_stage_description varchar(250) NOT NULL
 );
 
-
+-- NOT a 1:1 with the DCSA IM version of the similarly named entity
 CREATE TABLE shipment_transport (
     shipment_id uuid NULL REFERENCES shipment(id),
-    transport_id uuid NOT NULL REFERENCES transport(id),
     transport_plan_stage_sequence_number integer NOT NULL,
     transport_plan_stage_code varchar(3) NOT NULL REFERENCES transport_plan_stage_type(transport_plan_stage_code),
-    commercial_voyage_id uuid NULL REFERENCES commercial_voyage(commercial_voyage_id),
-    is_under_shippers_responsibility boolean NOT NULL,
-    UNIQUE (shipment_id, transport_id, transport_plan_stage_sequence_number) -- transport_plan_stage_sequence_number must be unique together with transport and shipment
+    dcsa_transport_type varchar(50) NULL CHECK (dcsa_transport_type IS NULL OR dcsa_transport_type IN ('RAIL', 'BARGE', 'VESSEL', 'TRUCK')),
+    planned_arrival_date date NOT NULL,
+    planned_departure_date date NOT NULL,
+    load_location_id uuid NOT NULL REFERENCES location(id),
+    discharge_location_id uuid NOT NULL REFERENCES location(id),
+    vessel_imo_number varchar(7) NULL,
+    vessel_name varchar(35) NULL,
+    carrier_import_voyage_number varchar(50) NULL,
+    carrier_export_voyage_number varchar(50) NULL,
+    carrier_service_code varchar(11) NULL,
+    universal_import_voyage_reference varchar(5) NULL,
+    universal_export_voyage_reference varchar(5) NULL,
+    universal_service_reference varchar(8) NULL,
+    is_under_shippers_responsibility boolean NOT NULL
 );
 
 
@@ -704,69 +674,14 @@ CREATE TABLE document_type (
 );
 
 
-CREATE TABLE transport_event_type (
-    transport_event_type_code varchar(4) PRIMARY KEY,
-    transport_event_type_name varchar(30) NOT NULL,
-    transport_event_type_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE empty_indicator (
-    empty_indicator_code varchar(5) PRIMARY KEY
-);
-
-
-CREATE TABLE event (
-    event_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    event_classifier_code varchar(3) NOT NULL REFERENCES event_classifier(event_classifier_code),
-    event_created_date_time timestamp with time zone DEFAULT now() NOT NULL,
-    event_date_time timestamp with time zone NOT NULL
-);
-
 CREATE TABLE shipment_event (
+    event_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    event_classifier_code varchar(3) NOT NULL REFERENCES event_classifier(event_classifier_code)
+        CHECK ( event_classifier_code = 'ACT'),
+    event_created_date_time timestamp with time zone DEFAULT now() NOT NULL,
+    event_date_time timestamp with time zone NOT NULL,
     shipment_event_type_code varchar(4) NOT NULL REFERENCES shipment_event_type(shipment_event_type_code),
     document_type_code varchar(3) NOT NULL REFERENCES document_type(document_type_code),
     document_id uuid NOT NULL,
     reason varchar(5000) NULL
-) INHERITS (event);
-
-ALTER TABLE shipment_event ADD PRIMARY KEY (event_id),
-                                        ADD CONSTRAINT event_classifier_code_is_act CHECK (event_classifier_code = 'ACT');
-
-
-CREATE TABLE smdg_delay_reason (
-    delay_reason_code varchar(3) NOT NULL PRIMARY KEY,
-    delay_reason_name varchar(100) NOT NULL,
-    delay_reason_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE transport_event (
-    transport_event_type_code varchar(4) NOT NULL REFERENCES transport_event_type(transport_event_type_code),
-    delay_reason_code varchar(3) NULL REFERENCES smdg_delay_reason(delay_reason_code),
-    change_remark varchar(250),
-    transport_call_id uuid NULL REFERENCES transport_call(id)
-) INHERITS (event);
-
-ALTER TABLE transport_event ADD PRIMARY KEY (event_id);
-
-CREATE TABLE service_proforma (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    service_proforma_agreed_date_time timestamp with time zone NOT NULL,
-    port_call_sequence_number integer NULL,
-    port_code varchar(5) NULL,
-    port_terminal_call_sequence_number integer NULL,
-    port_terminal_code varchar(11) NULL,
-    service_id uuid NULL REFERENCES service (id)
-);
-
-ALTER TABLE transport_call
-    ADD FOREIGN KEY (import_voyage_id) REFERENCES voyage (id) INITIALLY DEFERRED;
-ALTER TABLE transport_call
-    ADD FOREIGN KEY (export_voyage_id) REFERENCES voyage (id) INITIALLY DEFERRED;
-
-
-CREATE TABLE commercial_voyage_transport_call (
-    transport_call_id uuid NOT NULL REFERENCES transport_call(id),
-    commercial_voyage_id uuid NOT NULL REFERENCES commercial_voyage(commercial_voyage_id)
 );

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
+import org.dcsa.edocumentation.domain.persistence.entity.ShipmentTransport;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.EquipmentAssignment;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
@@ -16,6 +17,8 @@ import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.EquipmentRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
+import org.dcsa.edocumentation.service.ShipmentLocationService;
+import org.dcsa.edocumentation.service.ShipmentTransportService;
 import org.dcsa.edocumentation.service.mapping.EquipmentAssignmentMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentLocationMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
@@ -44,7 +47,9 @@ public class ManageShipmentService {
   private final EquipmentAssignmentMapper equipmentAssignmentMapper;
   private final EquipmentRepository equipmentRepository;
   private final BookingValidationService bookingValidationService;
-  private final ShipmentLocationMapper shipmentLocationMapper;
+  private final ShipmentLocationService shipmentLocationService;
+  private final ShipmentTransportService shipmentTransportService;
+
   private static final Predicate<ShipmentLocationTypeCode> HAS_SOURCE_LOCATION = code ->
           code == ShipmentLocationTypeCode.PRE || code == ShipmentLocationTypeCode.POL;
   private static final Predicate<ShipmentLocationTypeCode> HAS_DESTINATION_LOCATION = code ->
@@ -68,7 +73,15 @@ public class ManageShipmentService {
     OffsetDateTime confirmationTime = OffsetDateTime.now();
     ValidationResult<BkgDocumentStatus> validationResult = bookingValidationService.validateBooking(booking);
 
+    shipmentEventRepository.save(booking.confirm(confirmationTime));
+
+    // FIXME: Check if the shipment (CBR) already exists and then attempt to reconfirm it if possible rather than
+    //  die with a 409 Conflict (or create a duplicate or whatever happens). Probably just set "valid_until = now()"
+    //  on the old shipment if it exists and then create a new one.
+    //  On reconfirm: If a CBR is not provided, then keep the original CBR. Otherwise, if they are distinct, replace
+    //  the old one with the new.
     Shipment shipment = Shipment.builder()
+            // FIXME: The booking must be deeply cloned, so the shipment is not mutable via PUT /bookings/{...}
             .booking(booking)
             .carrier(carrier)
             .carrierBookingReference(shipmentRequestTO.carrierBookingReference())
@@ -76,6 +89,13 @@ public class ManageShipmentService {
             .shipmentUpdatedDateTime(confirmationTime)
             .termsAndConditions(shipmentRequestTO.termsAndConditions())
             .build();
+
+    if (!validationResult.validationErrors().isEmpty()) {
+      return shipmentMapper.toStatusDTO(shipment, validationResult.proposedStatus());
+    }
+
+    // FIXME: This should be embedded into `validationResult`.
+    validateTransportPlans(shipmentRequestTO, shipmentRequestTO.shipmentLocations());
 
     shipment.assignEquipments(
       Objects.requireNonNullElse(
@@ -86,20 +106,10 @@ public class ManageShipmentService {
         .toList()
     );
 
-    if (!validationResult.validationErrors().isEmpty()) {
-      return shipmentMapper.toStatusDTO(shipment, validationResult.proposedStatus());
-    }
-    Booking validatedBooking = getBooking(shipmentRequestTO);
-    shipmentEventRepository.save(validatedBooking.confirm(confirmationTime));
 
-    var confirmedSl = shipmentRequestTO.shipmentLocations().stream().
-            map(dfs -> shipmentLocationMapper.toDAO(dfs, validatedBooking)).collect(Collectors.toSet());
-
-    shipment.toBuilder().shipmentLocations(confirmedSl).booking(validatedBooking);
-
-
-    validateTransportPlans(shipmentRequestTO, shipmentRequestTO.shipmentLocations());
     shipment = shipmentRepository.save(shipment);
+    shipmentLocationService.createShipmentLocations(shipmentRequestTO.shipmentLocations(), shipment);
+    shipmentTransportService.createShipmentTransports(shipmentRequestTO.transports(), shipment);
     return shipmentMapper.toStatusDTO(shipment, booking.getDocumentStatus());
   }
 

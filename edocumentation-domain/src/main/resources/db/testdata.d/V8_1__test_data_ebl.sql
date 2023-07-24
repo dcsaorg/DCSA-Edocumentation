@@ -47,14 +47,14 @@ INSERT INTO location (
 ) VALUES (
     uuid('84bfcf2e-403b-11eb-bc4a-1fc4aa7d879d'),
     'The Factory',
-    'USMIA'
+    'NLRTM'
 ), (
     uuid('286c605e-4043-11eb-9c0b-7b4196cf71fa'),
-    'Port of Singapore',
+    'Singapore',
     'SGSIN'
 ), (
     uuid('770b7624-403d-11eb-b44b-d3f4ad185386'),
-    'Port of Rotterdam',
+    'Rotterdam',
     'NLRTM'
 ), (
     uuid('770b7624-403d-11eb-b44b-d3f4ad185387'),
@@ -66,46 +66,18 @@ INSERT INTO location (
     'USMIA'
 ), (
     uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
-    'Port of Miami',
+    'Miami',
     'USMIA'
-);
-
-INSERT INTO address (
-    id,
-    name,
-    street,
-    street_number,
-    floor,
-    postal_code,
-    city,
-    state_region,
-    country
-) VALUES (
-    uuid('41272437-a160-4040-9a9d-c6676f9eb1b7'),
-    'Lagkagehuset',
-    'Islands Brygge',
-    '43',
-    'St',
-    '2300',
-    'København S',
-    'N/A',
-    'Denmark'
 );
 
 INSERT INTO location (
     id,
     location_name,
-    address_id,
-    latitude,
-    longitude,
     un_location_code
 ) VALUES (
     '01670315-a51f-4a11-b947-ce8e245128eb',
-    'Lagkagehuset Islands Brygge',
-    uuid('41272437-a160-4040-9a9d-c6676f9eb1b7'),
-    '55.6642249',
-    '12.57341045',
-    'USNYC'
+    'København',
+    'DKCPH'
 );
 
 INSERT INTO booking (
@@ -359,145 +331,81 @@ INSERT INTO vessel (
     (SELECT id FROM carrier WHERE smdg_code = 'MSK')
 );
 
-INSERT INTO transport_call (
-    id,
-    transport_call_reference,
-    transport_call_sequence_number,
-    facility_type_code,
-    location_id,
-    mode_of_transport_code,
-    vessel_id,
-    import_voyage_id,
-    export_voyage_id
-) VALUES (
-    '286c605e-4043-11eb-9c0b-7b4196cf71fa'::uuid,
-    'TC-REF-08_01-A',
-    1,
-    'POTE',
-    null,
-    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'VESSEL'),
-    (SELECT id FROM vessel WHERE vessel_imo_number = '9321483'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2106W'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2107E')
-), (
-    '770b7624-403d-11eb-b44b-d3f4ad185386'::uuid,
-    'TC-REF-08_01-B',
-    1,
-    'COFS',
-    null,
-    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'RAIL'),
-    null,
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2218W'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2219E')
-), (
-    '770b7624-403d-11eb-b44b-d3f4ad185387'::uuid,
-    'TC-REF-08_01-C',
-    1,
-    'COFS',
-    uuid('770b7624-403d-11eb-b44b-d3f4ad185387'),
-    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'RAIL'),
-    null,
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2418W'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '2419E')
-), (
-    '770b7624-403d-11eb-b44b-d3f4ad185388'::uuid,
-    'TC-REF-08_01-D',
-    1,
-    'INTE',
-    uuid('770b7624-403d-11eb-b44b-d3f4ad185388'),
-    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'RAIL'),
-    null,
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '3418W'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '3419E')
-), (
-    '8d8ba2d3-5ef4-457c-a526-45cb4e290e9a'::uuid,
-    'TC-REF-TD-NLRTM',
-    1,
-    'POTE',
-    uuid('770b7624-403d-11eb-b44b-d3f4ad185386'),
-    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'VESSEL'),
-    null,
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '3418W'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '3419E')
-), (
-    '1f9afa63-2711-407f-a85e-0a196498367c'::uuid,
-    'TC-REF-TD-NLRTM',
-    1,
-    'POTE',
-    uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
-    (SELECT mode_of_transport_code FROM mode_of_transport WHERE dcsa_transport_type = 'VESSEL'),
-    null,
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '3418W'),
-    (SELECT id FROM voyage WHERE carrier_voyage_number = '3419E')
-);
-
-INSERT INTO transport (
-    id,
-    transport_reference,
-    transport_name,
-    load_transport_call_id,
-    discharge_transport_call_id
-) VALUES (
-    '561a5606-402e-11eb-b19a-0f3aa4962e1f'::uuid,
-    'transport reference',
-    'Transport name',
-    '286c605e-4043-11eb-9c0b-7b4196cf71fa'::uuid,
-    '770b7624-403d-11eb-b44b-d3f4ad185386'::uuid
-), (
-    '561a5606-402e-11eb-b19a-0f3aa4962e2f'::uuid,
-    'transport reference xx',
-    'Transport name xx',
-    '770b7624-403d-11eb-b44b-d3f4ad185386'::uuid,
-    '770b7624-403d-11eb-b44b-d3f4ad185387'::uuid
-), (
-    '561a5606-402e-11eb-b19a-0f3aa4962e3f'::uuid,
-    'transport reference yy',
-    'Transport name yy',
-    '770b7624-403d-11eb-b44b-d3f4ad185387'::uuid,
-    '770b7624-403d-11eb-b44b-d3f4ad185388'::uuid
-), (
-    '561a5606-402e-11eb-b19a-0f3aa4962e3e'::uuid,
-    'transport reference yy',
-    'Transport name yy',
-    '8d8ba2d3-5ef4-457c-a526-45cb4e290e9a'::uuid,
-    '1f9afa63-2711-407f-a85e-0a196498367c'::uuid
-);
-
 INSERT INTO shipment_transport (
     shipment_id,
-    transport_id,
     transport_plan_stage_sequence_number,
     transport_plan_stage_code,
-    commercial_voyage_id,
+    load_location_id,
+    discharge_location_id,
+    planned_departure_date,
+    planned_arrival_date,
+    vessel_imo_number,
+    vessel_name,
+    carrier_import_voyage_number,
+    carrier_export_voyage_number,
+    carrier_service_code,
+    dcsa_transport_type,
     is_under_shippers_responsibility
 ) VALUES (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
-    uuid('561a5606-402e-11eb-b19a-0f3aa4962e1f'),
     1,
     'PRC',
+    '84bfcf2e-403b-11eb-bc4a-1fc4aa7d879d'::uuid,
+    '770b7624-403d-11eb-b44b-d3f4ad185386'::uuid,
+    '2021-12-01',
+    '2021-12-01',
     null,
+    null,
+    null,
+    null,
+    null,
+    'TRUCK',
     false
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
-    uuid('561a5606-402e-11eb-b19a-0f3aa4962e2f'),
     2,
-    'PRC',
+    'MNC',
+    '770b7624-403d-11eb-b44b-d3f4ad185386'::uuid,
+    '7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'::uuid,
+    '2021-12-01',
+    '2021-12-10',
+    '9321483',
+    'Emma Maersk',
+    '2106W',
+    '2107E',
     null,
+    'VESSEL',
     false
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
-    uuid('561a5606-402e-11eb-b19a-0f3aa4962e3f'),
     3,
-    'PRC',
+    'ONC',
+    '7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'::uuid,
+    '770b7624-403d-11eb-b44b-d3f4ad185387'::uuid,
+    '2021-12-10',
+    '2021-12-11',
     null,
-    true
+    null,
+    null,
+    null,
+    null,
+    'RAIL',
+    false
 ), (
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
-    uuid('561a5606-402e-11eb-b19a-0f3aa4962e3e'),
-    1,
-    'MNC',
-    NULL,
-    true
+  (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
+  1,
+  'MNC',
+  '770b7624-403d-11eb-b44b-d3f4ad185386'::uuid,
+  '7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'::uuid,
+  '2021-12-01',
+  '2021-12-10',
+  '9321483',
+  'Emma Maersk',
+  '2106W',
+  '2107E',
+  null,
+  'VESSEL',
+  false
 );
 
 INSERT INTO party (
@@ -583,17 +491,17 @@ INSERT INTO shipment_location (
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
-    uuid('286c605e-4043-11eb-9c0b-7b4196cf71fa'),
+    uuid('770b7624-403d-11eb-b44b-d3f4ad185386'),
     'POL'
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
-    uuid('770b7624-403d-11eb-b44b-d3f4ad185386'),
+    uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
     'POD'
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
-    uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
+    uuid('770b7624-403d-11eb-b44b-d3f4ad185387'),
     'PDE'
 ), (
    (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
@@ -1381,53 +1289,6 @@ INSERT INTO shipment (
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
     DATE '2020-04-07T12:12:12'
-);
-
-  INSERT INTO transport_event (
-  event_id,
-  event_classifier_code,
-  event_created_date_time,
-  event_date_time,
-  transport_event_type_code,
-  transport_call_id,
-  delay_reason_code,
-  change_remark
-) VALUES (
-  uuid('2968b966-ee81-46ba-af87-0c5031c641f3'),
-  'PLN',
-  '2021-11-28T14:12:56+01:00'::timestamptz,
-  '2021-12-01T07:41:00+08:30'::timestamptz,
-  'DEPA',
-  '770b7624-403d-11eb-b44b-d3f4ad185387'::uuid,
-  'WEA',
-  'Bad weather'
-), (
-    uuid('2968b966-ee81-46ba-af87-0c5031c641f2'),
-    'PLN',
-    '2021-11-28T14:12:56+01:00'::timestamptz,
-    '2021-12-01T07:41:00+08:30'::timestamptz,
-    'ARRI',
-    '770b7624-403d-11eb-b44b-d3f4ad185388'::uuid,
-    'WEA',
-    'Bad weather'
-), (
-    uuid_generate_v4(),
-    'PLN',
-    '2023-01-14T14:12:56+01:00'::timestamptz,
-    '2022-12-01T07:41:00+08:30'::timestamptz,
-    'DEPA',
-    '8d8ba2d3-5ef4-457c-a526-45cb4e290e9a'::uuid,
-    null,
-    null
-), (
-    uuid_generate_v4(),
-    'PLN',
-    '2023-01-01T14:12:56+01:00'::timestamptz,
-    '2022-12-01T07:41:00+08:30'::timestamptz,
-    'ARRI',
-    '1f9afa63-2711-407f-a85e-0a196498367c'::uuid,
-    null,
-    null
 );
 
 INSERT INTO commodity(
