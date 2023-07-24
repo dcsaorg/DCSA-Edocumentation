@@ -8,31 +8,9 @@ import org.mapstruct.Mapping;
 
 @Mapper(
     componentModel = "spring",
-    uses = {LocationMapper.class, DocumentStatusMapper.class})
+    uses = {LocationMapper.class, DocumentStatusMapper.class, ModeOfTransportMapper.class})
 public interface TransportMapper {
 
-  @Mapping(source = "transport.loadTransportCall.eventDateTimeDeparture", target = "plannedDepartureDate")
-  @Mapping(source = "transport.dischargeTransportCall.eventDateTimeArrival", target = "plannedArrivalDate")
-  @Mapping(source = "transport.dischargeTransportCall.vessel.vesselIMONumber", target = "vesselIMONumber")
-  @Mapping(source = "transport.dischargeTransportCall.vessel.name", target = "vesselName")
-  @Mapping(
-      source = "transport.dischargeTransportCall.importVoyage.carrierVoyageNumber",
-      target = "carrierImportVoyageNumber")
-  @Mapping(
-    source = "transport.dischargeTransportCall.importVoyage.universalVoyageReference",
-    target = "universalImportVoyageReference")
-  @Mapping(
-      source = "transport.dischargeTransportCall.exportVoyage.carrierVoyageNumber",
-      target = "carrierExportVoyageNumber")
-  @Mapping(
-    source = "transport.dischargeTransportCall.exportVoyage.universalVoyageReference",
-    target = "universalExportVoyageReference")
-  @Mapping(
-    source = "transport.loadTransportCall.location",
-    target = "loadLocation")
-  @Mapping(
-    source = "transport.dischargeTransportCall.location",
-    target = "dischargeLocation")
   @Mapping(
     source = "transportPlanStageCode",
     target = "transportPlanStage")
