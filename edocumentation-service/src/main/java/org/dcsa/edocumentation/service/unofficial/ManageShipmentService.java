@@ -1,6 +1,8 @@
 package org.dcsa.edocumentation.service.unofficial;
 
 import jakarta.transaction.Transactional;
+
+import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Predicate;
@@ -22,6 +24,7 @@ import org.dcsa.edocumentation.service.ShipmentTransportService;
 import org.dcsa.edocumentation.service.mapping.EquipmentAssignmentMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentLocationMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
+import org.dcsa.edocumentation.service.mapping.ShipmentTransportMapper;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
@@ -50,6 +53,9 @@ public class ManageShipmentService {
   private final ShipmentLocationService shipmentLocationService;
   private final ShipmentTransportService shipmentTransportService;
 
+
+  private final Random random = new SecureRandom();
+
   private static final Predicate<ShipmentLocationTypeCode> HAS_SOURCE_LOCATION = code ->
           code == ShipmentLocationTypeCode.PRE || code == ShipmentLocationTypeCode.POL;
   private static final Predicate<ShipmentLocationTypeCode> HAS_DESTINATION_LOCATION = code ->
@@ -61,6 +67,36 @@ public class ManageShipmentService {
   public static final List<ShipmentLocationTypeCode> SHIPMENT_LOCATION_TYPE_CODE_ORDER =
           List.of(ShipmentLocationTypeCode.PRE, ShipmentLocationTypeCode.POL, ShipmentLocationTypeCode.POD, ShipmentLocationTypeCode.PDE);
 
+
+  private static final char[] VALID_CBR_AUTOGEN_CHARS = (
+    // Exclude characters that look alike (I vs. 1, O vs 0)
+    asciiRange('A', 'Z', 'I', 'O')
+    + asciiRange('2', '9')
+
+  ).toCharArray();
+
+  private static String asciiRange(char start, char end, Character ... except) {
+    StringBuilder range = new StringBuilder(end - start + 1 - except.length);  // Range is inclusive
+    Set<Character> exceptions = Set.of(except);
+    if (exceptions.contains(start) || exceptions.contains(end)) {
+      throw new IllegalArgumentException("Range must not start / end on an exception");
+    }
+    var current = start;
+    do {
+      if (!exceptions.contains(current)) {
+        range.append(current);
+      }
+    } while (++current <= end);
+    return range.toString();
+  }
+
+  private String generateCarrierBookingReference() {
+    char[] cbr = new char[35];
+    for (int i = 0 ; i < cbr.length ; i++) {
+      cbr[i] = VALID_CBR_AUTOGEN_CHARS[random.nextInt(VALID_CBR_AUTOGEN_CHARS.length)];
+    }
+    return new String(cbr);
+  }
 
   @Transactional
   public ShipmentRefStatusTO create(ManageShipmentRequestTO shipmentRequestTO) {
@@ -84,7 +120,7 @@ public class ManageShipmentService {
             // FIXME: The booking must be deeply cloned, so the shipment is not mutable via PUT /bookings/{...}
             .booking(booking)
             .carrier(carrier)
-            .carrierBookingReference(shipmentRequestTO.carrierBookingReference())
+            .carrierBookingReference(Objects.requireNonNullElseGet(shipmentRequestTO.carrierBookingReference(), this::generateCarrierBookingReference))
             .shipmentCreatedDateTime(confirmationTime)
             .shipmentUpdatedDateTime(confirmationTime)
             .termsAndConditions(shipmentRequestTO.termsAndConditions())
