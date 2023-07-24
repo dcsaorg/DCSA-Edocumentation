@@ -82,13 +82,13 @@ public class UnofficialTransportDocumentService {
     // FIXME: We need to "freeze" the transport document such that changes to the SI does *NOT* change
     //  the transport document. This affects basically any non-trivial object associated with the
     //  transport document.
+    // TODO: This logic should not be a builder; but in a SI .issueDraft() or something like that, which could
+    //  then validate the draft document is in a sentible state (e.g., isElectronic vs. original/copies/rider pages)
     TransportDocument document = TransportDocument.builder()
       .shippingInstruction(shippingInstruction)
-      .shippedOnBoardDate(transportDocumentRequestTO.shippedOnBoardDate())
-      .receivedForShipmentDate(transportDocumentRequestTO.receivedForShipmentDate())
+      .shippedOnBoardDate(shippingInstruction.getIsShippedOnBoardType() == Boolean.TRUE ? transportDocumentRequestTO.shipmentDate() : null)
+      .receivedForShipmentDate(shippingInstruction.getIsShippedOnBoardType() == Boolean.FALSE ? transportDocumentRequestTO.shipmentDate() : null)
       .numberOfRiderPages(transportDocumentRequestTO.numberOfRiderPages())
-      // FIXME: numberOfOriginalsWithCharges
-      // FIXME: numberOfOriginalsWithoutCharges
       .carrier(carrier)
       .issuingParty(partyService.createParty(transportDocumentRequestTO.issuingParty()))
       .build();
