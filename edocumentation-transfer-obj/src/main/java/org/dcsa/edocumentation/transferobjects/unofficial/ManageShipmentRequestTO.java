@@ -1,24 +1,23 @@
 package org.dcsa.edocumentation.transferobjects.unofficial;
 
-import lombok.Builder;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.util.List;
+import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
 
-import java.util.List;
-import java.util.Set;
-
 public record ManageShipmentRequestTO(
-  @NotBlank
+  @Pattern(regexp = "^\\S+(\\s+\\S+)*$")
   @Size(max = 35, message = "The attribute carrierBookingReference has a max size of 35.")
   String carrierBookingReference,
 
-  @NotBlank
+  @Pattern(regexp = "^\\S+(\\s+\\S+)*$")
   @Size(max = 100)
+  @NotBlank
   String carrierBookingRequestReference,
 
   String termsAndConditions,
