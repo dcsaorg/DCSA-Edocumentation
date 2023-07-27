@@ -41,7 +41,7 @@ public class StuffingService {
                   Commodity commodity = commodityRepository.save(Commodity.builder()
                     .booking(shipment.getBooking())
                     .commodityType(consignmentItem.getDescriptionOfGoods())
-                    .hsCode(consignmentItemTO.hsCode())
+                    .hsCodes(consignmentItemTO.hsCodes())
                     .build()
                   );
                   return consignmentItem.toBuilder()

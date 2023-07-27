@@ -387,7 +387,6 @@ INSERT INTO commodity(
     id,
     booking_id,
     commodity_type,
-    hs_code,
     cargo_gross_weight,
     cargo_gross_weight_unit,
     export_license_issue_date,
@@ -396,7 +395,6 @@ INSERT INTO commodity(
     '85b681bf-68a0-4f90-8cc6-79bf77d3b2a1'::uuid,
     'a521dbdb-a12b-48f5-b489-8594349731bf'::uuid,
     'Hand Bags',
-    '411510',
     1200.0,
     'KGM',
     NULL,
@@ -406,7 +404,6 @@ INSERT INTO commodity (
     id,
     booking_id,
     commodity_type,
-    hs_code,
     cargo_gross_weight,
     cargo_gross_weight_unit,
     export_license_issue_date,
@@ -415,7 +412,6 @@ INSERT INTO commodity (
     '54c9b7fb-b641-4ccc-b1be-70a63fac17d6'::uuid,
     'a521dbdb-a12b-48f5-b489-8594349731bf'::uuid,
     'Bloom',
-    '720711',
     2000.0,
     'LBR',
     NULL,
@@ -425,7 +421,6 @@ INSERT INTO commodity (
     id,
     booking_id,
     commodity_type,
-    hs_code,
     cargo_gross_weight,
     cargo_gross_weight_unit,
     export_license_issue_date,
@@ -434,7 +429,6 @@ INSERT INTO commodity (
     'bf93f6fb-98b8-4268-a4dc-23a40eab95a9'::uuid,
     '8b78219e-d049-4c68-8d9e-f40bf9a85140'::uuid,
     'Bloom',
-    '720711',
     2000.0,
     'LBR',
     NULL,
@@ -444,7 +438,6 @@ INSERT INTO commodity (
     id,
     booking_id,
     commodity_type,
-    hs_code,
     cargo_gross_weight,
     cargo_gross_weight_unit,
     export_license_issue_date,
@@ -453,11 +446,27 @@ INSERT INTO commodity (
     'bf93f6fb-98b8-4268-a4dc-23a40eab95a8'::uuid,
     (SELECT booking_id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
     'Bloom',
-    '720711',
     2000.0,
     'LBR',
     NULL,
     NULL);
+
+INSERT INTO hs_code_item (
+  commodity_id,
+  hs_code
+) VALUES (
+  '85b681bf-68a0-4f90-8cc6-79bf77d3b2a1'::uuid,
+  '411510'
+), (
+  '54c9b7fb-b641-4ccc-b1be-70a63fac17d6'::uuid,
+  '720711'
+), (
+  'bf93f6fb-98b8-4268-a4dc-23a40eab95a9'::uuid,
+  '720711'
+), (
+  'bf93f6fb-98b8-4268-a4dc-23a40eab95a8'::uuid,
+  '720711'
+);
 
 INSERT INTO shipment (
     id,

@@ -116,7 +116,6 @@ public record TransportDocumentTO(
   List<@Valid @NotNull DocumentPartyTO> documentParties,
 
   // TODO: TransportLeg here
-  // TODO: transports have a different definition in the swagger
   @NotNull
   TDTransportTO transports,
 

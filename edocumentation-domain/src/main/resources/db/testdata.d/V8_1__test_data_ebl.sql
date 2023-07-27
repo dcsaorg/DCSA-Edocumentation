@@ -686,120 +686,155 @@ INSERT INTO shipping_instruction (
 INSERT INTO commodity (
     id,
     booking_id,
-    hs_code,
     commodity_type,
     cargo_gross_weight,
     cargo_gross_weight_unit
 ) VALUES (
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
     (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
-    '411510',
     'Expensive Shoes',
     4000,
     'KGM'
 ), (
     '2219e859-e3b5-4e87-80b8-32e9f77cca04',
     (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
-    '720711',
     'Massive Yacht',
     4000,
     'KGM'
 ), (
     '877ce0f8-3126-45f5-b22e-2d1d27d42d85',
     (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
-    '411510',
     'Leather Jackets',
     4000,
     'KGM'
 ), (
     '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
     (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
-    '411510',
     'Air ballons',
     4000,
     'KGM'
 ), (
     'cb6354c9-1ceb-452c-aed0-3cb25a04647a',
     (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
-    '411510',
     'Leather Jackets',
     4000,
     'KGM'
 ), (
     '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
     (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
-    '411510',
     'Leather Jackets',
     4000,
     'KGM'
 ), (
     '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
     (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
-    '411510',
     'Leather Jackets',
     4000,
     'KGM'
 );
 
-
+INSERT INTO hs_code_item (
+  commodity_id,
+  hs_code
+) VALUES (
+  '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
+  '411510'
+), (
+  '2219e859-e3b5-4e87-80b8-32e9f77cca04',
+  '720711'
+), (
+  '877ce0f8-3126-45f5-b22e-2d1d27d42d85',
+  '411510'
+), (
+  '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
+  '411510'
+), (
+  'cb6354c9-1ceb-452c-aed0-3cb25a04647a',
+  '411510'
+), (
+  '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
+  '411510'
+), (
+  '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
+  '411510'
+);
 
 INSERT INTO consignment_item (
     id,
     shipping_instruction_id,
     shipment_id,
     commodity_id,
-    hs_code,
     description_of_goods
 ) VALUES (
     '10f41e70-0cae-47cd-8eb8-4ee6f05e85c1',
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Expensive Shoes'
 ), (
     'c7104528-66d5-4d11-9b82-7af30e84d664',
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Massive Yacht'
 ), (
     '20e8aca5-4524-4ff9-a258-96c506966388',
     '877ce0f8-3126-45f5-b22e-2d1d27d42d85',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'bca68f1d3b804ff88aaa1e43055432f7'),
     '877ce0f8-3126-45f5-b22e-2d1d27d42d85',
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Leather Jackets'
 ), (
     'ca4ff535-407f-41ab-a009-830ddf06bdba',
     '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
     (SELECT id FROM shipment WHERE carrier_booking_reference = '832deb4bd4ea4b728430b857c59bd057'),
     '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Air ballons'
 ), (
     '83ec9f50-2eab-42f7-892d-cad2d25f3b9e',
     'cb6354c9-1ceb-452c-aed0-3cb25a04647a',
     (SELECT id FROM shipment WHERE carrier_booking_reference = '994f0c2b590347ab86ad34cd1ffba505'),
     'cb6354c9-1ceb-452c-aed0-3cb25a04647a',
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Leather Jackets'
 ), (
     '824e8fed-d181-4079-b6ca-9d9069a2a738',
     '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
     (SELECT id FROM shipment WHERE carrier_booking_reference = '02c965382f5a41feb9f19b24b5fe2906'),
     '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Leather Jackets'
 ), (
     '1829548e-5938-4adc-a08e-3af55d8ccf63',
     '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
     '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Leather Jackets'
 );
+
+INSERT INTO hs_code_item (
+  consignment_item_id,
+  hs_code   -- TODO: HS Code probably does not match the description of the goods for any of these.
+) VALUES (
+  '10f41e70-0cae-47cd-8eb8-4ee6f05e85c1',
+  '411510'
+), (
+  'c7104528-66d5-4d11-9b82-7af30e84d664',
+  '720711'
+), (
+  '20e8aca5-4524-4ff9-a258-96c506966388',
+  '411510'
+), (
+  'ca4ff535-407f-41ab-a009-830ddf06bdba',
+  '411510'
+), (
+  '83ec9f50-2eab-42f7-892d-cad2d25f3b9e',
+  '411510'
+), (
+  '824e8fed-d181-4079-b6ca-9d9069a2a738',
+  '411510'
+), (
+  '1829548e-5938-4adc-a08e-3af55d8ccf63',
+  '411510'
+);
+
 
 INSERT INTO transport_document (
     transport_document_reference,
@@ -1295,7 +1330,6 @@ INSERT INTO commodity(
     id,
     booking_id,
     commodity_type,
-    hs_code,
     cargo_gross_weight,
     cargo_gross_weight_unit,
     export_license_issue_date,
@@ -1304,11 +1338,18 @@ INSERT INTO commodity(
     'a5b681bf-68a0-4f90-8cc6-79bf77d3b2a1'::uuid,
     'b521dbdb-a12b-48f5-b489-8594349731bf'::uuid,
     'Hand Bags',
-    '411510',
     1200.0,
     'KGM',
     NULL,
     NULL
+);
+
+INSERT INTO hs_code_item (
+  commodity_id,
+  hs_code
+) VALUES (
+  'a5b681bf-68a0-4f90-8cc6-79bf77d3b2a1'::uuid,
+  '411510'
 );
 
 -------- ShipmentLocationRepository.findByTransportDocumentID BEGIN --------
@@ -1493,27 +1534,38 @@ INSERT INTO consignment_item (
     id,
     shipping_instruction_id,
     shipment_id,
-    hs_code,
     description_of_goods
 ) VALUES (
     '0e98eef4-6ebd-47eb-bd6e-d3878b341b7f',
     'a1c7b95d-3004-40a5-bae1-e379021b7782',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'E379021B7782'),
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Expensive shoes'
 ), (
     '06c0e716-3128-4172-be09-7f82b7ec02ca',
     'a1c7b95d-3004-40a5-bae1-e379021b7782',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'E379021B7782'),
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Slightly less expensive shoes'
 ), (
     'cf1798fe-9447-4ea8-a4a6-9515de751d5e',
     'a1c7b95d-3004-40a5-bae1-e379021b7782',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Even more expensive shoes'
 );
+
+INSERT INTO hs_code_item (
+  consignment_item_id,
+  hs_code -- TODO: HS Code probably does not match the description of the goods for any of these1
+) VALUES (
+  '0e98eef4-6ebd-47eb-bd6e-d3878b341b7f',
+  '411510'
+), (
+  '06c0e716-3128-4172-be09-7f82b7ec02ca',
+  '411510'
+), (
+  'cf1798fe-9447-4ea8-a4a6-9515de751d5e',
+  '411510'
+);
+
 
 INSERT INTO transport_document (
     id,
@@ -1768,14 +1820,20 @@ INSERT INTO consignment_item (
     id,
     shipping_instruction_id,
     shipment_id,
-    hs_code,
     description_of_goods
 ) VALUES (
     '5d943239-23fc-4d5c-ab70-a33a469f9e59',
     '2c337fcc-2814-42b3-a752-f1847e74cba7',
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'D659FDB7E33C'),
-    '411510', -- TODO: HS Code probably does not match the description of the goods.
     'Expensive shoes'
+);
+
+INSERT INTO hs_code_item (
+  consignment_item_id,
+  hs_code
+) VALUES (
+  '5d943239-23fc-4d5c-ab70-a33a469f9e59',
+  '411510' -- TODO: HS Code probably does not match the description of the goods.
 );
 
 INSERT INTO transport_document (
