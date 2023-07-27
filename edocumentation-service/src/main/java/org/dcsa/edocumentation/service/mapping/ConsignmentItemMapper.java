@@ -7,6 +7,8 @@ import org.dcsa.edocumentation.transferobjects.ConsignmentItemTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = {
   ReferenceMapper.class,
   CargoItemMapper.class,
@@ -20,12 +22,12 @@ public interface ConsignmentItemMapper {
     return shipment.getCarrierBookingReference();
   }
 
-  default String mapCommodityToHsCode(Commodity commodity) {
-    return commodity.getHsCode();
+  default List<String> mapCommodityToHsCodes(Commodity commodity) {
+    return commodity.getHsCodes();
   }
 
 
   @Mapping(source = "shipment", target = "carrierBookingReference")
-  @Mapping(source = "commodity", target = "hsCode")
+  @Mapping(source = "commodity", target = "hsCodes")
   ConsignmentItemTO toDTO(ConsignmentItem consignmentItem);
 }

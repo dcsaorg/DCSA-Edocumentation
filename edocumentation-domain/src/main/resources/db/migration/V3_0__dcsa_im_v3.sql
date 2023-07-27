@@ -340,7 +340,6 @@ CREATE TABLE commodity (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     booking_id uuid NOT NULL REFERENCES booking(id),
     commodity_type varchar(550) NOT NULL,
-    hs_code varchar(10) NULL REFERENCES hs_code (hs_code),
     cargo_gross_weight real NULL,
     cargo_gross_weight_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (cargo_gross_weight_unit IN ('KGM','LBR')),
     cargo_gross_volume real NULL,
@@ -510,9 +509,16 @@ CREATE TABLE consignment_item (
     description_of_goods text NOT NULL,
     shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
     shipment_id uuid NOT NULL REFERENCES shipment (id),
-    commodity_id uuid NULL REFERENCES commodity (id),
-    hs_code varchar(10) NOT NULL REFERENCES hs_code (hs_code) -- TODO: Should be a list
+    commodity_id uuid NULL REFERENCES commodity (id)
 );
+
+CREATE TABLE hs_code_item (
+    commodity_id uuid NULL REFERENCES commodity (id),
+    consignment_item_id uuid NULL REFERENCES consignment_item (id),
+    hs_code varchar(10) NOT NULL REFERENCES hs_code (hs_code),
+    element_order int NOT NULL default 0
+);
+
 
 -- Supporting FK constraints
 CREATE INDEX ON consignment_item (shipping_instruction_id);

@@ -33,11 +33,8 @@ public record ConsignmentItemTO(
   @Pattern(regexp = "^\\S+(\\s+\\S+)*$")
   String descriptionOfGoods,
 
-  @Pattern(regexp = "^[0-9]+$")
-  @Size(min = 6, max = 10)
-  @JsonProperty("HSCode")
-   // TODO: List in the TD (and probably also in the SI) now.
-  String hsCode,
+  @JsonProperty("HSCodes")
+  List<@Pattern(regexp = "^[0-9]+$") @Size(min = 6, max = 10) String> hsCodes,
 
   @Valid
   List<@Valid @NotNull ReferenceTO> references,

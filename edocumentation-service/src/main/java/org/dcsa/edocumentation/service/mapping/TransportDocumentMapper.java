@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@Mapper(componentModel = "spring", uses = {LocationMapper.class, DocumentPartyMapper.class, CargoItemMapper.class})
+@Mapper(componentModel = "spring", uses = {LocationMapper.class, DocumentPartyMapper.class, ConsignmentItemMapper.class})
 public abstract class TransportDocumentMapper {
 
   @Autowired

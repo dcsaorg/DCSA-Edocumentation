@@ -13,6 +13,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,8 +40,11 @@ public class Commodity {
   @Column(name = "commodity_type", nullable = false, length = 550)
   private String commodityType;
 
-  @Column(name = "hs_code", length = 10) // we need an enum for this
-  private String hsCode;
+  @ElementCollection
+  @Column(name = "hs_code", nullable = false)
+  @CollectionTable(name = "hs_code_item", joinColumns = @JoinColumn(name = "commodity_id"))
+  @OrderColumn(name = "element_order")
+  private List<String> hsCodes;
 
   @Column(name = "cargo_gross_weight")
   private Float cargoGrossWeight;

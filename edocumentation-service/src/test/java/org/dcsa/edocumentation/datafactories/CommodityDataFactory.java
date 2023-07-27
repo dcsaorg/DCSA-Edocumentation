@@ -7,6 +7,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 import org.dcsa.edocumentation.transferobjects.CommodityTO;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public class CommodityDataFactory {
       .exportLicenseExpiryDate(LocalDate.now().plusMonths(6))
       .numberOfPackages(1)
       .requestedEquipments(Set.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
-      .hsCode("123");
+      .hsCodes(List.of("123456"));
   }
 
   public CommodityTO singleCommodityTO() {
@@ -47,7 +48,7 @@ public class CommodityDataFactory {
       .exportLicenseIssueDate(LocalDate.now())
       .exportLicenseExpiryDate(LocalDate.now().plusMonths(6))
       .numberOfPackages(1)
-      .hsCode("123")
+      .hsCodes(List.of("123456"))
       .commodityRequestedEquipmentLink("commodityRequestedEquipmentLink")
       .requestedEquipments(RequestedEquipmentDataFactory.requestedEquipmentTOList())
       .build();

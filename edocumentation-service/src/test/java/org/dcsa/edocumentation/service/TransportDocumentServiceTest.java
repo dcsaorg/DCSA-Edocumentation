@@ -5,18 +5,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import org.dcsa.edocumentation.datafactories.TransportDocumentDataFactory;
-import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
-import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
-import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
+import org.dcsa.edocumentation.service.mapping.ConsignmentItemMapper;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
-import org.dcsa.skernel.domain.persistence.entity.Carrier;
-import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +29,8 @@ class TransportDocumentServiceTest {
 
   @Mock LocationMapper locationMapper;
 
+  @Mock ConsignmentItemMapper consignmentItemMapper;
+
   @Spy
   TransportDocumentMapper transportDocumentMapper =
       Mappers.getMapper(TransportDocumentMapper.class);
@@ -45,6 +41,7 @@ class TransportDocumentServiceTest {
   void init() {
     ReflectionTestUtils.setField(transportDocumentMapper, "locationMapper", locationMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "locMapper", locationMapper);
+    ReflectionTestUtils.setField(transportDocumentMapper, "consignmentItemMapper", consignmentItemMapper);
   }
 
   @Test

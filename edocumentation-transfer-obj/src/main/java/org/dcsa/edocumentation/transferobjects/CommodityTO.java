@@ -21,10 +21,8 @@ public record CommodityTO(
   @NotBlank @Size(max = 550)
   String commodityType,
 
-  @Pattern(regexp = "^[0-9]+$")
-  @Size(min = 6, max = 10)
-  @JsonProperty("HSCode")
-  String hsCode,
+  @JsonProperty("HSCodes")
+  List<@Pattern(regexp = "^[0-9]+$") @Size(min = 6, max = 10) String> hsCodes,
 
   @NotNull
   Float cargoGrossWeight,
