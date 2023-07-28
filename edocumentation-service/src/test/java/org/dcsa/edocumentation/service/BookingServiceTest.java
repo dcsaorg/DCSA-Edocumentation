@@ -1,5 +1,18 @@
 package org.dcsa.edocumentation.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.OffsetDateTime;
+import java.util.Optional;
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.datafactories.LocationDataFactory;
 import org.dcsa.edocumentation.datafactories.VesselDataFactory;
@@ -33,20 +46,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.OffsetDateTime;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
   @Nested
@@ -55,6 +54,8 @@ class BookingServiceTest {
 
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
+
+    @Spy private PartyMapper partyMapper = Mappers.getMapper(PartyMapper.class);
 
     @Spy private DocumentPartyMapper documentPartyMapper = Mappers.getMapper(DocumentPartyMapper.class);
     @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
@@ -71,6 +72,8 @@ class BookingServiceTest {
       ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
       ReflectionTestUtils.setField(documentPartyMapper, "displayedAddressMapper", displayedAddressMapper);
+      ReflectionTestUtils.setField(documentPartyMapper, "partyMapper", partyMapper);
+      ReflectionTestUtils.setField(partyMapper, "addressMapper", addressMapper);
     }
 
     @Test
@@ -132,6 +135,8 @@ class BookingServiceTest {
 
     @Mock private BookingRepository bookingRepository;
     @Mock private ShipmentEventRepository shipmentEventRepository;
+
+    @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
     @SuppressWarnings({"unused"}) /* It gets auto-injected */
     @Spy private ModeOfTransportMapper modeOfTransportMapper = Mappers.getMapper(ModeOfTransportMapper.class);
@@ -140,6 +145,7 @@ class BookingServiceTest {
 
     @BeforeEach
     public void resetMocks() {
+      ReflectionTestUtils.setField(bookingMapper, "addressMapper", addressMapper);
       reset(locationService, voyageService, vesselService, commodityService,
         requestedEquipmentGroupService, referenceService, documentPartyService, shipmentLocationService,
         bookingRepository, shipmentEventRepository);

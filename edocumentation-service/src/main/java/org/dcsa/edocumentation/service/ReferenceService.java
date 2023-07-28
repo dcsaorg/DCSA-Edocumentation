@@ -35,9 +35,7 @@ public class ReferenceService {
     if (references != null && !references.isEmpty()) {
       List<Reference> referenceDAOs =
           references.stream()
-              .map(referenceTO -> referenceMapper.toDAO(referenceTO).toBuilder()
-                .shippingInstructionID(shippingInstruction.getId())
-                .build())
+              .map(referenceTO -> referenceMapper.toDAO(referenceTO, shippingInstruction))
               .toList();
       saveReferenceDAOs(referenceDAOs);
     }

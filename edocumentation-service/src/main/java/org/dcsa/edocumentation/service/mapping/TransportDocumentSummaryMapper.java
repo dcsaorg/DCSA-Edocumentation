@@ -12,7 +12,7 @@ import java.util.List;
 
 @Mapper(
     componentModel = "spring",
-    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    config = EDocumentationMappingConfig.class,
     uses = {PartyMapper.class})
 public abstract class TransportDocumentSummaryMapper {
 
@@ -24,6 +24,12 @@ public abstract class TransportDocumentSummaryMapper {
         @Mapping(
             target = "documentStatus",
             source = "transportDocument.shippingInstruction.documentStatus"),
+        @Mapping(
+          target = "numberOfOriginalsWithCharges",
+          source = "transportDocument.shippingInstruction.numberOfOriginalsWithCharges"),
+        @Mapping(
+          target = "numberOfOriginalsWithoutCharges",
+          source = "transportDocument.shippingInstruction.numberOfOriginalsWithoutCharges"),
         @Mapping(target = "shippedOnBoardDate", source = "shippedOnBoardDate"),
         @Mapping(target = "carrierCode", source = "transportDocument"),
         @Mapping(target = "carrierCodeListProvider", source = "transportDocument"),

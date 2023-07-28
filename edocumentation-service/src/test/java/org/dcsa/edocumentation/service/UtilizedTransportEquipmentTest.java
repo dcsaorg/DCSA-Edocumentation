@@ -5,6 +5,7 @@ import org.dcsa.edocumentation.datafactories.UtilizedTransportEquipmentEquipment
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.repository.UtilizedTransportEquipmentRepository;
 import org.dcsa.edocumentation.service.mapping.EquipmentMapper;
+import org.dcsa.edocumentation.service.mapping.SealMapper;
 import org.dcsa.edocumentation.service.mapping.UtilizedTransportEquipmentMapper;
 import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.edocumentation.transferobjects.UtilizedTransportEquipmentTO;
@@ -42,6 +43,7 @@ class UtilizedTransportEquipmentTest {
       Mappers.getMapper(UtilizedTransportEquipmentMapper.class);
 
   @Spy EquipmentMapper equipmentMapper = Mappers.getMapper(EquipmentMapper.class);
+  @Spy SealMapper sealMapper = Mappers.getMapper(SealMapper.class);
 
   @InjectMocks UtilizedTransportEquipmentService utilizedTransportEquipmentService;
 
@@ -49,7 +51,9 @@ class UtilizedTransportEquipmentTest {
 
   @BeforeEach
   void setup() {
+
     ReflectionTestUtils.setField(utilizedTransportEquipmentMapper, "equipmentMapper", equipmentMapper);
+    ReflectionTestUtils.setField(utilizedTransportEquipmentMapper, "sealMapper", sealMapper);
   }
 
   @Test

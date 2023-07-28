@@ -1,5 +1,10 @@
 package org.dcsa.edocumentation.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+import java.util.List;
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.datafactories.DocumentPartyDataFactory;
 import org.dcsa.edocumentation.datafactories.ShippingInstructionDataFactory;
@@ -24,12 +29,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentPartyServiceTest {
@@ -54,6 +54,7 @@ class DocumentPartyServiceTest {
 
   @BeforeEach
   public void resetMocks() {
+    ReflectionTestUtils.setField(documentPartyMapper, "partyMapper", partyMapper);
     reset(
         addressService,
         documentPartyRepository,

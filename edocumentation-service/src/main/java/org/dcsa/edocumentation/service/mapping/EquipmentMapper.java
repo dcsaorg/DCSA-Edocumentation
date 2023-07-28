@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 
 import java.util.stream.Stream;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
 public interface EquipmentMapper {
   Equipment toDAO(EquipmentTO equipmentTO);
 

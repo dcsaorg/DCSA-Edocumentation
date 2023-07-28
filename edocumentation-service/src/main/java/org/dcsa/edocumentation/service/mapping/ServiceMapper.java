@@ -4,7 +4,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.Service;
 import org.dcsa.edocumentation.transferobjects.ServiceTO;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
 public interface ServiceMapper {
   ServiceTO toDTO(Service service);
 }

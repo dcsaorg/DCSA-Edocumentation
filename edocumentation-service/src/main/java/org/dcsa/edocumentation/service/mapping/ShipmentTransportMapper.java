@@ -7,7 +7,7 @@ import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
 public interface ShipmentTransportMapper {
 
   // Required to make the mapper use the argument rather than throwing it away

@@ -5,7 +5,7 @@ import org.dcsa.edocumentation.transferobjects.ShipmentSummaryTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
 public interface ShipmentSummaryMapper {
   @Mapping(
       source = "booking.carrierBookingRequestReference",

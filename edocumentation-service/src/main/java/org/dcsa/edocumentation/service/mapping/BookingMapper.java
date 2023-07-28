@@ -3,13 +3,18 @@ package org.dcsa.edocumentation.service.mapping;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.skernel.infrastructure.services.mapping.AddressMapper;
 import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(
     componentModel = "spring",
+    config = EDocumentationMappingConfig.class,
+    unmappedTargetPolicy = ReportingPolicy.WARN,  // FIXME: Remove this when we are ready to do ERROR level reporting
     uses = {
+      AddressMapper.class,
       LocationMapper.class,
       DisplayedAddressMapper.class,
       DocumentPartyMapper.class,

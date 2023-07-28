@@ -9,13 +9,21 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {
-  ReferenceMapper.class,
-  CargoItemMapper.class,
-})
+@Mapper(
+  componentModel = "spring",
+  config = EDocumentationMappingConfig.class,
+  uses = {
+    ReferenceMapper.class,
+    CargoItemMapper.class,
+    CustomsReferenceMapper.class,
+  }
+)
 public interface ConsignmentItemMapper {
 
-  @Mapping(source = "cargoItems", target = "cargoItems", ignore = true)
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "shippingInstruction", ignore = true)
+  @Mapping(target = "shipment", ignore = true)
+  @Mapping(target = "commodity", ignore = true)
   ConsignmentItem toDAO(ConsignmentItemTO consignmentItemTO);
 
   default String mapShipmentToCarrierBookingReference(Shipment shipment) {
@@ -29,5 +37,9 @@ public interface ConsignmentItemMapper {
 
   @Mapping(source = "shipment", target = "carrierBookingReference")
   @Mapping(source = "commodity", target = "hsCodes")
+  @Mapping(target = "weight", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME
+  @Mapping(target = "weightUnit", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME
+  @Mapping(target = "volume", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME
+  @Mapping(target = "volumeUnit", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME
   ConsignmentItemTO toDTO(ConsignmentItem consignmentItem);
 }

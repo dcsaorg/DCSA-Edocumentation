@@ -7,6 +7,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
 import org.dcsa.edocumentation.transferobjects.TDTransportTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
+import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
 import org.dcsa.edocumentation.transferobjects.unofficial.TransportDocumentRefStatusTO;
 import org.dcsa.skernel.domain.persistence.entity.Location;
@@ -17,7 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@Mapper(componentModel = "spring", uses = {LocationMapper.class, DocumentPartyMapper.class, ConsignmentItemMapper.class})
+@Mapper(componentModel = "spring",
+  config = EDocumentationMappingConfig.class,
+  uses = {
+    LocationMapper.class,
+    DocumentPartyMapper.class,
+    DisplayedAddressMapper.class,
+    ConsignmentItemMapper.class,
+  })
 public abstract class TransportDocumentMapper {
 
   @Autowired
@@ -35,9 +43,54 @@ public abstract class TransportDocumentMapper {
   @Mapping(source = "transportDocument.shippingInstruction.isElectronic", target = "isElectronic")
   @Mapping(source = "transportDocument.shippingInstruction.isToOrder", target = "isToOrder")
   @Mapping(source = "transportDocument.shippingInstruction.documentStatus", target = "documentStatus")
+  @Mapping(source = "transportDocument.shippingInstruction.transportDocumentTypeCode", target = "transportDocumentTypeCode")
+
+  @Mapping(source = "transportDocument.shippingInstruction.displayedNameForPlaceOfReceipt", target = "displayedNameForPlaceOfReceipt")
+  @Mapping(source = "transportDocument.shippingInstruction.displayedNameForPortOfLoad", target = "displayedNameForPortOfLoad")
+  @Mapping(source = "transportDocument.shippingInstruction.displayedNameForPortOfDischarge", target = "displayedNameForPortOfDischarge")
+  @Mapping(source = "transportDocument.shippingInstruction.displayedNameForPlaceOfDelivery", target = "displayedNameForPlaceOfDelivery")
+
+  @Mapping(source = "transportDocument.shippingInstruction.numberOfCopiesWithCharges", target = "numberOfCopiesWithCharges")
+  @Mapping(source = "transportDocument.shippingInstruction.numberOfCopiesWithoutCharges", target = "numberOfCopiesWithoutCharges")
+  @Mapping(source = "transportDocument.shippingInstruction.numberOfOriginalsWithCharges", target = "numberOfOriginalsWithCharges")
+  @Mapping(source = "transportDocument.shippingInstruction.numberOfOriginalsWithoutCharges", target = "numberOfOriginalsWithoutCharges")
+
   @Mapping(target = "transports", expression = "java(mapSIToTransports(transportDocument.getShippingInstruction()))")
-  // TODO: Go over this mapping and ensure all fields are covered.
+  @Mapping(target = "carrierCode", expression = "java(carrierCode(transportDocument))")
+  @Mapping(target = "carrierCodeListProvider", expression = "java(carrierCodeListProvider(transportDocument))")
+
+  @Mapping(target = "termsAndConditions", ignore = true)  // FIXME: We should be mapping this field.
+  @Mapping(target = "serviceContractReference", ignore = true)  // FIXME: We should be mapping this field.
+  @Mapping(target = "contractQuotationReference", ignore = true)  // FIXME: We should be mapping this field.
+  @Mapping(target = "declaredValue", ignore = true)  // FIXME: We should be mapping this field.
+  @Mapping(target = "declaredValueCurrency", ignore = true)  // FIXME: We should be mapping this field.
+
+  @Mapping(target = "receiptTypeAtOrigin", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
+  @Mapping(target = "deliveryTypeAtDestination", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
+  @Mapping(target = "cargoMovementTypeAtOrigin", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
+  @Mapping(target = "cargoMovementTypeAtDestination", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
+  @Mapping(target = "utilizedTransportEquipments", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
+  @Mapping( target = "invoicePayableAt", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
   public abstract TransportDocumentTO toDTO(TransportDocument transportDocument);
+
+
+  protected CarrierCodeListProvider carrierCodeListProvider(TransportDocument transportDocument) {
+    var carrier = transportDocument.getCarrier();
+    if (carrier.getSmdgCode() != null) {
+      return CarrierCodeListProvider.SMDG;
+    }
+    assert carrier.getNmftaCode() != null;
+    return CarrierCodeListProvider.NMFTA;
+  }
+
+  protected String carrierCode(TransportDocument transportDocument) {
+    var carrier = transportDocument.getCarrier();
+    if (carrier.getSmdgCode() != null) {
+      return carrier.getSmdgCode();
+    }
+    assert carrier.getNmftaCode() != null;
+    return carrier.getNmftaCode();
+  }
 
   private boolean isSameLocation(Location lhs, Location rhs) {
     if (rhs == null) {

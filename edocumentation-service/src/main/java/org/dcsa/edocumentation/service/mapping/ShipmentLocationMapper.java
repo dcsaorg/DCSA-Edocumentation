@@ -9,12 +9,13 @@ import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = LocationMapper.class)
+@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class, uses = LocationMapper.class)
 public interface ShipmentLocationMapper {
 
   @Mapping(target = "id", ignore = true) /* It defaults to pulling booking.getId(), which is wrong */
   // Needed to force the argument rather than shipmentLocationTO.location()
   @Mapping(source = "location", target = "location")
+  @Mapping(target = "shipment", ignore = true)
   ShipmentLocation toDAO(ShipmentLocationTO shipmentLocationTO, Location location, Booking booking);
 
   @Mapping(target = "id", ignore = true) /* It defaults to pulling booking.getId(), which is wrong */
