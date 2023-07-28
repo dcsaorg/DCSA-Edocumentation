@@ -35,7 +35,7 @@ public class ConsignmentItem {
   @Column(name = "hs_code", nullable = false)
   @CollectionTable(name = "hs_code_item", joinColumns = @JoinColumn(name = "consignment_item_id"))
   @OrderColumn(name = "element_order")
-  private List<String> hsCode;
+  private List<String> hsCodes;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

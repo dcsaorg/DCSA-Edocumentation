@@ -8,13 +8,16 @@ import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring",
   injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  unmappedTargetPolicy = ReportingPolicy.WARN,  // FIXME; Remove this line when we can migrate to ERROR
+  config = EDocumentationMappingConfig.class,
   uses = {LocationMapper.class,DocumentStatusMapper.class, BookingMapper.class, TransportMapper.class})
 public interface ShipmentMapper {
   @Mapping(source = "shipmentTransports", target = "transports")
-   ShipmentTO shipmentToShipmentTO(Shipment shipment);
+  ShipmentTO shipmentToShipmentTO(Shipment shipment);
 
   @Mapping(source = "shipment.booking.bookingRequestUpdatedDateTime", target = "bookingRequestUpdatedDateTime")
   @Mapping(source = "shipment.booking.bookingRequestCreatedDateTime", target = "bookingRequestCreatedDateTime")

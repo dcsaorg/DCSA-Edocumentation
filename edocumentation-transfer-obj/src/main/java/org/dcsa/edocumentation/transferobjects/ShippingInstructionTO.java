@@ -1,20 +1,15 @@
 package org.dcsa.edocumentation.transferobjects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.dcsa.skernel.infrastructure.validation.RequiredIfFalse;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @RequiredIfFalse(
   ifFalse = "isElectronic",
@@ -26,9 +21,6 @@ import java.util.UUID;
   }
 )
 public record ShippingInstructionTO(
-  @Size(max = 35)
-  String carrierBookingReference,
-
   @Size(max = 100)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   String shippingInstructionReference,
@@ -82,7 +74,9 @@ public record ShippingInstructionTO(
   @Size(max = 5)
   List<@Size(max = 35) String> displayedNameForPlaceOfDelivery,
 
-  UUID amendmentToTransportDocument,
+  @Size(max = 20)
+  @Pattern(regexp = "^\\S+(\\s+\\S+)$")
+  String amendmentToTransportDocument,
 
   @Valid
   @NotEmpty(message = "consignmentItems are required.")

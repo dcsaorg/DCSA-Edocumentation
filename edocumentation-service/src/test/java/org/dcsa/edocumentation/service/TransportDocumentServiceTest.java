@@ -9,6 +9,7 @@ import org.dcsa.edocumentation.datafactories.TransportDocumentDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
 import org.dcsa.edocumentation.service.mapping.ConsignmentItemMapper;
+import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
 import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
@@ -31,6 +32,8 @@ class TransportDocumentServiceTest {
 
   @Mock ConsignmentItemMapper consignmentItemMapper;
 
+  @Mock DisplayedAddressMapper displayedAddressMapper;
+
   @Spy
   TransportDocumentMapper transportDocumentMapper =
       Mappers.getMapper(TransportDocumentMapper.class);
@@ -42,6 +45,7 @@ class TransportDocumentServiceTest {
     ReflectionTestUtils.setField(transportDocumentMapper, "locationMapper", locationMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "locMapper", locationMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "consignmentItemMapper", consignmentItemMapper);
+    ReflectionTestUtils.setField(transportDocumentMapper, "displayedAddressMapper", displayedAddressMapper);
   }
 
   @Test

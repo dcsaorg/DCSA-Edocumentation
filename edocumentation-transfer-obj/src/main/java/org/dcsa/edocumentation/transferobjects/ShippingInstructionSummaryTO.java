@@ -47,7 +47,7 @@ public record ShippingInstructionSummaryTO(
   @JsonAlias({"numberOfOriginals", "requestedNumberOfOriginals"})
   Integer numberOfOriginalsWithCharges,
 
-  Integer numberOfOriginalsWithOutCharges,
+  Integer numberOfOriginalsWithoutCharges,
 
   @NotNull(message = "The boolean attribute isElectronic is required.")
   boolean isElectronic,

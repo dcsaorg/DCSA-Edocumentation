@@ -5,7 +5,7 @@ import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.ShipmentLocationTypeCode;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
 public interface DocumentStatusMapper {
   org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus toDomainBkgDocumentStatus(BkgDocumentStatus documentStatus);
   org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus toDomainEblDocumentStatus(EblDocumentStatus documentStatus);

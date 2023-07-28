@@ -6,7 +6,7 @@ import org.dcsa.edocumentation.transferobjects.CommodityTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
 public interface CommodityMapper {
   @Mapping(source = "booking", target = "booking")
   @Mapping(source = "booking.id", target = "id", ignore = true)

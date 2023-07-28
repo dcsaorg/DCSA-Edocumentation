@@ -8,11 +8,13 @@ import org.mapstruct.Mapping;
 
 @Mapper(
     componentModel = "spring",
+    config = EDocumentationMappingConfig.class,
     uses = {LocationMapper.class, DocumentStatusMapper.class, ModeOfTransportMapper.class})
 public interface TransportMapper {
 
   @Mapping(
     source = "transportPlanStageCode",
     target = "transportPlanStage")
+  @Mapping(target = "isUnderShippersResponsibility", ignore = true)  // FIXME: Verify if this should be mapped
   TransportTO shipmentTransportToTransportTO(ShipmentTransport shipmentTransport);
 }

@@ -5,10 +5,16 @@ import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipm
 import org.dcsa.edocumentation.transferobjects.CargoItemTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+  componentModel = "spring",
+  config = EDocumentationMappingConfig.class,
+  unmappedTargetPolicy = ReportingPolicy.WARN  // FIXME: Remove this line when we are ready for ERROR.
+)
 public interface CargoItemMapper {
 
+  @Mapping(target = "id", ignore = true)
   CargoItem toDAO(CargoItemTO cargoItemTO);
 
 

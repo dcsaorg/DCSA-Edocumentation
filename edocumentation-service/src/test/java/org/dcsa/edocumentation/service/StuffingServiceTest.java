@@ -36,11 +36,11 @@ class StuffingServiceTest {
   @Mock private CommodityRepository commodityRepository;
   @Mock private ConsignementItemRepository consignementItemRepository;
 
+
+  @Spy private CargoItemMapper cargoItemMapper = Mappers.getMapper(CargoItemMapper.class);
   @Spy
   private ConsignmentItemMapper consignmentItemMapper =
       Mappers.getMapper(ConsignmentItemMapper.class);
-
-  @Spy private CargoItemMapper cargoItemMapper = Mappers.getMapper(CargoItemMapper.class);
   @Spy private EquipmentMapper equipmentMapper = Mappers.getMapper(EquipmentMapper.class);
 
   @InjectMocks private StuffingService stuffingService;
@@ -58,6 +58,7 @@ class StuffingServiceTest {
   @BeforeEach
   void init() {
     ReflectionTestUtils.setField(utilizedTransportEquipmentMapper, "equipmentMapper", equipmentMapper);
+    ReflectionTestUtils.setField(consignmentItemMapper, "cargoItemMapper", cargoItemMapper);
     shippingInstruction = ShippingInstructionDataFactory.singleShallowShippingInstruction();
     savedUtilizedTransportEquipments =
         UtilizedTransportEquipmentEquipmentDataFactory.multipleCarrierOwned().stream()

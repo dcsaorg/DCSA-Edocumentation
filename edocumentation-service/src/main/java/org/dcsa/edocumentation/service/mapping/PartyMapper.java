@@ -10,11 +10,18 @@ import org.dcsa.skernel.infrastructure.services.mapping.AddressMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = AddressMapper.class)
+@Mapper(componentModel = "spring",
+  config = EDocumentationMappingConfig.class,
+  uses = {
+    AddressMapper.class,
+    PartyContactDetailsMapper.class,
+    PartyIdentifyingCodeMapper.class,
+  })
 public interface PartyMapper {
   @Mapping(source = "address", target = "address", ignore = true)
   @Mapping(source = "partyContactDetails", target = "partyContactDetails", ignore = true)
   @Mapping(source = "identifyingCodes", target = "identifyingCodes", ignore = true)
+  @Mapping(target = "id", ignore = true)
   Party toDAO(PartyTO partyTo);
   PartyTO toTO(Party party);
 

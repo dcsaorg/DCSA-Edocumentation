@@ -41,7 +41,7 @@ class ReferenceServiceTest {
     referenceService.createReferences(null, (Booking) null);
 
     verify(referenceRepository, never()).saveAll(any());
-    verify(referenceMapper, never()).toDAO(any(), any());
+    verify(referenceMapper, never()).toDAO(any(), any(Booking.class));
   }
 
   @Test
@@ -49,7 +49,7 @@ class ReferenceServiceTest {
     referenceService.createReferences(null, (ShippingInstruction) null);
 
     verify(referenceRepository, never()).saveAll(any());
-    verify(referenceMapper, never()).toDAO(any(), any());
+    verify(referenceMapper, never()).toDAO(any(), any(ShippingInstruction.class));
   }
 
   @Test
@@ -57,7 +57,7 @@ class ReferenceServiceTest {
     referenceService.createReferences(Collections.emptyList(), (Booking) null);
 
     verify(referenceRepository, never()).saveAll(any());
-    verify(referenceMapper, never()).toDAO(any(), any());
+    verify(referenceMapper, never()).toDAO(any(), any(Booking.class));
   }
 
   @Test
@@ -65,7 +65,7 @@ class ReferenceServiceTest {
     referenceService.createReferences(Collections.emptyList(), (ShippingInstruction) null);
 
     verify(referenceRepository, never()).saveAll(any());
-    verify(referenceMapper, never()).toDAO(any(), any());
+    verify(referenceMapper, never()).toDAO(any(), any(ShippingInstruction.class));
   }
 
   @Test
@@ -98,7 +98,7 @@ class ReferenceServiceTest {
     referenceService.createReferences(List.of(referenceTO), shippingInstruction);
 
     // Verify
-    verify(referenceMapper).toDAO(referenceTO);
+    verify(referenceMapper).toDAO(referenceTO, shippingInstruction);
     verify(referenceRepository).saveAll(List.of(reference));
   }
 }
