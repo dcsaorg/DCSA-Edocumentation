@@ -1,12 +1,11 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import jakarta.persistence.*;
+import java.util.List;
+import java.util.UUID;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.VolumeUnit;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
-
-import jakarta.persistence.*;
-import java.util.Set;
-import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)
@@ -36,11 +35,11 @@ public class CargoItem {
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnit;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "cargo_item_id", nullable = false, referencedColumnName = "id")
-  private Set<CargoLineItem> cargoLineItems;
+  @ElementCollection
+  @Column(name = "shipping_mark", nullable = false)
+  @CollectionTable(name = "shipping_mark", joinColumns = @JoinColumn(name = "cargo_item"))
+  @OrderColumn(name = "element_order")
+  private List<String> shippingMarks;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

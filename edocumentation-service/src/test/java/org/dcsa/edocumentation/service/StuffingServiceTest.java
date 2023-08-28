@@ -106,9 +106,9 @@ class StuffingServiceTest {
     assertEquals(
         2,
         savedCargoItems.stream()
-            .map(CargoItem::getCargoLineItems)
+            .map(CargoItem::getShippingMarks)
             .filter(Objects::nonNull)
-            .mapToInt(Set::size)
+            .mapToInt(List::size)
             .sum());
   }
 
