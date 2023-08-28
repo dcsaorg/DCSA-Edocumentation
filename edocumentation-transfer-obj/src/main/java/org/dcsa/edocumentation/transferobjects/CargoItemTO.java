@@ -30,9 +30,8 @@ public record CargoItemTO(
 
   // TODO: Missing outerPackaging (DG)
 
-  // TODO: cargoLineItems have been replaced by shipping marks.
   @Valid
-  List<CargoLineItemTO> cargoLineItems
+  List<@Valid @Size(max =  500) String> shippingMarks
 ) {
   @Builder
   public CargoItemTO{}

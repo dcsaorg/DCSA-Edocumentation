@@ -11,9 +11,6 @@
 ALTER TABLE shipment_location
     ADD COLUMN IF NOT EXISTS id uuid DEFAULT uuid_generate_v4() PRIMARY KEY;
 
-ALTER TABLE cargo_line_item
-    ADD COLUMN IF NOT EXISTS id uuid DEFAULT uuid_generate_v4() PRIMARY KEY;
-
 ALTER TABLE shipment_transport
     ADD COLUMN IF NOT EXISTS id uuid DEFAULT uuid_generate_v4() PRIMARY KEY;
 
@@ -28,7 +25,7 @@ ALTER TABLE party_identifying_code
 
 -- DateTime metadata
 
--- Metadata for Booking table to avoid having to query shipmentEvent for 
+-- Metadata for Booking table to avoid having to query shipmentEvent for
 -- updated date_time necessary for BookingResponseTO
 
 ALTER TABLE booking

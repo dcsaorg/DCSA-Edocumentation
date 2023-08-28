@@ -16,7 +16,6 @@ CREATE TABLE hs_code (
     hs_code_description varchar(250) NOT NULL
 );
 
-
 CREATE TABLE reference_type (
     reference_type_code varchar(3) PRIMARY KEY,
     reference_type_name varchar(100) NOT NULL,
@@ -519,6 +518,9 @@ CREATE TABLE hs_code_item (
     element_order int NOT NULL default 0
 );
 
+CREATE INDEX ON hs_code_item (commodity_id);
+CREATE INDEX ON hs_code_item (consignment_item_id);
+
 
 -- Supporting FK constraints
 CREATE INDEX ON consignment_item (shipping_instruction_id);
@@ -541,15 +543,13 @@ CREATE INDEX ON cargo_item (consignment_item_id);
 CREATE INDEX ON cargo_item (utilized_transport_equipment_id);
 
 
-CREATE TABLE cargo_line_item (
-    cargo_line_item_id text NOT NULL,
-    cargo_item_id uuid NOT NULL REFERENCES cargo_item (id),
-    shipping_marks text NOT NULL,
-    -- Choice of cargo_item_id as first member is deliberate as it enables the
-    -- underlying index to be used for FK checks as well (without a separate index
-    -- because Postgres currently always creates an INDEX for UNIQUE constraints)
-    UNIQUE (cargo_item_id, cargo_line_item_id)
+CREATE TABLE shipping_mark (
+    cargo_item uuid NOT NULL REFERENCES cargo_item (id),
+    shipping_mark varchar(500) NOT NULL,
+    element_order int NOT NULL default 0
 );
+
+CREATE INDEX ON shipping_mark (cargo_item);
 
 
 CREATE TABLE reference (

@@ -1036,17 +1036,12 @@ INSERT INTO cargo_item (
   uuid('aa030eb6-009b-411c-985c-527ce008b35a')
 );
 
-INSERT INTO cargo_line_item(
-    cargo_line_item_id,
-     cargo_item_id,
-      shipping_marks,
-       id
-)
-VALUES (
-'9653b630-7847-467c-bcf7-15374dcc6ae2',
-'2d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
- 'shipping marks',
-'aab30eb6-009b-411c-985c-527ce008b35a'
+INSERT INTO shipping_mark (
+  cargo_item,
+  shipping_mark
+) VALUES (
+  '2d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
+  'shipping marks'
 );
 
 INSERT INTO booking (
