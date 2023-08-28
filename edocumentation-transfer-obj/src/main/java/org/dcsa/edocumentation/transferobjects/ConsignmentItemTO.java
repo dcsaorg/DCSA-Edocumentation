@@ -34,6 +34,7 @@ public record ConsignmentItemTO(
   String descriptionOfGoods,
 
   @JsonProperty("HSCodes")
+  @NotEmpty
   List<@Pattern(regexp = "^[0-9]+$") @Size(min = 6, max = 10) String> hsCodes,
 
   @Valid
