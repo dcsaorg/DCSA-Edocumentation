@@ -21,7 +21,7 @@ public class DocumentPartyDataFactory {
         .id(UUID.randomUUID())
         .party(PartyDataFactory.singleParty())
         .isToBeNotified(true)
-        .partyFunction(PartyFunction.CN)
+        .partyFunction(PartyFunction.CN.name())
         .displayedAddress(
             DisplayedAddress.builder()
                 .addressLine1("Strawingskylaan 4117 floor 6")
@@ -32,7 +32,7 @@ public class DocumentPartyDataFactory {
 
   public DocumentPartyTO fullDocumentPartyTO() {
     return DocumentPartyTO.builder()
-        .partyFunction(org.dcsa.edocumentation.transferobjects.enums.PartyFunction.BA)
+        .partyFunction(org.dcsa.edocumentation.transferobjects.enums.PartyFunction.BA.name())
         .displayedAddress(List.of("line1", "line2"))
         .isToBeNotified(true)
         .party(
@@ -55,7 +55,7 @@ public class DocumentPartyDataFactory {
   /** DocumentParty part of a full DocumentParty. */
   public DocumentParty partialDocumentParty(Party party) {
     return DocumentParty.builder()
-        .partyFunction(PartyFunction.BA)
+        .partyFunction(PartyFunction.BA.name())
         .party(party)
         .isToBeNotified(true)
         .build();

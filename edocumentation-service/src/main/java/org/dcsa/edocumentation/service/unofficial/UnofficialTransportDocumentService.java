@@ -1,5 +1,6 @@
 package org.dcsa.edocumentation.service.unofficial;
 
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
@@ -41,6 +42,7 @@ public class UnofficialTransportDocumentService {
   private final TransportDocumentRepository transportDocumentRepository;
 
   private final DocumentStatusMapper documentStatusMapper;
+  private final Validator validator;
 
   @Transactional
   public Optional<TransportDocumentRefStatusTO> issueDraft(DraftTransportDocumentRequestTO transportDocumentRequestTO) {
@@ -51,7 +53,7 @@ public class UnofficialTransportDocumentService {
     }
     ValidationResult<EblDocumentStatus> validationResult;
     try {
-      validationResult = shippingInstruction.asyncValidation();
+      validationResult = shippingInstruction.asyncValidation(validator);
     } catch (IllegalStateException e) {
       throw ConcreteRequestErrorMessageException.conflict("SI is not in a state to be DRFT'ed", e);
     }

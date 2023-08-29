@@ -113,6 +113,7 @@ public record TransportDocumentTO(
   List<@Valid @NotNull UtilizedTransportEquipmentTO> utilizedTransportEquipments,
 
   @Valid
+  @NotEmpty
   List<@Valid @NotNull DocumentPartyTO> documentParties,
 
   // TODO: TransportLeg here
@@ -177,7 +178,7 @@ public record TransportDocumentTO(
 
   private void validateContractQuotation() {
     if (contractQuotationReference == null) {
-      var sco = nullSafeStream(documentParties).filter(p -> p.partyFunction() == PartyFunction.SCO).toList();
+      var sco = nullSafeStream(documentParties).filter(p -> p.partyFunction().equals(PartyFunction.SCO.name())).toList();
       verifyConsistency(!sco.isEmpty(),
         "Without a contractQuotationReference, a service contract owner must be present"
       );
@@ -187,27 +188,30 @@ public record TransportDocumentTO(
   private void validateStraightBL() {
     // TODO: Does DDS (consignee freight forwarder) also count?
     // NB: Currently if both are present, we do not know which of them is the "real" consignee
-    Predicate<DocumentPartyTO> isConsigneeOrCFF = p -> p.partyFunction() == PartyFunction.CN
-      || p.partyFunction() == PartyFunction.DDS;
+    Predicate<DocumentPartyTO> isConsigneeOrCFF = p -> p.partyFunction().equals(PartyFunction.CN.name())
+      || p.partyFunction().equals(PartyFunction.DDS.name());
+    Predicate<DocumentPartyTO> isEndorseeParty = p -> p.partyFunction().equals(PartyFunction.END.name());
     var consignees = nullSafeStream(documentParties).filter(isConsigneeOrCFF).toList();
     verifyConsistency(consignees.size() == 1,
       "The B/L did not have exactly one consignee (documentParties[*].partyFunction in {OS, DDS})"
     );
+
+    var endorseeParties = nullSafeStream(documentParties).filter(isEndorseeParty).toList();
+    verifyConsistency(endorseeParties.isEmpty(), "Straight B/Ls cannot have an endorsee party (only consignee / CN).");
   }
 
   private void validateNegotiableBL() {
-    // We cannot tell the cases from each other current.
-    verifyConsistency(false,
-      "Negotiable B/Ls are currently not supported"
-    );
+    Predicate<DocumentPartyTO> isEndorseeParty = p -> p.partyFunction().equals(PartyFunction.END.name());
+    var endorseeParties = nullSafeStream(documentParties).filter(isEndorseeParty).toList();
+    verifyConsistency(endorseeParties.size() < 2, "Negotiable B/Ls cannot more than one endorsee party");
   }
 
 
   private void validateShipper() {
     // TODO: Does DDR (shipper freight forwarder) also count?
     // NB: Currently if both are present, we do not know which of them is the "shipper" consignee
-    Predicate<DocumentPartyTO> isShipperOrSFF = p -> p.partyFunction() == PartyFunction.OS
-      || p.partyFunction() == PartyFunction.DDR;
+    Predicate<DocumentPartyTO> isShipperOrSFF = p -> p.partyFunction().equals(PartyFunction.OS.name())
+      || p.partyFunction().equals(PartyFunction.DDR.name());
     var shippers = nullSafeStream(documentParties).filter(isShipperOrSFF).toList();
     verifyConsistency(shippers.size() == 1,
       "The B/L did not have exactly one shipper (documentParties[*].partyFunction in {OS, DDR})"

@@ -1,9 +1,10 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.PartyFunction;
 
 import jakarta.persistence.*;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 
 import java.util.UUID;
 
@@ -24,9 +25,9 @@ public class DocumentParty {
   @OneToOne
   private Party party;
 
+  @PseudoEnum(value = "partyfunctioncodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   @Column(name = "party_function")
-  @Enumerated(EnumType.STRING)
-  private PartyFunction partyFunction;
+  private String partyFunction;
 
   @Column(name = "is_to_be_notified")
   private Boolean isToBeNotified = false;

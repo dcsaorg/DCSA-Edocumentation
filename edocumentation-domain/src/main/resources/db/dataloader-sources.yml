@@ -33,6 +33,7 @@ sources:
       - port_call_service_type
       - port_call_status_type
       - empty_indicator
+      - party_function
 
   - path: classpath:db/samples.d
     type: csv
