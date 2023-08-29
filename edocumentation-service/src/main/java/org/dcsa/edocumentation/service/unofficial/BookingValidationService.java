@@ -2,6 +2,8 @@ package org.dcsa.edocumentation.service.unofficial;
 
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
+
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
@@ -23,6 +25,7 @@ public class BookingValidationService {
   private final BookingRepository bookingRepository;
   private final ShipmentEventRepository shipmentEventRepository;
   private final DocumentStatusMapper documentStatusMapper;
+  private final Validator validator;
 
   @Transactional
   public ValidationResult<BkgDocumentStatus> validateBooking(String carrierBookingRequestReference) {
@@ -46,7 +49,7 @@ public class BookingValidationService {
 
     ValidationResult<BkgDocumentStatus> validationResult;
     try {
-      validationResult = booking.asyncValidation();
+      validationResult = booking.asyncValidation(validator);
     } catch (IllegalStateException e) {
       throw ConcreteRequestErrorMessageException.conflict(e.getLocalizedMessage(), e);
     }

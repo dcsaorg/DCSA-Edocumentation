@@ -1,0 +1,15 @@
+Party Function Code,Party Function Name,Party Function Description
+OS,Original shipper.,The original supplier of the goods.
+CN,Consignee.,Party to which goods are consigned.
+COW,Freight payer on behalf of the consignor.,Freight payer is a third party acting on behalf of the consignor.
+COX,Freight payer on behalf of the consignee.,Freight payer is a third party acting on behalf of the consignee.
+MS,"Document/message issuer/sender",Issuer of a document and/or sender of a message.
+N1,First Notify Party.,The first party which is to be notified.
+N2,Second Notify Party.,The second party which is to be notified.
+NI,Notify party,Party to be notified of arrival of goods.
+DDR,"Consignor's freight forwarder",Identification of freight forwarder giving services to the consignor (shipper).
+DDS,"Consignee's freight forwarder",Identification of freight forwarder giving services to the consignee.
+HE,"Carrier booking office (transportation office)",
+SCO,Service contract owner,"The party signing the service contract with the carrier."
+BA,Booking Agent,"Party acting as a booking office for transport and forwarding services."
+END,Endorsee Party,

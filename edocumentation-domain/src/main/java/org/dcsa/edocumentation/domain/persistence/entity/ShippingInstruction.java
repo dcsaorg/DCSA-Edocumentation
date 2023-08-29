@@ -1,22 +1,23 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
-import org.dcsa.edocumentation.domain.dfa.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
-import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
-import org.dcsa.skernel.domain.persistence.entity.Location;
-import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
-import org.springframework.data.domain.Persistable;
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
 import jakarta.persistence.*;
-
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
+import jakarta.validation.Validator;
+import lombok.*;
+import org.dcsa.edocumentation.domain.dfa.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
+import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.skernel.domain.persistence.entity.Location;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.data.domain.Persistable;
 
 @EqualsAndHashCode(callSuper = true)
 @NamedEntityGraph(
@@ -232,7 +233,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return id == null || isNew;
   }
 
-  public ValidationResult<EblDocumentStatus> asyncValidation() {
+  public ValidationResult<EblDocumentStatus> asyncValidation(Validator validator) {
     List<String> validationErrors = new ArrayList<>();
 
     if (!CAN_BE_VALIDATED.contains(documentStatus)) {
@@ -245,6 +246,9 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     } else {
       validateStraightBL(validationErrors);
     }
+    for (var violation : validator.validate(this, AsyncShipperProvidedDataValidation.class)) {
+      validationErrors.add(violation.getPropertyPath().toString() + ": " +  violation.getMessage());
+    }
 
     var proposedStatus = validationErrors.isEmpty()
       ? DRFT
@@ -254,10 +258,11 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
   private void validateStraightBL(List<String> validationErrors) {
-    if (validateAtLeastOneOfIsPresent(validationErrors, Set.of(PartyFunction.CN, PartyFunction.DDS))) {
+    if (validateAtLeastOneOfIsPresent(validationErrors, Set.of(PartyFunction.CN.name(), PartyFunction.DDS.name()))) {
       validateAtMostOncePartyFunction(validationErrors, PartyFunction.CN);
       validateAtMostOncePartyFunction(validationErrors, PartyFunction.DDS);
     }
+    validateLimitOnPartyFunction(validationErrors, PartyFunction.END, 0);
   }
 
 
@@ -267,7 +272,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   private void validateLimitOnPartyFunction(List<String> validationErrors, PartyFunction partyFunction, int limit) {
     var matches = nullSafeStream(documentParties)
-      .filter(p -> p.getPartyFunction() == partyFunction)
+      .filter(p -> p.getPartyFunction().equals(partyFunction.name()))
       .count();
     if (matches > limit) {
       switch (limit) {
@@ -282,14 +287,14 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
   private boolean validateAtLeastOneOfIsPresent(List<String> validationErrors,
-                                                Set<PartyFunction> partyFunctions) {
+                                                Set<String> partyFunctions) {
     var matches = nullSafeStream(documentParties)
       .filter(p -> partyFunctions.contains(p.getPartyFunction()))
       .count();
     if (matches < 1) {
       validationErrors.add(
         "This SI requires at least one of the following party functions to be present: " +
-          String.join(", ", partyFunctions.stream().map(Enum::name).toList())
+          String.join(", ", partyFunctions.stream().toList())
       );
       return false;
     }
@@ -297,13 +302,12 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
   private void validateNegotiableBL(List<String> validationErrors) {
-    // We cannot tell the cases from each other current.
-    validationErrors.add("Negotiable B/Ls are currently not supported");
+    validateAtMostOncePartyFunction(validationErrors, PartyFunction.END);
   }
 
 
   private void validateShipper(List<String> validationErrors) {
-    if (validateAtLeastOneOfIsPresent(validationErrors, Set.of(PartyFunction.OS, PartyFunction.DDR))) {
+    if (validateAtLeastOneOfIsPresent(validationErrors, Set.of(PartyFunction.OS.name(), PartyFunction.DDR.name()))) {
       validateAtMostOncePartyFunction(validationErrors, PartyFunction.OS);
       validateAtMostOncePartyFunction(validationErrors, PartyFunction.DDR);
     }

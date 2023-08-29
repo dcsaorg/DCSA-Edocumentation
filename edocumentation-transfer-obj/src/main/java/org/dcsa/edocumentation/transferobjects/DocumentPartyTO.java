@@ -1,19 +1,18 @@
 package org.dcsa.edocumentation.transferobjects;
 
-import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.PartyFunction;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import lombok.Builder;
 
 public record DocumentPartyTO(
   @NotNull @Valid
   PartyTO party,
 
   @NotNull
-  PartyFunction partyFunction,
+  // Async validated via @PseudoEnum
+  String partyFunction,
 
   // TODO: Missing partyContactDetails here
 

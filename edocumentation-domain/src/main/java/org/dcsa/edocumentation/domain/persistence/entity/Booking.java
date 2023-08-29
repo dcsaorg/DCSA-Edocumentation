@@ -1,5 +1,7 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
 import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
@@ -7,6 +9,7 @@ import org.dcsa.edocumentation.domain.dfa.DFADefinition;
 import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
@@ -224,6 +227,7 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "booking")
+  @Valid
   private Set<DocumentParty> documentParties;
 
   @ToString.Exclude
@@ -256,7 +260,7 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   /**
    * Subject to change. Reefer will probably change it.
    */
-  public ValidationResult<BkgDocumentStatus> asyncValidation() {
+  public ValidationResult<BkgDocumentStatus> asyncValidation(Validator validator) {
     LocalDate today = LocalDate.now();
     List<String> validationErrors = new ArrayList<>();
 
@@ -275,6 +279,9 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
       validationErrors.add("expectedArrivalAtPlaceOfDeliveryEndDate is in the past");
     }
     validateShipmentLocations(shipmentLocations, validationErrors);
+    for (var violation : validator.validate(this, AsyncShipperProvidedDataValidation.class)) {
+      validationErrors.add(violation.getPropertyPath().toString() + ": " +  violation.getMessage());
+    }
     var proposedStatus = validationErrors.isEmpty()
       ? PENC
       : PENU

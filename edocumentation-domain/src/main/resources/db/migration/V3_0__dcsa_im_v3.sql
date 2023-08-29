@@ -428,20 +428,12 @@ CREATE TABLE shipment_carrier_clauses (
 );
 
 
-CREATE TABLE party_function (
-    party_function_code varchar(3) PRIMARY KEY,
-    party_function_name varchar(100) NOT NULL,
-    party_function_description varchar(350) NOT NULL
-);
-
-
-
 CREATE TABLE document_party (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     party_id uuid NOT NULL REFERENCES party (id),
     shipping_instruction_id uuid NULL REFERENCES shipping_instruction (id),
     shipment_id uuid NULL REFERENCES shipment (id),
-    party_function varchar(3) NOT NULL REFERENCES party_function (party_function_code),
+    party_function varchar(3) NOT NULL,
     is_to_be_notified boolean NOT NULL,
     booking_id uuid NULL REFERENCES booking(id),
     displayed_address_id uuid NULL REFERENCES displayed_address(id)
@@ -449,7 +441,6 @@ CREATE TABLE document_party (
 
 -- Supporting FK constraints
 CREATE INDEX ON document_party (party_id);
-CREATE INDEX ON document_party (party_function);
 CREATE INDEX ON document_party (shipment_id);
 CREATE INDEX ON document_party (shipping_instruction_id);
 CREATE INDEX ON document_party (booking_id);
