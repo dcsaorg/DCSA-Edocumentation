@@ -303,6 +303,9 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   private void validateNegotiableBL(List<String> validationErrors) {
     validateAtMostOncePartyFunction(validationErrors, PartyFunction.END);
+
+    validateLimitOnPartyFunction(validationErrors, PartyFunction.OS, 0);
+    validateLimitOnPartyFunction(validationErrors, PartyFunction.DDR, 0);
   }
 
 
