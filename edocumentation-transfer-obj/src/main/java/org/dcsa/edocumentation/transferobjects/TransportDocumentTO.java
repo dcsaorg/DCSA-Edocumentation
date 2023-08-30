@@ -204,6 +204,13 @@ public record TransportDocumentTO(
     Predicate<DocumentPartyTO> isEndorseeParty = p -> p.partyFunction().equals(PartyFunction.END.name());
     var endorseeParties = nullSafeStream(documentParties).filter(isEndorseeParty).toList();
     verifyConsistency(endorseeParties.size() < 2, "Negotiable B/Ls cannot more than one endorsee party");
+
+    Predicate<DocumentPartyTO> isConsigneeOrCFF = p -> p.partyFunction().equals(PartyFunction.CN.name())
+      || p.partyFunction().equals(PartyFunction.DDS.name());
+    var consignees = nullSafeStream(documentParties).filter(isConsigneeOrCFF).toList();
+    verifyConsistency(consignees.isEmpty(),
+      "The negotiable B/Ls cannot have a consignee / consignee freight forwarder (documentParties[*].partyFunction in {OS, DDS})"
+    );
   }
 
 
