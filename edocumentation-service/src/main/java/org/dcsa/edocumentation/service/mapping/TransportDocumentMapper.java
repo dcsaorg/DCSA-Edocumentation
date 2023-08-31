@@ -1,9 +1,8 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import java.time.LocalDate;
-import org.dcsa.edocumentation.domain.persistence.entity.ShipmentLocation;
-import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
-import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
+
+import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
 import org.dcsa.edocumentation.transferobjects.TDTransportTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
@@ -37,6 +36,26 @@ public abstract class TransportDocumentMapper {
   @Mapping(source = "transportDocument.shippingInstruction.documentStatus", target = "documentStatus")
   public abstract TransportDocumentRefStatusTO toStatusDTO(TransportDocument transportDocument);
 
+
+  /*
+      There is a list of fields that must be the same if multiple bookings are being linked to from the same SI:
+
+      transportPlan
+      shipmentLocations
+      receiptTypeAtOrigin
+      deliveryTypeAtDestination
+      cargoMovementTypeAtOrigin
+      cargoMovementTypeAtDestination
+      serviceContractReference
+      termsAndConditions
+      Invoice Payable At (if provided)
+      Place of B/L Issuance (if provided)
+      Transport Document Type Code (if provided)
+      Transport Document Reference (if provided)
+
+      This means that we can just pick *any* of the bookings/shipments when resolving these fields for the
+      purpose of figuring out the value.
+   */
   @Mapping(source = "transportDocument.shippingInstruction.consignmentItems", target = "consignmentItems")
   @Mapping(source = "transportDocument.shippingInstruction.documentParties", target = "documentParties")
   @Mapping(source = "transportDocument.shippingInstruction.references", target = "references")
@@ -59,9 +78,9 @@ public abstract class TransportDocumentMapper {
   @Mapping(target = "carrierCode", expression = "java(carrierCode(transportDocument))")
   @Mapping(target = "carrierCodeListProvider", expression = "java(carrierCodeListProvider(transportDocument))")
 
-  @Mapping(target = "termsAndConditions", ignore = true)  // FIXME: We should be mapping this field.
-  @Mapping(target = "serviceContractReference", ignore = true)  // FIXME: We should be mapping this field.
-  @Mapping(target = "contractQuotationReference", ignore = true)  // FIXME: We should be mapping this field.
+  @Mapping(target = "termsAndConditions", expression = "java(termsAndConditions(transportDocument))")
+  @Mapping(target = "serviceContractReference", expression = "java(serviceContractReference(transportDocument))")
+  @Mapping(target = "contractQuotationReference", expression = "java(contractQuotationReference(transportDocument))")
   @Mapping(target = "declaredValue", ignore = true)  // FIXME: We should be mapping this field.
   @Mapping(target = "declaredValueCurrency", ignore = true)  // FIXME: We should be mapping this field.
 
@@ -73,6 +92,21 @@ public abstract class TransportDocumentMapper {
   @Mapping( target = "invoicePayableAt", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
   public abstract TransportDocumentTO toDTO(TransportDocument transportDocument);
 
+  protected Shipment resolveAnyShipment(TransportDocument document) {
+    return document.getShippingInstruction().getConsignmentItems().iterator().next().getShipment();
+  }
+
+  protected String termsAndConditions(TransportDocument document) {
+    return resolveAnyShipment(document).getTermsAndConditions();
+  }
+
+  protected String serviceContractReference(TransportDocument document) {
+    return resolveAnyShipment(document).getBooking().getServiceContractReference();
+  }
+
+  protected String contractQuotationReference(TransportDocument document) {
+    return resolveAnyShipment(document).getBooking().getContractQuotationReference();
+  }
 
   protected CarrierCodeListProvider carrierCodeListProvider(TransportDocument transportDocument) {
     var carrier = transportDocument.getCarrier();

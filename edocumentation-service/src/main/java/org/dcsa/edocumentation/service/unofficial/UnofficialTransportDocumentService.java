@@ -85,7 +85,7 @@ public class UnofficialTransportDocumentService {
     //  the transport document. This affects basically any non-trivial object associated with the
     //  transport document.
     // TODO: This logic should not be a builder; but in a SI .issueDraft() or something like that, which could
-    //  then validate the draft document is in a sentible state (e.g., isElectronic vs. original/copies/rider pages)
+    //  then validate the draft document is in a sensible state (e.g., isElectronic vs. original/copies/rider pages)
     TransportDocument document = TransportDocument.builder()
       .shippingInstruction(shippingInstruction)
       .shippedOnBoardDate(shippingInstruction.getIsShippedOnBoardType() == Boolean.TRUE ? transportDocumentRequestTO.shipmentDate() : null)
