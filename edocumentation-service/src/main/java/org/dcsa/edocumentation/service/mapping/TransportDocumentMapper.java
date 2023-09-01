@@ -1,14 +1,13 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import java.time.LocalDate;
-
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
 import org.dcsa.edocumentation.transferobjects.TDTransportTO;
+import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
 import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
-import org.dcsa.edocumentation.transferobjects.unofficial.TransportDocumentRefStatusTO;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.Mapper;
@@ -51,7 +50,6 @@ public abstract class TransportDocumentMapper {
       Invoice Payable At (if provided)
       Place of B/L Issuance (if provided)
       Transport Document Type Code (if provided)
-      Transport Document Reference (if provided)
 
       This means that we can just pick *any* of the bookings/shipments when resolving these fields for the
       purpose of figuring out the value.

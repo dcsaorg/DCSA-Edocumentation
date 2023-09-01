@@ -42,7 +42,6 @@ public abstract class ShippingInstructionMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "isNew", ignore = true)
   @Mapping(target = "validUntil", ignore = true)
-  @Mapping(target = "dfa", ignore = true)
   public abstract ShippingInstruction toDAO(ShippingInstructionTO shippingInstructionTO);
 
   // TODO: Complete this stub mapping (DDT-1296)

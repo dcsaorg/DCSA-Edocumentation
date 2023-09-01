@@ -4,8 +4,10 @@ import jakarta.transaction.Transactional;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
+import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
+import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
 import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
@@ -17,6 +19,7 @@ public class TransportDocumentService {
 
   private final TransportDocumentRepository transportDocumentRepository;
   private final TransportDocumentMapper transportDocumentMapper;
+  private final ShipmentEventRepository shipmentEventRepository;
 
   @Transactional
   public Optional<TransportDocumentTO> findByReference(String transportDocumentReference) {
@@ -84,5 +87,19 @@ public class TransportDocumentService {
       builder.carrierCode(carrier.getNmftaCode());
     }
     return builder;
+  }
+
+  public Optional<TransportDocumentRefStatusTO> approveTransportDocument(String transportDocumentReference) {
+    TransportDocument document = transportDocumentRepository
+      .findByTransportDocumentReferenceAndValidUntilIsNull(transportDocumentReference)
+      .orElse(null);
+    if (document == null) {
+      return Optional.empty();
+    }
+    ShipmentEvent event = document.approveFromShipper();
+
+    transportDocumentRepository.save(document);
+    shipmentEventRepository.save(event);
+    return Optional.of(transportDocumentMapper.toStatusDTO(document));
   }
 }

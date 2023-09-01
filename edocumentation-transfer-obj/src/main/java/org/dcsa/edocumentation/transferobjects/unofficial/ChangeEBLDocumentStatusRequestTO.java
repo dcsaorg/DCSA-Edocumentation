@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record ChangeEBLDocumentStatusRequestTO(
+
+  // FIXME: Should not support ISSU; ISSU requires more complex logic.
   @NotNull
   @EnumSubset(anyOf = "PENU,PENA,APPR,ISSU,SURR,VOID")
   EblDocumentStatus documentStatus,
