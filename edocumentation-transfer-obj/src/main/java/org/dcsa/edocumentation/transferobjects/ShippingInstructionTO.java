@@ -10,6 +10,7 @@ import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.dcsa.skernel.infrastructure.validation.RequiredIfFalse;
+import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 
 @RequiredIfFalse(
   ifFalse = "isElectronic",
@@ -46,6 +47,10 @@ public record ShippingInstructionTO(
   Integer numberOfOriginalsWithCharges,
   @Min(0)
   Integer numberOfOriginalsWithoutCharges,
+
+  @Valid
+  @RestrictLocationTO({LocationTO.LocationType.ADDRESS, LocationTO.LocationType.UNLOCATION})
+  LocationTO invoicePayableAt,
 
   @NotNull(message = "isElectronic is required.")
   Boolean isElectronic,

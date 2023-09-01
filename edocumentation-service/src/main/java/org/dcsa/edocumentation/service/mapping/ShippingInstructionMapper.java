@@ -37,6 +37,8 @@ public abstract class ShippingInstructionMapper {
   @Mapping(source = "consignmentItems", target = "consignmentItems", ignore = true)
   @Mapping(target = "placeOfIssue.id", ignore = true)  // FIXME: We need a TO -> DAO location mapper
   @Mapping(target = "placeOfIssue.facility", ignore = true)  // FIXME: We need a TO -> DAO location mapper
+  @Mapping(target = "invoicePayableAt.id", ignore = true)  // FIXME: We need a TO -> DAO location mapper
+  @Mapping(target = "invoicePayableAt.facility", ignore = true)  // FIXME: We need a TO -> DAO location mapper
   @Mapping(target = "amendmentToTransportDocument", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
   // Internal details; should not be mapped
   @Mapping(target = "id", ignore = true)
@@ -51,8 +53,8 @@ public abstract class ShippingInstructionMapper {
   @Mapping(target = "areChargesDisplayedOnCopies", ignore = true)  // FIXME: DAO/TO should be aligned here
   public abstract ShippingInstructionTO toDTO(ShippingInstruction shippingInstruction);
 
-  protected List<UtilizedTransportEquipmentTO> mapConsignmentItemSetToUtilizedTransportEquipmentTOList(Set<ConsignmentItem> consignmentItemSet) {
-    return consignmentItemSet.stream()
+  protected List<UtilizedTransportEquipmentTO> mapConsignmentItemListToUtilizedTransportEquipmentTOList(List<ConsignmentItem> consignmentItems) {
+    return consignmentItems.stream()
       .flatMap(ci -> ci.getCargoItems().stream())
       .map(CargoItem::getUtilizedTransportEquipment)
       .distinct()

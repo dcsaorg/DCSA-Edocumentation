@@ -2,7 +2,6 @@ package org.dcsa.edocumentation.datafactories;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -87,7 +86,7 @@ public class ShippingInstructionDataFactory {
             .carrier(Carrier.builder().carrierName("dummy carrier").build())
             .build();
 
-    Set<ConsignmentItem> consignmentItems = Set.of(ConsignmentItem.builder()
+    var consignmentItems = List.of(ConsignmentItem.builder()
       .shipment(shipments)
       .build());
 
@@ -146,7 +145,7 @@ public class ShippingInstructionDataFactory {
         .build())
       .build();
 
-    Set<ConsignmentItem> consignmentItems = Set.of(
+    var consignmentItems = List.of(
       ConsignmentItem.builder()
         .shipment(shipment)
         .build()

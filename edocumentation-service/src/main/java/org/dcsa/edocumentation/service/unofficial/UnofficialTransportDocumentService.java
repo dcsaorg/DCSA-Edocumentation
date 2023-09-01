@@ -1,13 +1,10 @@
 package org.dcsa.edocumentation.service.unofficial;
 
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
@@ -40,9 +37,9 @@ public class UnofficialTransportDocumentService {
   private final PartyService partyService;
   private final TransportDocumentMapper transportDocumentMapper;
   private final TransportDocumentRepository transportDocumentRepository;
+  private final UnofficialShippingInstructionService unofficialShippingInstructionService;
 
   private final DocumentStatusMapper documentStatusMapper;
-  private final Validator validator;
 
   @Transactional
   public Optional<TransportDocumentRefStatusTO> issueDraft(DraftTransportDocumentRequestTO transportDocumentRequestTO) {
@@ -51,27 +48,9 @@ public class UnofficialTransportDocumentService {
     if (shippingInstruction == null) {
       return Optional.empty();
     }
-    ValidationResult<EblDocumentStatus> validationResult;
-    try {
-      validationResult = shippingInstruction.asyncValidation(validator);
-    } catch (IllegalStateException e) {
-      throw ConcreteRequestErrorMessageException.conflict("SI is not in a state to be DRFT'ed", e);
-    }
-    if (!validationResult.validationErrors().isEmpty()) {
-      var status = validationResult.proposedStatus();
-      var reason = validationResult.presentErrors(5000);
-      ShipmentEvent e;
-      if (status == EblDocumentStatus.REJE) {
-        e = shippingInstruction.rejected(reason);
-      } else {
-        assert status == EblDocumentStatus.PENU;
-        e = shippingInstruction.pendingUpdate(reason);
-      }
-      shippingInstructionRepository.save(shippingInstruction);
-      shipmentEventRepository.save(e);
-
+    if (!unofficialShippingInstructionService.performValidationOfShippingInstruction(shippingInstruction)) {
       throw ConcreteRequestErrorMessageException.conflict(
-        "The SI had validation errors and is now in state " + status.name(),
+        "The SI had validation errors; please run the validation endpoint to trigger the relevant shipment event",
         null
       );
     }
@@ -133,6 +112,8 @@ public class UnofficialTransportDocumentService {
     ShipmentEvent event = switch (documentStatusMapper.toDomainEblDocumentStatus(status)) {
       case APPR -> transportDocument.approveFromCarrier();
       case PENA -> transportDocument.pendingApproval(reason);
+      // FIXME: issue requires that all documents related to the booking is issued at the same time
+      //  That is, if booking is split between multiple SIs, the TDs for those SIs must be issued at the same time
       case ISSU -> transportDocument.issue();
       case SURR -> transportDocument.surrender();
       case VOID -> transportDocument.voidDocument();

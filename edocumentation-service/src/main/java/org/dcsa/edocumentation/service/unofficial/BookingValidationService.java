@@ -15,6 +15,7 @@ import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventReposi
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.transferobjects.unofficial.ValidationResultTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /** Emulates SMEs asynchronous validation of a booking. */
@@ -25,6 +26,7 @@ public class BookingValidationService {
   private final BookingRepository bookingRepository;
   private final ShipmentEventRepository shipmentEventRepository;
   private final DocumentStatusMapper documentStatusMapper;
+  @Qualifier("eagerValidator")
   private final Validator validator;
 
   @Transactional
