@@ -389,6 +389,7 @@ CREATE TABLE shipping_instruction (
     is_electronic boolean NOT NULL,
     is_to_order boolean NOT NULL,
     place_of_issue_id uuid NULL REFERENCES location(id),
+    invoice_payable_at_id uuid NULL REFERENCES location(id),
     transport_document_type_code varchar(3) NULL REFERENCES transport_document_type(transport_document_type_code),
     displayed_name_for_place_of_receipt uuid NULL REFERENCES displayed_address(id),
     displayed_name_for_port_of_load uuid NULL REFERENCES displayed_address(id),
@@ -499,7 +500,8 @@ CREATE TABLE consignment_item (
     description_of_goods text NOT NULL,
     shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
     shipment_id uuid NOT NULL REFERENCES shipment (id),
-    commodity_id uuid NULL REFERENCES commodity (id)
+    commodity_id uuid NULL REFERENCES commodity (id),
+    si_entry_order int NOT NULL default 0
 );
 
 CREATE TABLE hs_code_item (

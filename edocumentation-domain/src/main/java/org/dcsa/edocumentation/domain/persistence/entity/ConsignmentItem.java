@@ -1,5 +1,9 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import jakarta.persistence.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,11 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import jakarta.persistence.*;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.ConsignmentItemValidation;
 
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Getter
 @Entity
 @Table(name = "consignment_item")
+@ConsignmentItemValidation(groups = AsyncShipperProvidedDataValidation.class)
 public class ConsignmentItem {
 
   @Id

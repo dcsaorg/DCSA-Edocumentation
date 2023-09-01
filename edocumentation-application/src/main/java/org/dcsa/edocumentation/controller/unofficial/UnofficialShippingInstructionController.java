@@ -39,4 +39,19 @@ public class UnofficialShippingInstructionController {
           "No shipping instruction found with shippingInstructionReference: "
             + shippingInstructionReference));
   }
+
+  @PostMapping(path = "/unofficial${spring.application.ebl-context-path}/shipping-instructions/{shippingInstructionReference}/validate")
+  @ResponseStatus(HttpStatus.OK)
+  public ShippingInstructionRefStatusTO validate(
+    @PathVariable("shippingInstructionReference")
+    @NotBlank @Size(max = 100)
+    String shippingInstructionReference
+    ) {
+
+    return service.validateShippingInstruction(shippingInstructionReference)
+      .orElseThrow(() ->
+        ConcreteRequestErrorMessageException.notFound(
+          "No shipping instruction found with shippingInstructionReference: "
+            + shippingInstructionReference));
+  }
 }

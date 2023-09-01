@@ -87,7 +87,7 @@ public abstract class TransportDocumentMapper {
   @Mapping(target = "cargoMovementTypeAtOrigin", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
   @Mapping(target = "cargoMovementTypeAtDestination", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
   @Mapping(target = "utilizedTransportEquipments", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
-  @Mapping( target = "invoicePayableAt", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
+  @Mapping(source = "transportDocument.shippingInstruction.invoicePayableAt", target = "invoicePayableAt")
   public abstract TransportDocumentTO toDTO(TransportDocument transportDocument);
 
   protected Shipment resolveAnyShipment(TransportDocument document) {

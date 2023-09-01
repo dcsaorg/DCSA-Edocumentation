@@ -6,15 +6,15 @@ import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.ShippingInstructionValidation;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
@@ -48,6 +48,7 @@ import org.springframework.data.domain.Persistable;
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "shipping_instruction")
+@ShippingInstructionValidation(groups = AsyncShipperProvidedDataValidation.class)
 public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     implements Persistable<UUID> {
 
@@ -121,6 +122,12 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @Column(name = "number_of_originals_without_charges")
   private Integer numberOfOriginalsWithoutCharges;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "invoice_payable_at_id")
+  private Location invoicePayableAt;
+
   @Column(name = "is_electronic")
   private Boolean isElectronic;
 
@@ -170,7 +177,8 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "shippingInstruction")
-  private Set<ConsignmentItem> consignmentItems;
+  @OrderColumn(name = "si_entry_order")
+  private List<@Valid ConsignmentItem> consignmentItems;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -186,33 +194,6 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "shipping_instruction_id")
   private List<CustomsReference> customsReferences;
-
-  // Todo consider if it makes sense to move this to a validation annotation
-  public Boolean hasOnlyConfirmedBookings() {
-
-    long unconfirmedBookingCount =
-        this.consignmentItems.stream()
-            .map(ConsignmentItem::getShipment)
-            .map(Shipment::getBooking)
-            .map(Booking::getDocumentStatus)
-            .filter(status -> !status.equals(BkgDocumentStatus.CONF))
-            .count();
-
-    return unconfirmedBookingCount < 1;
-  }
-
-  // Todo consider if it makes sense to move this to a validation annotation
-  public Boolean containsOneBooking() {
-    long distinctBookingCount =
-        this.consignmentItems.stream()
-            .map(ConsignmentItem::getShipment)
-            .map(Shipment::getBooking)
-            .map(Booking::getCarrierBookingRequestReference)
-            .distinct()
-            .count();
-
-    return distinctBookingCount == 1;
-  }
 
   // certain characteristics like the transport plan, are share among all shipments in the shipping
   // instruction, so it is beneficial to be able to retrieve one
@@ -240,15 +221,28 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
       throw new IllegalStateException("documentStatus must be one of " + CAN_BE_VALIDATED);
     }
 
-    validateShipper(validationErrors);
-    if (isToOrder == Boolean.TRUE) {
-      validateNegotiableBL(validationErrors);
-    } else {
-      validateStraightBL(validationErrors);
-    }
     for (var violation : validator.validate(this, AsyncShipperProvidedDataValidation.class)) {
       validationErrors.add(violation.getPropertyPath().toString() + ": " +  violation.getMessage());
     }
+
+    /*
+      There is a list of fields that must be the same if multiple bookings are being linked to from the same SI:
+
+      transportPlan
+      shipmentLocations
+      receiptTypeAtOrigin
+      deliveryTypeAtDestination
+      cargoMovementTypeAtOrigin
+      cargoMovementTypeAtDestination
+      serviceContractReference
+      termsAndConditions
+      Invoice Payable At (if provided)
+      Place of B/L Issuance (if provided)
+      Transport Document Type Code (if provided)
+
+      This means that we can just pick *any* of the bookings/shipments when resolving these fields for the
+      purpose of figuring out the value.
+   */
 
     var proposedStatus = validationErrors.isEmpty()
       ? DRFT
@@ -257,68 +251,6 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return new ValidationResult<>(proposedStatus, validationErrors);
   }
 
-  private void validateStraightBL(List<String> validationErrors) {
-    if (validateAtLeastOneOfIsPresent(validationErrors, Set.of(PartyFunction.CN.name(), PartyFunction.DDS.name()))) {
-      validateAtMostOncePartyFunction(validationErrors, PartyFunction.CN);
-      validateAtMostOncePartyFunction(validationErrors, PartyFunction.DDS);
-    }
-    validateLimitOnPartyFunction(validationErrors, PartyFunction.END, 0);
-  }
-
-
-  private void validateAtMostOncePartyFunction(List<String> validationErrors, PartyFunction partyFunction) {
-    validateLimitOnPartyFunction(validationErrors, partyFunction, 1);
-  }
-
-  private void validateLimitOnPartyFunction(List<String> validationErrors, PartyFunction partyFunction, int limit) {
-    var matches = nullSafeStream(documentParties)
-      .filter(p -> p.getPartyFunction().equals(partyFunction.name()))
-      .count();
-    if (matches > limit) {
-      switch (limit) {
-        case 0 -> validationErrors.add(
-          "The party function " + partyFunction.name() + " cannot be used on this SI.");
-        case 1 -> validationErrors.add(
-          "There can only be at most one party with the partyFunction " + partyFunction.name());
-        default -> validationErrors.add(
-          "There can only be at most " + limit + " parties with the partyFunction " + partyFunction.name());
-      }
-    }
-  }
-
-  private boolean validateAtLeastOneOfIsPresent(List<String> validationErrors,
-                                                Set<String> partyFunctions) {
-    var matches = nullSafeStream(documentParties)
-      .filter(p -> partyFunctions.contains(p.getPartyFunction()))
-      .count();
-    if (matches < 1) {
-      validationErrors.add(
-        "This SI requires at least one of the following party functions to be present: " +
-          String.join(", ", partyFunctions.stream().toList())
-      );
-      return false;
-    }
-    return true;
-  }
-
-  private void validateNegotiableBL(List<String> validationErrors) {
-    validateAtMostOncePartyFunction(validationErrors, PartyFunction.END);
-
-    validateLimitOnPartyFunction(validationErrors, PartyFunction.OS, 0);
-    validateLimitOnPartyFunction(validationErrors, PartyFunction.DDR, 0);
-  }
-
-
-  private void validateShipper(List<String> validationErrors) {
-    if (validateAtLeastOneOfIsPresent(validationErrors, Set.of(PartyFunction.OS.name(), PartyFunction.DDR.name()))) {
-      validateAtMostOncePartyFunction(validationErrors, PartyFunction.OS);
-      validateAtMostOncePartyFunction(validationErrors, PartyFunction.DDR);
-    }
-  }
-
-  private <T> Stream<T> nullSafeStream(Collection<T> c) {
-    return c != null ? c.stream() : Stream.of();
-  }
 
   /** Transition the document into its {@link EblDocumentStatus#RECE} state. */
   public ShipmentEvent receive() {
