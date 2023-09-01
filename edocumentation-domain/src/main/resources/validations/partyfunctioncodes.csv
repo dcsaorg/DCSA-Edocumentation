@@ -12,4 +12,4 @@ DDS,"Consignee's freight forwarder",Identification of freight forwarder giving s
 HE,"Carrier booking office (transportation office)",
 SCO,Service contract owner,"The party signing the service contract with the carrier."
 BA,Booking Agent,"Party acting as a booking office for transport and forwarding services."
-END,Endorsee Party,
+END,Endorsee Party,Party to whom the title to the goods is transferred by means of endorsement.
