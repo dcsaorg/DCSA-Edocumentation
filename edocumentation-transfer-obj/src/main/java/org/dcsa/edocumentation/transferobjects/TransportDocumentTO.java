@@ -203,7 +203,7 @@ public record TransportDocumentTO(
   private void validateNegotiableBL() {
     Predicate<DocumentPartyTO> isEndorseeParty = p -> p.partyFunction().equals(PartyFunction.END.name());
     var endorseeParties = nullSafeStream(documentParties).filter(isEndorseeParty).toList();
-    verifyConsistency(endorseeParties.size() < 2, "Negotiable B/Ls cannot more than one endorsee party");
+    verifyConsistency(endorseeParties.size() < 2, "Negotiable B/Ls cannot have more than one endorsee party");
 
     Predicate<DocumentPartyTO> isConsigneeOrCFF = p -> p.partyFunction().equals(PartyFunction.CN.name())
       || p.partyFunction().equals(PartyFunction.DDS.name());
