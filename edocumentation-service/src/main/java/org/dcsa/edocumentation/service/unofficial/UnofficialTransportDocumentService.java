@@ -16,9 +16,9 @@ import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
 import org.dcsa.edocumentation.transferobjects.PartyTO;
+import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.edocumentation.transferobjects.unofficial.DraftTransportDocumentRequestTO;
-import org.dcsa.edocumentation.transferobjects.unofficial.TransportDocumentRefStatusTO;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.dcsa.skernel.domain.persistence.repository.CarrierRepository;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
@@ -131,7 +131,7 @@ public class UnofficialTransportDocumentService {
       return Optional.empty();
     }
     ShipmentEvent event = switch (documentStatusMapper.toDomainEblDocumentStatus(status)) {
-      case APPR -> transportDocument.approve();
+      case APPR -> transportDocument.approveFromCarrier();
       case PENA -> transportDocument.pendingApproval(reason);
       case ISSU -> transportDocument.issue();
       case SURR -> transportDocument.surrender();

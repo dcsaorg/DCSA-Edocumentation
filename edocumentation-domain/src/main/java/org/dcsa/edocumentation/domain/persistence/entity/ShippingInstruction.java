@@ -362,8 +362,6 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     this.validUntil = lockTime;
   }
 
-  @Transient private DFA<EblDocumentStatus> dfa;
-
   protected DFADefinition<EblDocumentStatus> getDfaDefinition() {
     return this.amendmentToTransportDocument != null
         ? AMENDMENT_EBL_DFA_DEFINITION
@@ -373,6 +371,14 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @Override
   protected EblDocumentStatus getResumeFromState() {
     return this.documentStatus;
+  }
+
+  protected EblDocumentStatus getCurrentState() {
+    var d = this.getDfa();
+    if (d == null) {
+      return this.getResumeFromState();
+    }
+    return d.getCurrentState();
   }
 
   @Override

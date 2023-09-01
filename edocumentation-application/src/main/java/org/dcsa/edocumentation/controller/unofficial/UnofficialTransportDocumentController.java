@@ -2,9 +2,9 @@ package org.dcsa.edocumentation.controller.unofficial;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.service.unofficial.UnofficialTransportDocumentService;
+import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.ChangeEBLDocumentStatusRequestTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.DraftTransportDocumentRequestTO;
-import org.dcsa.edocumentation.transferobjects.unofficial.TransportDocumentRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;

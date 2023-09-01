@@ -1,9 +1,13 @@
 package org.dcsa.edocumentation.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.service.TransportDocumentService;
+import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
+import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.dcsa.skernel.infrastructure.validation.EnumSubset;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -28,4 +32,22 @@ public class TransportDocumentController {
           "No transport document found with transportDocumentReference: "
             + transportDocumentReference));
   }
+
+  @PatchMapping("/{transportDocumentReference}")
+  @ResponseStatus(HttpStatus.OK)
+  public TransportDocumentRefStatusTO approveTransportDocumentByReference(
+    @PathVariable("transportDocumentReference") @Size(max = 20) String transportDocumentReference,
+    @Valid @RequestBody ApproveTDPayload ignored
+  ) {
+    return transportDocumentService.approveTransportDocument(transportDocumentReference).orElseThrow(
+      () ->
+        ConcreteRequestErrorMessageException.notFound(
+          "No transport document found with transportDocumentReference: "
+            + transportDocumentReference));
+  }
+
+  private record ApproveTDPayload(
+    @EnumSubset(anyOf = "APPR")
+    EblDocumentStatus documentStatus
+  ) {}
 }

@@ -6,6 +6,7 @@ import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
+import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 
@@ -162,7 +163,19 @@ public class TransportDocument implements Persistable<UUID> {
   }
 
   /** Transition the document into its {@link EblDocumentStatus#APPR} state. */
-  public ShipmentEvent approve() {
+  public ShipmentEvent approveFromShipper() {
+    if (this.shippingInstruction.getCurrentState() != DRFT) {
+      throw ConcreteRequestErrorMessageException.conflict("Cannot approveFromShipper: The TransportDocument is not in the DRFT state", null);
+    }
+    return processTransition(APPR, null);
+  }
+
+
+  /** Transition the document into its {@link EblDocumentStatus#APPR} state. */
+  public ShipmentEvent approveFromCarrier() {
+    if (this.shippingInstruction.getCurrentState() != PENA) {
+      throw ConcreteRequestErrorMessageException.conflict("Cannot approveFromCarrier: The TransportDocument is not in the PENA state", null);
+    }
     return processTransition(APPR, null);
   }
 

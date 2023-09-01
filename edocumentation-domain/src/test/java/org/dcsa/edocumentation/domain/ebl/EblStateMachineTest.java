@@ -38,7 +38,7 @@ class EblStateMachineTest {
     Assertions.assertTrue(transportDocument.isPendingApprovalSupported());
     transportDocument.pendingApproval("We have provided foo, please approve the draft TRD");
     Assertions.assertEquals(PENA, shippingInstruction.getDocumentStatus());
-    transportDocument.approve();
+    transportDocument.approveFromCarrier();
     Assertions.assertEquals(APPR, shippingInstruction.getDocumentStatus());
     transportDocument.issue();
     Assertions.assertEquals(ISSU, shippingInstruction.getDocumentStatus());
@@ -53,7 +53,7 @@ class EblStateMachineTest {
     Assertions.assertEquals(RECE, shippingInstruction.getDocumentStatus());
     transportDocument.draft();
     Assertions.assertEquals(DRFT, shippingInstruction.getDocumentStatus());
-    transportDocument.approve();
+    transportDocument.approveFromShipper();
     Assertions.assertEquals(APPR, shippingInstruction.getDocumentStatus());
     transportDocument.issue();
     Assertions.assertEquals(ISSU, shippingInstruction.getDocumentStatus());
@@ -63,7 +63,7 @@ class EblStateMachineTest {
       .build();
     transportDocument = TransportDocument.builder().shippingInstruction(shippingInstruction).build();
     Assertions.assertEquals(DRFT, shippingInstruction.getDocumentStatus());
-    transportDocument.approve();
+    transportDocument.approveFromShipper();
     Assertions.assertEquals(APPR, shippingInstruction.getDocumentStatus());
   }
 
@@ -121,7 +121,8 @@ class EblStateMachineTest {
       TransportDocument stateMachine = initializer.apply(VOID);
       Assertions.assertThrows(ConflictException.class, stateMachine::draft);
       Assertions.assertThrows(ConflictException.class, () -> stateMachine.pendingApproval("Should throw"));
-      Assertions.assertThrows(ConflictException.class, stateMachine::approve);
+      Assertions.assertThrows(ConflictException.class, stateMachine::approveFromShipper);
+      Assertions.assertThrows(ConflictException.class, stateMachine::approveFromCarrier);
       Assertions.assertThrows(ConflictException.class, stateMachine::issue);
       Assertions.assertThrows(ConflictException.class, stateMachine::surrender);
       Assertions.assertThrows(ConflictException.class, stateMachine::voidDocument);
