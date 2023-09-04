@@ -1,14 +1,15 @@
 package org.dcsa.edocumentation.domain.validations;
 
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 
+@Getter
 @RequiredArgsConstructor(staticName = "of")
 class ValidationState<T> {
-  final T value;
-  final ConstraintValidatorContext context;
-  boolean isValid = true;
+  private final T value;
+  private final ConstraintValidatorContext context;
+  private boolean isValid = true;
 
   public void applyResult(boolean validationPassed) {
     this.isValid = this.isValid && validationPassed;

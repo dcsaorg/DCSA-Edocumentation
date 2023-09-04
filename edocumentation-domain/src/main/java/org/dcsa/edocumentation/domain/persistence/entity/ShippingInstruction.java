@@ -225,25 +225,6 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
       validationErrors.add(violation.getPropertyPath().toString() + ": " +  violation.getMessage());
     }
 
-    /*
-      There is a list of fields that must be the same if multiple bookings are being linked to from the same SI:
-
-      transportPlan
-      shipmentLocations
-      receiptTypeAtOrigin
-      deliveryTypeAtDestination
-      cargoMovementTypeAtOrigin
-      cargoMovementTypeAtDestination
-      serviceContractReference
-      termsAndConditions
-      Invoice Payable At (if provided)
-      Place of B/L Issuance (if provided)
-      Transport Document Type Code (if provided)
-
-      This means that we can just pick *any* of the bookings/shipments when resolving these fields for the
-      purpose of figuring out the value.
-   */
-
     var proposedStatus = validationErrors.isEmpty()
       ? DRFT
       : (amendmentToTransportDocument != null ? REJE : PENU)
