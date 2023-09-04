@@ -17,13 +17,13 @@ public class ConsignmentItemValidator implements ConstraintValidator<Consignment
 
     var state = ValidationState.of(value, context);
     validateConfirmedBookings(state);
-    return state.isValid;
+    return state.isValid();
   }
 
   private void validateConfirmedBookings(ValidationState<ConsignmentItem> state) {
-    var shipment = state.value.getShipment();
+    var shipment = state.getValue().getShipment();
     if (shipment.getBooking().getDocumentStatus() != BkgDocumentStatus.CONF) {
-      state.context.buildConstraintViolationWithTemplate("The booking " + shipment.getCarrierBookingReference() + " is not in state CONF")
+      state.getContext().buildConstraintViolationWithTemplate("The booking " + shipment.getCarrierBookingReference() + " is not in state CONF")
         // Match the TO path
         .addPropertyNode("carrierBookingReference")
         .addConstraintViolation();
