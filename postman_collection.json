@@ -48,9 +48,13 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test('Body contains 0 or more items', () => {\r",
-											"    pm.expect(pm.response.json().length).to.equal(0);\r",
-											"});"
+											"pm.test('All matches must have correct status', () => {\r",
+											"    const response = pm.response.json()\r",
+											"    for (let i = 0; i < response.length ; i++) {\r",
+											"        pm.expect(response[i].documentStatus).to.equal(\"CMPL\");\r",
+											"    }\r",
+											"});\r",
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -375,8 +379,11 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test('Body contains 0 or more items', () => {\r",
-											"    pm.expect(pm.response.json().length).to.equal(0);\r",
+											"pm.test('All matches must have correct status', () => {\r",
+											"    const response = pm.response.json()\r",
+											"    for (let i = 0; i < response.length ; i++) {\r",
+											"        pm.expect(response[i].documentStatus).to.equal(\"CMPL\");\r",
+											"    }\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -5968,7 +5975,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n    \"isShippedOnBoardType\": true,\r\n    \"isElectronic\": true,\r\n    \"isToOrder\": false,\r\n    \"displayedNameForPortOfLoad\": [\r\n            \"Port of Rotterdam\"\r\n        ],\r\n    \"customsReferences\": [\r\n        {\r\n            \"type\": \"CERS\",\r\n            \"countryCode\": \"CA\",\r\n            \"value\": \"12345678\"\r\n        }\r\n    ],\r\n    \"consignmentItems\": [\r\n        {\r\n            \"HSCodes\": [\"411510\"],\r\n            \"carrierBookingReference\": \"{{CARRIER_BOOKING_REFERENCE}}\",\r\n            \"weight\": 120.4,\r\n            \"weightUnit\": \"KGM\",\r\n            \"descriptionOfGoods\": \"The goods!\",\r\n            \"cargoItems\": [\r\n                {\r\n                    \"equipmentReference\": \"BMOU2149612\",\r\n                    \"weight\": 120.3,\r\n                    \"weightUnit\": \"KGM\",\r\n                    \"shippingMarks\": [\"bar\"]\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"utilizedTransportEquipments\": [\r\n        {\r\n            \"equipmentReference\": \"BMOU2149612\",\r\n            \"cargoGrossWeight\": 120.3,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"isShipperOwned\": false,\r\n            \"seals\": [\r\n                {\r\n                    \"number\": \"12345\",\r\n                    \"source\": \"CAR\",\r\n                    \"type\": \"BLT\"\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"foo party\",\r\n                \"address\": {\r\n                    \"name\": \"foo address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\",\r\n                        \"email\": \"someone@foo.example.com\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"CN\",\r\n            \"displayedAddress\": [\r\n                \"foo\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        },\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"bar party\",\r\n                \"address\": {\r\n                    \"name\": \"bar address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\",\r\n                        \"email\": \"someone@bar.example.com\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"OS\",\r\n            \"displayedAddress\": [\r\n                \"bar\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"foo reference\"\r\n        }\r\n    ]\r\n}",
+											"raw": "{\r\n    \"isShippedOnBoardType\": true,\r\n    \"isElectronic\": true,\r\n    \"isToOrder\": false,\r\n    \"displayedNameForPortOfLoad\": [\r\n            \"Port of Rotterdam\"\r\n    ],\r\n    \"customsReferences\": [\r\n        {\r\n            \"type\": \"CERS\",\r\n            \"countryCode\": \"CA\",\r\n            \"value\": \"12345678\"\r\n        }\r\n    ],\r\n    \"consignmentItems\": [\r\n        {\r\n            \"HSCodes\": [\"411510\"],\r\n            \"carrierBookingReference\": \"{{CARRIER_BOOKING_REFERENCE}}\",\r\n            \"weight\": 120.4,\r\n            \"weightUnit\": \"KGM\",\r\n            \"descriptionOfGoods\": \"The goods!\",\r\n            \"cargoItems\": [\r\n                {\r\n                    \"equipmentReference\": \"BMOU2149612\",\r\n                    \"weight\": 120.3,\r\n                    \"weightUnit\": \"KGM\",\r\n                    \"shippingMarks\": [\"bar\"]\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"utilizedTransportEquipments\": [\r\n        {\r\n            \"equipmentReference\": \"BMOU2149612\",\r\n            \"cargoGrossWeight\": 120.3,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"isShipperOwned\": false,\r\n            \"seals\": [\r\n                {\r\n                    \"number\": \"12345\",\r\n                    \"source\": \"CAR\",\r\n                    \"type\": \"BLT\"\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"foo party\",\r\n                \"address\": {\r\n                    \"name\": \"foo address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\",\r\n                        \"email\": \"someone@foo.example.com\"\r\n                    }\r\n                ],\r\n                \"identifyingCodes\": [\r\n                    {\r\n                        \"DCSAResponsibleAgencyCode\": \"EPI\",\r\n                        \"partyCode\": \"foo@platform1.example.com\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"CN\",\r\n            \"displayedAddress\": [\r\n                \"foo\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        },\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"bar party\",\r\n                \"address\": {\r\n                    \"name\": \"bar address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\",\r\n                        \"email\": \"someone@bar.example.com\"\r\n                    }\r\n                ],\r\n                \"identifyingCodes\": [\r\n                    {\r\n                        \"DCSAResponsibleAgencyCode\": \"EPI\",\r\n                        \"partyCode\": \"bar@platform2.example.com\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"OS\",\r\n            \"displayedAddress\": [\r\n                \"bar\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"foo reference\"\r\n        }\r\n    ]\r\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -6428,6 +6435,10 @@
 		},
 		{
 			"key": "CARRIER_BOOKING_REQUEST_REFERENCE",
+			"value": ""
+		},
+		{
+			"key": "DOCUMENT_STATUSSES",
 			"value": ""
 		}
 	]

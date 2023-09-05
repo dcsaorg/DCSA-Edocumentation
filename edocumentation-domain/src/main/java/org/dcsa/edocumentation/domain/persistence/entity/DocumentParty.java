@@ -3,8 +3,7 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import lombok.*;
 
 import jakarta.persistence.*;
-import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
-import org.dcsa.edocumentation.domain.validations.PseudoEnum;
+import org.dcsa.edocumentation.domain.validations.*;
 
 import java.util.UUID;
 
@@ -15,6 +14,8 @@ import java.util.UUID;
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "document_party")
+@DocumentPartyEBLValidation(groups = EBLValidation.class)
+@DocumentPartyPaperBLValidation(groups = PaperBLValidation.class)
 public class DocumentParty {
 
   @Id

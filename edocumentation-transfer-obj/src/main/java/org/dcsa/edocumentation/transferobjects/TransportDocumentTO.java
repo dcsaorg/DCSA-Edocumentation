@@ -3,16 +3,16 @@ package org.dcsa.edocumentation.transferobjects;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.*;
+import org.dcsa.edocumentation.transferobjects.validation.EBLValidation;
+import org.dcsa.edocumentation.transferobjects.validation.PaperBLValidation;
+import org.dcsa.edocumentation.transferobjects.validation.TransportDocumentTOValidation;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 
+@TransportDocumentTOValidation
 public record TransportDocumentTO(
   @NotNull
   @Size(max = 20)
@@ -36,6 +36,8 @@ public record TransportDocumentTO(
   @NotNull
   PartyTO issuingParty,
   @Min(0)
+  @NotNull(groups = PaperBLValidation.class, message = "Must not be null for a paper B/L")
+  @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   Integer numberOfRiderPages,
   @NotNull
   @Size(max = 20000)
@@ -69,13 +71,21 @@ public record TransportDocumentTO(
   LocationTO invoicePayableAt,
 
   @Min(0)
+  @NotNull(groups = PaperBLValidation.class, message = "Must not be null for a paper B/L")
+  @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   Integer numberOfCopiesWithCharges,
   @Min(0)
+  @NotNull(groups = PaperBLValidation.class, message = "Must not be null for a paper B/L")
+  @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   Integer numberOfCopiesWithoutCharges,
 
   @Min(0)
+  @NotNull(groups = PaperBLValidation.class, message = "Must not be null for a paper B/L")
+  @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   Integer numberOfOriginalsWithCharges,
   @Min(0)
+  @NotNull(groups = PaperBLValidation.class, message = "Must not be null for a paper B/L")
+  @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   Integer numberOfOriginalsWithoutCharges,
 
   // TODO: preCarriageUnderShippersResponsibility here
@@ -132,120 +142,4 @@ public record TransportDocumentTO(
   @Builder(toBuilder = true)
   public TransportDocumentTO{}
 
-  //FIXME: This really belongs in the domain object, but we do not share the domain object between the issuance and
-  // the ebl data standard, so that is "meh" to say the least.  Additionally, all validations we do in the issuance
-  // API must be doable from the TO alone (the platform receiving the TD does not have the same context as the
-  // carrier does).
-  public void validateConsistency() {
-    verifyConsistency(!hasBeenIssued() || issueDate != null,
-      "Issued transport document is missing an issueDate"
-    );
-    validatePaperOnlyAttributes();
-    if (hasBeenIssued()) {
-      validateShippedOnBoardVsReceivedForShipment();
-    }
-    validateContractQuotation();
-    validateShipper();
-    if (isToOrder == Boolean.TRUE) {
-      validateNegotiableBL();
-    } else {
-      validateStraightBL();
-    }
-  }
-
-  public boolean hasBeenIssued() {
-    // ISSU and any status after it.
-    return documentStatus == EblDocumentStatus.ISSU
-      || documentStatus == EblDocumentStatus.SURR
-      || documentStatus == EblDocumentStatus.VOID;
-  }
-
-  private void validatePaperOnlyAttributes() {
-    if (this.isElectronic == Boolean.TRUE) {
-      verifyConsistency(this.numberOfRiderPages == null, "Electronic B/Ls cannot have rider pages");
-      verifyConsistency(this.numberOfCopiesWithCharges == null, "Electronic B/Ls cannot have copies (w. charges)");
-      verifyConsistency(this.numberOfCopiesWithoutCharges == null, "Electronic B/Ls cannot have copies (w.o. charges)");
-      verifyConsistency(this.numberOfOriginalsWithCharges == null, "Electronic B/Ls cannot have multiple originals (w. charges)");
-      verifyConsistency(this.numberOfOriginalsWithoutCharges == null, "Electronic B/Ls cannot have multiple originals (w.o. charges)");
-    } else {
-      verifyConsistency(this.numberOfRiderPages != null, "Paper B/Ls must list how many rider pages it has.");
-      verifyConsistency(this.numberOfCopiesWithCharges != null, "Paper B/Ls must list how many copies with charges it has.");
-      verifyConsistency(this.numberOfCopiesWithoutCharges != null, "Paper B/Ls must list how many copies without charges it has.");
-      verifyConsistency(this.numberOfOriginalsWithCharges != null, "Paper B/Ls must list how many originals with charges it has.");
-      verifyConsistency(this.numberOfOriginalsWithoutCharges != null, "Paper B/Ls must list how many originals without charges it has.");
-    }
-  }
-
-  private void validateContractQuotation() {
-    if (contractQuotationReference == null) {
-      var sco = nullSafeStream(documentParties).filter(p -> p.partyFunction().equals(PartyFunction.SCO.name())).toList();
-      verifyConsistency(!sco.isEmpty(),
-        "Without a contractQuotationReference, a service contract owner must be present"
-      );
-    }
-  }
-
-  private void validateStraightBL() {
-    // TODO: Does DDS (consignee freight forwarder) also count?
-    // NB: Currently if both are present, we do not know which of them is the "real" consignee
-    Predicate<DocumentPartyTO> isConsigneeOrCFF = p -> p.partyFunction().equals(PartyFunction.CN.name())
-      || p.partyFunction().equals(PartyFunction.DDS.name());
-    Predicate<DocumentPartyTO> isEndorseeParty = p -> p.partyFunction().equals(PartyFunction.END.name());
-    var consignees = nullSafeStream(documentParties).filter(isConsigneeOrCFF).toList();
-    verifyConsistency(consignees.size() == 1,
-      "The B/L did not have exactly one consignee (documentParties[*].partyFunction in {OS, DDS})"
-    );
-
-    var endorseeParties = nullSafeStream(documentParties).filter(isEndorseeParty).toList();
-    verifyConsistency(endorseeParties.isEmpty(), "Straight B/Ls cannot have an endorsee party (only consignee / CN).");
-  }
-
-  private void validateNegotiableBL() {
-    Predicate<DocumentPartyTO> isEndorseeParty = p -> p.partyFunction().equals(PartyFunction.END.name());
-    var endorseeParties = nullSafeStream(documentParties).filter(isEndorseeParty).toList();
-    verifyConsistency(endorseeParties.size() < 2, "Negotiable B/Ls cannot have more than one endorsee party");
-
-    Predicate<DocumentPartyTO> isConsigneeOrCFF = p -> p.partyFunction().equals(PartyFunction.CN.name())
-      || p.partyFunction().equals(PartyFunction.DDS.name());
-    var consignees = nullSafeStream(documentParties).filter(isConsigneeOrCFF).toList();
-    verifyConsistency(consignees.isEmpty(),
-      "The negotiable B/Ls cannot have a consignee / consignee freight forwarder (documentParties[*].partyFunction in {OS, DDS})"
-    );
-  }
-
-
-  private void validateShipper() {
-    // TODO: Does DDR (shipper freight forwarder) also count?
-    // NB: Currently if both are present, we do not know which of them is the "shipper" consignee
-    Predicate<DocumentPartyTO> isShipperOrSFF = p -> p.partyFunction().equals(PartyFunction.OS.name())
-      || p.partyFunction().equals(PartyFunction.DDR.name());
-    var shippers = nullSafeStream(documentParties).filter(isShipperOrSFF).toList();
-    verifyConsistency(shippers.size() == 1,
-      "The B/L did not have exactly one shipper (documentParties[*].partyFunction in {OS, DDR})"
-    );
-  }
-
-  private void validateShippedOnBoardVsReceivedForShipment() {
-    verifyConsistency(receivedForShipmentDate != null ^ shippedOnBoardDate != null,
-      "The B/L must have exactly one of shippedOnBoardDate or shippedOnBoardDate");
-    if (shippedOnBoardDate != null) {
-      verifyConsistency(!shippedOnBoardDate.isBefore(issueDate),
-        "The shippedOnBoardDate is after the issuance date which should not be possible"
-      );
-    } else {
-      verifyConsistency(!receivedForShipmentDate.isBefore(issueDate),
-        "The receivedForShipmentDate is after the issuance date which should not be possible"
-      );
-    }
-  }
-
-  private void verifyConsistency(boolean condition, String msg) {
-    if (!condition) {
-      throw new IllegalStateException(msg);
-    }
-  }
-
-  private <T> Stream<T> nullSafeStream(Collection<T> c) {
-    return c != null ? c.stream() : Stream.of();
-  }
 }

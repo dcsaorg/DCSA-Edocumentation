@@ -9,11 +9,15 @@ import java.util.function.Function;
 
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.EBLValidation;
+import org.dcsa.edocumentation.domain.validations.PaperBLValidation;
 import org.dcsa.edocumentation.domain.validations.ShippingInstructionValidation;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
@@ -111,15 +115,23 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   private Boolean isShippedOnBoardType;
 
   @Column(name = "number_of_copies_with_charges")
+  @NotNull(groups = PaperBLValidation.class, message = "Must not be null for a paper B/L")
+  @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   private Integer numberOfCopiesWithCharges;
 
   @Column(name = "number_of_copies_without_charges")
+  @NotNull(groups = PaperBLValidation.class, message = "Must not be null for a paper B/L")
+  @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   private Integer numberOfCopiesWithoutCharges;
 
   @Column(name = "number_of_originals_with_charges")
+  @NotNull(groups = PaperBLValidation.class, message = "Must not be null for a paper B/L")
+  @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   private Integer numberOfOriginalsWithCharges;
 
   @Column(name = "number_of_originals_without_charges")
+  @NotNull(groups = PaperBLValidation.class, message = "Must not be null for a paper B/L")
+  @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   private Integer numberOfOriginalsWithoutCharges;
 
   @ToString.Exclude
@@ -183,7 +195,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "shippingInstructionID")
-  private Set<DocumentParty> documentParties;
+  private Set<@Valid DocumentParty> documentParties;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -220,8 +232,12 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     if (!CAN_BE_VALIDATED.contains(documentStatus)) {
       throw new IllegalStateException("documentStatus must be one of " + CAN_BE_VALIDATED);
     }
+    Class<?>[] validations = {
+      AsyncShipperProvidedDataValidation.class,
+      (this.isElectronic == Boolean.TRUE ? EBLValidation.class : PaperBLValidation.class),
+    };
 
-    for (var violation : validator.validate(this, AsyncShipperProvidedDataValidation.class)) {
+    for (var violation : validator.validate(this, validations)) {
       validationErrors.add(violation.getPropertyPath().toString() + ": " +  violation.getMessage());
     }
 
