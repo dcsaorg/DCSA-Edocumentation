@@ -1,7 +1,6 @@
 package org.dcsa.edocumentation.service.unofficial;
 
 import jakarta.transaction.Transactional;
-
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
-import org.dcsa.edocumentation.domain.persistence.entity.ShipmentTransport;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.EquipmentAssignment;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
@@ -22,9 +20,7 @@ import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
 import org.dcsa.edocumentation.service.ShipmentLocationService;
 import org.dcsa.edocumentation.service.ShipmentTransportService;
 import org.dcsa.edocumentation.service.mapping.EquipmentAssignmentMapper;
-import org.dcsa.edocumentation.service.mapping.ShipmentLocationMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
-import org.dcsa.edocumentation.service.mapping.ShipmentTransportMapper;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
@@ -56,16 +52,14 @@ public class ManageShipmentService {
 
   private final Random random = new SecureRandom();
 
-  private static final Predicate<ShipmentLocationTypeCode> HAS_SOURCE_LOCATION = code ->
-          code == ShipmentLocationTypeCode.PRE || code == ShipmentLocationTypeCode.POL;
-  private static final Predicate<ShipmentLocationTypeCode> HAS_DESTINATION_LOCATION = code ->
-          code == ShipmentLocationTypeCode.POD || code == ShipmentLocationTypeCode.PDE;
+  private static final Predicate<String> SOURCE_LOCATION_TYPE = Set.of(ShipmentLocationTypeCode.PRE.name(), ShipmentLocationTypeCode.POL.name())::contains;
+  private static final Predicate<String> DESTINATION_LOCATION_TYPE = Set.of(ShipmentLocationTypeCode.POD.name(), ShipmentLocationTypeCode.PDE.name())::contains;
   public static final Predicate<ShipmentLocationTO> HAS_SOURCE_OR_DESTINATION_LOCATION =
-          sl -> HAS_SOURCE_LOCATION.test(sl.shipmentLocationTypeCode())
-                  || HAS_DESTINATION_LOCATION.test(sl.shipmentLocationTypeCode());
+          sl -> SOURCE_LOCATION_TYPE.test(sl.shipmentLocationTypeCode())
+                  || DESTINATION_LOCATION_TYPE.test(sl.shipmentLocationTypeCode());
 
-  public static final List<ShipmentLocationTypeCode> SHIPMENT_LOCATION_TYPE_CODE_ORDER =
-          List.of(ShipmentLocationTypeCode.PRE, ShipmentLocationTypeCode.POL, ShipmentLocationTypeCode.POD, ShipmentLocationTypeCode.PDE);
+  public static final List<String> SHIPMENT_LOCATION_TYPE_CODE_ORDER =
+          List.of(ShipmentLocationTypeCode.PRE.name(), ShipmentLocationTypeCode.POL.name(), ShipmentLocationTypeCode.POD.name(), ShipmentLocationTypeCode.PDE.name());
 
 
   private static final char[] VALID_CBR_AUTOGEN_CHARS = (
@@ -197,7 +191,7 @@ public class ManageShipmentService {
     }
 
     // Find the first occurrence of each shipment location in the transport plan and index it.
-    Map<ShipmentLocationTypeCode,Integer> firstOccurrences = new HashMap<>();
+    Map<String, Integer> firstOccurrences = new HashMap<>();
     for (int i = 0; i < transportToList.size(); i++) {
       TransportTO leg = transportToList.get(i);
 
@@ -228,27 +222,27 @@ public class ManageShipmentService {
     }
 
     // Check if the first and last locations are PRE and PDE or POL and POD respectively
-    if(firstOccurrences.containsKey(ShipmentLocationTypeCode.PRE) && firstOccurrences.get(ShipmentLocationTypeCode.PRE) != 0){
+    if(firstOccurrences.containsKey(ShipmentLocationTypeCode.PRE.name()) && firstOccurrences.get(ShipmentLocationTypeCode.PRE.name()) != 0){
       throw ConcreteRequestErrorMessageException.invalidInput("PRE must be the first location if provided.");
     }
 
-    if(firstOccurrences.containsKey(ShipmentLocationTypeCode.PDE) && firstOccurrences.get(ShipmentLocationTypeCode.PDE) != transportToList.size() - 1){
+    if(firstOccurrences.containsKey(ShipmentLocationTypeCode.PDE.name()) && firstOccurrences.get(ShipmentLocationTypeCode.PDE.name()) != transportToList.size() - 1){
       throw ConcreteRequestErrorMessageException.invalidInput("PDE must be the last location if provided.");
     }
     // Check if PDE and POD, if present, are at the correct positions;
-    if(firstOccurrences.containsKey(ShipmentLocationTypeCode.PDE)){
-      if (firstOccurrences.get(ShipmentLocationTypeCode.PDE) != transportToList.size() - 1) {
+    if(firstOccurrences.containsKey(ShipmentLocationTypeCode.PDE.name())){
+      if (firstOccurrences.get(ShipmentLocationTypeCode.PDE.name()) != transportToList.size() - 1) {
         throw  ConcreteRequestErrorMessageException.invalidInput("PDE must be the last location if provided");
       }
-    } else if (firstOccurrences.containsKey(ShipmentLocationTypeCode.POD)) {
-      if (firstOccurrences.get(ShipmentLocationTypeCode.POD) != transportToList.size() - 1)
+    } else if (firstOccurrences.containsKey(ShipmentLocationTypeCode.POD.name())) {
+      if (firstOccurrences.get(ShipmentLocationTypeCode.POD.name()) != transportToList.size() - 1)
         throw  ConcreteRequestErrorMessageException.invalidInput("POD must be the last location if PDE is not provided.");
       }
 
       // Check that the first occurrences follow the expected order
       for (int i = 0; i < SHIPMENT_LOCATION_TYPE_CODE_ORDER.size() - 1; i++) {
-        ShipmentLocationTypeCode current = SHIPMENT_LOCATION_TYPE_CODE_ORDER.get(i);
-        ShipmentLocationTypeCode next = SHIPMENT_LOCATION_TYPE_CODE_ORDER.get(i + 1);
+        var current = SHIPMENT_LOCATION_TYPE_CODE_ORDER.get(i);
+        var next = SHIPMENT_LOCATION_TYPE_CODE_ORDER.get(i + 1);
 
         if (firstOccurrences.containsKey(current) && firstOccurrences.containsKey(next) &&
                 firstOccurrences.get(current) > firstOccurrences.get(next)) {
@@ -259,8 +253,8 @@ public class ManageShipmentService {
 
     // CHECK FOR: the minimum required length
     long countOfPreAndPde = shipmentLocationTOS.stream()
-            .filter(sl -> sl.shipmentLocationTypeCode().equals(ShipmentLocationTypeCode.PRE)
-                    || sl.shipmentLocationTypeCode().equals(ShipmentLocationTypeCode.PDE))
+            .filter(sl -> sl.shipmentLocationTypeCode().equals(ShipmentLocationTypeCode.PRE.name())
+                    || sl.shipmentLocationTypeCode().equals(ShipmentLocationTypeCode.PDE.name()))
             .count();
 
     if (countOfPreAndPde >= transportToList.size()) {
@@ -271,11 +265,11 @@ public class ManageShipmentService {
      return true;
   }
 
-  void validateTransportStages(List<TransportTO> transportToList, List<ShipmentLocationTO> shipmentLocationTOS, Map<ShipmentLocationTypeCode, Integer> firstOccurrences) {
+  void validateTransportStages(List<TransportTO> transportToList, List<ShipmentLocationTO> shipmentLocationTOS, Map<String, Integer> firstOccurrences) {
 
     var SlCodes = shipmentLocationTOS.stream().map(ShipmentLocationTO::shipmentLocationTypeCode).toList();
-    var polIndex = firstOccurrences.get(ShipmentLocationTypeCode.POL);
-    var podIndex = firstOccurrences.get(ShipmentLocationTypeCode.POD);
+    var polIndex = firstOccurrences.get(ShipmentLocationTypeCode.POL.name());
+    var podIndex = firstOccurrences.get(ShipmentLocationTypeCode.POD.name());
     boolean insideVesselSegment = false;
 
     // Validate transport stages
@@ -290,22 +284,22 @@ public class ManageShipmentService {
       }
     }
     // Validate PRE and PDE stages
-    if (SlCodes.contains(ShipmentLocationTypeCode.PRE)
+    if (SlCodes.contains(ShipmentLocationTypeCode.PRE.name())
             && transportToList.get(0).transportPlanStage() != TransportPlanStageCode.PRC) {
       throw ConcreteRequestErrorMessageException.invalidInput("Invalid transport plan stage Code. First leg TransportPlanStageCode must be PRC if PRE is defined.");
     }
-    if (SlCodes.contains(ShipmentLocationTypeCode.PDE)
+    if (SlCodes.contains(ShipmentLocationTypeCode.PDE.name())
             && transportToList.get(transportToList.size() - 1).transportPlanStage() != TransportPlanStageCode.ONC) {
       throw ConcreteRequestErrorMessageException.invalidInput("Invalid transport plan stage Code. Last legs TransportPlanStageCode must be ONC if PDE is defined.");
     }
 
   }
 
-  void validateModeOfTransport(List<TransportTO> transportToList, Map<ShipmentLocationTypeCode, Integer> firstOccurrences) {
-    Integer preIndex = firstOccurrences.get(ShipmentLocationTypeCode.PRE);
-    Integer polIndex = firstOccurrences.get(ShipmentLocationTypeCode.POL);
-    Integer podIndex = firstOccurrences.get(ShipmentLocationTypeCode.POD);
-    Integer pdeIndex = firstOccurrences.get(ShipmentLocationTypeCode.PDE);
+  void validateModeOfTransport(List<TransportTO> transportToList, Map<String, Integer> firstOccurrences) {
+    Integer preIndex = firstOccurrences.get(ShipmentLocationTypeCode.PRE.name());
+    Integer polIndex = firstOccurrences.get(ShipmentLocationTypeCode.POL.name());
+    Integer podIndex = firstOccurrences.get(ShipmentLocationTypeCode.POD.name());
+    Integer pdeIndex = firstOccurrences.get(ShipmentLocationTypeCode.PDE.name());
 
     for (int i = 0; i < transportToList.size(); i++) {
       TransportTO currentLeg = transportToList.get(i);

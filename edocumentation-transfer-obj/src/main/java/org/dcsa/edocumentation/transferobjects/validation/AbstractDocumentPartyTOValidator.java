@@ -26,7 +26,7 @@ public abstract class AbstractDocumentPartyTOValidator<A extends Annotation> imp
 
     int epiCodes = (int)Objects.requireNonNullElseGet(documentParty.party().identifyingCodes(), List::<PartyIdentifyingCodeTO>of)
       .stream()
-      .filter(c -> c.dcsaResponsibleAgencyCode() == DCSAResponsibleAgencyCode.EPI)
+      .filter(c -> c.dcsaResponsibleAgencyCode().equals(DCSAResponsibleAgencyCode.EPI.name()))
       .count();
     final int expectedAmountOfEPICodes = isForEBL && PFS_ON_THE_EBL_REQUIRING_PID.contains(partyFunction) ? 1 : 0;
 

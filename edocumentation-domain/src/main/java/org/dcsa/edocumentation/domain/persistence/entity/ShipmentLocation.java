@@ -2,6 +2,8 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 
 import jakarta.persistence.*;
@@ -26,8 +28,8 @@ public class ShipmentLocation {
   private Location location;
 
   @Column(name = "shipment_location_type_code")
-  @Enumerated(EnumType.STRING)
-  private LocationType shipmentLocationTypeCode;
+  @PseudoEnum(value = "shipmentlocationtypes.csv", groups = AsyncShipperProvidedDataValidation.class)
+  private String shipmentLocationTypeCode;
 
   @Column(name = "event_date_time")
   private OffsetDateTime eventDateTime;

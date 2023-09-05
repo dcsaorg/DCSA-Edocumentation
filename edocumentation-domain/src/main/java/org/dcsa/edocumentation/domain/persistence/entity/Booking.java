@@ -10,6 +10,7 @@ import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
@@ -68,11 +69,9 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
 
   private static final Set<BkgDocumentStatus> CAN_BE_VALIDATED =
     Set.of(BkgDocumentStatus.RECE, BkgDocumentStatus.PENC);
-  private static final Predicate<LocationType> IS_SOURCE_LOCATION_TYPE = code ->
-    code == LocationType.PRE || code == LocationType.POL;
-  private static final Predicate<LocationType> IS_DESTINATION_LOCATION_TYPE = code ->
-    code == LocationType.POD || code == LocationType.PDE;
-  private static final Predicate<LocationType> IS_SOURCE_OR_DESTINATION_LOCATION_TYPE =
+  private static final Predicate<String> IS_SOURCE_LOCATION_TYPE = Set.of(LocationType.PRE.name(), LocationType.POL.name())::contains;
+  private static final Predicate<String> IS_DESTINATION_LOCATION_TYPE = Set.of(LocationType.POD.name(), LocationType.PDE.name())::contains;
+  private static final Predicate<String> IS_SOURCE_OR_DESTINATION_LOCATION_TYPE =
     IS_SOURCE_LOCATION_TYPE.or(IS_DESTINATION_LOCATION_TYPE);
   private static final Predicate<ShipmentLocation> IS_SOURCE_OR_DESTINATION_LOCATION =
     sl -> IS_SOURCE_OR_DESTINATION_LOCATION_TYPE.test(sl.getShipmentLocationTypeCode());
@@ -122,8 +121,8 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   private String serviceContractReference;
 
   @Column(name = "payment_term_code")
-  @Enumerated(EnumType.STRING)
-  private PaymentTerm paymentTermCode;
+  @PseudoEnum(value = "paymentterms.csv", groups = AsyncShipperProvidedDataValidation.class)
+  private String paymentTermCode;
 
   @Column(name = "is_partial_load_allowed")
   private Boolean isPartialLoadAllowed;
@@ -150,8 +149,8 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   private String contractQuotationReference;
 
   @Column(name = "incoterms")
-  @Enumerated(EnumType.STRING)
-  private IncoTerms incoTerms;
+  @PseudoEnum(value = "incotermscodes.csv", groups = AsyncShipperProvidedDataValidation.class)
+  private String incoTerms;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -179,8 +178,8 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   private String bookingChannelReference;
 
   @Column(name = "communication_channel_code")
-  @Enumerated(EnumType.STRING)
-  private CommunicationChannelCode communicationChannelCode;
+  @PseudoEnum(value = "communicationchannelqualifier.csv", groups = AsyncShipperProvidedDataValidation.class)
+  private String communicationChannelCode;
 
   @Column(name = "is_equipment_substitution_allowed")
   private Boolean isEquipmentSubstitutionAllowed;

@@ -1,5 +1,6 @@
 package org.dcsa.edocumentation.transferobjects;
 
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.ShipmentLocationTypeCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
@@ -16,7 +17,8 @@ public record ShipmentLocationTO(
   LocationTO location,
 
   @NotNull
-  ShipmentLocationTypeCode shipmentLocationTypeCode,
+  @Size(max = 3)
+  String shipmentLocationTypeCode,
 
   OffsetDateTime eventDateTime
 ) {

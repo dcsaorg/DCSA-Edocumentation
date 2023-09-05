@@ -2,7 +2,6 @@ package org.dcsa.edocumentation.domain.validations;
 
 
 import jakarta.validation.ConstraintValidator;
-
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +26,7 @@ public abstract class AbstractDocumentPartyValidator<A extends Annotation> imple
 
     int epiCodes = (int)Objects.requireNonNullElseGet(documentParty.getParty().getIdentifyingCodes(), List::<PartyIdentifyingCode>of)
       .stream()
-      .filter(c -> c.getDcsaResponsibleAgencyCode() == DCSAResponsibleAgencyCode.EPI)
+      .filter(c -> c.getDcsaResponsibleAgencyCode().equals(DCSAResponsibleAgencyCode.EPI.name()))
       .count();
     final int expectedAmountOfEPICodes = isForEBL && PFS_ON_THE_EBL_REQUIRING_PID.contains(partyFunction) ? 1 : 0;
 

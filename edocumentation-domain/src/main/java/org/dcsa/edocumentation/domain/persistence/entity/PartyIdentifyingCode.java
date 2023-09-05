@@ -1,5 +1,14 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,20 +17,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSAResponsibleAgencyCode;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
-import java.util.UUID;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 
 @Data
 @Builder(toBuilder = true)
@@ -48,7 +45,7 @@ public class PartyIdentifyingCode {
   @Column(name = "party_code", length = 100)
   private String partyCode;
 
-  @Enumerated(EnumType.STRING)
   @Column(name = "dcsa_responsible_agency_code")
-  private DCSAResponsibleAgencyCode dcsaResponsibleAgencyCode;
+  @PseudoEnum(value = "codelistresponsibleagencycodes.csv", groups = AsyncShipperProvidedDataValidation.class)
+  private String dcsaResponsibleAgencyCode;
 }

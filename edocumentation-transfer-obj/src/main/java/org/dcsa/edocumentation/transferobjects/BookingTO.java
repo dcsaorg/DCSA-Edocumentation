@@ -94,7 +94,8 @@ public record BookingTO(
   @Size(max = 3)
   String declaredValueCurrency,
 
-  PaymentTerm paymentTermCode,
+  @Size(max = 3)
+  String paymentTermCode,
 
   @NotNull
   Boolean isPartialLoadAllowed,
@@ -132,10 +133,12 @@ public record BookingTO(
   @Size(max = 20)
   String bookingChannelReference,
 
-  IncoTerms incoTerms,
+  @Size(max = 3)
+  String incoTerms,
 
   @NotNull
-  CommunicationChannelCode communicationChannelCode,
+  @Size(max = 2)
+  String communicationChannelCode,
 
   @NotNull
   Boolean isEquipmentSubstitutionAllowed,

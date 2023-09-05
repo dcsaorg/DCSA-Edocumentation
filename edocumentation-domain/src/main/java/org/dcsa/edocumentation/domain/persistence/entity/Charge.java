@@ -4,6 +4,9 @@ import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
 
 import jakarta.persistence.*;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
+
 import java.util.UUID;
 
 @Data
@@ -33,8 +36,8 @@ public class Charge {
   private String currencyCode;
 
   @Column(name = "payment_term_code")
-  @Enumerated(EnumType.STRING)
-  private PaymentTerm paymentTermCode;
+  @PseudoEnum(value = "paymentterms.csv", groups = AsyncShipperProvidedDataValidation.class)
+  private String paymentTermCode;
 
   @Column(name = "calculation_basis")
   private String calculationBasis;

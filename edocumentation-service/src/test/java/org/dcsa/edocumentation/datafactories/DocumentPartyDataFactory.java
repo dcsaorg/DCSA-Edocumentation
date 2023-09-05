@@ -42,7 +42,7 @@ public class DocumentPartyDataFactory {
                 .identifyingCodes(
                     List.of(
                         PartyIdentifyingCodeTO.builder()
-                            .dcsaResponsibleAgencyCode(DCSAResponsibleAgencyCode.DCSA)
+                            .dcsaResponsibleAgencyCode(DCSAResponsibleAgencyCode.DCSA.name())
                             .partyCode("reponsible fun")
                             .codeListName("irreponsible fun")
                             .build()))
@@ -72,7 +72,7 @@ public class DocumentPartyDataFactory {
     return PartyIdentifyingCode.builder()
         .party(party)
         .dcsaResponsibleAgencyCode(
-            org.dcsa.edocumentation.domain.persistence.entity.enums.DCSAResponsibleAgencyCode.DCSA)
+            org.dcsa.edocumentation.domain.persistence.entity.enums.DCSAResponsibleAgencyCode.DCSA.name())
         .partyCode("reponsible fun")
         .codeListName("irreponsible fun")
         .build();
