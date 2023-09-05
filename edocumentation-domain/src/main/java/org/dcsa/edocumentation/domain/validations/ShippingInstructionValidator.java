@@ -85,25 +85,22 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
   }
 
   private void validateStraightBL(ValidationState<ShippingInstruction> state) {
-    state.applyResult(validateLimitOnPartyFunction(state, PartyFunction.END, 0));
+    validateLimitOnPartyFunction(state, PartyFunction.END, 0);
     if (validateAtLeastOneOfIsPresent(state, Set.of(PartyFunction.CN.name(), PartyFunction.DDS.name()))) {
-      state.applyResult(validateAtMostOncePartyFunction(state, PartyFunction.CN));
-      state.applyResult(validateAtMostOncePartyFunction(state, PartyFunction.DDS));
-    } else {
-      state.invalidate();
+      validateAtMostOncePartyFunction(state, PartyFunction.CN);
+      validateAtMostOncePartyFunction(state, PartyFunction.DDS);
     }
   }
 
-
-  private boolean validateAtMostOncePartyFunction(ValidationState<ShippingInstruction> state, PartyFunction partyFunction) {
-    return validateLimitOnPartyFunction(state, partyFunction, 1);
+  private void validateAtMostOncePartyFunction(ValidationState<ShippingInstruction> state, PartyFunction partyFunction) {
+    validateLimitOnPartyFunction(state, partyFunction, 1);
   }
 
   private <T> Stream<T> nullSafeStream(Collection<T> c) {
     return c != null ? c.stream() : Stream.of();
   }
 
-  private boolean validateLimitOnPartyFunction(ValidationState<ShippingInstruction> state, PartyFunction partyFunction, int limit) {
+  private void validateLimitOnPartyFunction(ValidationState<ShippingInstruction> state, PartyFunction partyFunction, int limit) {
     var matches = nullSafeStream(state.getValue().getDocumentParties())
       .filter(p -> p.getPartyFunction().equals(partyFunction.name()))
       .count();
@@ -117,9 +114,7 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
         .addPropertyNode("documentParties")
         .addConstraintViolation();
       state.invalidate();
-      return false;
     }
-    return true;
   }
 
   private boolean validateAtLeastOneOfIsPresent(ValidationState<ShippingInstruction> state,
@@ -149,10 +144,8 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
 
   private void validateShipper(ValidationState<ShippingInstruction> state) {
     if (validateAtLeastOneOfIsPresent(state, Set.of(PartyFunction.OS.name(), PartyFunction.DDR.name()))) {
-      state.applyResult(validateAtMostOncePartyFunction(state, PartyFunction.OS));
-      state.applyResult(validateAtMostOncePartyFunction(state, PartyFunction.DDR));
-    } else {
-      state.invalidate();
+      validateAtMostOncePartyFunction(state, PartyFunction.OS);
+      validateAtMostOncePartyFunction(state, PartyFunction.DDR);
     }
   }
 

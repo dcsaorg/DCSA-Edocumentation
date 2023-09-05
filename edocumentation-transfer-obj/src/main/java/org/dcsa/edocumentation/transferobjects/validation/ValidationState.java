@@ -1,4 +1,4 @@
-package org.dcsa.edocumentation.domain.validations;
+package org.dcsa.edocumentation.transferobjects.validation;
 
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.Getter;

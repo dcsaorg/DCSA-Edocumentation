@@ -12,15 +12,6 @@ import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.dcsa.skernel.infrastructure.validation.RequiredIfFalse;
 import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 
-@RequiredIfFalse(
-  ifFalse = "isElectronic",
-  thenNotNull = {
-    "numberOfCopiesWithCharges",
-    "numberOfCopiesWithoutCharges",
-    "numberOfOriginalsWithCharges",
-    "numberOfOriginalsWithoutCharges"
-  }
-)
 public record ShippingInstructionTO(
   @Size(max = 100)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
