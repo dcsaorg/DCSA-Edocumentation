@@ -18,7 +18,7 @@ public class ShipmentLocationDataFactory {
     return ShipmentLocation.builder()
         .id(UUID.randomUUID())
         .location(Location.builder().address(AddressDataFactory.getSingleAddress()).build())
-        .shipmentLocationTypeCode(LocationType.OIR)
+        .shipmentLocationTypeCode(LocationType.OIR.name())
         .eventDateTime(OffsetDateTime.now())
         .build();
   }
@@ -30,7 +30,7 @@ public class ShipmentLocationDataFactory {
   public ShipmentLocationTO shipmentLocationTO(OffsetDateTime now) {
     return ShipmentLocationTO.builder()
       .location(LocationDataFactory.addressLocationTO())
-      .shipmentLocationTypeCode(ShipmentLocationTypeCode.OIR)
+      .shipmentLocationTypeCode(ShipmentLocationTypeCode.OIR.name())
       .eventDateTime(now)
       .build();
   }
@@ -39,7 +39,7 @@ public class ShipmentLocationDataFactory {
     return ShipmentLocation.builder()
       .booking(booking)
       .location(LocationDataFactory.addressLocationWithId())
-      .shipmentLocationTypeCode(LocationType.OIR)
+      .shipmentLocationTypeCode(LocationType.OIR.name())
       .eventDateTime(now)
       .build();
   }

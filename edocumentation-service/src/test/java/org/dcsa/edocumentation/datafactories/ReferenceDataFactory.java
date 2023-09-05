@@ -23,13 +23,13 @@ public class ReferenceDataFactory {
 
   private Reference.ReferenceBuilder referenceBuilder() {
     return Reference.builder()
-      .type(ReferenceTypeCode.AAO)
+      .type(ReferenceTypeCode.AAO.name())
       .value("ref value");
   }
 
   public ReferenceTO singleReferenceTO() {
     return ReferenceTO.builder()
-      .type(ReferenceType.AAO)
+      .type(ReferenceType.AAO.name())
       .value("ref value")
       .build();
   }

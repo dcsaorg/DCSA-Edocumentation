@@ -33,7 +33,7 @@ public class TransportDocumentDataFactory {
         .build()))
       .charges(Set.of(Charge.builder()
         .id("chargeId")
-        .paymentTermCode(PaymentTerm.PRE)
+        .paymentTermCode(PaymentTerm.PRE.name())
         .currencyAmount(100.0)
         .currencyCode("EUR")
         .build()))

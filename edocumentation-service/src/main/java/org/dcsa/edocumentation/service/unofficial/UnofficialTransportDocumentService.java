@@ -108,7 +108,7 @@ public class UnofficialTransportDocumentService {
     String partyCode = null;
     if (identifyingCodes != null) {
       var carrierCodes = identifyingCodes.stream()
-        .filter(code -> DCSAResponsibleAgencyCode.SMDG.equals(code.dcsaResponsibleAgencyCode()))
+        .filter(code -> DCSAResponsibleAgencyCode.SMDG.name().equals(code.dcsaResponsibleAgencyCode()))
         .filter(code -> Objects.equals(code.codeListName(), "LCL"))
         .map(PartyIdentifyingCodeTO::partyCode)
         .toList();

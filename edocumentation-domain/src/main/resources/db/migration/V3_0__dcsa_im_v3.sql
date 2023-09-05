@@ -16,13 +16,6 @@ CREATE TABLE hs_code (
     hs_code_description varchar(250) NOT NULL
 );
 
-CREATE TABLE reference_type (
-    reference_type_code varchar(3) PRIMARY KEY,
-    reference_type_name varchar(100) NOT NULL,
-    reference_type_description varchar(400) NOT NULL
-);
-
-
 CREATE TABLE receipt_delivery_type (
     receipt_delivery_type_code varchar(3) PRIMARY KEY,
     receipt_delivery_type_name varchar(50) NOT NULL,
@@ -121,34 +114,11 @@ CREATE TABLE party_contact_details (
     url varchar(100) NULL
 );
 
-
-CREATE TABLE code_list_responsible_agency (
-    dcsa_responsible_agency_code varchar(5) NOT NULL PRIMARY KEY,
-    code_list_responsible_agency_code varchar(3) NULL,
-    code_list_responsible_agency_name varchar(100) NULL,
-    code_list_responsible_agency_description varchar(300)
-);
-
-
 CREATE TABLE party_identifying_code (
-    dcsa_responsible_agency_code varchar(5) NOT NULL REFERENCES code_list_responsible_agency(dcsa_responsible_agency_code),
+    dcsa_responsible_agency_code varchar(5) NOT NULL,
     party_id uuid NOT NULL REFERENCES party(id),
     code_list_name varchar(100),
     party_code varchar(100) NOT NULL
-);
-
-
-CREATE TABLE payment_term_type (
-    payment_term_code varchar(3) PRIMARY KEY,
-    payment_term_name varchar(100) NOT NULL,
-    payment_term_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE incoterms (
-    incoterms_code varchar(3) PRIMARY KEY,
-    incoterms_name varchar(100) NOT NULL,
-    incoterms_description varchar(250) NOT NULL
 );
 
 
@@ -186,13 +156,6 @@ CREATE TABLE vessel (
     width numeric NULL,
     vessel_type_code varchar(4) NULL REFERENCES vessel_type (vessel_type_code),
     dimension_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CONSTRAINT dimension_unit CHECK (dimension_unit IN ('FOT','MTR'))
-);
-
-
-CREATE TABLE communication_channel_qualifier (
-    communication_channel_qualifier_code varchar(2) PRIMARY KEY,
-    communication_channel_qualifier_name varchar(100) NOT NULL,
-    communication_channel_qualifier_description varchar(250) NOT NULL
 );
 
 
@@ -253,7 +216,7 @@ CREATE TABLE booking (
     cargo_movement_type_at_destination varchar(3) NOT NULL REFERENCES cargo_movement_type(cargo_movement_type_code),
     booking_request_datetime timestamp with time zone NOT NULL,
     service_contract_reference varchar(30) NULL,
-    payment_term_code varchar(3) NULL REFERENCES payment_term_type(payment_term_code),
+    payment_term_code varchar(3) NULL,
     is_partial_load_allowed boolean NOT NULL,
     is_export_declaration_required boolean NOT NULL,
     export_declaration_reference varchar(35) NULL,
@@ -262,7 +225,7 @@ CREATE TABLE booking (
     is_ams_aci_filing_required boolean NULL,
     is_destination_filing_required boolean NULL,
     contract_quotation_reference varchar(35) NULL,
-    incoterms varchar(3) NULL REFERENCES incoterms(incoterms_code),
+    incoterms varchar(3) NULL,
     invoice_payable_at_id uuid NULL REFERENCES location(id),
     expected_departure_date date NULL,
     expected_arrival_at_place_of_delivery_start_date date NULL CHECK ((expected_arrival_at_place_of_delivery_start_date IS NULL) OR (expected_arrival_at_place_of_delivery_end_date IS NULL) OR expected_arrival_at_place_of_delivery_start_date <= expected_arrival_at_place_of_delivery_end_date),
@@ -270,7 +233,7 @@ CREATE TABLE booking (
     transport_document_type_code varchar(3) NULL REFERENCES transport_document_type(transport_document_type_code),
     transport_document_reference varchar(20) NULL,
     booking_channel_reference varchar(20) NULL,
-    communication_channel_code varchar(2) NOT NULL REFERENCES communication_channel_qualifier(communication_channel_qualifier_code),
+    communication_channel_code varchar(2) NOT NULL,
     is_equipment_substitution_allowed boolean NOT NULL,
     vessel_id uuid NULL REFERENCES vessel(id),
     declared_value_currency_code varchar(3) NULL,
@@ -454,7 +417,7 @@ CREATE TABLE charge (
     charge_type varchar(20) NOT NULL,
     currency_amount real NOT NULL,
     currency_code varchar(3) NOT NULL,
-    payment_term_code varchar(3) NOT NULL REFERENCES payment_term_type(payment_term_code),
+    payment_term_code varchar(3) NOT NULL,
     calculation_basis varchar(50) NOT NULL,
     unit_price real NOT NULL,
     quantity real NOT NULL
@@ -546,7 +509,7 @@ CREATE INDEX ON shipping_mark (cargo_item);
 
 
 CREATE TABLE reference (
-    reference_type_code varchar(3) NOT NULL REFERENCES reference_type (reference_type_code),
+    reference_type_code varchar(3) NOT NULL,
     reference_value varchar(100) NOT NULL,
     shipment_id uuid NULL REFERENCES shipment (id),
     shipping_instruction_id uuid NULL REFERENCES shipping_instruction (id),
@@ -593,13 +556,6 @@ CREATE INDEX ON seal (utilized_transport_equipment_id);
 CREATE INDEX ON seal (seal_source_code);
 CREATE INDEX ON seal (seal_type_code);
 
-
-CREATE TABLE shipment_location_type (
-    shipment_location_type_code varchar(3) PRIMARY KEY,
-    shipment_location_type_name varchar(50) NOT NULL,
-    shipment_location_type_description varchar(250) NOT NULL
-);
-
 -- Supporting FK constraints
 CREATE INDEX ON un_location (country_code);
 
@@ -611,7 +567,7 @@ CREATE TABLE shipment_location (
     shipment_id uuid NULL REFERENCES shipment (id),
     booking_id uuid NULL REFERENCES booking(id),
     location_id uuid NOT NULL REFERENCES location (id),
-    shipment_location_type_code varchar(3) NOT NULL REFERENCES shipment_location_type (shipment_location_type_code),
+    shipment_location_type_code varchar(3) NOT NULL,
     event_date_time timestamp with time zone NULL, --optional datetime indicating when the event at the location takes place
     UNIQUE (location_id, shipment_location_type_code, shipment_id)
 );

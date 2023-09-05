@@ -42,7 +42,8 @@ public record BookingSummaryTO(
   @Size(max = 30, message = "The attribute serviceContractReference has a max size of 30.")
   String serviceContractReference,
 
-  PaymentTerm paymentTermCode,
+  @Size(max = 3)
+  String paymentTermCode,
 
   @NotNull(message = "The attribute isPartialLoadAllowed is required.")
   Boolean isPartialLoadAllowed,
@@ -86,10 +87,10 @@ public record BookingSummaryTO(
   @Size(max = 20, message = "The attribute bookingChannelReference has a max size of 20.")
   String bookingChannelReference,
 
-  IncoTerms incoTerms,
+  String incoTerms,
 
   @NotNull(message = "The attribute communicationChannelCode is required.")
-  CommunicationChannelCode communicationChannelCode,
+  String communicationChannelCode,
 
   @NotNull(message = "The attribute isEquipmentSubstitutionAllowed is required.")
   Boolean isEquipmentSubstitutionAllowed,

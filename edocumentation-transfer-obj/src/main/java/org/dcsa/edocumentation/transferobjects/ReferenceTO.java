@@ -1,15 +1,14 @@
 package org.dcsa.edocumentation.transferobjects;
 
-import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.ReferenceType;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 public record ReferenceTO(
   @NotNull
-  ReferenceType type,
+  @Size(max = 3)
+  String type,
 
   @NotBlank @Size(max = 100)
   String value

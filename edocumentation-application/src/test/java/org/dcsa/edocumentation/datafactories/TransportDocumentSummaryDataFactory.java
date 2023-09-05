@@ -1,5 +1,9 @@
 package org.dcsa.edocumentation.datafactories;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.transferobjects.PartyContactDetailsTO;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
@@ -9,11 +13,6 @@ import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
 import org.dcsa.edocumentation.transferobjects.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.skernel.infrastructure.transferobject.AddressTO;
-
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @UtilityClass
 public class TransportDocumentSummaryDataFactory {
@@ -73,7 +72,7 @@ public class TransportDocumentSummaryDataFactory {
             List.of(
                 PartyIdentifyingCodeTO.builder()
                     .partyCode("ABC")
-                    .dcsaResponsibleAgencyCode(DCSAResponsibleAgencyCode.DCSA)
+                    .dcsaResponsibleAgencyCode(DCSAResponsibleAgencyCode.DCSA.name())
                     .codeListName("DCSA")
                     .build()))
         .build();

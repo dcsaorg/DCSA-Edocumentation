@@ -34,12 +34,18 @@ sources:
       - port_call_status_type
       - empty_indicator
       - party_function
+      - reference_type
+      - payment_term_type
+      - communication_channel_qualifier
+      - code_list_responsible_agency
+      - shipment_location_type
 
   - path: classpath:db/samples.d
     type: csv
     groups: [sample]
     excludes:
       - smdg_delay_reason
+      - incoterms
 
   - path: classpath:db/testdata.d
     type: flyway

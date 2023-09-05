@@ -68,11 +68,11 @@ public class ShippingInstructionDataFactory {
             Set.of(
               ShipmentLocation.builder()
                 .location(Location.builder().UNLocationCode("DKCPH").build())
-                .shipmentLocationTypeCode(LocationType.POL)
+                .shipmentLocationTypeCode(LocationType.POL.name())
                 .build(),
               ShipmentLocation.builder()
                 .location(Location.builder().UNLocationCode("DEHAM").build())
-                .shipmentLocationTypeCode(LocationType.POD)
+                .shipmentLocationTypeCode(LocationType.POD.name())
                 .build()
             ))
             .shipmentTransports(Set.of(

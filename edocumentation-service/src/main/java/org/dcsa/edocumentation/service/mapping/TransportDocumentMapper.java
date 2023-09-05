@@ -185,7 +185,7 @@ public abstract class TransportDocumentMapper {
   protected Location findLocation(Iterable<ShipmentLocation> shipmentLocations, LocationType locationType) {
     ShipmentLocation found = null;
     for (var sl : shipmentLocations) {
-      if (sl.getShipmentLocationTypeCode() == locationType) {
+      if (sl.getShipmentLocationTypeCode().equals(locationType.name())) {
         found = sl;
         break;
       }

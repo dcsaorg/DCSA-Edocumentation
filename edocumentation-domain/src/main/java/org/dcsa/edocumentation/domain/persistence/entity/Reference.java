@@ -1,11 +1,13 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
 import lombok.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.ReferenceTypeCode;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
+
 import java.util.UUID;
 
 @Data
@@ -24,8 +26,8 @@ public class Reference {
 
   @Column(name = "reference_type_code")
   @NotNull
-  @Enumerated(EnumType.STRING)
-  private ReferenceTypeCode type;
+  @PseudoEnum(value = "referencetypes.csv", groups = AsyncShipperProvidedDataValidation.class)
+  private String type;
 
   @Column(name = "reference_value")
   @Size(max = 100)
