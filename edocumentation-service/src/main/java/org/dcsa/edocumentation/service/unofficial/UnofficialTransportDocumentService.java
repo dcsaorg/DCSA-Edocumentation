@@ -1,29 +1,36 @@
 package org.dcsa.edocumentation.service.unofficial;
 
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.PENC;
+
+import jakarta.transaction.Transactional;
+import jakarta.validation.Validator;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
+import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.EBLValidation;
+import org.dcsa.edocumentation.domain.validations.PaperBLValidation;
 import org.dcsa.edocumentation.service.PartyService;
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
 import org.dcsa.edocumentation.transferobjects.PartyTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
 import org.dcsa.edocumentation.transferobjects.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.edocumentation.transferobjects.unofficial.DraftTransportDocumentRequestTO;
 import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.dcsa.skernel.domain.persistence.repository.CarrierRepository;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -40,6 +47,7 @@ public class UnofficialTransportDocumentService {
   private final UnofficialShippingInstructionService unofficialShippingInstructionService;
 
   private final DocumentStatusMapper documentStatusMapper;
+  private final Validator validator;
 
   @Transactional
   public Optional<TransportDocumentRefStatusTO> issueDraft(DraftTransportDocumentRequestTO transportDocumentRequestTO) {
@@ -73,6 +81,21 @@ public class UnofficialTransportDocumentService {
       .carrier(carrier)
       .issuingParty(partyService.createParty(transportDocumentRequestTO.issuingParty()))
       .build();
+
+    TransportDocumentTO mapped = transportDocumentMapper.toDTO(document);
+    Class<?>[] validations = {
+      AsyncShipperProvidedDataValidation.class,
+      (mapped.isElectronic() == Boolean.TRUE ? EBLValidation.class : PaperBLValidation.class),
+    };
+    var errors = validator.validate(mapped, validations);
+    if (!errors.isEmpty()) {
+      var r = new ValidationResult<>(PENC,
+        errors.stream()
+          .map(v -> v.getPropertyPath().toString() + ": " + v.getMessage())
+          .toList()
+      );
+      throw new AssertionError("Generated draft TD had validation errors. " + r.presentErrors(Integer.MAX_VALUE));
+    }
 
     shipmentEventRepository.save(document.draft());
     transportDocumentRepository.save(document);
