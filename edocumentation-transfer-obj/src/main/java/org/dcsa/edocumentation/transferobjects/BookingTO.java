@@ -1,13 +1,17 @@
 package org.dcsa.edocumentation.transferobjects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.CargoMovementType;
-import org.dcsa.edocumentation.transferobjects.enums.CommunicationChannelCode;
-import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
-import org.dcsa.edocumentation.transferobjects.enums.IncoTerms;
-import org.dcsa.edocumentation.transferobjects.enums.PaymentTerm;
 import org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
@@ -19,15 +23,6 @@ import org.dcsa.skernel.infrastructure.validation.RequiredIfTrue;
 import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 import org.dcsa.skernel.infrastructure.validation.UniversalServiceReference;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.List;
 
 @AtLeast(
   nonNullsRequired = 1,
@@ -146,7 +141,8 @@ public record BookingTO(
   @ValidVesselIMONumber(allowNull = true)
   String vesselIMONumber,
 
-  DCSATransportType preCarriageModeOfTransportCode,
+  @Size(max = 10)
+  String preCarriageUnderShippersResponsibility,
 
   @Valid
   @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION})

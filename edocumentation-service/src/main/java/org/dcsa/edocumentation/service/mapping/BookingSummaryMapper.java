@@ -9,9 +9,6 @@ import org.mapstruct.Mapping;
 public interface BookingSummaryMapper {
 
   @Mapping(source = "booking.vessel.vesselIMONumber", target = "vesselIMONumber")
-  @Mapping(
-      source = " booking.modeOfTransport.dcsaTransportType",
-      target = "preCarriageModeOfTransportCode")
   @Mapping(target = "submissionDateTime", ignore = true)  // FIXME: Verify if this should be mapped
   @Mapping(target = "vesselName", ignore = true)  // FIXME: Verify if this should be mapped
   @Mapping(target = "exportVoyageNumber", ignore = true)  // FIXME: Verify if this should be mapped

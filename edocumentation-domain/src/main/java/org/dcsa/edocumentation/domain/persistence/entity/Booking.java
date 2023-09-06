@@ -28,12 +28,11 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumen
 
 @NamedEntityGraph(
     name = "graph.booking-summary",
-    attributeNodes = {@NamedAttributeNode("vessel"), @NamedAttributeNode("modeOfTransport")})
+    attributeNodes = {@NamedAttributeNode("vessel")})
 @NamedEntityGraph(
     name = "graph.booking",
     attributeNodes = {
       @NamedAttributeNode("vessel"),
-      @NamedAttributeNode("modeOfTransport"),
       @NamedAttributeNode("placeOfIssue"),
       @NamedAttributeNode("invoicePayableAt"),
       @NamedAttributeNode(value = "commodities", subgraph = "graph.commodities"),
@@ -192,9 +191,9 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "pre_carriage_mode_of_transport_code")
-  private ModeOfTransport modeOfTransport;
+  @PseudoEnum(value = "modeoftransportcodes.csv", column = "DCSA Transport Type")
+  private String preCarriageUnderShippersResponsibility;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

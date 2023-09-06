@@ -39,6 +39,7 @@ sources:
       - communication_channel_qualifier
       - code_list_responsible_agency
       - shipment_location_type
+      - mode_of_transport
 
   - path: classpath:db/samples.d
     type: csv

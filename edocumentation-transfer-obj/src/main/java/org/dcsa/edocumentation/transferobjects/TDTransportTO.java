@@ -1,18 +1,18 @@
 package org.dcsa.edocumentation.transferobjects;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
-
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import lombok.Builder;
+import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 
 public record TDTransportTO(
   @NotNull
   LocalDate plannedArrivalDate,  // TODO: TransportDocumentMapper does not map this field yet
   @NotNull
   LocalDate plannedDepartureDate, // TODO: TransportDocumentMapper does not map this field yet
-  DCSATransportType preCarriedBy, // TODO: TransportDocumentMapper does not map this field yet
+  @Size(max = 10)
+  String preCarriedBy,  // TODO: TransportDocumentMapper does not map this field yet
   LocationTO placeOfReceipt,
   @NotNull
   LocationTO portOfLoading,

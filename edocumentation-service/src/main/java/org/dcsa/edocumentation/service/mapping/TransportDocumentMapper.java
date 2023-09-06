@@ -7,7 +7,6 @@ import org.dcsa.edocumentation.transferobjects.TDTransportTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
 import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
-import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
 import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.Mapper;
@@ -28,9 +27,6 @@ public abstract class TransportDocumentMapper {
 
   @Autowired
   protected LocationMapper locMapper;
-
-  @Autowired
-  protected ModeOfTransportMapper modeOfTransportMapper;
 
   @Mapping(source = "transportDocument.shippingInstruction.documentStatus", target = "documentStatus")
   public abstract TransportDocumentRefStatusTO toStatusDTO(TransportDocument transportDocument);
@@ -149,7 +145,7 @@ public abstract class TransportDocumentMapper {
 
     LocalDate departureDate = null;
     LocalDate arrivalDate = null;
-    DCSATransportType preCarriedBy = null;
+    String preCarriedBy = null;
 
     for (var st : shipmentTransports) {
       var loadLoc = st.getLoadLocation();
@@ -160,7 +156,7 @@ public abstract class TransportDocumentMapper {
           departureDate = date;
         }
         if (isSameLocation(loadLoc, preLoc)) {
-          preCarriedBy = modeOfTransportMapper.toTO(st.getModeOfTransport());
+          preCarriedBy = st.getModeOfTransport();
         }
       }
       if (isSameLocation(dischargeLoc, podLoc) || isSameLocation(dischargeLoc, pdeLoc)) {

@@ -104,7 +104,8 @@ public record BookingSummaryTO(
   @Size(max = 50, message = "The attribute exportVoyageNumber has a max size of 50.")
   String exportVoyageNumber,
 
-  DCSATransportType preCarriageModeOfTransportCode
+  @Size(max = 10)
+  String preCarriageUnderShippersResponsibility
 ) {
   @Builder
   public BookingSummaryTO { }

@@ -1,8 +1,12 @@
 package org.dcsa.edocumentation.datafactories;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.ModeOfTransport;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
@@ -13,12 +17,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ReceiptDeliveryType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
-
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @UtilityClass
 public class BookingDataFactory {
@@ -58,14 +56,6 @@ public class BookingDataFactory {
   public Booking singleShallowBookingWithVesselAndModeOfTransport() {
     Vessel mockVessel = VesselDataFactory.vessel();
 
-    ModeOfTransport mockModeOfTransport =
-        ModeOfTransport.builder()
-            .code("1")
-            .description("Vessel")
-            .name("Vessel")
-            .dcsaTransportType(DCSATransportType.VESSEL)
-            .build();
-
     return Booking.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
         .carrierBookingRequestReference("BOOKING_REQ_REF_01")
@@ -94,21 +84,13 @@ public class BookingDataFactory {
         .isEquipmentSubstitutionAllowed(false)
         .declaredValueCurrency("EUR")
         .declaredValue(10000F)
-        .modeOfTransport(mockModeOfTransport)
+        .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
         .vessel(mockVessel)
         .build();
   }
 
   public List<Booking> multipleShallowBookingsWithVesselAndModeOfTransport() {
     Vessel mockVessel = VesselDataFactory.vessel();
-
-    ModeOfTransport mockModeOfTransport =
-        ModeOfTransport.builder()
-            .code("1")
-            .description("Vessel")
-            .name("Vessel")
-            .dcsaTransportType(DCSATransportType.VESSEL)
-            .build();
 
     Booking booking1 =
         Booking.builder()
@@ -139,7 +121,7 @@ public class BookingDataFactory {
             .isEquipmentSubstitutionAllowed(false)
             .declaredValueCurrency("EUR")
             .declaredValue(10000F)
-            .modeOfTransport(mockModeOfTransport)
+            .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
             .vessel(mockVessel)
             .build();
 
@@ -172,7 +154,7 @@ public class BookingDataFactory {
             .isEquipmentSubstitutionAllowed(false)
             .declaredValueCurrency("EUR")
             .declaredValue(2000F)
-            .modeOfTransport(mockModeOfTransport)
+            .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
             .vessel(mockVessel)
             .build();
 
@@ -181,14 +163,6 @@ public class BookingDataFactory {
 
   public Booking singleDeepBooking() {
     Vessel mockVessel = VesselDataFactory.vessel();
-
-    ModeOfTransport mockModeOfTransport =
-        ModeOfTransport.builder()
-            .code("1")
-            .description("Vessel")
-            .name("Vessel")
-            .dcsaTransportType(DCSATransportType.VESSEL)
-            .build();
 
     return Booking.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
@@ -218,7 +192,7 @@ public class BookingDataFactory {
         .isEquipmentSubstitutionAllowed(false)
         .declaredValueCurrency("EUR")
         .declaredValue(10000F)
-        .modeOfTransport(mockModeOfTransport)
+        .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
         .vessel(mockVessel)
         .commodities(Set.of(CommodityDataFactory.singleCommodity()))
         .references(Set.of(ReferenceDataFactory.singleReference()))
@@ -276,7 +250,7 @@ public class BookingDataFactory {
       .communicationChannelCode(org.dcsa.edocumentation.transferobjects.enums.CommunicationChannelCode.AO.name())
       .isEquipmentSubstitutionAllowed(true)
       .vesselIMONumber("1234567")
-      .preCarriageModeOfTransportCode(org.dcsa.edocumentation.transferobjects.enums.DCSATransportType.VESSEL)
+      .preCarriageUnderShippersResponsibility(org.dcsa.edocumentation.transferobjects.enums.DCSATransportType.VESSEL.name())
       .invoicePayableAt(LocationDataFactory.addressLocationTO())
       .placeOfBLIssue(LocationDataFactory.addressLocationTO())
       .commodities(List.of(CommodityDataFactory.singleCommodityTO()))

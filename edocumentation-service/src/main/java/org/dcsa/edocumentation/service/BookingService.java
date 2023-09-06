@@ -6,7 +6,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
-import org.dcsa.edocumentation.service.mapping.ModeOfTransportMapper;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.dcsa.skernel.infrastructure.services.LocationService;
@@ -27,13 +26,11 @@ public class BookingService {
   private final ReferenceService referenceService;
   private final DocumentPartyService documentPartyService;
   private final ShipmentLocationService shipmentLocationService;
-  private final ModeOfTransportService modeOfTransportService;
 
   private final BookingRepository bookingRepository;
   private final ShipmentEventRepository shipmentEventRepository;
 
   private final BookingMapper bookingMapper;
-  private final ModeOfTransportMapper modeOfTransportMapper;
 
   @Transactional
   public Optional<BookingTO> getBooking(String carrierBookingRequestReference) {
@@ -120,8 +117,7 @@ public class BookingService {
     return bookingMapper.toDAO(bookingRequest).toBuilder()
       .voyage(voyageService.resolveVoyage(bookingRequest))
       .vessel(vesselService.resolveVessel(bookingRequest))
-      .modeOfTransport(modeOfTransportService.resolveModeOfTransport(
-        modeOfTransportMapper.toDAO(bookingRequest.preCarriageModeOfTransportCode())))
+      .preCarriageUnderShippersResponsibility(bookingRequest.preCarriageUnderShippersResponsibility())
       .placeOfIssue(locationService.ensureResolvable(bookingRequest.placeOfBLIssue()))
       .invoicePayableAt(locationService.ensureResolvable(bookingRequest.invoicePayableAt()));
   }

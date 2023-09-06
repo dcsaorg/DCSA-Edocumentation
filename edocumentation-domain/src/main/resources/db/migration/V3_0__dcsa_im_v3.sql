@@ -198,14 +198,6 @@ CREATE TABLE voyage (
 );
 
 
-CREATE TABLE mode_of_transport (
-    mode_of_transport_code varchar(3) PRIMARY KEY,
-    mode_of_transport_name varchar(100) NULL,
-    mode_of_transport_description varchar(250) NULL,
-    dcsa_transport_type varchar(50) NULL UNIQUE
-);
-
-
 CREATE TABLE booking (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     carrier_booking_request_reference varchar(100) NOT NULL DEFAULT uuid_generate_v4()::text,
@@ -239,7 +231,7 @@ CREATE TABLE booking (
     declared_value_currency_code varchar(3) NULL,
     declared_value real NULL,
     place_of_issue_id uuid NULL REFERENCES location(id),
-    pre_carriage_mode_of_transport_code varchar(3) NULL REFERENCES mode_of_transport(mode_of_transport_code),
+    pre_carriage_under_shippers_responsibility varchar(10) NULL,
     voyage_id UUID NULL REFERENCES voyage(id)
 );
 
@@ -598,7 +590,7 @@ CREATE TABLE shipment_transport (
     shipment_id uuid NULL REFERENCES shipment(id),
     transport_plan_stage_sequence_number integer NOT NULL,
     transport_plan_stage_code varchar(3) NOT NULL REFERENCES transport_plan_stage_type(transport_plan_stage_code),
-    dcsa_transport_type varchar(50) NULL CHECK (dcsa_transport_type IS NULL OR dcsa_transport_type IN ('RAIL', 'BARGE', 'VESSEL', 'TRUCK')),
+    dcsa_transport_type varchar(50) NULL,
     planned_arrival_date date NOT NULL,
     planned_departure_date date NOT NULL,
     load_location_id uuid NOT NULL REFERENCES location(id),
