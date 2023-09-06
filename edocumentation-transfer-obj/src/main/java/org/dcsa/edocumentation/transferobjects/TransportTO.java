@@ -4,11 +4,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-
 import java.time.LocalDate;
-
 import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
 import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.dcsa.skernel.infrastructure.transferobject.LocationTO.LocationType;
@@ -37,7 +34,8 @@ public record TransportTO(
   @NotNull(message = "The attribute plannedArrivalDate is required.")
   LocalDate plannedArrivalDate,
 
-  DCSATransportType modeOfTransport,
+  @Size(max = 10)
+  String modeOfTransport,
   @Size(max = 35, message = "The attribute vesselName has a max size of 35.") String vesselName,
   @ValidVesselIMONumber(allowNull = true, message = "The attribute vesselIMONumber is invalid.")
         String vesselIMONumber,

@@ -1,15 +1,12 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportPlanStageCode;
-
 import jakarta.persistence.*;
-import org.dcsa.skernel.domain.persistence.entity.Location;
-
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportPlanStageCode;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
+import org.dcsa.skernel.domain.persistence.entity.Location;
 
 @Data
 @Builder
@@ -52,8 +49,8 @@ public class ShipmentTransport {
   private LocalDate plannedArrivalDate;
 
   @Column(name = "dcsa_transport_type")
-  @Enumerated(EnumType.STRING)
-  private DCSATransportType modeOfTransport;
+  @PseudoEnum(value = "modeoftransportcodes.csv", column = "DCSA Transport Type")
+  private String modeOfTransport;
 
   @Column(name = "vessel_imo_number")
   private String vesselIMONumber;

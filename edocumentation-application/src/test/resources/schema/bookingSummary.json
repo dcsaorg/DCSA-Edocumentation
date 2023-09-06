@@ -205,7 +205,7 @@
         "type": "string",
         "description": "The vessel operator-specific identifier of the export Voyage."
       },
-      "preCarriageModeOfTransportCode": {
+      "preCarriageUnderShippersResponsibility": {
         "type": "string",
         "description": "The mode of transport as defined by DCSA.\n",
         "enum": [

@@ -305,20 +305,20 @@ public class ManageShipmentService {
       TransportTO currentLeg = transportToList.get(i);
 
       // Check mode of transport
-      if (preIndex != null && i == 0 && currentLeg.modeOfTransport() != null && currentLeg.modeOfTransport() == DCSATransportType.VESSEL) {
+      if (preIndex != null && i == 0 && currentLeg.modeOfTransport() != null && Objects.equals(currentLeg.modeOfTransport(), DCSATransportType.VESSEL.name())) {
         throw ConcreteRequestErrorMessageException.invalidInput("First modeOfTransport must be non-VESSEL if PRE is defined.");
       }
-      if (polIndex != null && preIndex != null && i < polIndex && currentLeg.modeOfTransport() != null && currentLeg.modeOfTransport() == DCSATransportType.VESSEL) {
+      if (polIndex != null && preIndex != null && i < polIndex && currentLeg.modeOfTransport() != null && Objects.equals(currentLeg.modeOfTransport(), DCSATransportType.VESSEL.name())) {
         throw ConcreteRequestErrorMessageException.invalidInput("modeOfTransports before POL must be non-VESSEL.");
       }
-      if (podIndex != null && pdeIndex != null  && i > pdeIndex && currentLeg.modeOfTransport() != null && currentLeg.modeOfTransport() == DCSATransportType.VESSEL) {
+      if (podIndex != null && pdeIndex != null  && i > pdeIndex && currentLeg.modeOfTransport() != null && Objects.equals(currentLeg.modeOfTransport(), DCSATransportType.VESSEL.name())) {
         throw ConcreteRequestErrorMessageException.invalidInput("modeOfTransports after PDE must be non-VESSEL.");
       }
-      if (pdeIndex != null && i == transportToList.size()-1 && currentLeg.modeOfTransport() != null && currentLeg.modeOfTransport() == DCSATransportType.VESSEL) {
+      if (pdeIndex != null && i == transportToList.size()-1 && currentLeg.modeOfTransport() != null && Objects.equals(currentLeg.modeOfTransport(), DCSATransportType.VESSEL.name())) {
         throw ConcreteRequestErrorMessageException.invalidInput("Last modeOfTransport must be non-VESSEL if PDE is defined.");
       }
       if (polIndex != null && podIndex != null &&  polIndex < i && i <  podIndex
-              && i == transportToList.size()-1 && currentLeg.modeOfTransport() != null && currentLeg.modeOfTransport() != DCSATransportType.VESSEL) {
+              && i == transportToList.size()-1 && currentLeg.modeOfTransport() != null && Objects.equals(currentLeg.modeOfTransport(), DCSATransportType.VESSEL.name())) {
         throw ConcreteRequestErrorMessageException.invalidInput("There must be at least one VESSEL leg in the transport plan, it must be between POL and POD if these are given.");
       }
     }
