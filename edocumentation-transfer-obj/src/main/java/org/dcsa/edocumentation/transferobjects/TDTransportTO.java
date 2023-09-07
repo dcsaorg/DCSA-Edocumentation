@@ -19,7 +19,13 @@ public record TDTransportTO(
   @NotNull
   LocationTO portOfDischarge,
   LocationTO placeOfDelivery,
-  LocationTO onwardInlandRouting
+  LocationTO onwardInlandRouting,
+
+  @NotNull
+  String vesselName,
+  @NotNull
+  String carrierExportVoyageNumber,
+  String universalExportVoyageReference
 ) {
   @Builder(toBuilder = true)
   public TDTransportTO {}
