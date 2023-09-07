@@ -1,7 +1,9 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
 import org.dcsa.edocumentation.transferobjects.TDTransportTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
@@ -147,6 +149,14 @@ public abstract class TransportDocumentMapper {
     LocalDate arrivalDate = null;
     String preCarriedBy = null;
 
+    var firstVesselLeg = shipmentTransports.stream()
+      .filter(st -> DCSATransportType.VESSEL.name().equals(st.getModeOfTransport()))
+      .findFirst()
+      .orElseThrow();
+    var vesselName = firstVesselLeg.getVesselName();
+    var carrierExportVoyageNumber = firstVesselLeg.getCarrierExportVoyageNumber();
+    var universalExportVoyageReference = firstVesselLeg.getUniversalExportVoyageReference();
+
     for (var st : shipmentTransports) {
       var loadLoc = st.getLoadLocation();
       var dischargeLoc = st.getDischargeLocation();
@@ -175,6 +185,9 @@ public abstract class TransportDocumentMapper {
         .portOfDischarge(locMapper.toDTO(podLoc))
         .placeOfDelivery(locMapper.toDTO(pdeLoc))
         .onwardInlandRouting(locMapper.toDTO(findLocation(shipmentLocations, LocationType.OIR)))
+        .vesselName(vesselName)
+        .carrierExportVoyageNumber(carrierExportVoyageNumber)
+        .universalExportVoyageReference(universalExportVoyageReference)
         .build();
   }
 
