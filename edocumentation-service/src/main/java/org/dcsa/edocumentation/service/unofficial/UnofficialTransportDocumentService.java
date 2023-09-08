@@ -12,6 +12,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
+import org.dcsa.edocumentation.domain.persistence.repository.CarrierRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
@@ -27,8 +28,6 @@ import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
 import org.dcsa.edocumentation.transferobjects.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.edocumentation.transferobjects.unofficial.DraftTransportDocumentRequestTO;
-import org.dcsa.skernel.domain.persistence.entity.Carrier;
-import org.dcsa.skernel.domain.persistence.repository.CarrierRepository;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +63,7 @@ public class UnofficialTransportDocumentService {
     }
 
     String carrierSMDGCode = findCarrierSMGCode(transportDocumentRequestTO.issuingParty());
-    Carrier carrier = carrierRepository.findBySmdgCode(carrierSMDGCode);
+    var carrier = carrierRepository.findBySmdgCode(carrierSMDGCode);
     if (carrier == null) {
       throw ConcreteRequestErrorMessageException.notFound("Unknown carrier SMDG code: " + carrierSMDGCode);
     }

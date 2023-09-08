@@ -24,56 +24,72 @@ public class PseudoEnumValidator implements ConstraintValidator<PseudoEnum, Stri
   public void initialize(PseudoEnum constraintAnnotation) {
     var name = constraintAnnotation.value();
     var columnName = constraintAnnotation.column();
-    allowedValues = loadData(name, columnName);
+    allowedValues = fetchData(name, columnName);
   }
 
-
-  @SneakyThrows(IOException.class)
-  private Set<String> loadData(String datasetName, String columnName) {
+  private Set<String> fetchData(String datasetName, String columnName) {
     var cacheKey = datasetName + "!" + columnName;
     Set<String> values = CACHE.get(cacheKey);
     if (values != null) {
       return values;
     }
+    values = loadData(datasetName, false, columnName).asSingleKeySet();
+    CACHE.put(cacheKey, values);
+    return values;
+  }
 
-    InputStream in = this.getClass().getClassLoader().getResourceAsStream("validations/" + datasetName);
+  @SneakyThrows(IOException.class)
+  static MultiStringKeySet loadData(String datasetName, boolean ignoreNullValues, String ... columnNames) {
+    InputStream in = PseudoEnumValidator.class.getClassLoader().getResourceAsStream("validations/" + datasetName);
     if (in == null) {
       throw new IllegalArgumentException("No data set called validations/" + datasetName);
+    }
+    if (columnNames.length < 1) {
+      columnNames = new String[]{""};
     }
     var mapper = new CsvMapper();
     var objectReader = mapper.readerForListOf(String.class)
       .with(CsvParser.Feature.WRAP_AS_ARRAY)
       .with(CsvParser.Feature.EMPTY_STRING_AS_NULL);
-    values = new HashSet<>();
+    var values = new MultiStringKeySet(columnNames.length);
     try (var r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-      var contents = objectReader.<List<String>>readValues(r)) {
+         var contents = objectReader.<List<String>>readValues(r)) {
       ensureHasNext(contents, datasetName);
       var headers = contents.next();
-      var columnIndex = 0;
-      if (!columnName.isBlank()) {
-        columnIndex = headers.indexOf(columnName);
+      var columnIndexes = Arrays.stream(columnNames).map(columnName -> {
+        if (columnName.isBlank()) {
+          return 0;
+        }
+        var columnIndex = headers.indexOf(columnName);
         if (columnIndex < 0) {
           throw new IllegalArgumentException("Cannot find the column with header \"" + columnName
             + "\" in the dataset validations/" + datasetName);
         }
-      }
+        return columnIndex;
+      }).toList();
+      int maxColumnIndex = columnIndexes.stream().max(Integer::compareTo).orElseThrow();
+
       ensureHasNext(contents, datasetName);
       do {
         var row = contents.next();
-        if (columnIndex >= row.size()) {
-          throw new IllegalArgumentException("The dataset in validations/" + datasetName + " have rows that did not have at least " + (columnIndex + 1) + " column(s).");
+        if (maxColumnIndex >= row.size()) {
+          throw new IllegalArgumentException("The dataset in validations/" + datasetName + " have rows that did not have at least " + (maxColumnIndex + 1) + " column(s).");
         }
-        var value = row.get(columnIndex);
-        values.add(value);
+        var keys = columnIndexes.stream().map(row::get).toArray(String[]::new);
+        if (Arrays.stream(keys).anyMatch(Objects::isNull)) {
+          if (ignoreNullValues) {
+            continue;
+          }
+          throw new IllegalArgumentException("The dataset validations/" + datasetName + " had cells with null values, which are not supported!");
+        }
+        values.add(keys);
       } while (contents.hasNext());
     }
 
-    values = Set.copyOf(values);
-    CACHE.put(cacheKey, values);
     return values;
   }
 
-  private void ensureHasNext(Iterator<?> it, String dataset) {
+  private static void ensureHasNext(Iterator<?> it, String dataset) {
     if (!it.hasNext()) {
       throw new IllegalArgumentException("The dataset validations/" + dataset + " must have at least two lines");
     }
@@ -81,9 +97,15 @@ public class PseudoEnumValidator implements ConstraintValidator<PseudoEnum, Stri
 
   @Override
   public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
-    if (null == value) {
+    if (null == value || this.allowedValues.contains(value)) {
       return true;
     }
-    return this.allowedValues.contains(value);
+    constraintValidatorContext.disableDefaultConstraintViolation();
+    String values = String.join(", ", this.allowedValues);
+    constraintValidatorContext.buildConstraintViolationWithTemplate(
+      "The value should have been one of: " + values
+    ).addConstraintViolation();
+
+    return false;
   }
 }

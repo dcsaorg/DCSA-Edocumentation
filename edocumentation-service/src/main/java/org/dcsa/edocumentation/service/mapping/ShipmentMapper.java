@@ -4,7 +4,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.unofficial.ShipmentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.ShipmentTO;
-import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

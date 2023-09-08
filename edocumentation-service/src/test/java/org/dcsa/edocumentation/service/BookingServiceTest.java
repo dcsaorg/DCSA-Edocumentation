@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,10 +28,6 @@ import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventReposi
 import org.dcsa.edocumentation.service.mapping.*;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
-import org.dcsa.skernel.domain.persistence.entity.Location;
-import org.dcsa.skernel.infrastructure.services.LocationService;
-import org.dcsa.skernel.infrastructure.services.mapping.AddressMapper;
-import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,6 +48,7 @@ class BookingServiceTest {
 
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
+    @Spy private LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
 
     @Spy private PartyMapper partyMapper = Mappers.getMapper(PartyMapper.class);
 
@@ -64,7 +60,6 @@ class BookingServiceTest {
 
     @BeforeEach
     void setupMappers() {
-      LocationMapper locationMapper = new LocationMapper(addressMapper);
       DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
       ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
       ReflectionTestUtils.setField(bookingMapper, "documentPartyMapper", documentPartyMapper);
@@ -73,6 +68,7 @@ class BookingServiceTest {
       ReflectionTestUtils.setField(documentPartyMapper, "displayedAddressMapper", displayedAddressMapper);
       ReflectionTestUtils.setField(documentPartyMapper, "partyMapper", partyMapper);
       ReflectionTestUtils.setField(partyMapper, "addressMapper", addressMapper);
+      ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
     }
 
     @Test
@@ -122,7 +118,6 @@ class BookingServiceTest {
 
   @Nested
   class CreateBooking {
-    @Mock private LocationService locationService;
     @Mock private VoyageService voyageService;
     @Mock private VesselService vesselService;
     @Mock private CommodityService commodityService;
@@ -135,14 +130,16 @@ class BookingServiceTest {
     @Mock private ShipmentEventRepository shipmentEventRepository;
 
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
+    @Spy private LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
 
     @InjectMocks private BookingService bookingService;
 
     @BeforeEach
     public void resetMocks() {
-      ReflectionTestUtils.setField(bookingMapper, "addressMapper", addressMapper);
-      reset(locationService, voyageService, vesselService, commodityService,
+      ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
+      ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
+      reset(voyageService, vesselService, commodityService,
         requestedEquipmentGroupService, referenceService, documentPartyService, shipmentLocationService,
         bookingRepository, shipmentEventRepository);
     }
@@ -151,7 +148,7 @@ class BookingServiceTest {
     void testCreateFullBooking() {
       Voyage voyage = VoyageDataFactory.voyage();
       Vessel vessel = VesselDataFactory.vessel();
-      Location location = LocationDataFactory.addressLocationWithId();
+      var location = LocationDataFactory.addressLocationWithId();
       OffsetDateTime now = OffsetDateTime.now();
 
       BookingTO bookingRequest = BookingDataFactory.singleFullBookingRequestTO();
@@ -171,7 +168,6 @@ class BookingServiceTest {
 
       when(voyageService.resolveVoyage(any())).thenReturn(voyage);
       when(vesselService.resolveVessel(any())).thenReturn(vessel);
-      when(locationService.ensureResolvable(any())).thenReturn(location);
       when(bookingRepository.save(any())).thenReturn(bookingSaved);
 
        // Execute
@@ -187,7 +183,6 @@ class BookingServiceTest {
       ArgumentCaptor<ShipmentEvent> shipmentEventArgumentCaptor = ArgumentCaptor.forClass(ShipmentEvent.class);
       verify(voyageService).resolveVoyage(bookingRequest);
       verify(vesselService).resolveVessel(bookingRequest);
-      verify(locationService, times(2)).ensureResolvable(bookingRequest.invoicePayableAt());
       verify(bookingRepository).save(bookingArgumentCaptor.capture());
       verify(shipmentEventRepository).save(shipmentEventArgumentCaptor.capture());
       verify(commodityService).createCommodities(eq(bookingRequest.commodities()), any(Booking.class));

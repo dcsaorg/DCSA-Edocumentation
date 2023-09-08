@@ -15,11 +15,8 @@ import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
-import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
-import org.dcsa.edocumentation.domain.validations.EBLValidation;
-import org.dcsa.edocumentation.domain.validations.PaperBLValidation;
-import org.dcsa.edocumentation.domain.validations.ShippingInstructionValidation;
-import org.dcsa.skernel.domain.persistence.entity.Location;
+import org.dcsa.edocumentation.domain.validations.*;
+import org.dcsa.edocumentation.domain.validations.LocationSubType;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 
@@ -138,6 +135,10 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @EqualsAndHashCode.Exclude
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "invoice_payable_at_id")
+  @LocationValidation(
+    allowedSubtypes = {LocationSubType.ADDR, LocationSubType.UNLO},
+    groups = AsyncShipperProvidedDataValidation.class
+  )
   private Location invoicePayableAt;
 
   @Column(name = "is_electronic")
@@ -150,6 +151,10 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @EqualsAndHashCode.Exclude
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "place_of_issue_id")
+  @LocationValidation(
+    allowedSubtypes = {LocationSubType.ADDR, LocationSubType.UNLO},
+    groups = AsyncShipperProvidedDataValidation.class
+  )
   private Location placeOfIssue;
 
   @Enumerated(EnumType.STRING)

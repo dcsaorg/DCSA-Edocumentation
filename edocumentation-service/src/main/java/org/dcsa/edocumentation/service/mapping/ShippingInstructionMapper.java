@@ -8,8 +8,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionTO;
 import org.dcsa.edocumentation.transferobjects.UtilizedTransportEquipmentTO;
-import org.dcsa.skernel.infrastructure.services.mapping.AddressMapper;
-import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +33,6 @@ public abstract class ShippingInstructionMapper {
 
   @Mapping(source = "documentParties", target = "documentParties", ignore = true)
   @Mapping(source = "consignmentItems", target = "consignmentItems", ignore = true)
-  @Mapping(target = "placeOfIssue.id", ignore = true)  // FIXME: We need a TO -> DAO location mapper
-  @Mapping(target = "placeOfIssue.facility", ignore = true)  // FIXME: We need a TO -> DAO location mapper
-  @Mapping(target = "invoicePayableAt.id", ignore = true)  // FIXME: We need a TO -> DAO location mapper
-  @Mapping(target = "invoicePayableAt.facility", ignore = true)  // FIXME: We need a TO -> DAO location mapper
   @Mapping(target = "amendmentToTransportDocument", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
   // Internal details; should not be mapped
   @Mapping(target = "id", ignore = true)

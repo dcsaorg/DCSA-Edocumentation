@@ -1,14 +1,13 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import java.time.OffsetDateTime;
+import java.util.*;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.AssignedEquipment;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.EquipmentAssignment;
-import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
-
-import jakarta.persistence.*;
-import java.time.OffsetDateTime;
-import java.util.*;
 
 @NamedEntityGraph(
     name = "graph.shipment-summary",
@@ -59,7 +58,7 @@ public class Shipment {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "shipment")
-  private Set<ConsignmentItem> consignmentItems;
+  private Set<@Valid ConsignmentItem> consignmentItems;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -87,7 +86,7 @@ public class Shipment {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "shipment")
-  private Set<ShipmentLocation> shipmentLocations = new LinkedHashSet<>();
+  private Set<@Valid ShipmentLocation> shipmentLocations = new LinkedHashSet<>();
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

@@ -1,14 +1,13 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
-import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
-import org.dcsa.edocumentation.domain.validations.PseudoEnum;
-import org.dcsa.skernel.domain.persistence.entity.Location;
-
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.*;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.LocationSubType;
+import org.dcsa.edocumentation.domain.validations.LocationValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 
 @Data
 @Builder(toBuilder = true)
@@ -24,7 +23,11 @@ public class ShipmentLocation {
   @Column(name = "id", nullable = false)
   private UUID id;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @LocationValidation(
+    allowedSubtypes = {LocationSubType.ADDR, LocationSubType.UNLO, LocationSubType.FACI},
+    groups = AsyncShipperProvidedDataValidation.class
+  )
   private Location location;
 
   @Column(name = "shipment_location_type_code")

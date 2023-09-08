@@ -17,7 +17,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = PseudoEnumValidator.class)
 public @interface PseudoEnum {
   /**
-   * Name of the dataset
+   * Name of the CSV dataset (usually "somename.csv")
+   *
+   * <p>The application must provide `validations/{value}` in its class path (usually via
+   * `src/main/resources/validations/{value}`). That file will be parsed as a CSV file and
+   * used to determine the values that makes up the pseudo enum.</p>
    */
   String value();
 
@@ -28,7 +32,7 @@ public @interface PseudoEnum {
    */
   String column() default "";
 
-  String message() default "unsupported value for this pseudo-enum. Please check the {value} dataset for allowed values";
+  String message() default "This attribute is not used (but required by the Validation API)";
 
   Class<?>[] groups() default {};
 

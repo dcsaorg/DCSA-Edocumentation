@@ -14,8 +14,6 @@ import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.CargoMovementType;
 import org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO.LocationType;
 import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 import org.dcsa.skernel.infrastructure.validation.AtLeast;
 import org.dcsa.skernel.infrastructure.validation.DateRange;
@@ -145,11 +143,9 @@ public record BookingTO(
   String preCarriageUnderShippersResponsibility,
 
   @Valid
-  @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION})
   LocationTO invoicePayableAt,
 
   @Valid
-  @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION})
   LocationTO placeOfBLIssue,
 
   @NotEmpty @Valid

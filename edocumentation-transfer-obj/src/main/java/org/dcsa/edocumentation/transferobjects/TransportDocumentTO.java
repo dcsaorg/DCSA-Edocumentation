@@ -9,8 +9,6 @@ import org.dcsa.edocumentation.transferobjects.enums.*;
 import org.dcsa.edocumentation.transferobjects.validation.EBLValidation;
 import org.dcsa.edocumentation.transferobjects.validation.PaperBLValidation;
 import org.dcsa.edocumentation.transferobjects.validation.TransportDocumentTOValidation;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
-import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 
 @TransportDocumentTOValidation
 public record TransportDocumentTO(
@@ -64,10 +62,6 @@ public record TransportDocumentTO(
   String declaredValueCurrency,
 
   @NotNull
-  @RestrictLocationTO({
-    LocationTO.LocationType.UNLOCATION,
-    LocationTO.LocationType.ADDRESS,
-  })
   LocationTO invoicePayableAt,
 
   @Min(0)
@@ -108,10 +102,6 @@ public record TransportDocumentTO(
   @Size(max = 5)
   List<@Size(max = 35) String> displayedNameForPlaceOfDelivery,
 
-  @RestrictLocationTO({
-    LocationTO.LocationType.UNLOCATION,
-    LocationTO.LocationType.ADDRESS,
-  })
   LocationTO placeOfIssue,
 
   @Valid
@@ -126,7 +116,6 @@ public record TransportDocumentTO(
   @NotEmpty
   List<@Valid @NotNull DocumentPartyTO> documentParties,
 
-  // TODO: TransportLeg here
   @NotNull
   TDTransportTO transports,
 

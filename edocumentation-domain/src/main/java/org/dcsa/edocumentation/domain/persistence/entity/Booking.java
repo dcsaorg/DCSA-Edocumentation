@@ -1,7 +1,17 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
+
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Predicate;
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
 import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
@@ -10,21 +20,11 @@ import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.LocationSubType;
+import org.dcsa.edocumentation.domain.validations.LocationValidation;
 import org.dcsa.edocumentation.domain.validations.PseudoEnum;
-import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
-
-import jakarta.persistence.*;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Predicate;
-
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
 
 @NamedEntityGraph(
     name = "graph.booking-summary",
@@ -74,8 +74,8 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
     IS_SOURCE_LOCATION_TYPE.or(IS_DESTINATION_LOCATION_TYPE);
   private static final Predicate<ShipmentLocation> IS_SOURCE_OR_DESTINATION_LOCATION =
     sl -> IS_SOURCE_OR_DESTINATION_LOCATION_TYPE.test(sl.getShipmentLocationTypeCode());
-  private static Predicate<ShipmentLocation> HAS_ADDRESS = sl -> sl.getLocation().getAddress() != null;
-  private static Predicate<ShipmentLocation> HAS_UNLOCATION_CODE = sl -> sl.getLocation().getUNLocationCode() != null;
+  private static final Predicate<ShipmentLocation> HAS_ADDRESS = sl -> sl.getLocation().getAddress() != null;
+  private static final Predicate<ShipmentLocation> HAS_UNLOCATION_CODE = sl -> sl.getLocation().getUNLocationCode() != null;
 
 
   private static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECE)
@@ -155,6 +155,10 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @EqualsAndHashCode.Exclude
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "invoice_payable_at_id")
+  @LocationValidation(
+    allowedSubtypes = {LocationSubType.ADDR, LocationSubType.UNLO},
+    groups = AsyncShipperProvidedDataValidation.class
+  )
   private Location invoicePayableAt;
 
   @Column(name = "expected_departure_date")
@@ -205,6 +209,10 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @EqualsAndHashCode.Exclude
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "place_of_issue_id")
+  @LocationValidation(
+    allowedSubtypes = {LocationSubType.ADDR, LocationSubType.UNLO},
+    groups = AsyncShipperProvidedDataValidation.class
+  )
   private Location placeOfIssue;
 
   @ToString.Exclude

@@ -5,10 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
-import org.dcsa.skernel.domain.persistence.entity.Carrier;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.LocationSubType;
+import org.dcsa.edocumentation.domain.validations.LocationValidation;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
-import org.dcsa.skernel.domain.persistence.entity.Location;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -109,6 +110,10 @@ public class TransportDocument implements Persistable<UUID> {
 
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "place_of_issue_id")
+  @LocationValidation(
+    allowedSubtypes = {LocationSubType.ADDR, LocationSubType.UNLO},
+    groups = AsyncShipperProvidedDataValidation.class
+  )
   private Location placeOfIssue;
 
   @ManyToOne(fetch = FetchType.LAZY)

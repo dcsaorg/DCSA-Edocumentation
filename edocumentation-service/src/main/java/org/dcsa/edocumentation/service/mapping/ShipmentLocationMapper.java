@@ -1,11 +1,10 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.Location;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentLocation;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
-import org.dcsa.skernel.domain.persistence.entity.Location;
-import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

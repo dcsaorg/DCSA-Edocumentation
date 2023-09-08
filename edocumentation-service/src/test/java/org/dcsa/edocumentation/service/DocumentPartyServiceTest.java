@@ -13,6 +13,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
 import org.dcsa.edocumentation.domain.persistence.entity.Party;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.repository.*;
+import org.dcsa.edocumentation.service.mapping.AddressMapper;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentPartyMapper;
 import org.dcsa.edocumentation.service.mapping.PartyMapper;
@@ -20,7 +21,6 @@ import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
 import org.dcsa.edocumentation.transferobjects.PartyContactDetailsTO;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
 import org.dcsa.edocumentation.transferobjects.PartyTO;
-import org.dcsa.skernel.infrastructure.services.AddressService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentPartyServiceTest {
-  @Mock private AddressService addressService;
 
   @Mock private DocumentPartyRepository documentPartyRepository;
   @Mock private PartyRepository partyRepository;
@@ -47,6 +46,8 @@ class DocumentPartyServiceTest {
 
   @Spy
   private PartyMapper partyMapper = Mappers.getMapper(PartyMapper.class);
+  @Spy
+  private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
 
   @Spy private DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
 
@@ -54,9 +55,9 @@ class DocumentPartyServiceTest {
 
   @BeforeEach
   public void resetMocks() {
+    ReflectionTestUtils.setField(partyMapper, "addressMapper", addressMapper);
     ReflectionTestUtils.setField(documentPartyMapper, "partyMapper", partyMapper);
     reset(
-        addressService,
         documentPartyRepository,
         partyRepository,
         partyContactDetailsRepository,
@@ -70,13 +71,12 @@ class DocumentPartyServiceTest {
   void documentPartyServiceTest_testCreateNullWithBooking() {
     documentPartyService.createDocumentParties(null, (Booking) null);
 
-    verify(addressService, never()).ensureResolvable(any());
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyTO.class));
-    verify(addressService, never()).ensureResolvable(any());
+    verify(addressMapper, never()).toDAO(any());
     verify(partyContactDetailsRepository, never()).saveAll(any());
     verify(partyIdentifyingCodeRepository, never()).saveAll(any());
   }
@@ -85,13 +85,12 @@ class DocumentPartyServiceTest {
   void documentPartyServiceTest_testCreateNullWithShippingInstruction() {
     documentPartyService.createDocumentParties(null, (ShippingInstruction) null);
 
-    verify(addressService, never()).ensureResolvable(any());
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyTO.class));
-    verify(addressService, never()).ensureResolvable(any());
+    verify(addressMapper, never()).toDAO(any());
     verify(partyContactDetailsRepository, never()).saveAll(any());
     verify(partyIdentifyingCodeRepository, never()).saveAll(any());
   }
@@ -100,13 +99,12 @@ class DocumentPartyServiceTest {
   void documentPartyServiceTest_testCreateEmptyWithBooking() {
     documentPartyService.createDocumentParties(Collections.emptyList(), (Booking) null);
 
-    verify(addressService, never()).ensureResolvable(any());
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyTO.class));
-    verify(addressService, never()).ensureResolvable(any());
+    verify(addressMapper, never()).toDAO(any());
     verify(partyContactDetailsRepository, never()).saveAll(any());
     verify(partyIdentifyingCodeRepository, never()).saveAll(any());
   }
@@ -115,13 +113,12 @@ class DocumentPartyServiceTest {
   void documentPartyServiceTest_testCreateEmptyWithShippingInstruction() {
     documentPartyService.createDocumentParties(Collections.emptyList(), (ShippingInstruction) null);
 
-    verify(addressService, never()).ensureResolvable(any());
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyContactDetailsTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyIdentifyingCodeTO.class), any());
     verify(partyMapper, never()).toDAO(any(PartyTO.class));
-    verify(addressService, never()).ensureResolvable(any());
+    verify(addressMapper, never()).toDAO(any());
     verify(partyContactDetailsRepository, never()).saveAll(any());
     verify(partyIdentifyingCodeRepository, never()).saveAll(any());
   }

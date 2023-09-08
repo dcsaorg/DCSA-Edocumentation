@@ -5,14 +5,10 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.transferobjects.PartyContactDetailsTO;
-import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
-import org.dcsa.edocumentation.transferobjects.PartyTO;
-import org.dcsa.edocumentation.transferobjects.TransportDocumentSummaryTO;
+import org.dcsa.edocumentation.transferobjects.*;
 import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
 import org.dcsa.edocumentation.transferobjects.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
-import org.dcsa.skernel.infrastructure.transferobject.AddressTO;
 
 @UtilityClass
 public class TransportDocumentSummaryDataFactory {

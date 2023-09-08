@@ -2,7 +2,6 @@ package org.dcsa.edocumentation.service.mapping;
 
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentTransport;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
-import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

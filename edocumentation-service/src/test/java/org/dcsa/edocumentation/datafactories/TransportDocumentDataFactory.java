@@ -1,11 +1,11 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
+import org.dcsa.edocumentation.domain.persistence.entity.Carrier;
 import org.dcsa.edocumentation.domain.persistence.entity.CarrierClause;
 import org.dcsa.edocumentation.domain.persistence.entity.Charge;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
-import org.dcsa.skernel.domain.persistence.entity.Carrier;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;

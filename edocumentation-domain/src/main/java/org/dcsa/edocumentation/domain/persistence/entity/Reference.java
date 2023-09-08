@@ -1,14 +1,12 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
+import lombok.*;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.PseudoEnum;
-
-import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)

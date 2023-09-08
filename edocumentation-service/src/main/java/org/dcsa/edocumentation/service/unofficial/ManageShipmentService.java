@@ -13,14 +13,12 @@ import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.EquipmentAssignment;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
-import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.EquipmentRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
+import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.ShipmentLocationService;
 import org.dcsa.edocumentation.service.ShipmentTransportService;
 import org.dcsa.edocumentation.service.mapping.EquipmentAssignmentMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
+import org.dcsa.edocumentation.transferobjects.LocationTO;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
@@ -29,10 +27,7 @@ import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
 import org.dcsa.edocumentation.transferobjects.unofficial.EquipmentAssignmentTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.ManageShipmentRequestTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.ShipmentRefStatusTO;
-import org.dcsa.skernel.domain.persistence.entity.Carrier;
-import org.dcsa.skernel.domain.persistence.repository.CarrierRepository;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -95,7 +90,7 @@ public class ManageShipmentService {
   @Transactional
   public ShipmentRefStatusTO create(ManageShipmentRequestTO shipmentRequestTO) {
     Booking booking = getBooking(shipmentRequestTO);
-    Carrier carrier = carrierRepository.findBySmdgCode(shipmentRequestTO.carrierSMDGCode());
+    var carrier = carrierRepository.findBySmdgCode(shipmentRequestTO.carrierSMDGCode());
     if (carrier == null) {
       throw ConcreteRequestErrorMessageException.invalidInput("Unrecognized SMDG LCL party code \""
         + shipmentRequestTO.carrierSMDGCode() + "\". Note the code may be valid but not loaded into this system.");

@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.Builder;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
 
 public record TDTransportTO(
   @NotNull
