@@ -40,6 +40,7 @@ sources:
       - code_list_responsible_agency
       - shipment_location_type
       - mode_of_transport
+      - facility_type
 
   - path: classpath:db/samples.d
     type: csv
@@ -47,6 +48,9 @@ sources:
     excludes:
       - smdg_delay_reason
       - incoterms
+      - country
+      - un_location
+      - facility
 
   - path: classpath:db/testdata.d
     type: flyway

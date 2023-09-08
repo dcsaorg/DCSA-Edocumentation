@@ -7,9 +7,6 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO.LocationType;
-import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 import org.dcsa.skernel.infrastructure.validation.UniversalServiceReference;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
@@ -21,11 +18,9 @@ public record TransportTO(
     Integer transportPlanStageSequenceNumber,
 
   @Valid @NotNull
-    @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION, LocationType.FACILITY})
     LocationTO loadLocation,
 
   @Valid @NotNull
-    @RestrictLocationTO({LocationType.ADDRESS, LocationType.UNLOCATION, LocationType.FACILITY})
     LocationTO dischargeLocation,
 
   @NotNull(message = "The attribute plannedDepartureDate is required.")

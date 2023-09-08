@@ -8,9 +8,6 @@ import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
-import org.dcsa.skernel.domain.persistence.entity.Address;
-import org.dcsa.skernel.domain.persistence.entity.Carrier;
-import org.dcsa.skernel.domain.persistence.entity.Location;
 
 @UtilityClass
 public class ShippingInstructionDataFactory {

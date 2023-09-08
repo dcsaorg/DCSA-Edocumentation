@@ -1,13 +1,10 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
-
 import jakarta.persistence.*;
+import java.util.UUID;
+import lombok.*;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.PseudoEnum;
-
-import java.util.UUID;
 
 @Data
 @Builder

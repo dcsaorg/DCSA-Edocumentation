@@ -8,11 +8,8 @@ import java.util.Optional;
 import org.dcsa.edocumentation.datafactories.TransportDocumentDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
 import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRepository;
-import org.dcsa.edocumentation.service.mapping.ConsignmentItemMapper;
-import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
-import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
+import org.dcsa.edocumentation.service.mapping.*;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
-import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +25,9 @@ class TransportDocumentServiceTest {
 
   @Mock TransportDocumentRepository transportDocumentRepository;
 
-  @Mock LocationMapper locationMapper;
+  AddressMapper addressMapper =
+    Mappers.getMapper(AddressMapper.class);
+  LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
 
   @Mock ConsignmentItemMapper consignmentItemMapper;
 
@@ -42,6 +41,8 @@ class TransportDocumentServiceTest {
 
   @BeforeEach
   void init() {
+    ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
+    ReflectionTestUtils.setField(transportDocumentMapper, "addressMapper", addressMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "locationMapper", locationMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "locMapper", locationMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "consignmentItemMapper", consignmentItemMapper);

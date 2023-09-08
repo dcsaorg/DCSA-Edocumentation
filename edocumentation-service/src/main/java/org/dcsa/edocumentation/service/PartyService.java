@@ -1,5 +1,7 @@
 package org.dcsa.edocumentation.service;
 
+import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Party;
 import org.dcsa.edocumentation.domain.persistence.repository.PartyContactDetailsRepository;
@@ -9,17 +11,12 @@ import org.dcsa.edocumentation.service.mapping.PartyMapper;
 import org.dcsa.edocumentation.transferobjects.PartyContactDetailsTO;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
 import org.dcsa.edocumentation.transferobjects.PartyTO;
-import org.dcsa.skernel.infrastructure.services.AddressService;
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class PartyService {
 
-  private final AddressService addressService;
   private final PartyRepository partyRepository;
   private final PartyMapper partyMapper;
   private final PartyContactDetailsRepository partyContactDetailsRepository;
@@ -28,10 +25,7 @@ public class PartyService {
   @Transactional
   public Party createParty(PartyTO partyTO) {
     Party party =
-      partyRepository.save(
-        partyMapper.toDAO(partyTO).toBuilder()
-          .address(addressService.ensureResolvable(partyTO.address()))
-          .build());
+      partyRepository.save(partyMapper.toDAO(partyTO));
 
     List<PartyContactDetailsTO> partyContactDetails = partyTO.partyContactDetails();
     if (partyContactDetails != null && !partyContactDetails.isEmpty()) {

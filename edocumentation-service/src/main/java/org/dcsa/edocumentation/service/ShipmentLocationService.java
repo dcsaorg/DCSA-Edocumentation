@@ -6,19 +6,19 @@ import java.util.Collection;
 import java.util.function.BiFunction;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.Location;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentLocation;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentLocationRepository;
+import org.dcsa.edocumentation.service.mapping.LocationMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentLocationMapper;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
-import org.dcsa.skernel.domain.persistence.entity.Location;
-import org.dcsa.skernel.infrastructure.services.LocationService;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class ShipmentLocationService {
-  private final LocationService locationService;
+  private final LocationMapper locationMapper;
   private final ShipmentLocationRepository shipmentLocationRepository;
   private final ShipmentLocationMapper shipmentLocationMapper;
 
@@ -44,7 +44,7 @@ public class ShipmentLocationService {
         shipmentLocations.stream()
           .map(
             sl ->
-              mapper.apply(sl, locationService.ensureResolvable(sl.location())))
+              mapper.apply(sl, locationMapper.toDAO(sl.location())))
           .toList());
     }
   }

@@ -1,14 +1,18 @@
 package org.dcsa.edocumentation.datafactories;
 
-import lombok.experimental.UtilityClass;
-import org.dcsa.skernel.domain.persistence.entity.Location;
-import org.dcsa.skernel.infrastructure.transferobject.LocationTO;
-import org.dcsa.skernel.infrastructure.transferobject.enums.FacilityCodeListProvider;
-
 import java.util.UUID;
+import lombok.experimental.UtilityClass;
+import org.dcsa.edocumentation.domain.persistence.entity.Location;
+import org.dcsa.edocumentation.transferobjects.LocationTO;
+import org.dcsa.skernel.infrastructure.transferobject.enums.FacilityCodeListProvider;
 
 @UtilityClass
 public class LocationDataFactory {
+
+  public static final String FACILITY_NAME = "PATRICK SYDNEY AUTOSTRAD TERMINAL";
+  public static final String FACILITY_UNLOCATION_CODE = "AUSYD";
+  public static final String FACILITY_SMDG_CODE = "ASLPB";
+
   public static LocationTO addressLocationTO() {
     return LocationTO.builder()
       .locationName("Asseco DK office")
@@ -21,7 +25,7 @@ public class LocationDataFactory {
       .locationName(FacilityDataFactory.NAME)
       .UNLocationCode(FacilityDataFactory.UNLOCATION_CODE)
       .facilityCode(FacilityDataFactory.SMDG_CODE)
-      .facilityCodeListProvider(FacilityCodeListProvider.SMDG)
+      .facilityCodeListProvider(FacilityCodeListProvider.SMDG.name())
       .build();
   }
 
@@ -61,10 +65,10 @@ public class LocationDataFactory {
 
   private static Location.LocationBuilder facilityLocationBuilder() {
     return Location.builder()
-      .locationName(FacilityDataFactory.NAME)
-      .UNLocationCode(FacilityDataFactory.UNLOCATION_CODE)
-      .facility(FacilityDataFactory.facility())
-      ;
+        .locationName(FACILITY_NAME)
+        .UNLocationCode(FACILITY_UNLOCATION_CODE)
+        .facilityCode(FACILITY_SMDG_CODE)
+        .facilityCodeListProvider(FacilityCodeListProvider.SMDG.name());
   }
 
   public static Location unLocationLocationWithoutId() {

@@ -1,8 +1,8 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.skernel.domain.persistence.entity.Address;
-import org.dcsa.skernel.infrastructure.transferobject.AddressTO;
+import org.dcsa.edocumentation.domain.persistence.entity.Address;
+import org.dcsa.edocumentation.transferobjects.AddressTO;
 
 import java.util.UUID;
 

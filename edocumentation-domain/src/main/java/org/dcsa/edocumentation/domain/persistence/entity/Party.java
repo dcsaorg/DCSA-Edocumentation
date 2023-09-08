@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import jakarta.validation.Valid;
 import lombok.*;
-import org.dcsa.skernel.domain.persistence.entity.Address;
 
 import jakarta.persistence.*;
 import java.util.Set;
@@ -34,17 +34,17 @@ public class Party {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY)
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "address_id")
   private Address address;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "party")
-  private Set<PartyContactDetails> partyContactDetails;
+  private Set<@Valid PartyContactDetails> partyContactDetails;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "party")
-  private Set<PartyIdentifyingCode> identifyingCodes;
+  private Set<@Valid PartyIdentifyingCode> identifyingCodes;
 }

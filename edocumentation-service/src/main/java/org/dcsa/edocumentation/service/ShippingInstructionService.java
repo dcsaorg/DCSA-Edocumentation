@@ -1,5 +1,8 @@
 package org.dcsa.edocumentation.service;
 
+import jakarta.transaction.Transactional;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
@@ -9,18 +12,12 @@ import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionTO;
-import org.dcsa.skernel.infrastructure.services.LocationService;
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ShippingInstructionService {
 
-  private final LocationService locationService;
   private final ShipmentEventRepository shipmentEventRepository;
   private final ShippingInstructionRepository shippingInstructionRepository;
   private final ShippingInstructionMapper shippingInstructionMapper;
@@ -64,7 +61,6 @@ public class ShippingInstructionService {
   private ShippingInstruction.ShippingInstructionBuilder toDAOBuilder(
       ShippingInstructionTO shippingInstructionTO) {
     return shippingInstructionMapper.toDAO(shippingInstructionTO).toBuilder()
-        .placeOfIssue(locationService.ensureResolvable(shippingInstructionTO.placeOfIssue()))
         .displayedNameForPlaceOfReceipt(
             displayedAddressMapper.toDAO(shippingInstructionTO.displayedNameForPlaceOfReceipt()))
         .displayedNameForPortOfLoad(

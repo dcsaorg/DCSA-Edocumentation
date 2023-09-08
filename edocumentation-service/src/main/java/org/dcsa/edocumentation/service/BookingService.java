@@ -1,5 +1,9 @@
 package org.dcsa.edocumentation.service;
 
+import jakarta.transaction.Transactional;
+import java.time.OffsetDateTime;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
@@ -8,18 +12,11 @@ import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventReposi
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
-import org.dcsa.skernel.infrastructure.services.LocationService;
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.time.OffsetDateTime;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class BookingService {
-  private final LocationService locationService;
   private final VoyageService voyageService;
   private final VesselService vesselService;
   private final CommodityService commodityService;
@@ -117,8 +114,6 @@ public class BookingService {
     return bookingMapper.toDAO(bookingRequest).toBuilder()
       .voyage(voyageService.resolveVoyage(bookingRequest))
       .vessel(vesselService.resolveVessel(bookingRequest))
-      .preCarriageUnderShippersResponsibility(bookingRequest.preCarriageUnderShippersResponsibility())
-      .placeOfIssue(locationService.ensureResolvable(bookingRequest.placeOfBLIssue()))
-      .invoicePayableAt(locationService.ensureResolvable(bookingRequest.invoicePayableAt()));
+      .preCarriageUnderShippersResponsibility(bookingRequest.preCarriageUnderShippersResponsibility());
   }
 }

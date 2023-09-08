@@ -1,7 +1,6 @@
 package org.dcsa.edocumentation.transferobjects;
 
 import lombok.Builder;
-import org.dcsa.skernel.infrastructure.transferobject.AddressTO;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;

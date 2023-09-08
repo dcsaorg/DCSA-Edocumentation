@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import java.time.LocalDate;
-import java.util.Collection;
+
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
@@ -9,8 +9,6 @@ import org.dcsa.edocumentation.transferobjects.TDTransportTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
 import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
-import org.dcsa.skernel.domain.persistence.entity.Location;
-import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel = "spring",
   config = EDocumentationMappingConfig.class,
   uses = {
+    AddressMapper.class,
     LocationMapper.class,
     DocumentPartyMapper.class,
     DisplayedAddressMapper.class,

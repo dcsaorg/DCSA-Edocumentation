@@ -5,8 +5,10 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportPlanStageCode;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.LocationSubType;
+import org.dcsa.edocumentation.domain.validations.LocationValidation;
 import org.dcsa.edocumentation.domain.validations.PseudoEnum;
-import org.dcsa.skernel.domain.persistence.entity.Location;
 
 @Data
 @Builder
@@ -34,12 +36,20 @@ public class ShipmentTransport {
   @Enumerated(EnumType.STRING)
   private TransportPlanStageCode transportPlanStageCode;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "load_location_id")
+  @LocationValidation(
+    allowedSubtypes = {LocationSubType.ADDR, LocationSubType.UNLO, LocationSubType.FACI},
+    groups = AsyncShipperProvidedDataValidation.class
+  )
   private Location loadLocation;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "discharge_location_id")
+  @LocationValidation(
+    allowedSubtypes = {LocationSubType.ADDR, LocationSubType.UNLO, LocationSubType.FACI},
+    groups = AsyncShipperProvidedDataValidation.class
+  )
   private Location dischargeLocation;
 
   @Column(name = "planned_departure_date")

@@ -10,7 +10,6 @@ import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
 import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
-import org.dcsa.skernel.domain.persistence.entity.Carrier;
 import org.springframework.stereotype.Service;
 
 @Service

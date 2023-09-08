@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.dcsa.skernel.domain.persistence.entity.Carrier;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

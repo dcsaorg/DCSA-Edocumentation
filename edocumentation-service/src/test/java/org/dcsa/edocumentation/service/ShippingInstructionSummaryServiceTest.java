@@ -9,7 +9,6 @@ import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionSummaryMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
-import org.dcsa.skernel.infrastructure.services.mapping.LocationMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

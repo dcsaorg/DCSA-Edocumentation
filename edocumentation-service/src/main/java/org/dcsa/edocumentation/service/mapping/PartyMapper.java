@@ -6,7 +6,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.PartyIdentifyingCode;
 import org.dcsa.edocumentation.transferobjects.PartyContactDetailsTO;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
 import org.dcsa.edocumentation.transferobjects.PartyTO;
-import org.dcsa.skernel.infrastructure.services.mapping.AddressMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -18,7 +17,6 @@ import org.mapstruct.Mapping;
     PartyIdentifyingCodeMapper.class,
   })
 public interface PartyMapper {
-  @Mapping(source = "address", target = "address", ignore = true)
   @Mapping(source = "partyContactDetails", target = "partyContactDetails", ignore = true)
   @Mapping(source = "identifyingCodes", target = "identifyingCodes", ignore = true)
   @Mapping(target = "id", ignore = true)

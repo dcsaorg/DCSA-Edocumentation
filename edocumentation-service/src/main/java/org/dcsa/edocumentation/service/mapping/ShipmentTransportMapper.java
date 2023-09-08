@@ -1,13 +1,14 @@
 package org.dcsa.edocumentation.service.mapping;
 
+import org.dcsa.edocumentation.domain.persistence.entity.Location;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentTransport;
+import org.dcsa.edocumentation.transferobjects.LocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
-import org.dcsa.skernel.domain.persistence.entity.Location;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
+@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class, uses = LocationMapper.class)
 public interface ShipmentTransportMapper {
 
   // Required to make the mapper use the argument rather than throwing it away
@@ -18,7 +19,7 @@ public interface ShipmentTransportMapper {
   @Mapping(target = "id", ignore = true)
   ShipmentTransport toDAO(TransportTO shipmentTransportTO,
                           Shipment shipment,
-                          Location loadLocation,
-                          Location dischargeLocation
+                          LocationTO loadLocation,
+                          LocationTO dischargeLocation
                           );
 }
