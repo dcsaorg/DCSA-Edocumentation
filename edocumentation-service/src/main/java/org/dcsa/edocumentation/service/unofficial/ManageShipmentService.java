@@ -6,6 +6,8 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
@@ -28,6 +30,7 @@ import org.dcsa.edocumentation.transferobjects.unofficial.EquipmentAssignmentTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.ManageShipmentRequestTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.ShipmentRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -96,7 +99,7 @@ public class ManageShipmentService {
         + shipmentRequestTO.carrierSMDGCode() + "\". Note the code may be valid but not loaded into this system.");
     }
     OffsetDateTime confirmationTime = OffsetDateTime.now();
-    ValidationResult<BkgDocumentStatus> validationResult = bookingValidationService.validateBooking(booking);
+    ValidationResult<BkgDocumentStatus> validationResult = bookingValidationService.validateBooking(booking, false);
 
     shipmentEventRepository.save(booking.confirm(confirmationTime));
 

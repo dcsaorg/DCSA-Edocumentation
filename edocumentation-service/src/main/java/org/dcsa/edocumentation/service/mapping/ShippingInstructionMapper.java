@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
     DisplayedAddressMapper.class,
     AddressMapper.class,
     CustomsReferenceMapper.class,
+    RequestedChangeMapper.class,
   })
 public abstract class ShippingInstructionMapper {
 

@@ -18,7 +18,6 @@ import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 import org.dcsa.skernel.infrastructure.validation.AtLeast;
 import org.dcsa.skernel.infrastructure.validation.DateRange;
 import org.dcsa.skernel.infrastructure.validation.RequiredIfTrue;
-import org.dcsa.skernel.infrastructure.validation.RestrictLocationTO;
 import org.dcsa.skernel.infrastructure.validation.UniversalServiceReference;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
@@ -48,6 +47,9 @@ public record BookingTO(
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   BkgDocumentStatus documentStatus,
+
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  List<RequestedChangeTO> requestedChanges,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   OffsetDateTime bookingRequestCreatedDateTime,

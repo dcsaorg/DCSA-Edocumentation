@@ -6,6 +6,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
 import org.dcsa.edocumentation.domain.persistence.entity.PartyIdentifyingCode;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSAResponsibleAgencyCode;
@@ -52,14 +53,8 @@ public abstract class AbstractDocumentPartyValidator<A extends Annotation> imple
         }
       };
       state.getContext().buildConstraintViolationWithTemplate(constraintMessage)
-        .addPropertyNode("documentParties")
+        .addPropertyNode("identifyingCodes")
         .addConstraintViolation();
-      if (epiCodes == 0) {
-        state.getContext()
-          .buildConstraintViolationWithTemplate("The document party with party function " + partyFunction + " had multiple EPI party codes, but it can have at most one.")
-          .addPropertyNode("documentParties")
-          .addConstraintViolation();
-      }
     }
   }
 }

@@ -23,6 +23,9 @@ public record ShippingInstructionSummaryTO(
   EblDocumentStatus documentStatus,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  List<RequestedChangeTO> requestedChanges,
+
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   @NotNull(message = "The attribute shippingInstructionCreatedDateTime is required.")
   OffsetDateTime shippingInstructionCreatedDateTime,

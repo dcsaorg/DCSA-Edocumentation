@@ -50,6 +50,7 @@ class BookingServiceTest {
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
 
+    @Spy private ShipmentLocationMapper shipmentLocationMapper = Mappers.getMapper(ShipmentLocationMapper.class);
     @Spy private PartyMapper partyMapper = Mappers.getMapper(PartyMapper.class);
 
     @Spy private DocumentPartyMapper documentPartyMapper = Mappers.getMapper(DocumentPartyMapper.class);
@@ -63,12 +64,14 @@ class BookingServiceTest {
       DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
       ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
       ReflectionTestUtils.setField(bookingMapper, "documentPartyMapper", documentPartyMapper);
+      ReflectionTestUtils.setField(bookingMapper, "shipmentLocationMapper", shipmentLocationMapper);
       ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
       ReflectionTestUtils.setField(documentPartyMapper, "displayedAddressMapper", displayedAddressMapper);
       ReflectionTestUtils.setField(documentPartyMapper, "partyMapper", partyMapper);
       ReflectionTestUtils.setField(partyMapper, "addressMapper", addressMapper);
       ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
+      ReflectionTestUtils.setField(shipmentLocationMapper, "locationMapper", locationMapper);
     }
 
     @Test
@@ -132,6 +135,7 @@ class BookingServiceTest {
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
+    @Spy private ReferenceMapper referenceMapper = Mappers.getMapper(ReferenceMapper.class);
 
     @InjectMocks private BookingService bookingService;
 
@@ -139,6 +143,7 @@ class BookingServiceTest {
     public void resetMocks() {
       ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
       ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
+      ReflectionTestUtils.setField(bookingMapper, "referenceMapper", referenceMapper);
       reset(voyageService, vesselService, commodityService,
         requestedEquipmentGroupService, referenceService, documentPartyService, shipmentLocationService,
         bookingRepository, shipmentEventRepository);
