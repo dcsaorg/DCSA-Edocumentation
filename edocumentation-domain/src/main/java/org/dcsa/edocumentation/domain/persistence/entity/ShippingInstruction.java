@@ -102,6 +102,13 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @Column(name = "document_status")
   private EblDocumentStatus documentStatus;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipping_instruction_id", referencedColumnName = "id", nullable = false)
+  @OrderColumn(name = "element_order")
+  private List<ShippingInstructionRequestedChange> requestedChanges;
+
   @Column(name = "created_date_time")
   private OffsetDateTime shippingInstructionCreatedDateTime;
 
@@ -237,13 +244,17 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     if (!CAN_BE_VALIDATED.contains(documentStatus)) {
       throw new IllegalStateException("documentStatus must be one of " + CAN_BE_VALIDATED);
     }
+    if (this.requestedChanges == null) {
+      this.requestedChanges = new ArrayList<>();
+    }
+    clearRequestedChanges();
     Class<?>[] validations = {
       AsyncShipperProvidedDataValidation.class,
       (this.isElectronic == Boolean.TRUE ? EBLValidation.class : PaperBLValidation.class),
     };
-
     for (var violation : validator.validate(this, validations)) {
       validationErrors.add(violation.getPropertyPath().toString() + ": " +  violation.getMessage());
+      this.requestedChanges.add(ShippingInstructionRequestedChange.fromConstraintViolation(violation));
     }
 
     var proposedStatus = validationErrors.isEmpty()
@@ -254,9 +265,17 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
 
+  private void clearRequestedChanges() {
+    if (this.requestedChanges != null && !this.requestedChanges.isEmpty()) {
+      this.requestedChanges.clear();
+    }
+  }
+
+
+
   /** Transition the document into its {@link EblDocumentStatus#RECE} state. */
   public ShipmentEvent receive() {
-    return processTransition(RECE, null);
+    return processTransition(RECE, null, true);
   }
 
   /**
@@ -266,7 +285,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    * flow.
    */
   public ShipmentEvent pendingUpdate(String reason) {
-    return processTransition(PENU, reason);
+    return processTransition(PENU, reason, false);
   }
 
   /**
@@ -286,7 +305,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    * <p>This state is only reachable in the Amendment flow.
    */
   public ShipmentEvent rejected(String reason) {
-    return processTransition(REJE, reason);
+    return processTransition(REJE, reason, false);
   }
 
   public void lockVersion(OffsetDateTime lockTime) {
@@ -329,22 +348,24 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return super.supportsState(state);
   }
 
-  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason) {
-    return processTransition(status, reason, this::shipmentEventSHIBuilder);
+  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, boolean clearRequestedChanges) {
+    return processTransition(status, reason, clearRequestedChanges, this::shipmentEventSHIBuilder);
   }
 
   protected <C extends ShipmentEvent, B extends ShipmentEvent.ShipmentEventBuilder<C, B>> ShipmentEvent processTransition(
     EblDocumentStatus status,
     String reason,
+    boolean clearRequestedChanges,
     Function<OffsetDateTime, ShipmentEvent.ShipmentEventBuilder<C, B>> eventBuilder
   ) {
-    return processTransition(status, reason, OffsetDateTime.now(), eventBuilder);
+    return processTransition(status, reason, OffsetDateTime.now(), clearRequestedChanges, eventBuilder);
   }
 
   protected <C extends ShipmentEvent, B extends ShipmentEvent.ShipmentEventBuilder<C, B>> ShipmentEvent processTransition(
       EblDocumentStatus status,
       String reason,
       OffsetDateTime updateTime,
+      boolean clearRequestedChanges,
       Function<OffsetDateTime, ShipmentEvent.ShipmentEventBuilder<C, B>> eventBuilder
       ) {
     if (validUntil != null) {
@@ -362,6 +383,9 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     }
     if (shippingInstructionReference == null) {
       shippingInstructionReference = UUID.randomUUID().toString();
+    }
+    if (clearRequestedChanges) {
+      clearRequestedChanges();
     }
     return eventBuilder.apply(updateTime)
         .shipmentEventTypeCode(status.asShipmentEventTypeCode())

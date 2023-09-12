@@ -338,6 +338,23 @@ ALTER TABLE shipping_instruction
     ADD FOREIGN KEY (amendment_to_transport_document_id) REFERENCES transport_document (id);
 
 
+CREATE TABLE bkg_requested_change (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    path varchar(500) NULL,
+    message varchar(500) NOT NULL,
+    booking_id uuid REFERENCES booking (id),
+    element_order int NOT NULL default 0
+);
+
+
+CREATE TABLE si_requested_change (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    path varchar(500) NULL,
+    message varchar(500) NOT NULL,
+    shipping_instruction_id uuid REFERENCES shipping_instruction (id),
+    element_order int NOT NULL default 0
+);
+
 CREATE TABLE carrier_clauses (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     clause_content text NOT NULL
@@ -349,7 +366,6 @@ CREATE TABLE shipment_carrier_clauses (
     shipment_id uuid NULL REFERENCES shipment (id),
     transport_document_id uuid NULL REFERENCES transport_document (id)
 );
-
 
 CREATE TABLE document_party (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -522,8 +538,7 @@ CREATE TABLE shipment_location (
     booking_id uuid NULL REFERENCES booking(id),
     location_id uuid NOT NULL REFERENCES location (id),
     shipment_location_type_code varchar(3) NOT NULL,
-    event_date_time timestamp with time zone NULL, --optional datetime indicating when the event at the location takes place
-    UNIQUE (location_id, shipment_location_type_code, shipment_id)
+    event_date_time timestamp with time zone NULL --optional datetime indicating when the event at the location takes place
 );
 
 -- Supporting FK constraints

@@ -18,6 +18,9 @@ public record ShippingInstructionTO(
   EblDocumentStatus documentStatus,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  List<RequestedChangeTO> requestedChanges,
+
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   OffsetDateTime shippingInstructionCreatedDateTime,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)

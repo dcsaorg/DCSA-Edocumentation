@@ -227,7 +227,7 @@ public class TransportDocument implements Persistable<UUID> {
   }
 
   protected ShipmentEvent processTransition(EblDocumentStatus status, String reason) {
-    return shippingInstruction.processTransition(status, reason, this::shipmentEventTRDBuilder);
+    return shippingInstruction.processTransition(status, reason, true, this::shipmentEventTRDBuilder);
   }
 
   protected ShipmentEvent.ShipmentEventBuilder<?, ?> shipmentEventTRDBuilder(OffsetDateTime updateTime) {

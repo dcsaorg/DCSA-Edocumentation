@@ -63,7 +63,6 @@ public class BookingService {
       .bookingRequestCreatedDateTime(existingBooking.getBookingRequestCreatedDateTime())
       .build();
 
-    // TODO: If we get "soft validation", we would have to conditionally call pendingUpdate here
     ShipmentEvent updateEvent = updatedBooking.pendingConfirmation(null, updateTime);
     // We have to flush the existing booking. Otherwise, JPA might be tempted to re-order that
     // write/save until after the updatedBooking is saved (which triggers the unique constraint

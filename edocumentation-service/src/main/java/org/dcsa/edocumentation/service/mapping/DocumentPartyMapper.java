@@ -2,7 +2,6 @@ package org.dcsa.edocumentation.service.mapping;
 
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
-import org.dcsa.skernel.infrastructure.services.mapping.AddressMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
