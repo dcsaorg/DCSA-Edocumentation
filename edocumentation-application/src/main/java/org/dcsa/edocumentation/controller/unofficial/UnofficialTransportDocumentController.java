@@ -47,8 +47,7 @@ public class UnofficialTransportDocumentController {
 
     return service.changeState(
         transportDocumentReference,
-        changeEBLDocumentStatusRequestTO.documentStatus(),
-        changeEBLDocumentStatusRequestTO.reason()
+        changeEBLDocumentStatusRequestTO.documentStatus()
       ).orElseThrow(() ->
         ConcreteRequestErrorMessageException.notFound(
           "No transport document with transportDocumentReference: "

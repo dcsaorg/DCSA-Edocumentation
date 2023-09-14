@@ -9,6 +9,8 @@ import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValida
 import org.dcsa.edocumentation.domain.validations.LocationSubType;
 import org.dcsa.edocumentation.domain.validations.LocationValidation;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
 
 import jakarta.persistence.*;
@@ -78,11 +80,13 @@ public class TransportDocument implements Persistable<UUID> {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   @Column(name = "created_date_time")
+  @CreatedDate
   protected OffsetDateTime transportDocumentCreatedDateTime;
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   @Column(name = "updated_date_time")
+  @LastModifiedDate
   protected OffsetDateTime transportDocumentUpdatedDateTime;
 
   @Column(name = "issue_date")
@@ -141,8 +145,8 @@ public class TransportDocument implements Persistable<UUID> {
 
 
   /** Transition the document into its {@link EblDocumentStatus#DRFT} state. */
-  public ShipmentEvent draft() {
-    return processTransition(DRFT, null);
+  public void draft() {
+    processTransition(DRFT);
   }
 
 
@@ -152,15 +156,15 @@ public class TransportDocument implements Persistable<UUID> {
    * <p>This state is not supported in all EBL flows. E.g., it is not reachable in the Amendment
    * flow.
    */
-  public ShipmentEvent pendingApproval(String reason) {
-    return processTransition(PENA, reason);
+  public void pendingApproval() {
+    processTransition(PENA);
   }
 
   /**
    * Check whether the flow supports the {@link EblDocumentStatus#PENA} state.
    *
    * <p>This state is not supported in all EBL flows. This will return false when the EBL flow does
-   * not support this state at all. I.e., calling {@link #pendingApproval(String)} will trigger an
+   * not support this state at all. I.e., calling {@link #pendingApproval()} will trigger an
    * exception causing an internal server error status.
    */
   public boolean isPendingApprovalSupported() {
@@ -168,25 +172,25 @@ public class TransportDocument implements Persistable<UUID> {
   }
 
   /** Transition the document into its {@link EblDocumentStatus#APPR} state. */
-  public ShipmentEvent approveFromShipper() {
+  public void approveFromShipper() {
     if (this.shippingInstruction.getCurrentState() != DRFT) {
       throw ConcreteRequestErrorMessageException.conflict("Cannot approveFromShipper: The TransportDocument is not in the DRFT state", null);
     }
-    return processTransition(APPR, null);
+    processTransition(APPR);
   }
 
 
   /** Transition the document into its {@link EblDocumentStatus#APPR} state. */
-  public ShipmentEvent approveFromCarrier() {
+  public void approveFromCarrier() {
     if (this.shippingInstruction.getCurrentState() != PENA) {
       throw ConcreteRequestErrorMessageException.conflict("Cannot approveFromCarrier: The TransportDocument is not in the PENA state", null);
     }
-    return processTransition(APPR, null);
+    processTransition(APPR);
   }
 
   /** Transition the document into its {@link EblDocumentStatus#ISSU} state. */
-  public ShipmentEvent issue() {
-    return issue(null, null);
+  public void issue() {
+    issue(null, null);
   }
 
   /** Transition the document into its {@link EblDocumentStatus#ISSU} state.
@@ -197,8 +201,8 @@ public class TransportDocument implements Persistable<UUID> {
    *                     the type of B/L being issued. If null, keep the original value (if present) or
    *                     use LocalDate.now() (if the original value was absent).
    */
-  public ShipmentEvent issue(LocalDate issueDate, LocalDate shipmentDate) {
-    ShipmentEvent event = processTransition(ISSU, null);
+  public void issue(LocalDate issueDate, LocalDate shipmentDate) {
+    processTransition(ISSU);
 
     if (shippingInstruction.getIsShippedOnBoardType() == Boolean.TRUE) {
       if (shipmentDate != null || this.shippedOnBoardDate == null) {
@@ -211,30 +215,21 @@ public class TransportDocument implements Persistable<UUID> {
     }
 
     this.issueDate = Objects.requireNonNullElseGet(issueDate, LocalDate::now);
-
-    return event;
   }
 
   /** Transition the document into its {@link EblDocumentStatus#SURR} state. */
-  public ShipmentEvent surrender() {
-    return processTransition(SURR, null);
+  public void surrender() {
+    processTransition(SURR);
   }
 
   /** Transition the document into its {@link EblDocumentStatus#VOID} state. */
   // "void" is a keyword and cannot be used as a method name.
-  public ShipmentEvent voidDocument() {
-    return processTransition(VOID, null);
+  public void voidDocument() {
+    processTransition(VOID);
   }
 
-  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason) {
-    return shippingInstruction.processTransition(status, reason, true, this::shipmentEventTRDBuilder);
-  }
-
-  protected ShipmentEvent.ShipmentEventBuilder<?, ?> shipmentEventTRDBuilder(OffsetDateTime updateTime) {
-    this.transportDocumentUpdatedDateTime = updateTime;
-    if (this.transportDocumentCreatedDateTime == null) {
-      this.transportDocumentCreatedDateTime = updateTime;
-    }
+  protected void processTransition(EblDocumentStatus status) {
+    shippingInstruction.processTransition(status, true);
     if (id == null) {
       id = UUID.randomUUID();
       isNew = true;
@@ -242,10 +237,11 @@ public class TransportDocument implements Persistable<UUID> {
     if (transportDocumentReference == null) {
       transportDocumentReference = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
     }
-    return ShipmentEvent.builder()
-      .documentID(id)
-      .documentReference(transportDocumentReference)
-      .documentTypeCode(DocumentTypeCode.TRD);
+    OffsetDateTime updateTime = OffsetDateTime.now();
+    this.transportDocumentUpdatedDateTime = updateTime;
+    if (this.transportDocumentCreatedDateTime == null) {
+      this.transportDocumentCreatedDateTime = updateTime;
+    }
   }
 
 }

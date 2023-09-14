@@ -38,7 +38,6 @@ import org.springframework.stereotype.Service;
 public class ManageShipmentService {
   private final ShipmentRepository shipmentRepository;
   private final BookingRepository bookingRepository;
-  private final ShipmentEventRepository shipmentEventRepository;
   private final ShipmentMapper shipmentMapper;
   private final CarrierRepository carrierRepository;
   private final EquipmentAssignmentMapper equipmentAssignmentMapper;
@@ -101,7 +100,7 @@ public class ManageShipmentService {
     OffsetDateTime confirmationTime = OffsetDateTime.now();
     ValidationResult<BkgDocumentStatus> validationResult = bookingValidationService.validateBooking(booking, false);
 
-    shipmentEventRepository.save(booking.confirm(confirmationTime));
+    booking.confirm(confirmationTime);
 
     // FIXME: Check if the shipment (CBR) already exists and then attempt to reconfirm it if possible rather than
     //  die with a 409 Conflict (or create a duplicate or whatever happens). Probably just set "valid_until = now()"
