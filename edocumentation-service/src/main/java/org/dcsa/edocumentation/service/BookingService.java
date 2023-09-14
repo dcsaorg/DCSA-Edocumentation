@@ -6,9 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
@@ -25,7 +23,6 @@ public class BookingService {
   private final ShipmentLocationService shipmentLocationService;
 
   private final BookingRepository bookingRepository;
-  private final ShipmentEventRepository shipmentEventRepository;
 
   private final BookingMapper bookingMapper;
 
@@ -40,7 +37,7 @@ public class BookingService {
   public BookingRefStatusTO createBooking(BookingTO bookingRequest) {
     Booking booking = toDAOBuilder(bookingRequest).build();
 
-    shipmentEventRepository.save(booking.receive());
+    booking.receive();
     booking = saveBooking(booking, bookingRequest);
 
     return bookingMapper.toStatusDTO(booking);
@@ -63,13 +60,12 @@ public class BookingService {
       .bookingRequestCreatedDateTime(existingBooking.getBookingRequestCreatedDateTime())
       .build();
 
-    ShipmentEvent updateEvent = updatedBooking.pendingConfirmation(null, updateTime);
+    updatedBooking.pendingConfirmation(null, updateTime);
     // We have to flush the existing booking. Otherwise, JPA might be tempted to re-order that
     // write/save until after the updatedBooking is saved (which triggers the unique constraint
     // in the database).
     bookingRepository.saveAndFlush(existingBooking);
     updatedBooking = saveBooking(updatedBooking, bookingRequest);
-    shipmentEventRepository.save(updateEvent);
 
     // A couple of fail-safe checks that should be unnecessary unless we introduce bugs.
     assert existingBooking.getValidUntil() != null;
@@ -97,9 +93,8 @@ public class BookingService {
     }
     OffsetDateTime updateTime = OffsetDateTime.now();
     // This works because we do not need to support versioning/rollback
-    ShipmentEvent event = booking.cancel(reason, updateTime);
+    booking.cancel(reason, updateTime);
     booking = bookingRepository.save(booking);
-    shipmentEventRepository.save(event);
     return Optional.of(bookingMapper.toStatusDTO(booking));
   }
 

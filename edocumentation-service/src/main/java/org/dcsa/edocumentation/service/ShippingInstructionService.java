@@ -6,7 +6,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
-import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ShippingInstructionService {
 
-  private final ShipmentEventRepository shipmentEventRepository;
   private final ShippingInstructionRepository shippingInstructionRepository;
   private final ShippingInstructionMapper shippingInstructionMapper;
   private final DocumentPartyService documentPartyService;
@@ -39,7 +37,7 @@ public class ShippingInstructionService {
       ShippingInstructionTO shippingInstructionTO) {
 
     ShippingInstruction shippingInstruction = toDAOBuilder(shippingInstructionTO).build();
-    shipmentEventRepository.save(shippingInstruction.receive());
+    shippingInstruction.receive();
 
     ShippingInstruction updatedShippingInstruction =
         shippingInstructionRepository.save(shippingInstruction);

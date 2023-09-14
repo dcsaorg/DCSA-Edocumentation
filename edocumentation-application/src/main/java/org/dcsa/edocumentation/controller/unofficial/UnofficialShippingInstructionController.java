@@ -32,8 +32,7 @@ public class UnofficialShippingInstructionController {
     ChangeEBLDocumentStatusRequestTO changeEBLDocumentStatusRequestTO) {
 
     return service.changeState(shippingInstructionReference,
-        changeEBLDocumentStatusRequestTO.documentStatus(),
-        changeEBLDocumentStatusRequestTO.reason())
+        changeEBLDocumentStatusRequestTO.documentStatus())
       .orElseThrow(() ->
         ConcreteRequestErrorMessageException.notFound(
           "No shipping instruction found with shippingInstructionReference: "

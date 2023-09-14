@@ -1,16 +1,14 @@
 package org.dcsa.edocumentation.service.unofficial;
 
 import jakarta.transaction.Transactional;
-import java.time.OffsetDateTime;
-
 import jakarta.validation.Validator;
+import java.time.OffsetDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BookingValidationService {
   private final BookingRepository bookingRepository;
-  private final ShipmentEventRepository shipmentEventRepository;
   private final BookingMapper bookingMapper;
   @Qualifier("eagerValidator")
   private final Validator validator;
@@ -53,16 +50,14 @@ public class BookingValidationService {
     if (validationResult.validationErrors().isEmpty()) {
       log.debug("Booking {} passed validation", carrierBookingRequestReference);
       if (persistOnPENC) {
-        var shipmentEvent = booking.pendingConfirmation("Booking passed validation", OffsetDateTime.now());
+        booking.pendingConfirmation("Booking passed validation", OffsetDateTime.now());
         bookingRepository.save(booking);
-        shipmentEventRepository.save(shipmentEvent);
       }
     } else {
       String reason = validationResult.presentErrors(5000);
-      var shipmentEvent = booking.pendingUpdate(reason, OffsetDateTime.now());
+      booking.pendingUpdate(reason, OffsetDateTime.now());
       log.debug("Booking {} failed validation because {}", carrierBookingRequestReference, reason);
       bookingRepository.save(booking);
-      shipmentEventRepository.save(shipmentEvent);
     }
     return validationResult;
   }

@@ -301,50 +301,50 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#RECE} state.
    */
-  public ShipmentEvent receive() {
-    return processTransition(RECE, null, false);
+  public void receive() {
+    processTransition(RECE, null, false);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#CANC} state.
    */
-  public ShipmentEvent cancel(String reason, OffsetDateTime updateTime) {
-    return processTransition(CANC, reason, updateTime, false);
+  public void cancel(String reason, OffsetDateTime updateTime) {
+    processTransition(CANC, reason, updateTime, false);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#REJE} state.
    */
-  public ShipmentEvent reject(String reason) {
-    return processTransition(REJE, reason, false);
+  public void reject(String reason) {
+    processTransition(REJE, reason, false);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENU} state.
    */
-  public ShipmentEvent pendingUpdate(String reason, OffsetDateTime updateTime) {
-    return processTransition(PENU, reason, updateTime, false);
+  public void pendingUpdate(String reason, OffsetDateTime updateTime) {
+    processTransition(PENU, reason, updateTime, false);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  public ShipmentEvent pendingConfirmation(String reason, OffsetDateTime updateTime) {
-    return processTransition(PENC, reason, updateTime, true);
+  public void pendingConfirmation(String reason, OffsetDateTime updateTime) {
+    processTransition(PENC, reason, updateTime, true);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  public ShipmentEvent confirm(OffsetDateTime confirmationTime) {
-    return processTransition(CONF, null, confirmationTime, true);
+  public void confirm(OffsetDateTime confirmationTime) {
+    processTransition(CONF, null, confirmationTime, true);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#CMPL} state.
    */
-  public ShipmentEvent complete() {
-    return processTransition(CMPL, null, true);
+  public void complete() {
+    processTransition(CMPL, null, true);
   }
 
   public void lockVersion(OffsetDateTime lockTime) {
@@ -364,11 +364,11 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
     return this.documentStatus;
   }
 
-  protected ShipmentEvent processTransition(BkgDocumentStatus status, String reason, boolean clearRequestedChanges) {
-    return processTransition(status, reason, OffsetDateTime.now(), clearRequestedChanges);
+  protected void processTransition(BkgDocumentStatus status, String reason, boolean clearRequestedChanges) {
+    processTransition(status, reason, OffsetDateTime.now(), clearRequestedChanges);
   }
 
-  protected ShipmentEvent processTransition(BkgDocumentStatus status, String reason, OffsetDateTime updateTime, boolean clearRequestedChanges) {
+  protected void processTransition(BkgDocumentStatus status, String reason, OffsetDateTime updateTime, boolean clearRequestedChanges) {
     if (this.validUntil != null) {
       throw new IllegalStateException("Cannot change state on a frozen version!");
     }
@@ -388,16 +388,6 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
     if (clearRequestedChanges) {
       this.clearRequestedChanges();
     }
-    return ShipmentEvent.builder()
-      .documentID(id)
-      .documentReference(carrierBookingRequestReference)
-      .documentTypeCode(DocumentTypeCode.CBR)
-      .shipmentEventTypeCode(status.asShipmentEventTypeCode())
-      .reason(reason)
-      .eventClassifierCode(EventClassifierCode.ACT)
-      .eventDateTime(updateTime)
-      .eventCreatedDateTime(updateTime)
-      .build();
   }
 
   @Override
