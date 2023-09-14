@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dd2e357d-6c31-488a-9711-49e4238cfb7b",
+		"_postman_id": "e5207a28-85a4-4459-a94f-d081adff6dea",
 		"name": "DCSA-EDocumentation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1686,57 +1686,6 @@
 									"response": []
 								},
 								{
-									"name": "Verify shipment events after POST",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 1 item', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(1);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Event contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Trigger validation",
 									"event": [
 										{
@@ -1765,64 +1714,6 @@
 												"bookings",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Verify shipment events after validation",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.collectionVariables.unset(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 2 items', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(2);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Events contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"\r",
-													"    pm.expect(jsonData[1].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[1].shipmentEventTypeCode).to.eql(\"PENC\");\r",
-													"    pm.expect(jsonData[1].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[1].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
 											]
 										}
 									},
@@ -1959,57 +1850,6 @@
 									"response": []
 								},
 								{
-									"name": "Verify shipment events after POST",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 1 item', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(1);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Event contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Trigger validation",
 									"event": [
 										{
@@ -2038,64 +1878,6 @@
 												"bookings",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Verify shipment events after validation",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.collectionVariables.unset(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 2 items', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(2);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Events contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"\r",
-													"    pm.expect(jsonData[1].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[1].shipmentEventTypeCode).to.eql(\"PENU\");\r",
-													"    pm.expect(jsonData[1].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[1].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
 											]
 										}
 									},
@@ -2207,57 +1989,6 @@
 									"response": []
 								},
 								{
-									"name": "Verify shipment events after POST",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 1 item', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(1);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Event contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Trigger validation",
 									"event": [
 										{
@@ -2292,64 +2023,6 @@
 												"bookings",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Verify shipment events after validation",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.collectionVariables.unset(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 2 items', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(2);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Events contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"\r",
-													"    pm.expect(jsonData[1].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[1].shipmentEventTypeCode).to.eql(\"PENU\");\r",
-													"    pm.expect(jsonData[1].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[1].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
 											]
 										}
 									},
@@ -2459,57 +2132,6 @@
 									"response": []
 								},
 								{
-									"name": "Verify shipment events after POST",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 1 item', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(1);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Event contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Trigger validation",
 									"event": [
 										{
@@ -2544,64 +2166,6 @@
 												"bookings",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Verify shipment events after validation",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.collectionVariables.unset(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 2 items', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(2);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Events contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"\r",
-													"    pm.expect(jsonData[1].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[1].shipmentEventTypeCode).to.eql(\"PENU\");\r",
-													"    pm.expect(jsonData[1].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[1].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
 											]
 										}
 									},
@@ -2712,57 +2276,6 @@
 									"response": []
 								},
 								{
-									"name": "Verify shipment events after POST",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 1 item', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(1);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Event contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Trigger validation",
 									"event": [
 										{
@@ -2797,64 +2310,6 @@
 												"bookings",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Verify shipment events after validation",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.collectionVariables.unset(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 2 items', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(2);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Events contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"\r",
-													"    pm.expect(jsonData[1].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[1].shipmentEventTypeCode).to.eql(\"PENU\");\r",
-													"    pm.expect(jsonData[1].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[1].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
 											]
 										}
 									},
@@ -2964,57 +2419,6 @@
 									"response": []
 								},
 								{
-									"name": "Verify shipment events after POST",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 1 item', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(1);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Event contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Trigger validation",
 									"event": [
 										{
@@ -3049,64 +2453,6 @@
 												"bookings",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Verify shipment events after validation",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.collectionVariables.unset(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 2 items', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(2);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Events contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"\r",
-													"    pm.expect(jsonData[1].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[1].shipmentEventTypeCode).to.eql(\"PENU\");\r",
-													"    pm.expect(jsonData[1].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[1].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
 											]
 										}
 									},
@@ -3356,62 +2702,6 @@
 											"path": [
 												"bookings",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Verify shipment events after PUT",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"const carrierBookingRequestReference = pm.collectionVariables.get(\"CARRIER_BOOKING_REQUEST_REFERENCE\");\r",
-													"\r",
-													"pm.test(\"Status code is 200\", () => {\r",
-													"    pm.response.to.have.status(200);\r",
-													"});\r",
-													"pm.test('Body contains 2 items', () => {\r",
-													"    pm.expect(pm.response.json().length).to.eql(2);\r",
-													"});\r",
-													"\r",
-													"pm.test(\"Event contains correct values\", () => {\r",
-													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData[0].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[0].shipmentEventTypeCode).to.eql(\"RECE\");\r",
-													"    pm.expect(jsonData[0].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[0].eventClassifierCode).to.eql(\"ACT\");\r",
-													"\r",
-													"    pm.expect(jsonData[1].documentReference).to.eql(carrierBookingRequestReference);\r",
-													"    pm.expect(jsonData[1].shipmentEventTypeCode).to.eql(\"PENC\");\r",
-													"    pm.expect(jsonData[1].documentTypeCode).to.eql(\"CBR\");\r",
-													"    pm.expect(jsonData[1].eventClassifierCode).to.eql(\"ACT\");\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipment-events?documentReference={{CARRIER_BOOKING_REQUEST_REFERENCE}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipment-events"
-											],
-											"query": [
-												{
-													"key": "documentReference",
-													"value": "{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
-												}
 											]
 										}
 									},

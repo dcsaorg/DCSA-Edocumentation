@@ -274,8 +274,8 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
 
   /** Transition the document into its {@link EblDocumentStatus#RECE} state. */
-  public ShipmentEvent receive() {
-    return processTransition(RECE, null, true);
+  public void receive() {
+    processTransition(RECE, true);
   }
 
   /**
@@ -284,15 +284,15 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    * <p>This state is not supported in all EBL flows. E.g., it is not reachable in the Amendment
    * flow.
    */
-  public ShipmentEvent pendingUpdate(String reason) {
-    return processTransition(PENU, reason, false);
+  public void pendingUpdate() {
+    processTransition(PENU, false);
   }
 
   /**
    * Check whether the flow supports the {@link EblDocumentStatus#PENU} state.
    *
    * <p>This state is not supported in all EBL flows. This will return false when the EBL flow does
-   * not support this state at all. I.e., calling {@link #pendingUpdate(String)} will trigger an
+   * not support this state at all. I.e., calling {@link #pendingUpdate()} will trigger an
    * exception causing an internal server error status.
    */
   public boolean isPendingUpdateSupported() {
@@ -304,8 +304,17 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
    *
    * <p>This state is only reachable in the Amendment flow.
    */
-  public ShipmentEvent rejected(String reason) {
-    return processTransition(REJE, reason, false);
+  public void rejected(String reason) {
+    processTransition(REJE, false);
+    this.clearRequestedChanges();
+    this.addRequestedChanges(ShippingInstructionRequestedChange.builder().message(reason).build());
+  }
+
+  private void addRequestedChanges(ShippingInstructionRequestedChange change) {
+    if (this.requestedChanges == null) {
+      this.requestedChanges = new ArrayList<>();
+    }
+    this.requestedChanges.add(change);
   }
 
   public void lockVersion(OffsetDateTime lockTime) {
@@ -348,25 +357,17 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return super.supportsState(state);
   }
 
-  protected ShipmentEvent processTransition(EblDocumentStatus status, String reason, boolean clearRequestedChanges) {
-    return processTransition(status, reason, clearRequestedChanges, this::shipmentEventSHIBuilder);
-  }
-
-  protected <C extends ShipmentEvent, B extends ShipmentEvent.ShipmentEventBuilder<C, B>> ShipmentEvent processTransition(
+  protected void processTransition(
     EblDocumentStatus status,
-    String reason,
-    boolean clearRequestedChanges,
-    Function<OffsetDateTime, ShipmentEvent.ShipmentEventBuilder<C, B>> eventBuilder
+    boolean clearRequestedChanges
   ) {
-    return processTransition(status, reason, OffsetDateTime.now(), clearRequestedChanges, eventBuilder);
+    processTransition(status, OffsetDateTime.now(), clearRequestedChanges);
   }
 
-  protected <C extends ShipmentEvent, B extends ShipmentEvent.ShipmentEventBuilder<C, B>> ShipmentEvent processTransition(
+  protected void processTransition(
       EblDocumentStatus status,
-      String reason,
       OffsetDateTime updateTime,
-      boolean clearRequestedChanges,
-      Function<OffsetDateTime, ShipmentEvent.ShipmentEventBuilder<C, B>> eventBuilder
+      boolean clearRequestedChanges
       ) {
     if (validUntil != null) {
       throw ConcreteRequestErrorMessageException.conflict("Cannot change state of locked document (the SI is locked)", null);
@@ -387,13 +388,6 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     if (clearRequestedChanges) {
       clearRequestedChanges();
     }
-    return eventBuilder.apply(updateTime)
-        .shipmentEventTypeCode(status.asShipmentEventTypeCode())
-        .reason(reason)
-        .eventClassifierCode(EventClassifierCode.ACT)
-        .eventDateTime(updateTime)
-        .eventCreatedDateTime(updateTime)
-        .build();
   }
 
   protected ShipmentEvent.ShipmentEventBuilder<?, ?> shipmentEventSHIBuilder(OffsetDateTime updateTime) {
