@@ -29,6 +29,8 @@ class TransportDocumentServiceTest {
     Mappers.getMapper(AddressMapper.class);
   LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
 
+  EnumMapper enumMapper = Mappers.getMapper(EnumMapper.class);
+
   @Mock ConsignmentItemMapper consignmentItemMapper;
 
   @Mock DisplayedAddressMapper displayedAddressMapper;
@@ -45,6 +47,7 @@ class TransportDocumentServiceTest {
     ReflectionTestUtils.setField(transportDocumentMapper, "addressMapper", addressMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "locationMapper", locationMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "locMapper", locationMapper);
+    ReflectionTestUtils.setField(transportDocumentMapper, "eMapper", enumMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "consignmentItemMapper", consignmentItemMapper);
     ReflectionTestUtils.setField(transportDocumentMapper, "displayedAddressMapper", displayedAddressMapper);
   }
