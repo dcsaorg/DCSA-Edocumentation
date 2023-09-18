@@ -14,7 +14,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          path: DCSA-Edocumentation
           submodules: recursive
 
       - name: Set up Java JDK
@@ -31,10 +30,10 @@ jobs:
           servers: '[{ "id": "github", "username": "${{ secrets.DCSA_USER }}", "password": "${{ secrets.DCSA_PACKAGES_PAT }}" }]'
 
       - name: Build Edocumentation
-        run: cd DCSA-Edocumentation && mvn clean -U -B package -Ddcsa.artifacttype=-SNAPSHOT
+        run: mvn clean -U -B package -Ddcsa.artifacttype=-SNAPSHOT
 
       - name: Build and run the microservices
-        run: cd DCSA-Edocumentation && docker-compose -f docker-compose.yml --env-file=.github/.env up -d -V --build
+        run: docker-compose -f docker-compose.yml --env-file=.github/.env up -d -V --build
 
       - name: Fetch Backend Status
         run: |
@@ -57,7 +56,7 @@ jobs:
             exit 1
           fi
 
-          echo "::set-output name=STATUS::$status"
+          echo STATUS="$status" >> $GITHUB_OUTPUT
         id: healthcheck
 
       - name: Confirm microservice status
@@ -69,12 +68,21 @@ jobs:
         run: npm install -g newman newman-reporter-htmlextra
 
       - name: Run Postman Integration Tests
-        run: newman run ./DCSA-Edocumentation/postman_collection.json --insecure --reporters=cli,htmlextra --reporter-htmlextra-export ./DCSA-Edocumentation/newman/report.html
+        run: newman run ./postman_collection.json --insecure --reporters=cli,junit,htmlextra --reporter-junit-export ./newman/TEST-newman-report.xml --reporter-htmlextra-export ./newman/report.html
 
       - name: Output summary to console
         run: echo ${{ steps.run-newman.outputs.summary }}
 
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: JUnit + Newman Tests
+          path: '**/TEST-*.xml'
+          reporter: java-junit
+
       - uses: actions/upload-artifact@v3
+        if: success() || failure()
         with:
           name: test-report
-          path: DCSA-Edocumentation/newman/report.html
+          path: newman/report.html
