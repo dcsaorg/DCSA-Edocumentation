@@ -189,6 +189,7 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @Column(name = "is_equipment_substitution_allowed")
   private Boolean isEquipmentSubstitutionAllowed;
 
+  @PseudoEnum(value = "currencycodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   @Column(name = "declared_value_currency_code", length = 3)
   private String declaredValueCurrency;
 
