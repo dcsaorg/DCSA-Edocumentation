@@ -1,15 +1,12 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
-
 import jakarta.persistence.*;
-import lombok.experimental.SuperBuilder;
+import java.util.UUID;
+import lombok.*;
 import org.dcsa.edocumentation.domain.validations.*;
 
-import java.util.UUID;
-
 @Data
-@SuperBuilder(toBuilder = true)
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
