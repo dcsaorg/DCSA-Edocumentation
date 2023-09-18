@@ -48,3 +48,26 @@ The tests may be useful to others as a starting point, but you may need to edit 
 your specific test data.
 
 The tests can either be imported in to postman or run via newman `newman run postman_collection.json`.
+
+## DEVELOPMENT FLOW
+
+`master` is the main development branch.
+
+`pre-release` and `release` are tagged and should be used as a stable version.
+
+Development continues on `master` and feature branches are created based on `master`.
+
+A typical development flow would look like:
+
+1) Create a feature branch with `master` as base, proceed to make changes to feature branch.
+2) Raise PR against `master`. When a PR is raised against master a CI is run to ensure everything is fine.
+3) Merge with `master` after approval by at least one verified code owner and successful CI run.
+
+> Note: If changes are required in the `DCSA-Shared-Kernel`, those changes should first be merged into the respective `master` branches before continuing development in this repository.
+
+4) If development has been completed as per requirements for a given API version, `master` must be tagged to <br>
+   create a `release` or `pre-release` accordingly.
+
+When bug fixes are required or changes in pre-release versions are needed, we branch off using the respective <br>
+tags and continue development on that branch. It is important to note that these changes must be cherry-picked <br>
+and included into `master`.
