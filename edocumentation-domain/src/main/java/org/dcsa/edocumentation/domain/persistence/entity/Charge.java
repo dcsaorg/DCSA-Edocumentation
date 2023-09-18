@@ -29,6 +29,7 @@ public class Charge {
   @Column(name = "currency_amount")
   private Double currencyAmount;
 
+  @PseudoEnum(value = "currencycodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   @Column(name = "currency_code")
   private String currencyCode;
 
