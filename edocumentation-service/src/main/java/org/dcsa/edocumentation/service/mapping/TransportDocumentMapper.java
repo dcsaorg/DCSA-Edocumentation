@@ -87,7 +87,7 @@ public abstract class TransportDocumentMapper {
   @Mapping(target = "receiptTypeAtOrigin", expression = "java(receiptTypeAtOrigin(transportDocument))")
   @Mapping(target = "deliveryTypeAtDestination", expression = "java(deliveryTypeAtDestination(transportDocument))")
   @Mapping(target = "cargoMovementTypeAtOrigin", expression = "java(cargoMovementTypeAtOrigin(transportDocument))")
-  @Mapping(target = "cargoMovementTypeAtDestination", expression = "java(cargoMovementTypeAtOrigin(transportDocument))")
+  @Mapping(target = "cargoMovementTypeAtDestination", expression = "java(cargoMovementTypeAtDestination(transportDocument))")
   @Mapping(target = "utilizedTransportEquipments", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
   @Mapping(source = "transportDocument.shippingInstruction.invoicePayableAt", target = "invoicePayableAt")
   public abstract TransportDocumentTO toDTO(TransportDocument transportDocument);
