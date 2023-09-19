@@ -582,30 +582,3 @@ CREATE TABLE shipment_transport (
     universal_service_reference varchar(8) NULL,
     is_under_shippers_responsibility boolean NOT NULL
 );
-
-
-CREATE TABLE event_classifier (
-    event_classifier_code varchar(3) PRIMARY KEY,
-    event_classifier_name varchar(30) NOT NULL,
-    event_classifier_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE document_type (
-    document_type_code varchar(3) PRIMARY KEY,
-    document_type_name varchar(100) NOT NULL,
-    document_type_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE shipment_event (
-    event_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    event_classifier_code varchar(3) NOT NULL REFERENCES event_classifier(event_classifier_code)
-        CHECK ( event_classifier_code = 'ACT'),
-    event_created_date_time timestamp with time zone DEFAULT now() NOT NULL,
-    event_date_time timestamp with time zone NOT NULL,
-    shipment_event_type_code varchar(4) NOT NULL REFERENCES shipment_event_type(shipment_event_type_code),
-    document_type_code varchar(3) NOT NULL REFERENCES document_type(document_type_code),
-    document_id uuid NOT NULL,
-    reason varchar(5000) NULL
-);

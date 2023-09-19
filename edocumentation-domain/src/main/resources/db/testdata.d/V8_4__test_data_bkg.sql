@@ -805,46 +805,5 @@ INSERT INTO shipping_instruction (
     DATE '2021-12-31'
 );
 
-INSERT INTO shipment_event (
-   event_id,
-   event_classifier_code,
-   event_date_time,
-   event_created_date_time,
-   shipment_event_type_code,
-   document_type_code,
-   document_id,
-   document_reference,
-   reason
-) VALUES (
-   '97eb7c09-571e-438f-8f65-ac6a29ba04e5'::uuid,
-   'ACT',
-   '2021-01-08T13:22:53Z',
-   '2021-01-08T13:22:53Z',
-   'RECE',
-   'CBR',
-   'b8376516-0c1c-4b6f-b51f-6707812c8ff4'::uuid,
-   'cbrr-b83765166707812c8ff4',
-   null
-), (
-   'd7dde15f-5ddc-42ce-8103-9fa1c4da0bde'::uuid,
-   'ACT',
-   '2021-01-08T13:22:53Z',
-   '2021-01-08T13:22:53Z',
-   'RECE',
-   'BKG',
-   (SELECT id FROM shipment WHERE carrier_booking_reference = 'cbr-b83765166707812c8ff4'),
-   'cbr-b83765166707812c8ff4',
-   null
-), (
-   '8b654176-fe41-41fd-a457-a632d6811246'::uuid,
-   'ACT',
-   '2021-01-08T13:22:53Z',
-   '2021-01-08T13:22:53Z',
-   'RECE',
-   'SHI',
-   'c144c6df-440e-4065-8430-f46b9fa67e65',
-   'c144c6dff46b9fa67e65',
-   null
-);
 /* End: Test data for events with carrierBookingReference and carrierBookingRequestReference */
 
