@@ -41,6 +41,8 @@ sources:
       - shipment_location_type
       - mode_of_transport
       - facility_type
+      - document_type
+      - event_classifier
 
   - path: classpath:db/samples.d
     type: csv

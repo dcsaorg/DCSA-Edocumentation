@@ -390,14 +390,6 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     }
   }
 
-  protected ShipmentEvent.ShipmentEventBuilder<?, ?> shipmentEventSHIBuilder(OffsetDateTime updateTime) {
-    this.shippingInstructionUpdatedDateTime = updateTime;
-    return ShipmentEvent.builder()
-      .documentID(id)
-      .documentReference(shippingInstructionReference)
-      .documentTypeCode(DocumentTypeCode.SHI);
-  }
-
   @Override
   protected RuntimeException errorForAttemptLeavingToLeaveTerminalState(
       EblDocumentStatus currentState,
