@@ -77,8 +77,7 @@ CREATE TABLE party_contact_details (
     party_id uuid NOT NULL REFERENCES party(id),
     name varchar(100) NOT NULL,
     email varchar(100) NULL,
-    phone varchar(30) NULL,
-    url varchar(100) NULL
+    phone varchar(30) NULL
 );
 
 CREATE TABLE party_identifying_code (

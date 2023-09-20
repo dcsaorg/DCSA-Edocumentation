@@ -14,10 +14,7 @@ public record PartyContactDetailsTO(
   String phone,
 
   @Size(max = 100) @Email
-  String email,
-
-  @Size(max = 100)
-  String url
+  String email
 ) {
   @Builder(toBuilder = true)
   public PartyContactDetailsTO { }
