@@ -18,8 +18,7 @@ public record ChargeTO(
         String currencyCode,
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
         @NotNull(message = "The attribute paymentTermCode is required.")
-        @Size(max = 3)
-        String paymentTermCode,
+        PaymentTerm paymentTermCode,
     @NotBlank(message = "The attribute calculationBasis is required.")
         @Size(max = 50, message = "The attribute calculationBasis has a max size of 50.")
         String calculationBasis,

@@ -119,8 +119,8 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   private String serviceContractReference;
 
   @Column(name = "payment_term_code")
-  @PseudoEnum(value = "paymentterms.csv", groups = AsyncShipperProvidedDataValidation.class)
-  private String paymentTermCode;
+  @Enumerated(EnumType.STRING)
+  private PaymentTerm paymentTermCode;
 
   @Column(name = "is_partial_load_allowed")
   private Boolean isPartialLoadAllowed;

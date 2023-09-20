@@ -46,8 +46,7 @@ public record BookingSummaryTO(
   @Size(max = 30, message = "The attribute serviceContractReference has a max size of 30.")
   String serviceContractReference,
 
-  @Size(max = 3)
-  String paymentTermCode,
+  PaymentTerm paymentTermCode,
 
   @NotNull(message = "The attribute isPartialLoadAllowed is required.")
   Boolean isPartialLoadAllowed,
