@@ -10,10 +10,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
-import org.dcsa.edocumentation.transferobjects.enums.CargoMovementType;
-import org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType;
-import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
+import org.dcsa.edocumentation.transferobjects.enums.*;
 import org.dcsa.skernel.infrastructure.validation.AllOrNone;
 import org.dcsa.skernel.infrastructure.validation.AtLeast;
 import org.dcsa.skernel.infrastructure.validation.DateRange;
@@ -89,8 +86,7 @@ public record BookingTO(
   @Size(max = 3)
   String declaredValueCurrency,
 
-  @Size(max = 3)
-  String paymentTermCode,
+  PaymentTerm paymentTermCode,
 
   @NotNull
   Boolean isPartialLoadAllowed,
