@@ -10,6 +10,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 
 @Data
 @Builder
@@ -25,8 +27,9 @@ public class Equipment {
   @Size(max = 15)
   private String equipmentReference;
 
-  @Column(name = "iso_equipment_code", columnDefinition = "bpchar")
+  @Column(name = "iso_equipment_code")
   @Size(max = 4)
+  @PseudoEnum(value = "isoequipmentcodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   private String isoEquipmentCode;
 
   @Column(name = "tare_weight")

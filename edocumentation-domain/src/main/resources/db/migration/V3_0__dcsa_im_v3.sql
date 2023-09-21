@@ -215,13 +215,6 @@ CREATE TABLE shipment (
 );
 
 
-CREATE TABLE iso_equipment_code (
-    iso_equipment_code varchar(4) PRIMARY KEY,
-    iso_equipment_name varchar(35) NOT NULL
-);
-
-
-
 CREATE TABLE active_reefer_settings (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     is_gen_set_required boolean NOT NULL,
@@ -246,9 +239,9 @@ CREATE TABLE requested_equipment_group (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     booking_id uuid NULL REFERENCES booking (id),
     shipment_id uuid NULL REFERENCES shipment (id),
-    requested_equipment_iso_equipment_code varchar(4) NULL REFERENCES iso_equipment_code (iso_equipment_code),
+    requested_equipment_iso_equipment_code varchar(4) NULL,
     requested_equipment_units real NULL,
-    confirmed_equipment_iso_equipment_code varchar(4) NULL REFERENCES iso_equipment_code (iso_equipment_code),
+    confirmed_equipment_iso_equipment_code varchar(4) NULL,
     confirmed_equipment_units integer NULL,
     is_shipper_owned boolean NOT NULL DEFAULT false,
     active_reefer_settings_id uuid NULL REFERENCES active_reefer_settings (id)
@@ -401,15 +394,13 @@ CREATE TABLE charge (
 
 CREATE TABLE equipment (
     equipment_reference varchar(15) PRIMARY KEY,    -- The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.
-    -- Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard.
-    iso_equipment_code char(4) NOT NULL REFERENCES iso_equipment_code (iso_equipment_code),
+    iso_equipment_code varchar(4) NOT NULL,
     tare_weight real NOT NULL,
     total_max_weight real null,
     weight_unit varchar(3) NOT NULL REFERENCES unit_of_measure(unit_of_measure_code)  CHECK (weight_unit IN ('KGM','LBR'))
 );
 
 -- Supporting FK constraints
-CREATE INDEX ON equipment (iso_equipment_code);
 CREATE INDEX ON equipment (equipment_reference);
 
 

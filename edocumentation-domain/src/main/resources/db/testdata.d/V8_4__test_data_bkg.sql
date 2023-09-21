@@ -564,13 +564,6 @@ INSERT INTO reference (
     NULL,
     'a521dbdb-a12b-48f5-b489-8594349731bf'::uuid);
 
-INSERT INTO iso_equipment_code (
-    iso_equipment_code,
-    iso_equipment_name
-) VALUES (
-    '22GP',
-    'GENERAL PURPOSE'
-);
 
 INSERT INTO requested_equipment_group (
     id,
