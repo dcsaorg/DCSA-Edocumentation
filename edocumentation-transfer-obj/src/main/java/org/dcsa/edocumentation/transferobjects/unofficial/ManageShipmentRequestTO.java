@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Builder;
+import org.dcsa.edocumentation.transferobjects.AdvanceManifestFilingTO;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
 
@@ -30,8 +31,9 @@ public record ManageShipmentRequestTO(
 
   @Valid List<@Valid ShipmentLocationTO> shipmentLocations,
 
-  @Valid List<@Valid TransportTO> transports
+  @Valid List<@Valid TransportTO> transports,
 
+  List<@Valid AdvanceManifestFilingTO> advancedManifestFilingTO
   ) {
 
   @Builder(toBuilder = true)

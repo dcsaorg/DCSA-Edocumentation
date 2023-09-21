@@ -33,7 +33,7 @@ import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
           attributeNodes = {
             @NamedAttributeNode("loadLocation"),
             @NamedAttributeNode("dischargeLocation"),
-          }),
+          })
     })
 @Data
 @Builder(toBuilder = true)
@@ -78,6 +78,8 @@ public class Shipment {
   @Column(name = "updated_date_time")
   private OffsetDateTime shipmentUpdatedDateTime;
 
+
+
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "shipment")
@@ -121,6 +123,11 @@ public class Shipment {
   @JoinColumn(name = "shipment_id", referencedColumnName = "id", nullable = false)
   private Set<AssignedEquipment> assignedEquipments;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipment_id")
+  private Set<AdvanceManifestFiling> advanceManifestFilings = new LinkedHashSet<>();
 
   public void assignEquipments(List<EquipmentAssignment> equipmentAssignments) {
     var requestedEquipmentGroupTable = requestedEquipmentGroupTable(booking.getRequestedEquipments());
