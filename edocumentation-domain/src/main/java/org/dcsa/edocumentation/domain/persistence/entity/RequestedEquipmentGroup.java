@@ -11,6 +11,9 @@ import lombok.ToString;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
+
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,6 +44,7 @@ public class RequestedEquipmentGroup {
 
   @Column(name = "requested_equipment_iso_equipment_code", nullable = false)
   @Size(max = 4)
+  @PseudoEnum(value = "isoequipmentcodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   private String requestedEquipmentIsoEquipmentCode;
 
   @Column(name = "requested_equipment_units", nullable = false)
@@ -48,6 +52,7 @@ public class RequestedEquipmentGroup {
 
   @Column(name = "confirmed_equipment_iso_equipment_code")
   @Size(max = 4)
+  @PseudoEnum("isoequipmentcodes.csv")
   private String confirmedEquipmentIsoEquipmentCode;
 
   @Column(name = "confirmed_equipment_units")

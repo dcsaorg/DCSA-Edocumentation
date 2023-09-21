@@ -520,14 +520,6 @@ INSERT INTO shipment_location (
    'POD'
 );
 
-INSERT INTO iso_equipment_code (
-    iso_equipment_code,
-    iso_equipment_name
-) VALUES (
-    '22G1',
-    'Twenty foot dry'
-);
-
 INSERT INTO equipment (
     equipment_reference,
     iso_equipment_code,
