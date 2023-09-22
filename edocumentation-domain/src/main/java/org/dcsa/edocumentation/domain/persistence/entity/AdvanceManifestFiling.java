@@ -14,6 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "advance_manifest_filing")
 public class AdvanceManifestFiling {
+  @GeneratedValue
   @Id private UUID manifest_id;
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "shipment_id", nullable = false)

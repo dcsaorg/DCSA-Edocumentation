@@ -10,11 +10,11 @@ import org.dcsa.edocumentation.transferobjects.validation.AdvanceManifestFilingV
 public record AdvanceManifestFilingTO(
 
   @NotNull
-  @Size(max = 1)
+  @Size(max = 3)
   @Pattern(regexp = "^\\S+(\\s+\\S+)*$", message = "Not a valid manifest type code ")
   String manifestTypeCode,
   @NotNull
-  @Size(max = 1)
+  @Size(max = 2)
   @Pattern(regexp = "^[A-Z]{2}$", message = "Not a valid country code")
   String countryCode) {
   @Builder(toBuilder = true)

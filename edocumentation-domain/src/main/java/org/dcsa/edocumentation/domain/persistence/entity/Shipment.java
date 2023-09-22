@@ -125,6 +125,7 @@ public class Shipment {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
+  @OrderColumn(name = "list_order")
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "shipment_id")
   private Set<AdvanceManifestFiling> advanceManifestFilings = new LinkedHashSet<>();

@@ -33,7 +33,7 @@ public record ManageShipmentRequestTO(
 
   @Valid List<@Valid TransportTO> transports,
 
-  List<@Valid AdvanceManifestFilingTO> advancedManifestFilingTO
+  List<@Valid AdvanceManifestFilingTO> advanceManifestFiling
   ) {
 
   @Builder(toBuilder = true)
