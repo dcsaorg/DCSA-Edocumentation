@@ -234,20 +234,26 @@ CREATE TABLE active_reefer_settings (
 );
 
 
-
 CREATE TABLE requested_equipment_group (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     booking_id uuid NULL REFERENCES booking (id),
     shipment_id uuid NULL REFERENCES shipment (id),
-    requested_equipment_iso_equipment_code varchar(4) NULL,
-    requested_equipment_units real NULL,
-    confirmed_equipment_iso_equipment_code varchar(4) NULL,
-    confirmed_equipment_units integer NULL,
+    iso_equipment_code varchar(4) NOT NULL,
+    units int NOT NULL,
     is_shipper_owned boolean NOT NULL DEFAULT false,
     active_reefer_settings_id uuid NULL REFERENCES active_reefer_settings (id)
 );
 
 CREATE INDEX ON requested_equipment_group (booking_id);
+
+
+CREATE TABLE confirmed_equipment (
+  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  shipment_id uuid NULL REFERENCES shipment (id),
+  iso_equipment_code varchar(4) NOT NULL,
+  units int NOT NULL CHECK (units > 0),
+  list_order int NOT NULL DEFAULT 0
+);
 
 
 CREATE TABLE commodity (
