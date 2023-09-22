@@ -1,11 +1,10 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import lombok.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.CutOffDateTimeCode;
-
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.*;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 
 @Data
 @Builder
@@ -14,17 +13,23 @@ import java.util.UUID;
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "shipment_cutoff_time")
-@IdClass(ShipmentCutOffTimeId.class)
 public class ShipmentCutOffTime {
 
   @Id
-  @Column(name = "shipment_id")
-  private UUID shipmentID;
+  @GeneratedValue
+  private UUID id;
 
-  @Id
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipment_id")
+  // Used by Shipment to make the JPA relations work
+  @Setter(AccessLevel.PACKAGE)
+  private Shipment shipment;
+
   @Column(name = "cut_off_time_code")
-  @Enumerated(EnumType.STRING)
-  private CutOffDateTimeCode cutOffDateTimeCode;
+  @PseudoEnum("cutofftimecodes.csv")
+  private String cutOffDateTimeCode;
 
   @Column(name = "cut_off_time", length = 35)
   private OffsetDateTime cutOffDateTime;

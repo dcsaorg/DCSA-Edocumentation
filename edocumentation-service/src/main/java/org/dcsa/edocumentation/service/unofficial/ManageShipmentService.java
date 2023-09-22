@@ -16,11 +16,9 @@ import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.ShipmentLocationService;
 import org.dcsa.edocumentation.service.ShipmentTransportService;
 import org.dcsa.edocumentation.service.mapping.ConfirmedEquipmentMapper;
+import org.dcsa.edocumentation.service.mapping.ShipmentCutOffTimeMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
-import org.dcsa.edocumentation.transferobjects.ConfirmedEquipmentTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO;
-import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
-import org.dcsa.edocumentation.transferobjects.TransportTO;
+import org.dcsa.edocumentation.transferobjects.*;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
 import org.dcsa.edocumentation.transferobjects.enums.ShipmentLocationTypeCode;
 import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
@@ -40,6 +38,7 @@ public class ManageShipmentService {
   private final ShipmentLocationService shipmentLocationService;
   private final ShipmentTransportService shipmentTransportService;
   private final ConfirmedEquipmentMapper confirmedEquipmentMapper;
+  private final ShipmentCutOffTimeMapper shipmentCutOffTimeMapper;
 
 
   private final Random random = new SecureRandom();
@@ -125,6 +124,15 @@ public class ManageShipmentService {
         Collections.<ConfirmedEquipmentTO>emptyList()
       ).stream()
         .map(confirmedEquipmentMapper::toDAO)
+        .toList()
+    );
+
+    shipment.assignShipmentCutOffTimes(
+      Objects.requireNonNullElse(
+          shipmentRequestTO.shipmentCutOffTimes(),
+          Collections.<ShipmentCutOffTimeTO>emptyList()
+        ).stream()
+        .map(shipmentCutOffTimeMapper::toDAO)
         .toList()
     );
 

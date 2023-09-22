@@ -1,19 +1,17 @@
 package org.dcsa.edocumentation.transferobjects;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.CutOffDateTimeCode;
-
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
+import lombok.Builder;
 
 public record ShipmentCutOffTimeTO(
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         @NotNull(message = "The attribute cutOffDateTimeCode is required.")
-        CutOffDateTimeCode cutOffDateTimeCode,
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        @Size(max = 3)
+        String cutOffDateTimeCode,
+
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         @NotNull(message = "The attribute cutOffDateTime is required.")
         OffsetDateTime cutOffDateTime) {

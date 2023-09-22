@@ -43,6 +43,7 @@ sources:
       - facility_type
       - document_type
       - event_classifier
+      - cut_off_time
 
   - path: classpath:db/samples.d
     type: csv
