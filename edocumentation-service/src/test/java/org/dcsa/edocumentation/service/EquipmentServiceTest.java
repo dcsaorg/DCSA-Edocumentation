@@ -86,7 +86,7 @@ public class EquipmentServiceTest {
     RequestedEquipmentTO extraRequestedEquipmentTO = RequestedEquipmentTO.builder()
       .equipmentReferences(List.of("notExist"))
       .isoEquipmentCode("GP22")
-      .units(1f)
+      .units(1)
       .isShipperOwned(true)
       .build();
     Equipment extraEquipment = Equipment.builder()
@@ -119,7 +119,7 @@ public class EquipmentServiceTest {
     RequestedEquipmentTO extraRequestedEquipmentTO = RequestedEquipmentTO.builder()
       .equipmentReferences(List.of("notExist"))
       .isoEquipmentCode("GP22")
-      .units(1f)
+      .units(1)
       .isShipperOwned(false)
       .build();
 
@@ -145,7 +145,7 @@ public class EquipmentServiceTest {
     RequestedEquipmentTO extraRequestedEquipmentTO = RequestedEquipmentTO.builder()
       .equipmentReferences(List.of("Equipment_Ref_01"))
       .isoEquipmentCode("GP22")
-      .units(1f)
+      .units(1)
       .isShipperOwned(false)
       .build();
 

@@ -26,7 +26,7 @@ public record RequestedEquipmentTO(
   WeightUnit tareWeightUnit,
 
   @NotNull
-  Float units,
+  Integer units,
 
   List<@NotBlank @ISO6346EquipmentReference String> equipmentReferences,
 

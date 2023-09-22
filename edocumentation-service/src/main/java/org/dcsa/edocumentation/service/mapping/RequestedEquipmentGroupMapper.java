@@ -22,13 +22,10 @@ public interface RequestedEquipmentGroupMapper {
   @Mapping(source = "booking", target = "booking")
   @Mapping(source = "booking.id", target = "id", ignore = true)
   @Mapping(source = "activeReeferSettings", target = "activeReeferSettings")
-  @Mapping(source = "requestedEquipment.isoEquipmentCode", target = "requestedEquipmentIsoEquipmentCode")
-  @Mapping(source = "requestedEquipment.units", target = "requestedEquipmentUnits")
+  @Mapping(source = "requestedEquipment.isoEquipmentCode", target = "isoEquipmentCode")
+  @Mapping(source = "requestedEquipment.units", target = "units")
   @Mapping(source = "commodity", target = "commodity")
-  // These are not provided at this stage
-  @Mapping(target = "confirmedEquipmentUnits", ignore = true)
-  @Mapping(target = "confirmedEquipmentIsoEquipmentCode", ignore = true)
-  @Mapping(target = "shipment", ignore = true)
+  // FIXME: The RequestedEquipmentGroup should probably not have a utilizedTransportEquipments
   @Mapping(target = "utilizedTransportEquipments", ignore = true)
   RequestedEquipmentGroup toDAO(
     RequestedEquipmentTO requestedEquipment,
@@ -37,8 +34,6 @@ public interface RequestedEquipmentGroupMapper {
     Commodity commodity
   );
 
-  @Mapping(source = "requestedEquipmentUnits", target = "units")
-  @Mapping(source = "requestedEquipmentIsoEquipmentCode", target = "isoEquipmentCode")
   RequestedEquipmentTO toTO(RequestedEquipmentGroup requestedEquipment);
 
   default String mapEquipmentToEquipmentReference(Equipment equipment) {
