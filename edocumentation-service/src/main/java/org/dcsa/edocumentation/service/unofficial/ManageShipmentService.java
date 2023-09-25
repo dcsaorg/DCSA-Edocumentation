@@ -108,8 +108,6 @@ public class ManageShipmentService {
 
     booking.confirm(confirmationTime);
 
-    convertAdvanceManifestFiling(shipmentRequestTO.advanceManifestFiling());
-
     // FIXME: Check if the shipment (CBR) already exists and then attempt to reconfirm it if possible rather than
     //  die with a 409 Conflict (or create a duplicate or whatever happens). Probably just set "valid_until = now()"
     //  on the old shipment if it exists and then create a new one.
@@ -361,10 +359,4 @@ public class ManageShipmentService {
     );
   }
 
-  private Set<AdvanceManifestFiling> convertAdvanceManifestFiling(List<AdvanceManifestFilingTO> advanceManifestFilingTOList) {
-    AdvanceManifestFilingMapper advanceManifestFilingMapper = new AdvanceManifestFilingMapperImpl();
-    return advanceManifestFilingTOList.stream()
-      .map(advanceManifestFilingMapper::toDAO)
-      .collect(Collectors.toSet());
-  }
 }
