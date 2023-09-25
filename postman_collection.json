@@ -2461,6 +2461,65 @@
 								}
 							],
 							"description": "This folder is one test case that requires multiple API requests to complete."
+						},
+						{
+							"name": "Test: Post booking with invalid party contact details",
+							"item": [
+								{
+									"name": "Create a booking",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const parsedBody = pm.response.json();\r",
+													"\r",
+													"pm.test(\"Status code is 400\", () => {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Error reason is invalid PartyContactDetails\", () => {\r",
+													"    var jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.errors[0].reason).to.eql(\"documentParties[0].party.partyContactDetails[0]\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"PartyContactDetails must contain either phone or email\", () => {\r",
+													"    var jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.errors[0].message).to.eql(\"at least 1 of [phone, email] must be non-null\");\r",
+													"});\r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"receiptTypeAtOrigin\": \"CY\",\r\n    \"deliveryTypeAtDestination\": \"CY\",\r\n    \"cargoMovementTypeAtOrigin\": \"FCL\",\r\n    \"cargoMovementTypeAtDestination\": \"FCL\",\r\n    \"serviceContractReference\": \"serviceRef\",\r\n    \"carrierExportVoyageNumber\": \"2106W\",\r\n    \"declaredValue\": 3.14,\r\n    \"declaredValueCurrency\": \"DKK\",\r\n    \"paymentTermCode\": \"PRE\",\r\n    \"isPartialLoadAllowed\": true,\r\n    \"isExportDeclarationRequired\": true,\r\n    \"exportDeclarationReference\": \"exportDeclarationRef\",\r\n    \"isImportLicenseRequired\": true,\r\n    \"importLicenseReference\": \"importLicenseRef\",\r\n    \"isAMSACIFilingRequired\": true,\r\n    \"isDestinationFilingRequired\": true,\r\n    \"contractQuotationReference\": \"contractQuotationRef\",\r\n    \"expectedDepartureDate\": \"2052-11-15\",\r\n    \"expectedArrivalAtPlaceOfDeliveryStartDate\": \"2052-11-15\",\r\n    \"expectedArrivalAtPlaceOfDeliveryEndDate\": \"2052-11-15\",\r\n    \"transportDocumentTypeCode\": \"BOL\",\r\n    \"transportDocumentReference\": \"transportDocumentRef\",\r\n    \"bookingChannelReference\": \"bookingChannelRef\",\r\n    \"incoTerms\": \"FOB\",\r\n    \"communicationChannelCode\": \"AO\",\r\n    \"isEquipmentSubstitutionAllowed\": true,\r\n    \"vesselIMONumber\": \"9321483\",\r\n    \"preCarriageUnderShippersResponsibility\": \"VESSEL\",\r\n    \"invoicePayableAt\": {\r\n        \"locationName\": \"Asseco DK office\",\r\n        \"locationType\": \"ADDR\",\r\n        \"address\": {\r\n            \"name\": \"Asseco DK\",\r\n            \"street\": \"Kronprinsessegade\",\r\n            \"streetNumber\": \"54\",\r\n            \"floor\": \"5. sal\",\r\n            \"postCode\": \"1306\",\r\n            \"city\": \"København\",\r\n            \"country\": \"Denmark\"\r\n        }\r\n    },\r\n    \"placeOfBLIssue\": {\r\n        \"locationName\": \"Asseco DK office\",\r\n        \"locationType\": \"ADDR\",\r\n        \"address\": {\r\n            \"name\": \"Asseco DK\",\r\n            \"street\": \"Kronprinsessegade\",\r\n            \"streetNumber\": \"54\",\r\n            \"floor\": \"5. sal\",\r\n            \"postCode\": \"1306\",\r\n            \"city\": \"København\",\r\n            \"country\": \"Denmark\"\r\n        }\r\n    },\r\n    \"commodities\": [\r\n        {\r\n            \"HSCodes\": [\"411510\"],\r\n            \"commodityType\": \"commodity type\",\r\n            \"cargoGrossWeight\": 323.32,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"cargoGrossVolume\": 100.0,\r\n            \"cargoGrossVolumeUnit\": \"MTQ\",\r\n            \"numberOfPackages\": 1,\r\n            \"exportLicenseIssueDate\": \"2022-11-15\",\r\n            \"exportLicenseExpiryDate\": \"2023-05-15\",\r\n            \"requestedEquipments\": [\r\n                {\r\n                    \"ISOEquipmentCode\": \"22G1\",\r\n                    \"units\": 3.0,\r\n                    \"isShipperOwned\": false,\r\n                    \"activeReeferSettings\": {\r\n                        \"isGeneratorSetRequired\": true,\r\n                        \"isPreCoolingRequired\": true,\r\n                        \"isColdTreatmentRequired\": true,\r\n                        \"isVentilationOpen\": true,\r\n                        \"isControlledAtmosphereRequired\":true,\r\n                        \"isDrainholesOpen\": true,\r\n                        \"isBulbMode\": true,\r\n                        \"temperatureSetpoint\": -17,\r\n                        \"temperatureUnit\": \"CEL\",\r\n                        \"o2Setpoint\": 12,\r\n                        \"co2Setpoint\": 13,\r\n                        \"humiditySetpoint\": 14,\r\n                        \"airExchangeSetpoint\": 25,\r\n                        \"airExchangeUnit\": \"MQH\"\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"ref value\"\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"boring party\",\r\n                \"address\": {\r\n                    \"name\": \"Asseco DK\",\r\n                    \"street\": \"Kronprinsessegade\",\r\n                    \"streetNumber\": \"54\",\r\n                    \"floor\": \"5. sal\",\r\n                    \"postCode\": \"1306\",\r\n                    \"city\": \"København\",\r\n                    \"country\": \"Denmark\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"Henrik\"\r\n                    }\r\n                ],\r\n                \"identifyingCodes\": [\r\n                    {\r\n                        \"DCSAResponsibleAgencyCode\": \"DCSA\",\r\n                        \"partyCode\": \"reponsible fun\",\r\n                        \"codeListName\": \"irreponsible fun\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"INV\",\r\n            \"displayedAddress\": [\r\n                \"line1\",\r\n                \"line2\"\r\n            ],\r\n            \"isToBeNotified\": true\r\n        }\r\n    ],\r\n    \"shipmentLocations\": [\r\n        {\r\n            \"location\": {\r\n                \"locationName\": \"LocationName /S\",\r\n                \"locationType\": \"UNLO\",\r\n                \"UNLocationCode\": \"DEHAM\"\r\n            },\r\n            \"shipmentLocationTypeCode\": \"PRE\",\r\n            \"eventDateTime\": \"2022-11-15T10:34:41.99631016+01:00\"\r\n        },\r\n        {\r\n            \"location\": {\r\n                \"locationName\": \"SGSIN/S\",\r\n                \"locationType\": \"UNLO\",\r\n                \"UNLocationCode\": \"SGSIN\"\r\n            },\r\n            \"shipmentLocationTypeCode\": \"POD\",\r\n            \"eventDateTime\": \"2022-11-15T10:34:41.99631016+01:00\" \r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"host": [
+												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
+											],
+											"path": [
+												"bookings"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"description": "This folder is one test case that requires multiple API requests to complete."
 						}
 					],
 					"event": [
