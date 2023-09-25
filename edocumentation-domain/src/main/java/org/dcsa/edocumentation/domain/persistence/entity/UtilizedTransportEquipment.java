@@ -1,5 +1,6 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import jakarta.validation.Valid;
 import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 
@@ -47,7 +48,7 @@ public class UtilizedTransportEquipment {
   @EqualsAndHashCode.Exclude
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "utilized_transport_equipment_id", nullable = false)
-  private Set<Seal> seals;
+  private Set<@Valid Seal> seals;
 
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
