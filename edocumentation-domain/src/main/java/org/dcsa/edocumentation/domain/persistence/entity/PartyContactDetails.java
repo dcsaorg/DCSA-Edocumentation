@@ -32,10 +32,6 @@ public class PartyContactDetails {
   @Column(name = "phone")
   private String phone;
 
-  @Size(max = 100)
-  @Column(name = "url")
-  private String url;
-
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY)
