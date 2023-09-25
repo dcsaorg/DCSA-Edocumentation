@@ -76,8 +76,4 @@ public class DocumentPartyDataFactory {
         .codeListName("irreponsible fun")
         .build();
   }
-
-  public PartyContactDetails partyContactDetails(Party party) {
-    return PartyContactDetails.builder().party(party).name("Henrik").build();
-  }
 }

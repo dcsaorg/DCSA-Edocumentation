@@ -25,7 +25,6 @@ public class PartyDataFactory {
       .partyContactDetails(Set.of(PartyContactDetails.builder()
           .id(UUID.randomUUID())
           .email("info@dcsa.org")
-          .url("https://dcsa.org")
         .build()))
       .build();
   }

@@ -52,15 +52,13 @@ INSERT INTO party_contact_details (
     party_id,
     name,
     email,
-    phone,
-    url
+    phone
 ) VALUES (
     'be59706b-b059-455b-bb20-aeb8d79605fe'::uuid,
     'c49ea2d6-3806-46c8-8490-294affc71286',
     'FDM',
     'info@fdm.org',
-    '+31123456789',
-    'https://www.fdm.org'
+    '+31123456789'
 );
 
 INSERT INTO transport_document (
@@ -605,15 +603,13 @@ INSERT INTO party_contact_details (
     party_id,
     name,
     email,
-    phone,
-    url
+    phone
 ) VALUES (
     'c4645dd4-56a7-4c32-898f-cc86d5252248'::uuid,
     '7bf6f428-58f0-4347-9ce8-d6be2f5d5745',
     'Hapag Lloyd',
     'info@h-l.org',
-    '+31123456789',
-    'https://www.hapag-llyod.org'
+    '+31123456789'
 );
 
 INSERT INTO party_identifying_code (
@@ -665,15 +661,14 @@ INSERT INTO party_contact_details (
     party_id,
     name,
     email,
-    phone,
-    url
+    phone
     ) VALUES (
     'b24d099e-a6f6-404e-b082-776f7f589061'::uuid,
     '7bf6f428-58f0-4347-9ce8-d6be2f5d5745',
     'DCSA',
     'info@dcsa.org',
-    '+31123456789',
-    'https://www.dcsa.org');
+    '+31123456789'
+);
 
 INSERT INTO shipment_location (
     id,
