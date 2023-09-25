@@ -128,7 +128,7 @@ public class Shipment {
   @OrderColumn(name = "list_order")
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "shipment_id")
-  private Set<AdvanceManifestFiling> advanceManifestFilings = new LinkedHashSet<>();
+  private List<AdvanceManifestFiling> advanceManifestFilings = new ArrayList<>();
 
   public void assignEquipments(List<EquipmentAssignment> equipmentAssignments) {
     var requestedEquipmentGroupTable = requestedEquipmentGroupTable(booking.getRequestedEquipments());
@@ -217,6 +217,18 @@ public class Shipment {
 
     public int getUnfilledCount() {
       return (int)Math.ceil(unfilledCount);
+    }
+  }
+
+  public void assignAdvanceManifestFiling(List<AdvanceManifestFiling> advanceManifestFilings) {
+    if (this.advanceManifestFilings == null) {
+      this.advanceManifestFilings = new ArrayList<>();
+    } else {
+      this.advanceManifestFilings.clear();
+    }
+    this.advanceManifestFilings.addAll(advanceManifestFilings);
+    for (var e : advanceManifestFilings) {
+      e.setShipment(this);  // For cascade to work properly
     }
   }
 

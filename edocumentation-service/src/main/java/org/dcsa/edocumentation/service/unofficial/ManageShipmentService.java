@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.dcsa.edocumentation.domain.persistence.entity.AdvanceManifestFiling;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
@@ -16,8 +17,11 @@ import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationRe
 import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.ShipmentLocationService;
 import org.dcsa.edocumentation.service.ShipmentTransportService;
+import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapper;
+import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapperImpl;
 import org.dcsa.edocumentation.service.mapping.EquipmentAssignmentMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
+import org.dcsa.edocumentation.transferobjects.AdvanceManifestFilingTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
@@ -43,6 +47,8 @@ public class ManageShipmentService {
   private final BookingValidationService bookingValidationService;
   private final ShipmentLocationService shipmentLocationService;
   private final ShipmentTransportService shipmentTransportService;
+
+  private final AdvanceManifestFilingMapper advanceManifestFilingMapper;
 
 
   private final Random random = new SecureRandom();
@@ -100,6 +106,8 @@ public class ManageShipmentService {
 
     shipmentEventRepository.save(booking.confirm(confirmationTime));
 
+    convertAdvanceManifestFiling(shipmentRequestTO.advanceManifestFiling());
+
     // FIXME: Check if the shipment (CBR) already exists and then attempt to reconfirm it if possible rather than
     //  die with a 409 Conflict (or create a duplicate or whatever happens). Probably just set "valid_until = now()"
     //  on the old shipment if it exists and then create a new one.
@@ -114,6 +122,15 @@ public class ManageShipmentService {
             .shipmentUpdatedDateTime(confirmationTime)
             .termsAndConditions(shipmentRequestTO.termsAndConditions())
             .build();
+
+    shipment.assignAdvanceManifestFiling(
+      Objects.requireNonNullElse(
+          shipmentRequestTO.advanceManifestFiling(),
+          Collections.<AdvanceManifestFilingTO>emptyList()
+        ).stream()
+        .map(advanceManifestFilingMapper::toDAO)
+        .toList()
+    );
 
     if (!validationResult.validationErrors().isEmpty()) {
       return shipmentMapper.toStatusDTO(shipment, validationResult.proposedStatus());
@@ -340,5 +357,12 @@ public class ManageShipmentService {
       equipmentAssignmentTO,
       equipments
     );
+  }
+
+  private Set<AdvanceManifestFiling> convertAdvanceManifestFiling(List<AdvanceManifestFilingTO> advanceManifestFilingTOList) {
+    AdvanceManifestFilingMapper advanceManifestFilingMapper = new AdvanceManifestFilingMapperImpl();
+    return advanceManifestFilingTOList.stream()
+      .map(advanceManifestFilingMapper::toDAO)
+      .collect(Collectors.toSet());
   }
 }

@@ -16,8 +16,9 @@ import java.util.UUID;
 public class AdvanceManifestFiling {
   @GeneratedValue
   @Id private UUID manifest_id;
-  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "shipment_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipment_id")
+  @Setter(AccessLevel.PACKAGE)
   private Shipment shipment;
 
   @Column(name = "manifest_type_code")

@@ -10,7 +10,7 @@ import org.dcsa.edocumentation.transferobjects.validation.AdvanceManifestFilingV
 public record AdvanceManifestFilingTO(
 
   @NotNull
-  @Size(max = 3)
+  @Size(max = 50)
   @Pattern(regexp = "^\\S+(\\s+\\S+)*$", message = "Not a valid manifest type code ")
   String manifestTypeCode,
   @NotNull
