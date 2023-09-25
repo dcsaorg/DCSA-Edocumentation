@@ -52,15 +52,13 @@ INSERT INTO party_contact_details (
     party_id,
     name,
     email,
-    phone,
-    url
+    phone
 ) VALUES (
     'be59706b-b059-455b-bb20-aeb8d79605fe'::uuid,
     'c49ea2d6-3806-46c8-8490-294affc71286',
     'FDM',
     'info@fdm.org',
-    '+31123456789',
-    'https://www.fdm.org'
+    '+31123456789'
 );
 
 INSERT INTO transport_document (
@@ -564,13 +562,6 @@ INSERT INTO reference (
     NULL,
     'a521dbdb-a12b-48f5-b489-8594349731bf'::uuid);
 
-INSERT INTO iso_equipment_code (
-    iso_equipment_code,
-    iso_equipment_name
-) VALUES (
-    '22GP',
-    'GENERAL PURPOSE'
-);
 
 INSERT INTO requested_equipment_group (
     id,
@@ -612,15 +603,13 @@ INSERT INTO party_contact_details (
     party_id,
     name,
     email,
-    phone,
-    url
+    phone
 ) VALUES (
     'c4645dd4-56a7-4c32-898f-cc86d5252248'::uuid,
     '7bf6f428-58f0-4347-9ce8-d6be2f5d5745',
     'Hapag Lloyd',
     'info@h-l.org',
-    '+31123456789',
-    'https://www.hapag-llyod.org'
+    '+31123456789'
 );
 
 INSERT INTO party_identifying_code (
@@ -672,15 +661,14 @@ INSERT INTO party_contact_details (
     party_id,
     name,
     email,
-    phone,
-    url
+    phone
     ) VALUES (
     'b24d099e-a6f6-404e-b082-776f7f589061'::uuid,
     '7bf6f428-58f0-4347-9ce8-d6be2f5d5745',
     'DCSA',
     'info@dcsa.org',
-    '+31123456789',
-    'https://www.dcsa.org');
+    '+31123456789'
+);
 
 INSERT INTO shipment_location (
     id,
@@ -805,46 +793,5 @@ INSERT INTO shipping_instruction (
     DATE '2021-12-31'
 );
 
-INSERT INTO shipment_event (
-   event_id,
-   event_classifier_code,
-   event_date_time,
-   event_created_date_time,
-   shipment_event_type_code,
-   document_type_code,
-   document_id,
-   document_reference,
-   reason
-) VALUES (
-   '97eb7c09-571e-438f-8f65-ac6a29ba04e5'::uuid,
-   'ACT',
-   '2021-01-08T13:22:53Z',
-   '2021-01-08T13:22:53Z',
-   'RECE',
-   'CBR',
-   'b8376516-0c1c-4b6f-b51f-6707812c8ff4'::uuid,
-   'cbrr-b83765166707812c8ff4',
-   null
-), (
-   'd7dde15f-5ddc-42ce-8103-9fa1c4da0bde'::uuid,
-   'ACT',
-   '2021-01-08T13:22:53Z',
-   '2021-01-08T13:22:53Z',
-   'RECE',
-   'BKG',
-   (SELECT id FROM shipment WHERE carrier_booking_reference = 'cbr-b83765166707812c8ff4'),
-   'cbr-b83765166707812c8ff4',
-   null
-), (
-   '8b654176-fe41-41fd-a457-a632d6811246'::uuid,
-   'ACT',
-   '2021-01-08T13:22:53Z',
-   '2021-01-08T13:22:53Z',
-   'RECE',
-   'SHI',
-   'c144c6df-440e-4065-8430-f46b9fa67e65',
-   'c144c6dff46b9fa67e65',
-   null
-);
 /* End: Test data for events with carrierBookingReference and carrierBookingRequestReference */
 

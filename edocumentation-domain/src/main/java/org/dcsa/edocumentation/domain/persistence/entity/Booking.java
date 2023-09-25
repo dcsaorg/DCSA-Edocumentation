@@ -5,13 +5,15 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumen
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Predicate;
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
 import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
@@ -19,10 +21,7 @@ import org.dcsa.edocumentation.domain.dfa.DFADefinition;
 import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
-import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
-import org.dcsa.edocumentation.domain.validations.LocationSubType;
-import org.dcsa.edocumentation.domain.validations.LocationValidation;
-import org.dcsa.edocumentation.domain.validations.PseudoEnum;
+import org.dcsa.edocumentation.domain.validations.*;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 
@@ -63,19 +62,12 @@ import org.springframework.data.domain.Persistable;
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "booking")
+@BookingValidation(groups = AsyncShipperProvidedDataValidation.class)
 public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements Persistable<UUID> {
 
 
   private static final Set<BkgDocumentStatus> CAN_BE_VALIDATED =
     Set.of(BkgDocumentStatus.RECE, BkgDocumentStatus.PENC);
-  private static final Predicate<String> IS_SOURCE_LOCATION_TYPE = Set.of(LocationType.PRE.name(), LocationType.POL.name())::contains;
-  private static final Predicate<String> IS_DESTINATION_LOCATION_TYPE = Set.of(LocationType.POD.name(), LocationType.PDE.name())::contains;
-  private static final Predicate<String> IS_SOURCE_OR_DESTINATION_LOCATION_TYPE =
-    IS_SOURCE_LOCATION_TYPE.or(IS_DESTINATION_LOCATION_TYPE);
-  private static final Predicate<ShipmentLocation> IS_SOURCE_OR_DESTINATION_LOCATION =
-    sl -> IS_SOURCE_OR_DESTINATION_LOCATION_TYPE.test(sl.getShipmentLocationTypeCode());
-  private static final Predicate<ShipmentLocation> HAS_ADDRESS = sl -> sl.getLocation().getAddress() != null;
-  private static final Predicate<ShipmentLocation> HAS_UNLOCATION_CODE = sl -> sl.getLocation().getUNLocationCode() != null;
 
 
   private static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECE)
@@ -96,6 +88,13 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @Column(name = "document_status")
   @Enumerated(EnumType.STRING)
   private BkgDocumentStatus documentStatus;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinColumn(name = "booking_id", referencedColumnName = "id", nullable = false)
+  @OrderColumn(name = "element_order")
+  private List<BookingRequestedChange> requestedChanges;
 
   @Column(name = "receipt_type_at_origin")
   @Enumerated(EnumType.STRING)
@@ -120,8 +119,8 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   private String serviceContractReference;
 
   @Column(name = "payment_term_code")
-  @PseudoEnum(value = "paymentterms.csv", groups = AsyncShipperProvidedDataValidation.class)
-  private String paymentTermCode;
+  @Enumerated(EnumType.STRING)
+  private PaymentTerm paymentTermCode;
 
   @Column(name = "is_partial_load_allowed")
   private Boolean isPartialLoadAllowed;
@@ -161,12 +160,15 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   )
   private Location invoicePayableAt;
 
+  @Future(groups = AsyncShipperProvidedDataValidation.class, message ="must be in the future" )
   @Column(name = "expected_departure_date")
   private LocalDate expectedDepartureDate;
 
+  @Future(groups = AsyncShipperProvidedDataValidation.class, message ="must be in the future" )
   @Column(name = "expected_arrival_at_place_of_delivery_start_date")
   private LocalDate expectedArrivalAtPlaceOfDeliveryStartDate;
 
+  @Future(groups = AsyncShipperProvidedDataValidation.class, message ="must be in the future" )
   @Column(name = "expected_arrival_at_place_of_delivery_end_date")
   private LocalDate expectedArrivalAtPlaceOfDeliveryEndDate;
 
@@ -187,6 +189,7 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @Column(name = "is_equipment_substitution_allowed")
   private Boolean isEquipmentSubstitutionAllowed;
 
+  @PseudoEnum(value = "currencycodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   @Column(name = "declared_value_currency_code", length = 3)
   private String declaredValueCurrency;
 
@@ -233,13 +236,14 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "booking")
-  @Valid
-  private Set<DocumentParty> documentParties;
+  private Set<@Valid DocumentParty> documentParties;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "booking")
-  private Set<ShipmentLocation> shipmentLocations;
+  @Size(min = 2, message = "Must have at least two shipment locations", groups = AsyncShipperProvidedDataValidation.class)
+  @NotNull(groups = AsyncShipperProvidedDataValidation.class)
+  private Set<@Valid ShipmentLocation> shipmentLocations;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -267,25 +271,18 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
    * Subject to change. Reefer will probably change it.
    */
   public ValidationResult<BkgDocumentStatus> asyncValidation(Validator validator) {
-    LocalDate today = LocalDate.now();
     List<String> validationErrors = new ArrayList<>();
-
 
     if (!CAN_BE_VALIDATED.contains(documentStatus)) {
       throw new IllegalStateException("documentStatus must be one of " + CAN_BE_VALIDATED);
     }
+    if (this.requestedChanges == null) {
+      this.requestedChanges = new ArrayList<>();
+    }
+    clearRequestedChanges();
 
-    if (isInThePast(today, expectedDepartureDate)) {
-      validationErrors.add("expectedDepartureDate is in the past");
-    }
-    if (isInThePast(today, expectedArrivalAtPlaceOfDeliveryStartDate)) {
-      validationErrors.add("expectedArrivalAtPlaceOfDeliveryStartDate is in the past");
-    }
-    if (isInThePast(today, expectedArrivalAtPlaceOfDeliveryEndDate)) {
-      validationErrors.add("expectedArrivalAtPlaceOfDeliveryEndDate is in the past");
-    }
-    validateShipmentLocations(shipmentLocations, validationErrors);
     for (var violation : validator.validate(this, AsyncShipperProvidedDataValidation.class)) {
+      this.requestedChanges.add(BookingRequestedChange.fromConstraintViolation(violation));
       validationErrors.add(violation.getPropertyPath().toString() + ": " +  violation.getMessage());
     }
     var proposedStatus = validationErrors.isEmpty()
@@ -295,74 +292,9 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
     return new ValidationResult<>(proposedStatus, validationErrors);
   }
 
-  private boolean isInThePast(LocalDate today, LocalDate time) {
-    return time != null && today.isAfter(time);
-  }
-
-  private void validateShipmentLocations(Set<ShipmentLocation> shipmentLocations, List<String> validationErrors) {
-    if (shipmentLocations.isEmpty()) {
-      validationErrors.add("Invalid booking: Shipment locations should not be empty");
-    }
-
-    boolean slHasPREorPOLs =
-      shipmentLocations.stream()
-        .map(ShipmentLocation::getShipmentLocationTypeCode)
-        .anyMatch(IS_SOURCE_LOCATION_TYPE);
-
-    if (!slHasPREorPOLs) {
-      validationErrors.add("No ShipmentLocationTypeCode of PRE or POL found in the shipmentLocations."
-        + " At least one of them should be provided.");
-    }
-
-    boolean slHasPODorPDE =
-      shipmentLocations.stream()
-        .map(ShipmentLocation::getShipmentLocationTypeCode)
-        .anyMatch(IS_DESTINATION_LOCATION_TYPE);
-
-    if (!slHasPODorPDE) {
-      validationErrors.add("No ShipmentLocationTypeCode of POD or PDE found in the shipmentLocations."
-        + "At least one of them should be provided.");
-    }
-
-
-    var filteredByUNLocationCode =
-      shipmentLocations.stream()
-        .filter(IS_SOURCE_OR_DESTINATION_LOCATION.and(HAS_UNLOCATION_CODE))
-        .toList();
-
-    var filteredByUNLocationCodeCount = filteredByUNLocationCode.size();
-
-    boolean hasUniqueUNLocationCodes =
-      filteredByUNLocationCode.stream()
-        .map(sl -> sl.getLocation().getUNLocationCode())
-        .distinct()
-        .count()
-        == filteredByUNLocationCodeCount;
-
-    if (!hasUniqueUNLocationCodes) {
-      validationErrors.add("Duplicate UNLocationCodes found in shipmentLocations");
-    }
-
-    var filteredByAddress =
-      shipmentLocations.stream()
-        .filter(IS_SOURCE_OR_DESTINATION_LOCATION.and(HAS_ADDRESS))
-        .toList();
-
-    var filteredByAddressCount = filteredByAddress.size();
-
-    boolean hasUniqueAddresses =
-      shipmentLocations.stream()
-        .filter(IS_SOURCE_OR_DESTINATION_LOCATION.and(HAS_ADDRESS))
-        .map(sl -> sl.getLocation().getAddress())
-        .filter(
-          address ->
-            filteredByAddress.stream()
-              .noneMatch(other -> other.getLocation().getAddress().equals(address)))
-        .count()
-        == filteredByAddressCount;
-
-    if (!hasUniqueAddresses) {
-      validationErrors.add("Duplicate addresses found in shipmentLocations");
+  private void clearRequestedChanges() {
+    if (this.requestedChanges != null && !this.requestedChanges.isEmpty()) {
+      this.requestedChanges.clear();
     }
   }
 
@@ -370,50 +302,50 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#RECE} state.
    */
-  public ShipmentEvent receive() {
-    return processTransition(RECE, null);
+  public void receive() {
+    processTransition(RECE, null, false);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#CANC} state.
    */
-  public ShipmentEvent cancel(String reason, OffsetDateTime updateTime) {
-    return processTransition(CANC, reason, updateTime);
+  public void cancel(String reason, OffsetDateTime updateTime) {
+    processTransition(CANC, reason, updateTime, false);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#REJE} state.
    */
-  public ShipmentEvent reject(String reason) {
-    return processTransition(REJE, reason);
+  public void reject(String reason) {
+    processTransition(REJE, reason, false);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENU} state.
    */
-  public ShipmentEvent pendingUpdate(String reason, OffsetDateTime updateTime) {
-    return processTransition(PENU, reason, updateTime);
+  public void pendingUpdate(String reason, OffsetDateTime updateTime) {
+    processTransition(PENU, reason, updateTime, false);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  public ShipmentEvent pendingConfirmation(String reason, OffsetDateTime updateTime) {
-    return processTransition(PENC, reason, updateTime);
+  public void pendingConfirmation(String reason, OffsetDateTime updateTime) {
+    processTransition(PENC, reason, updateTime, true);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
    */
-  public ShipmentEvent confirm(OffsetDateTime confirmationTime) {
-    return processTransition(CONF, null, confirmationTime);
+  public void confirm(OffsetDateTime confirmationTime) {
+    processTransition(CONF, null, confirmationTime, true);
   }
 
   /**
    * Transition the booking into its {@link BkgDocumentStatus#CMPL} state.
    */
-  public ShipmentEvent complete() {
-    return processTransition(CMPL, null);
+  public void complete() {
+    processTransition(CMPL, null, true);
   }
 
   public void lockVersion(OffsetDateTime lockTime) {
@@ -433,11 +365,11 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
     return this.documentStatus;
   }
 
-  protected ShipmentEvent processTransition(BkgDocumentStatus status, String reason) {
-    return processTransition(status, reason, OffsetDateTime.now());
+  protected void processTransition(BkgDocumentStatus status, String reason, boolean clearRequestedChanges) {
+    processTransition(status, reason, OffsetDateTime.now(), clearRequestedChanges);
   }
 
-  protected ShipmentEvent processTransition(BkgDocumentStatus status, String reason, OffsetDateTime updateTime) {
+  protected void processTransition(BkgDocumentStatus status, String reason, OffsetDateTime updateTime, boolean clearRequestedChanges) {
     if (this.validUntil != null) {
       throw new IllegalStateException("Cannot change state on a frozen version!");
     }
@@ -454,16 +386,9 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
     if (carrierBookingRequestReference == null) {
       carrierBookingRequestReference = UUID.randomUUID().toString();
     }
-    return ShipmentEvent.builder()
-      .documentID(id)
-      .documentReference(carrierBookingRequestReference)
-      .documentTypeCode(DocumentTypeCode.CBR)
-      .shipmentEventTypeCode(status.asShipmentEventTypeCode())
-      .reason(reason)
-      .eventClassifierCode(EventClassifierCode.ACT)
-      .eventDateTime(updateTime)
-      .eventCreatedDateTime(updateTime)
-      .build();
+    if (clearRequestedChanges) {
+      this.clearRequestedChanges();
+    }
   }
 
   @Override

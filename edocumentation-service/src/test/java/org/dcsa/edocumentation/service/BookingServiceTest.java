@@ -17,14 +17,11 @@ import org.dcsa.edocumentation.datafactories.LocationDataFactory;
 import org.dcsa.edocumentation.datafactories.VesselDataFactory;
 import org.dcsa.edocumentation.datafactories.VoyageDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.ShipmentEvent;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.ShipmentEventTypeCode;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.ShipmentEventRepository;
 import org.dcsa.edocumentation.service.mapping.*;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
@@ -50,6 +47,7 @@ class BookingServiceTest {
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
 
+    @Spy private ShipmentLocationMapper shipmentLocationMapper = Mappers.getMapper(ShipmentLocationMapper.class);
     @Spy private PartyMapper partyMapper = Mappers.getMapper(PartyMapper.class);
 
     @Spy private DocumentPartyMapper documentPartyMapper = Mappers.getMapper(DocumentPartyMapper.class);
@@ -63,12 +61,14 @@ class BookingServiceTest {
       DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
       ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
       ReflectionTestUtils.setField(bookingMapper, "documentPartyMapper", documentPartyMapper);
+      ReflectionTestUtils.setField(bookingMapper, "shipmentLocationMapper", shipmentLocationMapper);
       ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
       ReflectionTestUtils.setField(documentPartyMapper, "displayedAddressMapper", displayedAddressMapper);
       ReflectionTestUtils.setField(documentPartyMapper, "partyMapper", partyMapper);
       ReflectionTestUtils.setField(partyMapper, "addressMapper", addressMapper);
       ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
+      ReflectionTestUtils.setField(shipmentLocationMapper, "locationMapper", locationMapper);
     }
 
     @Test
@@ -127,11 +127,11 @@ class BookingServiceTest {
     @Mock private ShipmentLocationService shipmentLocationService;
 
     @Mock private BookingRepository bookingRepository;
-    @Mock private ShipmentEventRepository shipmentEventRepository;
 
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
+    @Spy private ReferenceMapper referenceMapper = Mappers.getMapper(ReferenceMapper.class);
 
     @InjectMocks private BookingService bookingService;
 
@@ -139,9 +139,10 @@ class BookingServiceTest {
     public void resetMocks() {
       ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
       ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
+      ReflectionTestUtils.setField(bookingMapper, "referenceMapper", referenceMapper);
       reset(voyageService, vesselService, commodityService,
         requestedEquipmentGroupService, referenceService, documentPartyService, shipmentLocationService,
-        bookingRepository, shipmentEventRepository);
+        bookingRepository);
     }
 
     @Test
@@ -180,11 +181,9 @@ class BookingServiceTest {
       assertEquals(org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE, result.documentStatus());
 
       ArgumentCaptor<Booking> bookingArgumentCaptor = ArgumentCaptor.forClass(Booking.class);
-      ArgumentCaptor<ShipmentEvent> shipmentEventArgumentCaptor = ArgumentCaptor.forClass(ShipmentEvent.class);
       verify(voyageService).resolveVoyage(bookingRequest);
       verify(vesselService).resolveVessel(bookingRequest);
       verify(bookingRepository).save(bookingArgumentCaptor.capture());
-      verify(shipmentEventRepository).save(shipmentEventArgumentCaptor.capture());
       verify(commodityService).createCommodities(eq(bookingRequest.commodities()), any(Booking.class));
       verify(referenceService).createReferences(eq(bookingRequest.references()), any(Booking.class));
       verify(documentPartyService).createDocumentParties(eq(bookingRequest.documentParties()), any(Booking.class));
@@ -202,7 +201,6 @@ class BookingServiceTest {
       assertNotNull(bookingActuallySaved.getBookingRequestCreatedDateTime());
       assertNotNull(bookingActuallySaved.getBookingRequestUpdatedDateTime());
       assertEquals(BkgDocumentStatus.RECE, bookingActuallySaved.getDocumentStatus());
-      assertEquals(ShipmentEventTypeCode.RECE, shipmentEventArgumentCaptor.getValue().getShipmentEventTypeCode());
     }
   }
 }

@@ -3,6 +3,7 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 
@@ -29,12 +30,13 @@ public class Charge {
   @Column(name = "currency_amount")
   private Double currencyAmount;
 
+  @PseudoEnum(value = "currencycodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   @Column(name = "currency_code")
   private String currencyCode;
 
   @Column(name = "payment_term_code")
-  @PseudoEnum(value = "paymentterms.csv", groups = AsyncShipperProvidedDataValidation.class)
-  private String paymentTermCode;
+  @Enumerated(EnumType.STRING)
+  private PaymentTerm paymentTermCode;
 
   @Column(name = "calculation_basis")
   private String calculationBasis;

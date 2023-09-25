@@ -8,7 +8,9 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
 import org.dcsa.edocumentation.transferobjects.TDTransportTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
+import org.dcsa.edocumentation.transferobjects.enums.CargoMovementType;
 import org.dcsa.edocumentation.transferobjects.enums.CarrierCodeListProvider;
+import org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public abstract class TransportDocumentMapper {
 
   @Autowired
   protected LocationMapper locMapper;
+
+  @Autowired
+  protected EnumMapper eMapper;
 
   @Mapping(source = "transportDocument.shippingInstruction.documentStatus", target = "documentStatus")
   public abstract TransportDocumentRefStatusTO toStatusDTO(TransportDocument transportDocument);
@@ -79,10 +84,10 @@ public abstract class TransportDocumentMapper {
   @Mapping(target = "declaredValue", ignore = true)  // FIXME: We should be mapping this field.
   @Mapping(target = "declaredValueCurrency", ignore = true)  // FIXME: We should be mapping this field.
 
-  @Mapping(target = "receiptTypeAtOrigin", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
-  @Mapping(target = "deliveryTypeAtDestination", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
-  @Mapping(target = "cargoMovementTypeAtOrigin", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
-  @Mapping(target = "cargoMovementTypeAtDestination", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
+  @Mapping(target = "receiptTypeAtOrigin", expression = "java(receiptTypeAtOrigin(transportDocument))")
+  @Mapping(target = "deliveryTypeAtDestination", expression = "java(deliveryTypeAtDestination(transportDocument))")
+  @Mapping(target = "cargoMovementTypeAtOrigin", expression = "java(cargoMovementTypeAtOrigin(transportDocument))")
+  @Mapping(target = "cargoMovementTypeAtDestination", expression = "java(cargoMovementTypeAtDestination(transportDocument))")
   @Mapping(target = "utilizedTransportEquipments", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
   @Mapping(source = "transportDocument.shippingInstruction.invoicePayableAt", target = "invoicePayableAt")
   public abstract TransportDocumentTO toDTO(TransportDocument transportDocument);
@@ -91,17 +96,38 @@ public abstract class TransportDocumentMapper {
     return document.getShippingInstruction().getConsignmentItems().iterator().next().getShipment();
   }
 
+  protected Booking resolveAnyBooking(TransportDocument document) {
+    return resolveAnyShipment(document).getBooking();
+  }
+
   protected String termsAndConditions(TransportDocument document) {
     return resolveAnyShipment(document).getTermsAndConditions();
   }
 
   protected String serviceContractReference(TransportDocument document) {
-    return resolveAnyShipment(document).getBooking().getServiceContractReference();
+    return resolveAnyBooking(document).getServiceContractReference();
   }
 
   protected String contractQuotationReference(TransportDocument document) {
-    return resolveAnyShipment(document).getBooking().getContractQuotationReference();
+    return resolveAnyBooking(document).getContractQuotationReference();
   }
+
+  protected ReceiptDeliveryType receiptTypeAtOrigin(TransportDocument document) {
+    return eMapper.toTO(resolveAnyBooking(document).getReceiptTypeAtOrigin());
+  }
+
+  protected ReceiptDeliveryType deliveryTypeAtDestination(TransportDocument document) {
+    return eMapper.toTO(resolveAnyBooking(document).getDeliveryTypeAtDestination());
+  }
+
+  protected CargoMovementType cargoMovementTypeAtOrigin(TransportDocument document) {
+    return eMapper.toTO(resolveAnyBooking(document).getCargoMovementTypeAtOrigin());
+  }
+
+  protected CargoMovementType cargoMovementTypeAtDestination(TransportDocument document) {
+    return eMapper.toTO(resolveAnyBooking(document).getCargoMovementTypeAtDestination());
+  }
+
 
   protected CarrierCodeListProvider carrierCodeListProvider(TransportDocument transportDocument) {
     var carrier = transportDocument.getCarrier();

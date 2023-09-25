@@ -6,6 +6,7 @@ import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 public record ShippingInstructionRefStatusTO(
   @Size(max = 100)
@@ -15,6 +16,9 @@ public record ShippingInstructionRefStatusTO(
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   EblDocumentStatus documentStatus,
 
+
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  List<RequestedChangeTO> requestedChanges,
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   OffsetDateTime shippingInstructionCreatedDateTime,
 

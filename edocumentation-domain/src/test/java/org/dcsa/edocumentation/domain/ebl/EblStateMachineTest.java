@@ -24,7 +24,7 @@ class EblStateMachineTest {
     shippingInstruction.receive();
     Assertions.assertEquals(RECE, shippingInstruction.getDocumentStatus());
     Assertions.assertTrue(shippingInstruction.isPendingUpdateSupported());
-    shippingInstruction.pendingUpdate("Please fix foo!");
+    shippingInstruction.pendingUpdate();
     Assertions.assertEquals(PENU, shippingInstruction.getDocumentStatus());
     shippingInstruction.receive();
     Assertions.assertEquals(RECE, shippingInstruction.getDocumentStatus());
@@ -36,7 +36,7 @@ class EblStateMachineTest {
     transportDocument = TransportDocument.builder().shippingInstruction(shippingInstruction).build();
     Assertions.assertEquals(DRFT, shippingInstruction.getDocumentStatus());
     Assertions.assertTrue(transportDocument.isPendingApprovalSupported());
-    transportDocument.pendingApproval("We have provided foo, please approve the draft TRD");
+    transportDocument.pendingApproval();
     Assertions.assertEquals(PENA, shippingInstruction.getDocumentStatus());
     transportDocument.approveFromCarrier();
     Assertions.assertEquals(APPR, shippingInstruction.getDocumentStatus());
@@ -79,14 +79,14 @@ class EblStateMachineTest {
     // RECE must go directly to DRFT in the amendment flow (which is weird because there is no
     // reject state either... >.>)
     Assertions.assertFalse(shippingInstruction.isPendingUpdateSupported());
-    Assertions.assertThrows(InternalServerErrorException.class, () -> shippingInstruction.pendingUpdate("Not possible"));
+    Assertions.assertThrows(InternalServerErrorException.class, shippingInstruction::pendingUpdate);
     // The error should not have made it change state
     Assertions.assertEquals(RECE, shippingInstruction.getDocumentStatus());
 
     transportDocument.draft();
     // DRFT must go directly to APPR in the amendment flow.
     Assertions.assertFalse(transportDocument.isPendingApprovalSupported());
-    Assertions.assertThrows(InternalServerErrorException.class, () -> transportDocument.pendingApproval("Not possible"));
+    Assertions.assertThrows(InternalServerErrorException.class, transportDocument::pendingApproval);
     // Again, it retains the current state on invalid transitions.
     Assertions.assertEquals(DRFT, shippingInstruction.getDocumentStatus());
 
@@ -96,7 +96,7 @@ class EblStateMachineTest {
       .build();
     // DRFT must go directly to APPR in the amendment flow - even after resume
     Assertions.assertFalse(transportDocument.isPendingApprovalSupported());
-    Assertions.assertThrows(InternalServerErrorException.class, () -> transportDocument.pendingApproval("Not possible"));
+    Assertions.assertThrows(InternalServerErrorException.class, transportDocument::pendingApproval);
     // Again, it retains the current state on invalid transitions.
     Assertions.assertEquals(DRFT, amendmentStateMachine.getDocumentStatus());
   }
@@ -115,12 +115,12 @@ class EblStateMachineTest {
     for (var initializer : shiInitializers) {
       ShippingInstruction stateMachine = initializer.apply(VOID);
       Assertions.assertThrows(ConflictException.class, stateMachine::receive);
-      Assertions.assertThrows(ConflictException.class, () -> stateMachine.pendingUpdate("Should throw"));
+      Assertions.assertThrows(ConflictException.class, stateMachine::pendingUpdate);
     }
     for (var initializer : trdInitializers) {
       TransportDocument stateMachine = initializer.apply(VOID);
       Assertions.assertThrows(ConflictException.class, stateMachine::draft);
-      Assertions.assertThrows(ConflictException.class, () -> stateMachine.pendingApproval("Should throw"));
+      Assertions.assertThrows(ConflictException.class, stateMachine::pendingApproval);
       Assertions.assertThrows(ConflictException.class, stateMachine::approveFromShipper);
       Assertions.assertThrows(ConflictException.class, stateMachine::approveFromCarrier);
       Assertions.assertThrows(ConflictException.class, stateMachine::issue);

@@ -1,35 +1,51 @@
 # DCSA-Edocumentation - Booking and EBL
 
-Building and Running the project,
--------------------------------------
-**[RECOMMENDED]**
-Setup a Github Personal Access Token as mentioned [here](https://github.com/dcsaorg/DCSA-Core/blob/master/README.md#how-to-use-dcsa-core-packages), then skip to **step 3**.
+## Developer on-boarding Building and Running the project
 
-If you would like to build required DCSA packages individually, begin with step 1.
+The recommended flow for setting up the development machine for the sake of modifying
+the reference implementation is to:
 
-1) Clone **DCSA-Edocumentation** (with ``--recurse-submodules`` option.) and Build using, ``mvn package``
+1) Set up a GitHub Personal Access Token as mentioned [here](https://github.com/dcsaorg/DCSA-Core/blob/master/README.md#how-to-use-dcsa-core-packages).
+2) Clone **DCSA-Edocumentation** (with ``--recurse-submodules`` option.)
+3) Set up a database via: `docker compose up -d -V --build dcsa-test-db`
+4) Build once using ``mvn package``
+   - This step will hopefully be obsolete in the future.
+5) Have IDEA run the `Application.class` as a spring boot application with the following
+   profiles active: `dev,localdb,logsql,nosecurity`
+   - If you have the community edition of IDEA, set the `SPRING_PROFILES_ACTIVE` environment
+     variable to `dev,localdb,logsql,nosecurity`.
+6) Verify if the application is running: `curl http://localhost:9090/actuator/health`
+7) Run the test suite via `newman run postman_collection.json`
 
-2) Initialize your local postgresql database as described in [datamodel/README.md](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/README.md) \
-   or If you have docker installed, you may skip this step and use the docker-compose command mentioned below to set it up (This will initialize the application along with the database).
+You will often need to reset your database, which can be done by:
 
-3) Run application,
-```
-mvn spring-boot:run [options]
+ 1) Stop the application
+ 2) Run `docker compose down`
+ 3) Run `docker compose up -d -V --build dcsa-test-db`
+ 4) Start the application again.
 
-options:
- -Dspring-boot.run.arguments="--DB_HOSTNAME=localhost:5432 --LOG_LEVEL=DEBUG"
- ```
+We do not offer migration from previous versions of the database.  Any change that changes the SQL
+will require a reset of the database.
 
-OR using **docker-compose**
+## Non-developer usage of the reference implementation
 
-```
-docker-compose up -d -V --build
-```
+As a non-DCSA developer wanting to use / test the reference implementation, the recommended
+flow is:
 
-4) Verify if the application is running,
-```
-curl http://localhost:9090/v1/actuator/health
-```
+1) Set up a GitHub Personal Access Token as mentioned [here](https://github.com/dcsaorg/DCSA-Core/blob/master/README.md#how-to-use-dcsa-core-packages).
+2) Clone **DCSA-Edocumentation** (with ``--recurse-submodules`` option.)
+3) Build the application using ``mvn package``
+4) Set up the reference implementation via: `docker compose up -d -V --build`
+   - Note that `docker compose` by default does **not** load the test data (the sql files marked as test).
+     For that, you will have to run the `docker compose` with the environment variable
+     `SPRING_PROFILES_ACTIVE=nosecurity,loadtestdata` (`nosecurity` is the default if you do not set this
+     variable). At the moment, this step is required if you want the postman collection tests to succeed.
+5) Verify if the application is running: `curl http://localhost:9090/actuator/health`
+6) **If** test data was loaded (see step 4), you can now run the postman tests with
+   `newman run postman_collection.json`
+
+
+You are also welcome to use the DCSA developer flow, which should also work for this purpose.
 
 ## Security considerations
 
@@ -48,3 +64,26 @@ The tests may be useful to others as a starting point, but you may need to edit 
 your specific test data.
 
 The tests can either be imported in to postman or run via newman `newman run postman_collection.json`.
+
+## DEVELOPMENT FLOW
+
+`master` is the main development branch.
+
+`pre-release` and `release` are tagged and should be used as a stable version.
+
+Development continues on `master` and feature branches are created based on `master`.
+
+A typical development flow would look like:
+
+1) Create a feature branch with `master` as base, proceed to make changes to feature branch.
+2) Raise PR against `master`. When a PR is raised against master a CI is run to ensure everything is fine.
+3) Merge with `master` after approval by at least one verified code owner and successful CI run.
+
+> Note: If changes are required in the `DCSA-Shared-Kernel`, those changes should first be merged into the respective `master` branches before continuing development in this repository.
+
+4) If development has been completed as per requirements for a given API version, `master` must be tagged to <br>
+   create a `release` or `pre-release` accordingly.
+
+When bug fixes are required or changes in pre-release versions are needed, we branch off using the respective <br>
+tags and continue development on that branch. It is important to note that these changes must be cherry-picked <br>
+and included into `master`.

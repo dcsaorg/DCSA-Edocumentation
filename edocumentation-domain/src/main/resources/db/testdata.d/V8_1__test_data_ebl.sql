@@ -432,29 +432,25 @@ INSERT INTO party (
     party_id,
     name,
     email,
-    phone,
-    url
+    phone
 ) VALUES (
     'b24d099e-a6f6-404e-b082-776f7f589023'::uuid,
     '4e448f26-4035-11eb-a49d-7f9eb9bc8dd9',
     'DCSA',
     'info@dcsa.org',
-    '+31123456789',
-    'https://www.dcsa.org'
+    '+31123456789'
 ), (
     'b24d099e-a6f6-404e-b082-776f7f589064'::uuid,
     '8dd9a4c4-4039-11eb-8770-0b2b19847fab',
     'DCSA',
     'info@dcsa.org',
-    '+31123456789',
-    'https://www.dcsa.org'
+    '+31123456789'
 ), (
     'b24d099e-a6f6-404e-b082-776f7f589022'::uuid,
     '9dd9a4c4-4039-11eb-8770-0b2b19847fab',
     'DCSA',
     'info@dcsa.org',
-    '+31123456789',
-    'https://www.dcsa.org'
+    '+31123456789'
 );
 
 INSERT INTO document_party (
@@ -518,14 +514,6 @@ INSERT INTO shipment_location (
    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
    uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
    'POD'
-);
-
-INSERT INTO iso_equipment_code (
-    iso_equipment_code,
-    iso_equipment_name
-) VALUES (
-    '22G1',
-    'Twenty foot dry'
 );
 
 INSERT INTO equipment (
@@ -899,79 +887,6 @@ INSERT INTO transport_document (
    '4e448f26-4035-11eb-a49d-7f9eb9bc8dd9'
  );
 
-INSERT INTO shipment_event (
-   event_classifier_code,
-   event_date_time,
-   event_created_date_time,
-   shipment_event_type_code,
-   document_type_code,
-   document_id,
-   document_reference,
-   reason
-) VALUES (
-   'ACT',
-   '2021-01-08T13:22:53Z',
-   '2021-01-08T13:22:53Z',
-   'RECE',
-   'SHI',
-   '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
-   (SELECT shipping_instruction_reference FROM shipping_instruction si WHERE si.id = '770f11e5-aae2-4ae4-b27e-0c689ed2e333'),
-   null
-), (
-  'ACT',
-  '2021-01-08T17:22:53Z',
-  '2021-01-08T17:22:53Z',
-  'PENU',
-  'SHI',
-  '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
-  (SELECT shipping_instruction_reference FROM shipping_instruction si WHERE si.id = '770f11e5-aae2-4ae4-b27e-0c689ed2e333'),
-  'Carrier Booking Reference present in both shipping instruction as well as cargo items.'
-), (
-  'ACT',
-  '2021-01-08T18:22:53Z',
-  '2021-01-08T18:22:53Z',
-  'DRFT',
-  'SHI',
-  '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
-  (SELECT shipping_instruction_reference FROM shipping_instruction si WHERE si.id = '770f11e5-aae2-4ae4-b27e-0c689ed2e333'),
-  null
-), (
-   'ACT',
-   '2022-03-01T18:22:53Z',
-   '2022-03-01T18:22:53Z',
-   'RECE',
-   'SHI',
-   '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
-    (SELECT shipping_instruction_reference FROM shipping_instruction si WHERE si.id = '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d'),
-   null
-), (
-   'ACT',
-   '2022-03-03T18:22:53Z',
-   '2022-03-03T18:22:53Z',
-   'DRFT',
-   'SHI',
-   '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
-   (SELECT shipping_instruction_reference FROM shipping_instruction si WHERE si.id = '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d'),
-   null
-), (
-   'ACT',
-   '2022-03-03T18:22:53Z',
-   '2022-03-03T18:22:53Z',
-   'DRFT',
-   'TRD',
-   (SELECT id FROM transport_document td WHERE td.transport_document_reference = '2b02401c-b2fb-5009'),
-   '2b02401c-b2fb-5009',
-   null
-), (
-   'ACT',
-   '2022-03-05T13:56:12Z',
-   '2022-03-05T13:56:12Z',
-   'APPR',
-   'TRD',
-   (SELECT id FROM transport_document td WHERE td.transport_document_reference = '2b02401c-b2fb-5009'),
-   '2b02401c-b2fb-5009',
-   null
- );
 
 INSERT INTO package_code(
     package_code,
@@ -1376,15 +1291,13 @@ INSERT INTO party_contact_details (
     party_id,
     name,
     email,
-    phone,
-    url
+    phone
 ) VALUES (
     '0a42252d-c8d5-4a0e-ab93-fa355992fb29'::uuid,
     '499918a2-d12d-4df6-840c-dd92357002df',
     'DCSA',
     'info@dcsa.org',
-    '+31123456789',
-    'https://www.dcsa.org'
+    '+31123456789'
 );
 
 INSERT INTO displayed_address (
@@ -1711,15 +1624,13 @@ INSERT INTO party_contact_details (
     party_id,
     name,
     email,
-    phone,
-    url
+    phone
 ) VALUES (
     '0ffc61f0-c74d-4a57-8d32-009a32247c29'::uuid,
     '8e463a84-0a2d-47cd-9332-51e6cb36b635',
     'DCSA',
     'info@dcsa.org',
-    '+31123456789',
-    'https://www.dcsa.org'
+    '+31123456789'
 );
 
 INSERT INTO shipping_instruction (

@@ -1,3 +1,12 @@
 Incoterms Code,Incoterms Name,Incoterms Description
+EXW,Ex-Works,
 FCA,Free Carrier,"The seller delivers the goods, cleared for export, at a named place (possibly including the seller's own premises)"
+FAS,Free Alongside Ship,
 FOB,Free on Board,Under FOB terms the seller bears all costs and risks up to the point the goods are loaded on board the vessel.
+CFR,Cost and Freight,
+CIF,"Cost, Insurance and Freight",
+CPT,Carriage Paid To,
+CIP,Carriage And Insurance Paid To,
+DAP,Delivered At Place,
+DPU,Delivered At Place Unloaded,
+DDP,Delivered Duty Paid,

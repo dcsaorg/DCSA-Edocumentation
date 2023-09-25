@@ -77,8 +77,7 @@ CREATE TABLE party_contact_details (
     party_id uuid NOT NULL REFERENCES party(id),
     name varchar(100) NOT NULL,
     email varchar(100) NULL,
-    phone varchar(30) NULL,
-    url varchar(100) NULL
+    phone varchar(30) NULL
 );
 
 CREATE TABLE party_identifying_code (
@@ -215,13 +214,6 @@ CREATE TABLE shipment (
 );
 
 
-CREATE TABLE iso_equipment_code (
-    iso_equipment_code varchar(4) PRIMARY KEY,
-    iso_equipment_name varchar(35) NOT NULL
-);
-
-
-
 CREATE TABLE active_reefer_settings (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     is_gen_set_required boolean NOT NULL,
@@ -246,9 +238,9 @@ CREATE TABLE requested_equipment_group (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     booking_id uuid NULL REFERENCES booking (id),
     shipment_id uuid NULL REFERENCES shipment (id),
-    requested_equipment_iso_equipment_code varchar(4) NULL REFERENCES iso_equipment_code (iso_equipment_code),
+    requested_equipment_iso_equipment_code varchar(4) NULL,
     requested_equipment_units real NULL,
-    confirmed_equipment_iso_equipment_code varchar(4) NULL REFERENCES iso_equipment_code (iso_equipment_code),
+    confirmed_equipment_iso_equipment_code varchar(4) NULL,
     confirmed_equipment_units integer NULL,
     is_shipper_owned boolean NOT NULL DEFAULT false,
     active_reefer_settings_id uuid NULL REFERENCES active_reefer_settings (id)
@@ -338,6 +330,23 @@ ALTER TABLE shipping_instruction
     ADD FOREIGN KEY (amendment_to_transport_document_id) REFERENCES transport_document (id);
 
 
+CREATE TABLE bkg_requested_change (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    path varchar(500) NULL,
+    message varchar(500) NOT NULL,
+    booking_id uuid REFERENCES booking (id),
+    element_order int NOT NULL default 0
+);
+
+
+CREATE TABLE si_requested_change (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    path varchar(500) NULL,
+    message varchar(500) NOT NULL,
+    shipping_instruction_id uuid REFERENCES shipping_instruction (id),
+    element_order int NOT NULL default 0
+);
+
 CREATE TABLE carrier_clauses (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     clause_content text NOT NULL
@@ -349,7 +358,6 @@ CREATE TABLE shipment_carrier_clauses (
     shipment_id uuid NULL REFERENCES shipment (id),
     transport_document_id uuid NULL REFERENCES transport_document (id)
 );
-
 
 CREATE TABLE document_party (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -385,15 +393,13 @@ CREATE TABLE charge (
 
 CREATE TABLE equipment (
     equipment_reference varchar(15) PRIMARY KEY,    -- The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.
-    -- Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard.
-    iso_equipment_code char(4) NOT NULL REFERENCES iso_equipment_code (iso_equipment_code),
+    iso_equipment_code varchar(4) NOT NULL,
     tare_weight real NOT NULL,
     total_max_weight real null,
     weight_unit varchar(3) NOT NULL REFERENCES unit_of_measure(unit_of_measure_code)  CHECK (weight_unit IN ('KGM','LBR'))
 );
 
 -- Supporting FK constraints
-CREATE INDEX ON equipment (iso_equipment_code);
 CREATE INDEX ON equipment (equipment_reference);
 
 
@@ -522,8 +528,7 @@ CREATE TABLE shipment_location (
     booking_id uuid NULL REFERENCES booking(id),
     location_id uuid NOT NULL REFERENCES location (id),
     shipment_location_type_code varchar(3) NOT NULL,
-    event_date_time timestamp with time zone NULL, --optional datetime indicating when the event at the location takes place
-    UNIQUE (location_id, shipment_location_type_code, shipment_id)
+    event_date_time timestamp with time zone NULL --optional datetime indicating when the event at the location takes place
 );
 
 -- Supporting FK constraints
@@ -566,39 +571,4 @@ CREATE TABLE shipment_transport (
     universal_export_voyage_reference varchar(5) NULL,
     universal_service_reference varchar(8) NULL,
     is_under_shippers_responsibility boolean NOT NULL
-);
-
-
-CREATE TABLE event_classifier (
-    event_classifier_code varchar(3) PRIMARY KEY,
-    event_classifier_name varchar(30) NOT NULL,
-    event_classifier_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE document_type (
-    document_type_code varchar(3) PRIMARY KEY,
-    document_type_name varchar(100) NOT NULL,
-    document_type_description varchar(250) NOT NULL
-);
-
-
-CREATE TABLE shipment_event (
-    event_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    event_classifier_code varchar(3) NOT NULL REFERENCES event_classifier(event_classifier_code)
-        CHECK ( event_classifier_code = 'ACT'),
-    event_created_date_time timestamp with time zone DEFAULT now() NOT NULL,
-    event_date_time timestamp with time zone NOT NULL,
-    shipment_event_type_code varchar(4) NOT NULL REFERENCES shipment_event_type(shipment_event_type_code),
-    document_type_code varchar(3) NOT NULL REFERENCES document_type(document_type_code),
-    document_id uuid NOT NULL,
-    reason varchar(5000) NULL
-);
-
-  CREATE TABLE advance_manifest_filing (
-	manifest_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    shipment_id uuid NOT NULL REFERENCES shipment(id),
-    manifest_type_code varchar(50) NOT NULL,
-    country_code varchar(2) NOT NULL,
-	list_order int NOT NULL default 0
 );

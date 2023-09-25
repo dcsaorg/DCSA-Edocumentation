@@ -11,12 +11,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 public record BookingSummaryTO(
   String carrierBookingRequestReference,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   BkgDocumentStatus documentStatus,
+
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  List<RequestedChangeTO> requestedChanges,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -42,8 +46,7 @@ public record BookingSummaryTO(
   @Size(max = 30, message = "The attribute serviceContractReference has a max size of 30.")
   String serviceContractReference,
 
-  @Size(max = 3)
-  String paymentTermCode,
+  PaymentTerm paymentTermCode,
 
   @NotNull(message = "The attribute isPartialLoadAllowed is required.")
   Boolean isPartialLoadAllowed,
