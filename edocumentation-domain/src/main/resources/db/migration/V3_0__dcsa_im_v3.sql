@@ -572,3 +572,10 @@ CREATE TABLE shipment_transport (
     universal_service_reference varchar(8) NULL,
     is_under_shippers_responsibility boolean NOT NULL
 );
+  CREATE TABLE advance_manifest_filing (
+	manifest_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    shipment_id uuid NOT NULL REFERENCES shipment(id),
+    manifest_type_code varchar(50) NOT NULL,
+    country_code varchar(2) NOT NULL,
+	list_order int NOT NULL default 0
+);
