@@ -172,7 +172,8 @@ public abstract class TransportDocumentMapper {
 
     LocalDate departureDate = null;
     LocalDate arrivalDate = null;
-    String preCarriedBy = null;
+    String preCarriageBy = null;
+    String onCarriageBy = null;
 
     var firstVesselLeg = shipmentTransports.stream()
       .filter(st -> DCSATransportType.VESSEL.name().equals(st.getModeOfTransport()))
@@ -191,7 +192,7 @@ public abstract class TransportDocumentMapper {
           departureDate = date;
         }
         if (isSameLocation(loadLoc, preLoc)) {
-          preCarriedBy = st.getModeOfTransport();
+          preCarriageBy = st.getModeOfTransport();
         }
       }
       if (isSameLocation(dischargeLoc, podLoc) || isSameLocation(dischargeLoc, pdeLoc)) {
@@ -199,12 +200,16 @@ public abstract class TransportDocumentMapper {
         if (arrivalDate == null || arrivalDate.isBefore(date)) {
           arrivalDate = date;
         }
+        if (isSameLocation(loadLoc, dischargeLoc)) {
+          onCarriageBy = st.getModeOfTransport();
+        }
       }
     }
     return TDTransportTO.builder()
         .plannedArrivalDate(arrivalDate)
         .plannedDepartureDate(departureDate)
-        .preCarriedBy(preCarriedBy)
+        .preCarriageBy(preCarriageBy)
+        .onCarriageBy(onCarriageBy)
         .placeOfReceipt(locMapper.toDTO(preLoc))
         .portOfLoading(locMapper.toDTO(polLoc))
         .portOfDischarge(locMapper.toDTO(podLoc))

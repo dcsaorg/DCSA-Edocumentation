@@ -20,7 +20,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.service.mapping.*;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
@@ -158,7 +157,6 @@ class BookingServiceTest {
         .voyage(voyage)
         .placeOfIssue(location)
         .invoicePayableAt(location)
-        .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
         .build();
       Booking bookingSaved = bookingToSave.toBuilder()
         .carrierBookingRequestReference("carrierBookingRequestRef")

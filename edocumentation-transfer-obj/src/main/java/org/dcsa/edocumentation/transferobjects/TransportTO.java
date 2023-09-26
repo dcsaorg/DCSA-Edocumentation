@@ -47,8 +47,7 @@ public record TransportTO(
     String carrierServiceCode,
 
   @UniversalServiceReference
-    String universalServiceReference,
-  boolean isUnderShippersResponsibility) {
+    String universalServiceReference) {
 
   @Builder(toBuilder = true)
   public TransportTO {}

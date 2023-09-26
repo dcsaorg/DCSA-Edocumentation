@@ -82,8 +82,6 @@ public record TransportDocumentTO(
   @Null(groups = EBLValidation.class, message = "Must be omitted for an eBL")
   Integer numberOfOriginalsWithoutCharges,
 
-  // TODO: preCarriageUnderShippersResponsibility here
-
   @NotNull(message = "isElectronic is required.")
   Boolean isElectronic,
 

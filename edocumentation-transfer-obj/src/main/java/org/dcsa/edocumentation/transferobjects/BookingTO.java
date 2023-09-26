@@ -137,9 +137,6 @@ public record BookingTO(
   @ValidVesselIMONumber(allowNull = true)
   String vesselIMONumber,
 
-  @Size(max = 10)
-  String preCarriageUnderShippersResponsibility,
-
   @Valid
   LocationTO invoicePayableAt,
 

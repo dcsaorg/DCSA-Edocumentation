@@ -107,7 +107,6 @@ public class BookingService {
   private Booking.BookingBuilder toDAOBuilder(BookingTO bookingRequest) {
     return bookingMapper.toDAO(bookingRequest).toBuilder()
       .voyage(voyageService.resolveVoyage(bookingRequest))
-      .vessel(vesselService.resolveVessel(bookingRequest))
-      .preCarriageUnderShippersResponsibility(bookingRequest.preCarriageUnderShippersResponsibility());
+      .vessel(vesselService.resolveVessel(bookingRequest));
   }
 }
