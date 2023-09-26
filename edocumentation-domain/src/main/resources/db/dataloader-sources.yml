@@ -44,6 +44,8 @@ sources:
       - document_type
       - event_classifier
       - cut_off_time
+      - seal_source
+      - seal_type
 
   - path: classpath:db/samples.d
     type: csv
