@@ -85,7 +85,4 @@ public class ShipmentTransport {
 
   @Column(name = "universal_service_reference")
   private String universalServiceReference;
-
-  @Column(name = "is_under_shippers_responsibility")
-  private boolean isUnderShippersResponsibility;
 }

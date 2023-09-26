@@ -190,7 +190,6 @@ CREATE TABLE booking (
     declared_value_currency_code varchar(3) NULL,
     declared_value real NULL,
     place_of_issue_id uuid NULL REFERENCES location(id),
-    pre_carriage_under_shippers_responsibility varchar(10) NULL,
     voyage_id UUID NULL REFERENCES voyage(id)
 );
 
@@ -558,6 +557,5 @@ CREATE TABLE shipment_transport (
     carrier_service_code varchar(11) NULL,
     universal_import_voyage_reference varchar(5) NULL,
     universal_export_voyage_reference varchar(5) NULL,
-    universal_service_reference varchar(8) NULL,
-    is_under_shippers_responsibility boolean NOT NULL
+    universal_service_reference varchar(8) NULL
 );

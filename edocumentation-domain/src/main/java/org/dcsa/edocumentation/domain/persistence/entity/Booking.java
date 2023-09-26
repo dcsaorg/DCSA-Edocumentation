@@ -198,12 +198,6 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @JoinColumn(name = "pre_carriage_mode_of_transport_code")
-  @PseudoEnum(value = "modeoftransportcodes.csv", column = "DCSA Transport Type")
-  private String preCarriageUnderShippersResponsibility;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "vessel_id")
   private Vessel vessel;

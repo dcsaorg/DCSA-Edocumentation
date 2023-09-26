@@ -513,8 +513,7 @@ INSERT INTO shipment_transport (
   carrier_import_voyage_number,
   carrier_export_voyage_number,
   carrier_service_code,
-  dcsa_transport_type,
-  is_under_shippers_responsibility
+  dcsa_transport_type
 ) VALUES (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'DCR987876762'),
     1,
@@ -528,8 +527,7 @@ INSERT INTO shipment_transport (
     '2106W',
     '2107E',
     null,
-    'VESSEL',
-    false
+    'VESSEL'
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'C501576CD94F'),
     1,
@@ -543,8 +541,7 @@ INSERT INTO shipment_transport (
     '2106W',
     '2107E',
     null,
-    'VESSEL',
-    false
+    'VESSEL'
 );
 
 INSERT INTO reference (
