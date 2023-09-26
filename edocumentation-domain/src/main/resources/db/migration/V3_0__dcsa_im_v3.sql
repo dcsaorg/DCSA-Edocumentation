@@ -95,13 +95,6 @@ CREATE TABLE transport_document_type (
 );
 
 
-CREATE TABLE cut_off_time (
-    cut_off_time_code varchar(3) PRIMARY KEY,
-    cut_off_time_name varchar(100) NULL,
-    cut_off_time_description varchar(250) NULL
-);
-
-
 CREATE TABLE vessel_type (
     vessel_type_code varchar(4) PRIMARY KEY,
     vessel_type_name varchar(100) NULL,
@@ -279,10 +272,12 @@ CREATE TABLE requested_equipment_commodity (
 
 
 CREATE TABLE shipment_cutoff_time (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     shipment_id uuid NOT NULL REFERENCES shipment(id),
-    cut_off_time_code varchar(3) NOT NULL REFERENCES cut_off_time(cut_off_time_code),
+    cut_off_time_code varchar(3) NOT NULL,
     cut_off_time timestamp with time zone NOT NULL,
-    PRIMARY KEY (shipment_id, cut_off_time_code)
+    list_order int NOT NULL default 0,
+    UNIQUE (shipment_id, cut_off_time_code)
 );
 
 

@@ -8,9 +8,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.AdvanceManifestFiling;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
@@ -18,21 +16,17 @@ import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.ShipmentLocationService;
 import org.dcsa.edocumentation.service.ShipmentTransportService;
 import org.dcsa.edocumentation.service.mapping.ConfirmedEquipmentMapper;
+import org.dcsa.edocumentation.service.mapping.ShipmentCutOffTimeMapper;
 import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapper;
 import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapperImpl;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
-import org.dcsa.edocumentation.transferobjects.ConfirmedEquipmentTO;
-import org.dcsa.edocumentation.transferobjects.AdvanceManifestFilingTO;
-import org.dcsa.edocumentation.transferobjects.LocationTO;
-import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
-import org.dcsa.edocumentation.transferobjects.TransportTO;
+import org.dcsa.edocumentation.transferobjects.*;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
 import org.dcsa.edocumentation.transferobjects.enums.ShipmentLocationTypeCode;
 import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
 import org.dcsa.edocumentation.transferobjects.unofficial.ManageShipmentRequestTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.ShipmentRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,6 +40,7 @@ public class ManageShipmentService {
   private final ShipmentLocationService shipmentLocationService;
   private final ShipmentTransportService shipmentTransportService;
   private final ConfirmedEquipmentMapper confirmedEquipmentMapper;
+  private final ShipmentCutOffTimeMapper shipmentCutOffTimeMapper;
 
   private final AdvanceManifestFilingMapper advanceManifestFilingMapper;
 
@@ -133,7 +128,7 @@ public class ManageShipmentService {
       return shipmentMapper.toStatusDTO(shipment, validationResult.proposedStatus());
     }
 
-    // FIXME: This should be embedded into `validationResult`.
+    // FIXME: This should be processed into a status DTO rather than exception style.
     validateTransportPlans(shipmentRequestTO, shipmentRequestTO.shipmentLocations());
 
     shipment.assignConfirmedEquipments(
@@ -142,6 +137,15 @@ public class ManageShipmentService {
         Collections.<ConfirmedEquipmentTO>emptyList()
       ).stream()
         .map(confirmedEquipmentMapper::toDAO)
+        .toList()
+    );
+
+    shipment.assignShipmentCutOffTimes(
+      Objects.requireNonNullElse(
+          shipmentRequestTO.shipmentCutOffTimes(),
+          Collections.<ShipmentCutOffTimeTO>emptyList()
+        ).stream()
+        .map(shipmentCutOffTimeMapper::toDAO)
         .toList()
     );
 

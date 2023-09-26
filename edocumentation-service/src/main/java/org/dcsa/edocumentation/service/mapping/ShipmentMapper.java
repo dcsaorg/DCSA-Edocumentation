@@ -19,6 +19,7 @@ import org.mapstruct.ReportingPolicy;
     BookingMapper.class,
     TransportMapper.class,
     ConfirmedEquipmentMapper.class,
+    ShipmentCutOffTimeMapper.class,
     AdvanceManifestFilingMapper.class
   })
 public interface ShipmentMapper {

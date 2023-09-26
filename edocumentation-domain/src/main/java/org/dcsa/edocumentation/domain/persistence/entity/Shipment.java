@@ -87,14 +87,14 @@ public class Shipment {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipmentID")
-  private Set<ShipmentCutOffTime> shipmentCutOffTimes = new LinkedHashSet<>();
+  @OneToMany(mappedBy = "shipment", cascade = CascadeType.ALL)
+  @OrderColumn(name = "list_order")
+  private List<@Valid ShipmentCutOffTime> shipmentCutOffTimes;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "shipment", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @OrderColumn(name = "list_order")
-  @JoinColumn(name = "shipment_id")
   private List<ConfirmedEquipment> confirmedEquipments = new ArrayList<>();
 
   @ToString.Exclude
@@ -120,16 +120,23 @@ public class Shipment {
   private List<AdvanceManifestFiling> advanceManifestFilings = new ArrayList<>();
 
   public void assignConfirmedEquipments(List<ConfirmedEquipment> confirmedEquipments) {
-    if (this.confirmedEquipments == null) {
-      this.confirmedEquipments = new ArrayList<>();
-    } else {
-      this.confirmedEquipments.clear();
-    }
+    this.confirmedEquipments = Objects.requireNonNullElseGet(this.confirmedEquipments, ArrayList::new);
+    this.confirmedEquipments.clear();
     this.confirmedEquipments.addAll(confirmedEquipments);
     for (var e : confirmedEquipments) {
       e.setShipment(this);  // For cascade to work properly
     }
   }
+
+  public void assignShipmentCutOffTimes(List<ShipmentCutOffTime> shipmentCutOffTimes) {
+    this.shipmentCutOffTimes = Objects.requireNonNullElseGet(this.shipmentCutOffTimes, ArrayList::new);
+    this.shipmentCutOffTimes.clear();
+    this.shipmentCutOffTimes.addAll(shipmentCutOffTimes);
+    for (var t : shipmentCutOffTimes) {
+      t.setShipment(this);  // For cascade to work properly
+    }
+  }
+
 
   public void assignAdvanceManifestFiling(List<AdvanceManifestFiling> advanceManifestFilings) {
     if (this.advanceManifestFilings == null) {
