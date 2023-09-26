@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.*;
-import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 
 @Data
 @Builder
@@ -28,7 +27,6 @@ public class ShipmentCutOffTime {
   private Shipment shipment;
 
   @Column(name = "cut_off_time_code")
-  @PseudoEnum("cutofftimecodes.csv")
   private String cutOffDateTimeCode;
 
   @Column(name = "cut_off_time", length = 35)
