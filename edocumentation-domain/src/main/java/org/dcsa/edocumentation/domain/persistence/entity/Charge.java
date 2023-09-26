@@ -24,13 +24,13 @@ public class Charge {
   @Column(name = "shipment_id")
   private UUID shipmentID;
 
-  @Column(name = "charge_type")
-  private String chargeType;
+  @Column(name = "charge_name")
+  private String chargeName;
 
   @Column(name = "currency_amount")
   private Double currencyAmount;
 
-  @PseudoEnum(value = "currencycodes.csv", groups = AsyncShipperProvidedDataValidation.class)
+  @PseudoEnum(value = "currencycodes.csv")
   @Column(name = "currency_code")
   private String currencyCode;
 

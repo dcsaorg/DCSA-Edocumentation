@@ -91,7 +91,7 @@ INSERT INTO charge (
     id,
     transport_document_id,
     shipment_id,
-    charge_type,
+    charge_name,
     currency_amount,
     currency_code,
     payment_term_code,
