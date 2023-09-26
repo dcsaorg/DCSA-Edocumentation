@@ -28,6 +28,7 @@ public record ShipmentTO(
     @Valid List<ShipmentCutOffTimeTO> shipmentCutOffTimes,
     @Valid List<ShipmentLocationTO> shipmentLocations,
     @Valid List<ConfirmedEquipmentTO> confirmedEquipments,
+    @Valid List<AdvanceManifestFilingTO> advanceManifestFilings,
     @Valid List<ChargeTO> charges,
     @Valid List<CarrierClauseTO> carrierClauses) {
 

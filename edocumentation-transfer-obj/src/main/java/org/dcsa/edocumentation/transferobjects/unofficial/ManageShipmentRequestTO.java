@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Builder;
+import org.dcsa.edocumentation.transferobjects.AdvanceManifestFilingTO;
 import org.dcsa.edocumentation.transferobjects.ConfirmedEquipmentTO;
 import org.dcsa.edocumentation.transferobjects.ShipmentCutOffTimeTO;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
@@ -34,8 +35,9 @@ public record ManageShipmentRequestTO(
 
   @Valid List<@Valid TransportTO> transports,
 
-  List<@Valid ShipmentCutOffTimeTO> shipmentCutOffTimes
+  List<@Valid ShipmentCutOffTimeTO> shipmentCutOffTimes,
 
+  List<@Valid AdvanceManifestFilingTO> advanceManifestFiling
   ) {
 
   @Builder(toBuilder = true)

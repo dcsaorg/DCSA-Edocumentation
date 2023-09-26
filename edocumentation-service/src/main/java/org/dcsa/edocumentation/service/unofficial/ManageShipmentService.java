@@ -17,6 +17,8 @@ import org.dcsa.edocumentation.service.ShipmentLocationService;
 import org.dcsa.edocumentation.service.ShipmentTransportService;
 import org.dcsa.edocumentation.service.mapping.ConfirmedEquipmentMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentCutOffTimeMapper;
+import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapper;
+import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapperImpl;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
 import org.dcsa.edocumentation.transferobjects.*;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
@@ -39,6 +41,8 @@ public class ManageShipmentService {
   private final ShipmentTransportService shipmentTransportService;
   private final ConfirmedEquipmentMapper confirmedEquipmentMapper;
   private final ShipmentCutOffTimeMapper shipmentCutOffTimeMapper;
+
+  private final AdvanceManifestFilingMapper advanceManifestFilingMapper;
 
 
   private final Random random = new SecureRandom();
@@ -110,6 +114,15 @@ public class ManageShipmentService {
             .shipmentUpdatedDateTime(confirmationTime)
             .termsAndConditions(shipmentRequestTO.termsAndConditions())
             .build();
+
+    shipment.assignAdvanceManifestFiling(
+      Objects.requireNonNullElse(
+          shipmentRequestTO.advanceManifestFiling(),
+          Collections.<AdvanceManifestFilingTO>emptyList()
+        ).stream()
+        .map(advanceManifestFilingMapper::toDAO)
+        .toList()
+    );
 
     if (!validationResult.validationErrors().isEmpty()) {
       return shipmentMapper.toStatusDTO(shipment, validationResult.proposedStatus());

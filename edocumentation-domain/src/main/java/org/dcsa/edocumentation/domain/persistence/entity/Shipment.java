@@ -112,6 +112,13 @@ public class Shipment {
   @OneToMany(mappedBy = "shipmentID")
   private Set<Charge> charges = new LinkedHashSet<>();
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OrderColumn(name = "list_order")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipment_id")
+  private List<AdvanceManifestFiling> advanceManifestFilings = new ArrayList<>();
+
   public void assignConfirmedEquipments(List<ConfirmedEquipment> confirmedEquipments) {
     this.confirmedEquipments = Objects.requireNonNullElseGet(this.confirmedEquipments, ArrayList::new);
     this.confirmedEquipments.clear();
@@ -130,4 +137,16 @@ public class Shipment {
     }
   }
 
+
+  public void assignAdvanceManifestFiling(List<AdvanceManifestFiling> advanceManifestFilings) {
+    if (this.advanceManifestFilings == null) {
+      this.advanceManifestFilings = new ArrayList<>();
+    } else {
+      this.advanceManifestFilings.clear();
+    }
+    this.advanceManifestFilings.addAll(advanceManifestFilings);
+    for (var e : advanceManifestFilings) {
+      e.setShipment(this);  // For cascade to work properly
+    }
+  }
 }
