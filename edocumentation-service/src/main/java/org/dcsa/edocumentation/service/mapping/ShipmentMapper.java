@@ -19,6 +19,7 @@ import org.mapstruct.ReportingPolicy;
     BookingMapper.class,
     TransportMapper.class,
     ConfirmedEquipmentMapper.class,
+    ShipmentCutOffTimeMapper.class,
   })
 public interface ShipmentMapper {
   @Mapping(source = "shipmentTransports", target = "transports")
