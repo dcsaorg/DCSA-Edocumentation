@@ -349,8 +349,7 @@ INSERT INTO shipment_transport (
     carrier_import_voyage_number,
     carrier_export_voyage_number,
     carrier_service_code,
-    dcsa_transport_type,
-    is_under_shippers_responsibility
+    dcsa_transport_type
 ) VALUES (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     1,
@@ -364,8 +363,7 @@ INSERT INTO shipment_transport (
     null,
     null,
     null,
-    'TRUCK',
-    false
+    'TRUCK'
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     2,
@@ -379,8 +377,7 @@ INSERT INTO shipment_transport (
     '2106W',
     '2107E',
     null,
-    'VESSEL',
-    false
+    'VESSEL'
 ), (
     (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
     3,
@@ -394,8 +391,7 @@ INSERT INTO shipment_transport (
     null,
     null,
     null,
-    'RAIL',
-    false
+    'RAIL'
 ), (
   (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
   1,
@@ -409,8 +405,7 @@ INSERT INTO shipment_transport (
   '2106W',
   '2107E',
   null,
-  'VESSEL',
-  false
+  'VESSEL'
 );
 
 INSERT INTO party (

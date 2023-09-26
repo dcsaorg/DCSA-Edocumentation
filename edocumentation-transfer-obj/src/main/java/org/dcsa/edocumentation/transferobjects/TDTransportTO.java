@@ -7,11 +7,13 @@ import lombok.Builder;
 
 public record TDTransportTO(
   @NotNull
-  LocalDate plannedArrivalDate,  // TODO: TransportDocumentMapper does not map this field yet
+  LocalDate plannedArrivalDate,
   @NotNull
-  LocalDate plannedDepartureDate, // TODO: TransportDocumentMapper does not map this field yet
+  LocalDate plannedDepartureDate,
   @Size(max = 10)
-  String preCarriedBy,  // TODO: TransportDocumentMapper does not map this field yet
+  String preCarriageBy,
+  @Size(max = 10)
+  String onCarriageBy,
   LocationTO placeOfReceipt,
   @NotNull
   LocationTO portOfLoading,
