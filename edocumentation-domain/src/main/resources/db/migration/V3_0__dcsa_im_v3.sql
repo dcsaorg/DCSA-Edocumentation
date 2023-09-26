@@ -381,7 +381,7 @@ CREATE TABLE charge (
     id varchar(100) PRIMARY KEY,
     transport_document_id uuid NOT NULL REFERENCES transport_document(id),
     shipment_id uuid NULL REFERENCES shipment (id),
-    charge_type varchar(20) NOT NULL,
+    charge_name varchar(50) NOT NULL,
     currency_amount real NOT NULL,
     currency_code varchar(3) NOT NULL,
     payment_term_code varchar(3) NOT NULL,
