@@ -504,23 +504,11 @@ CREATE TABLE customs_reference (
 );
 
 
-CREATE TABLE seal_source (
-    seal_source_code varchar(5) PRIMARY KEY,
-    seal_source_description varchar(50) NOT NULL
-);
-
-
-CREATE TABLE seal_type (
-    seal_type_code varchar(5) PRIMARY KEY,
-    seal_type_description varchar(50) NOT NULL
-);
-
-
 CREATE TABLE seal (
     utilized_transport_equipment_id uuid NOT NULL REFERENCES utilized_transport_equipment (id),
     seal_number varchar(15) NOT NULL,
-    seal_source_code varchar(5) NULL REFERENCES seal_source (seal_source_code),
-    seal_type_code varchar(5) REFERENCES seal_type (seal_type_code)
+    seal_source_code varchar(5),
+    seal_type_code varchar(5)
 );
 -- Supporting FK constraints
 CREATE INDEX ON seal (utilized_transport_equipment_id);

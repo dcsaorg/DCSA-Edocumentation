@@ -6,8 +6,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipm
 import org.dcsa.edocumentation.transferobjects.EquipmentTO;
 import org.dcsa.edocumentation.transferobjects.SealTO;
 import org.dcsa.edocumentation.transferobjects.UtilizedTransportEquipmentTO;
-import org.dcsa.edocumentation.transferobjects.enums.SealSourceCode;
-import org.dcsa.edocumentation.transferobjects.enums.SealTypeCode;
 import org.dcsa.edocumentation.transferobjects.enums.VolumeUnit;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
 
@@ -103,8 +101,8 @@ public class UtilizedTransportEquipmentEquipmentDataFactory {
         .cargoGrossWeightUnit(WeightUnit.KGM)
         .seals(List.of(SealTO.builder()
             .number("12345")
-            .type(SealTypeCode.BLT)
-            .source(SealSourceCode.CAR)
+            .type("KLP")
+            .source("CAR")
           .build()))
         .build();
   }

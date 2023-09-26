@@ -5,6 +5,9 @@ import lombok.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
+
 import java.util.UUID;
 
 @Data
@@ -28,10 +31,12 @@ public class Seal {
 
   @Column(name = "seal_source_code")
   @Size(max = 5)
+  @PseudoEnum(value = "sealtypecodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   private String source;
 
   @Column(name = "seal_type_code")
   @Size(max = 5)
+  @PseudoEnum(value = "sealsourcecodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   @NotNull
   private String type;
 }
