@@ -13,7 +13,14 @@ import org.mapstruct.ReportingPolicy;
   injectionStrategy = InjectionStrategy.CONSTRUCTOR,
   unmappedTargetPolicy = ReportingPolicy.WARN,  // FIXME; Remove this line when we can migrate to ERROR
   config = EDocumentationMappingConfig.class,
-  uses = {LocationMapper.class,DocumentStatusMapper.class, BookingMapper.class, TransportMapper.class,AdvanceManifestFilingMapper.class})
+  uses = {
+    LocationMapper.class,
+    DocumentStatusMapper.class,
+    BookingMapper.class,
+    TransportMapper.class,
+    ConfirmedEquipmentMapper.class,
+    AdvanceManifestFilingMapper.class
+  })
 public interface ShipmentMapper {
   @Mapping(source = "shipmentTransports", target = "transports")
   ShipmentTO shipmentToShipmentTO(Shipment shipment);

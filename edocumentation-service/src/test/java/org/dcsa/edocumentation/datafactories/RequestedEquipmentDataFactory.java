@@ -13,10 +13,9 @@ public class RequestedEquipmentDataFactory {
   public static RequestedEquipmentGroup singleRequestedEquipment() {
     return RequestedEquipmentGroup.builder()
         .id(UUID.randomUUID())
-        .confirmedEquipmentIsoEquipmentCode("confirmed size type")
         .isShipperOwned(true)
-        .requestedEquipmentIsoEquipmentCode("size Type")
-        .requestedEquipmentUnits(1f)
+        .isoEquipmentCode("size Type")
+        .units(1)
         .build();
   }
 
@@ -28,7 +27,7 @@ public class RequestedEquipmentDataFactory {
     return RequestedEquipmentTO.builder()
       .equipmentReferences(List.of("Equipment_Ref_01"))
       .isoEquipmentCode("GP22")
-      .units(1f)
+      .units(1)
       .isShipperOwned(true)
       .activeReeferSettings(ActiveReeferSettingsDataFactory.activeReeferSettingsTO())
       .build();
@@ -38,7 +37,7 @@ public class RequestedEquipmentDataFactory {
     return RequestedEquipmentTO.builder()
       .equipmentReferences(List.of("Equipment_Ref_02"))
       .isoEquipmentCode("GP22")
-      .units(1f)
+      .units(1)
       .isShipperOwned(false)
       .build();
   }
@@ -50,16 +49,16 @@ public class RequestedEquipmentDataFactory {
   public static RequestedEquipmentGroup requestedEquipmentRef1() {
     return RequestedEquipmentGroup.builder()
       .isShipperOwned(true)
-      .requestedEquipmentIsoEquipmentCode("GP22")
-      .requestedEquipmentUnits(1f)
+      .isoEquipmentCode("GP22")
+      .units(1)
       .build();
   }
 
   public static RequestedEquipmentGroup requestedEquipmentRef2() {
     return RequestedEquipmentGroup.builder()
       .isShipperOwned(false)
-      .requestedEquipmentIsoEquipmentCode("GP22")
-      .requestedEquipmentUnits(1f)
+      .isoEquipmentCode("GP22")
+      .units(1)
       .build();
   }
 }

@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.AdvanceManifestFilingTO;
+import org.dcsa.edocumentation.transferobjects.ConfirmedEquipmentTO;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
 
@@ -27,7 +28,7 @@ public record ManageShipmentRequestTO(
   @NotNull
   String carrierSMDGCode,
 
-  @Valid List<@Valid EquipmentAssignmentTO> equipmentAssignments,
+  List<@Valid ConfirmedEquipmentTO> confirmedEquipments,
 
   @Valid List<@Valid ShipmentLocationTO> shipmentLocations,
 

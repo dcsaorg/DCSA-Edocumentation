@@ -33,30 +33,16 @@ public class RequestedEquipmentGroup {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "shipment_id")
-  private Shipment shipment;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "booking_id")
   private Booking booking;
 
-  @Column(name = "requested_equipment_iso_equipment_code", nullable = false)
+  @Column(name = "iso_equipment_code", nullable = false)
   @Size(max = 4)
   @PseudoEnum(value = "isoequipmentcodes.csv", groups = AsyncShipperProvidedDataValidation.class)
-  private String requestedEquipmentIsoEquipmentCode;
+  private String isoEquipmentCode;
 
-  @Column(name = "requested_equipment_units", nullable = false)
-  private Float requestedEquipmentUnits;
-
-  @Column(name = "confirmed_equipment_iso_equipment_code")
-  @Size(max = 4)
-  @PseudoEnum("isoequipmentcodes.csv")
-  private String confirmedEquipmentIsoEquipmentCode;
-
-  @Column(name = "confirmed_equipment_units")
-  private Integer confirmedEquipmentUnits;
+  @Column(name = "units", nullable = false)
+  private Integer units;
 
   @Column(name = "is_shipper_owned")
   private Boolean isShipperOwned;
@@ -78,8 +64,4 @@ public class RequestedEquipmentGroup {
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "commodity_id")
   private Commodity commodity;
-
-  public void equipmentProvidedForShipment(Shipment shipment) {
-    this.shipment = shipment;
-  }
 }

@@ -567,10 +567,8 @@ INSERT INTO requested_equipment_group (
     id,
     booking_id,
     shipment_id,
-    requested_equipment_iso_equipment_code,
-    requested_equipment_units,
-    confirmed_equipment_iso_equipment_code,
-    confirmed_equipment_units,
+    iso_equipment_code,
+    units,
     is_shipper_owned
     ) VALUES (
     '1a595981-c2d9-46a9-a870-3086735b4529'::uuid,
@@ -578,8 +576,6 @@ INSERT INTO requested_equipment_group (
     '6e4035d9-3200-43ee-a7ea-6d8108c5f0c8'::uuid,
     '22GP',
     3,
-    NULL,
-    NULL,
     true);
 
 INSERT INTO party (

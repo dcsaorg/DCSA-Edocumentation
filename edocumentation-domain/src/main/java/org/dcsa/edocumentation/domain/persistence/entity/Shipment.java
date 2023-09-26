@@ -5,9 +5,6 @@ import jakarta.validation.Valid;
 import java.time.OffsetDateTime;
 import java.util.*;
 import lombok.*;
-import org.dcsa.edocumentation.domain.persistence.entity.unofficial.AssignedEquipment;
-import org.dcsa.edocumentation.domain.persistence.entity.unofficial.EquipmentAssignment;
-import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
 @NamedEntityGraph(
     name = "graph.shipment-summary",
@@ -33,7 +30,7 @@ import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
           attributeNodes = {
             @NamedAttributeNode("loadLocation"),
             @NamedAttributeNode("dischargeLocation"),
-          })
+          }),
     })
 @Data
 @Builder(toBuilder = true)
@@ -78,8 +75,6 @@ public class Shipment {
   @Column(name = "updated_date_time")
   private OffsetDateTime shipmentUpdatedDateTime;
 
-
-
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "shipment")
@@ -98,8 +93,9 @@ public class Shipment {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OrderColumn(name = "list_order")
   @JoinColumn(name = "shipment_id")
-  private Set<RequestedEquipmentGroup> confirmedEquipments = new LinkedHashSet<>();
+  private List<ConfirmedEquipment> confirmedEquipments = new ArrayList<>();
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -116,13 +112,6 @@ public class Shipment {
   @OneToMany(mappedBy = "shipmentID")
   private Set<Charge> charges = new LinkedHashSet<>();
 
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "shipment_id", referencedColumnName = "id", nullable = false)
-  private Set<AssignedEquipment> assignedEquipments;
-
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OrderColumn(name = "list_order")
@@ -130,93 +119,15 @@ public class Shipment {
   @JoinColumn(name = "shipment_id")
   private List<AdvanceManifestFiling> advanceManifestFilings = new ArrayList<>();
 
-  public void assignEquipments(List<EquipmentAssignment> equipmentAssignments) {
-    var requestedEquipmentGroupTable = requestedEquipmentGroupTable(booking.getRequestedEquipments());
-    List<AssignedEquipment> assignments = new ArrayList<>();
-    if (equipmentAssignments.isEmpty()) {
-      if (booking.getRequestedEquipments().isEmpty()) {
-        this.assignedEquipments = Set.of();
-      }
-      else{
-      throw ConcreteRequestErrorMessageException.invalidInput("equipmentAssignments must be non-empty when the booking requires equipments");
-      }
+  public void assignConfirmedEquipments(List<ConfirmedEquipment> confirmedEquipments) {
+    if (this.confirmedEquipments == null) {
+      this.confirmedEquipments = new ArrayList<>();
+    } else {
+      this.confirmedEquipments.clear();
     }
-    for (var equipmentAssignment : equipmentAssignments) {
-      var unfilledRequestedEquipmentGroup = requestedEquipmentGroupTable.get(equipmentAssignment.getMatchKey());
-      var reeferMsg = " without any reefer";
-      if (equipmentAssignment.requestedReeferType() != null) {
-        reeferMsg = " with reefer type " + equipmentAssignment.requestedReeferType();
-      }
-      if (unfilledRequestedEquipmentGroup == null) {
-        throw ConcreteRequestErrorMessageException.invalidInput("The booking " + booking.getCarrierBookingRequestReference()
-          + " did not have any requests for equipment of " + equipmentAssignment.requestedISOEquipmentCode()
-          + reeferMsg + ". (Note: RequestedEquipmentGroups with isShipperOwned: true is are ignored)");
-      }
-      int totalUnfilled = unfilledRequestedEquipmentGroup.getUnfilledCount();
-      if (totalUnfilled != equipmentAssignment.equipments().size()) {
-        throw ConcreteRequestErrorMessageException.invalidInput("The booking " + booking.getCarrierBookingRequestReference()
-          + " requested a total of " + totalUnfilled + " equipments (rounded up) with of " + equipmentAssignment.requestedISOEquipmentCode()
-          + reeferMsg + ", but the request provided " + equipmentAssignment.equipments().size()
-          + ".  The these numbers should match exactly. (Note: RequestedEquipmentGroups with isShipperOwned: true are ignored)");
-      }
-      performAssign(assignments, equipmentAssignment.equipments(), unfilledRequestedEquipmentGroup.requestedEquipmentGroups);
-    }
-    this.assignedEquipments = Set.copyOf(assignments);
-  }
-
-  private void performAssign(List<AssignedEquipment> assignments, List<Equipment> equipments, List<RequestedEquipmentGroup> groups) {
-    int nextEquipmentIndex = equipments.size();
-    for (RequestedEquipmentGroup requestedEquipmentGroup : groups) {
-      int missingUnits = (int) Math.ceil(requestedEquipmentGroup.getRequestedEquipmentUnits());
-      assert missingUnits < nextEquipmentIndex;
-      int endIndex = nextEquipmentIndex;
-      int startIndex = endIndex - missingUnits;
-      nextEquipmentIndex -= startIndex;
-
-      assignments.add(
-        AssignedEquipment.builder()
-          .equipmentReferences(Set.copyOf(equipments.subList(startIndex, endIndex)))
-            .requestedEquipmentGroup(requestedEquipmentGroup)
-            .build()
-          );
-      requestedEquipmentGroup.equipmentProvidedForShipment(this);
-    }
-  }
-
-  private Map<String, UnfilledRequestedEquipmentGroup> requestedEquipmentGroupTable(Collection<RequestedEquipmentGroup> requestedEquipmentGroups) {
-    /* Simplifications/Assumptions in this code that you are welcome to fix at your own peril!
-     *
-     *   1. This code assumes that all reefer containers with a given ISO code and reefer type
-     *      support exactly the same ActiveReeferSettings (e.g., same amount of probes).
-     *   2. The provided containers are size-compatible with the request regardless of their
-     *      actual ISO code.
-     *   3. The code assumes that container groups with "isShipperOwned": true are all satisfied
-     *      already.
-     */
-    HashMap<String, UnfilledRequestedEquipmentGroup> table = new HashMap<>();
-    for (RequestedEquipmentGroup requestedEquipmentGroup : requestedEquipmentGroups) {
-      if (requestedEquipmentGroup.getIsShipperOwned() == Boolean.TRUE || requestedEquipmentGroup.getShipment() != null) {
-        // If the request is for shipper owner containers *OR* already part of a shipment,
-        // we assume it can be handled.
-        continue;
-      }
-      UnfilledRequestedEquipmentGroup unfilledGroup = new UnfilledRequestedEquipmentGroup();
-      unfilledGroup.add(requestedEquipmentGroup);
-    }
-    return table;
-  }
-
-  private static class UnfilledRequestedEquipmentGroup {
-    final List<RequestedEquipmentGroup> requestedEquipmentGroups = new ArrayList<>();
-    double unfilledCount = 0;
-
-    public void add(RequestedEquipmentGroup requestedEquipmentGroup) {
-      this.requestedEquipmentGroups.add(requestedEquipmentGroup);
-      this.unfilledCount += requestedEquipmentGroup.getRequestedEquipmentUnits();
-    }
-
-    public int getUnfilledCount() {
-      return (int)Math.ceil(unfilledCount);
+    this.confirmedEquipments.addAll(confirmedEquipments);
+    for (var e : confirmedEquipments) {
+      e.setShipment(this);  // For cascade to work properly
     }
   }
 
@@ -231,5 +142,4 @@ public class Shipment {
       e.setShipment(this);  // For cascade to work properly
     }
   }
-
 }

@@ -7,22 +7,21 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.AdvanceManifestFiling;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Equipment;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.unofficial.EquipmentAssignment;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.ShipmentLocationService;
 import org.dcsa.edocumentation.service.ShipmentTransportService;
+import org.dcsa.edocumentation.service.mapping.ConfirmedEquipmentMapper;
 import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapper;
 import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapperImpl;
-import org.dcsa.edocumentation.service.mapping.EquipmentAssignmentMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
+import org.dcsa.edocumentation.transferobjects.ConfirmedEquipmentTO;
 import org.dcsa.edocumentation.transferobjects.AdvanceManifestFilingTO;
 import org.dcsa.edocumentation.transferobjects.LocationTO;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
@@ -30,7 +29,6 @@ import org.dcsa.edocumentation.transferobjects.TransportTO;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
 import org.dcsa.edocumentation.transferobjects.enums.ShipmentLocationTypeCode;
 import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
-import org.dcsa.edocumentation.transferobjects.unofficial.EquipmentAssignmentTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.ManageShipmentRequestTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.ShipmentRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
@@ -44,11 +42,10 @@ public class ManageShipmentService {
   private final BookingRepository bookingRepository;
   private final ShipmentMapper shipmentMapper;
   private final CarrierRepository carrierRepository;
-  private final EquipmentAssignmentMapper equipmentAssignmentMapper;
-  private final EquipmentRepository equipmentRepository;
   private final BookingValidationService bookingValidationService;
   private final ShipmentLocationService shipmentLocationService;
   private final ShipmentTransportService shipmentTransportService;
+  private final ConfirmedEquipmentMapper confirmedEquipmentMapper;
 
   private final AdvanceManifestFilingMapper advanceManifestFilingMapper;
 
@@ -139,12 +136,12 @@ public class ManageShipmentService {
     // FIXME: This should be embedded into `validationResult`.
     validateTransportPlans(shipmentRequestTO, shipmentRequestTO.shipmentLocations());
 
-    shipment.assignEquipments(
+    shipment.assignConfirmedEquipments(
       Objects.requireNonNullElse(
-        shipmentRequestTO.equipmentAssignments(),
-        Collections.<EquipmentAssignmentTO>emptyList()
+        shipmentRequestTO.confirmedEquipments(),
+        Collections.<ConfirmedEquipmentTO>emptyList()
       ).stream()
-        .map(this::mapEquipmentAssignment)
+        .map(confirmedEquipmentMapper::toDAO)
         .toList()
     );
 
@@ -339,24 +336,6 @@ public class ManageShipmentService {
   private Booking getBooking(ManageShipmentRequestTO shipmentRequestTO) {
     return bookingRepository.findBookingByCarrierBookingRequestReference(shipmentRequestTO.carrierBookingRequestReference())
       .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound("No booking with reference " + shipmentRequestTO.carrierBookingRequestReference()));
-  }
-
-  private EquipmentAssignment mapEquipmentAssignment(EquipmentAssignmentTO equipmentAssignmentTO) {
-    List<Equipment> equipments = equipmentRepository.findByEquipmentReferenceIn(equipmentAssignmentTO.equipmentReferences());
-    if (equipments.size() != equipmentAssignmentTO.equipmentReferences().size()) {
-      Predicate<String> validReferences = (equipments.stream()
-        .map(Equipment::getEquipmentReference)
-        .collect(Collectors.toUnmodifiableSet())::contains);
-      String badRef = equipmentAssignmentTO.equipmentReferences().stream()
-        .filter(validReferences.negate())
-        .findFirst()
-        .orElseThrow(() -> ConcreteRequestErrorMessageException.internalServerError("Could not determine which equipment reference was bad!"));
-      throw ConcreteRequestErrorMessageException.invalidInput("Unknown equipment reference: " + badRef);
-    }
-    return equipmentAssignmentMapper.toDAO(
-      equipmentAssignmentTO,
-      equipments
-    );
   }
 
 }
