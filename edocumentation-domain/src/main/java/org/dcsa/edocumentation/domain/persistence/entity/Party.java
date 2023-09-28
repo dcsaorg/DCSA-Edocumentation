@@ -46,5 +46,10 @@ public class Party {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "party")
+  private Set<@Valid TaxAndLegalReference> taxAndLegalReferences;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "party")
   private Set<@Valid PartyIdentifyingCode> identifyingCodes;
 }
