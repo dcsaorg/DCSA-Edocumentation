@@ -88,7 +88,9 @@ public record ShippingInstructionTO(
   List<@Valid @NotNull ReferenceTO> references,
 
   @Valid
-  List<@Valid @NotNull CustomsReferenceTO> customsReferences
+  List<@Valid @NotNull CustomsReferenceTO> customsReferences,
+
+  List<@Valid @NotNull AdvanceManifestFilingEBLTO> advanceManifestFilings
 ) {
   @Builder
   public ShippingInstructionTO{}

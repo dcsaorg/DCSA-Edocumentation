@@ -219,6 +219,11 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @JoinColumn(name = "shipping_instruction_id")
   private List<CustomsReference> customsReferences;
 
+  @OrderColumn(name = "list_order")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "shipping_instruction_id")
+  private List<@Valid AdvanceManifestFilingEBL> advanceManifestFilings;
+
   // certain characteristics like the transport plan, are share among all shipments in the shipping
   // instruction, so it is beneficial to be able to retrieve one
   public Shipment retrieveOneShipment() {

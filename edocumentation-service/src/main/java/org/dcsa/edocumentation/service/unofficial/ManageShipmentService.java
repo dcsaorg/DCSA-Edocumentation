@@ -117,7 +117,7 @@ public class ManageShipmentService {
 
     shipment.assignAdvanceManifestFiling(
       Objects.requireNonNullElse(
-          shipmentRequestTO.advanceManifestFiling(),
+          shipmentRequestTO.advanceManifestFilings(),
           Collections.<AdvanceManifestFilingTO>emptyList()
         ).stream()
         .map(advanceManifestFilingMapper::toDAO)
