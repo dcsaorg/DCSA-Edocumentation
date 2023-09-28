@@ -8,7 +8,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.AdvanceManifestFilingEB
 public class AdvanceManifestFilingEBLValidator implements ConstraintValidator<AdvanceManifestFilingEBLValidation, AdvanceManifestFilingEBL> {
 
   private static final CodeCache VALID_MANIFEST_CODES =
-    CodeCache.of("advancedmanifestfilings.csv", "Advance Manifest Filing Type Code", "Country Code");
+    CodeCache.of("advancemanifestfilings.csv", "Advance Manifest Filing Type Code", "Country Code");
 
   @Override
   public boolean isValid(AdvanceManifestFilingEBL value, ConstraintValidatorContext context) {
