@@ -5,12 +5,12 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class DFADefinition<S extends Enum<S>> {
+public class DFADefinition<S extends Object> {
 
   protected final S initialState;
   protected final Map<S, DFAStateInfo<S>> stateInfo;
 
-  public static <S extends Enum<S>> DFADefinitionBuilder<S> builder(S initialState) {
+  public static <S extends Object> DFADefinitionBuilder<S> builder(S initialState) {
     return new DFADefinitionBuilder<>(initialState);
   }
 

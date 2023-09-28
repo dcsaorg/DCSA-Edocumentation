@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DFA<S extends Enum<S>> {
+public class DFA<S extends Object> {
 
   @Getter
   private final DFADefinition<S> definition;
@@ -33,18 +33,18 @@ public class DFA<S extends Enum<S>> {
     if (nextStateInfo == null) {
       if (isInitialState) {
         throw new UnknownOrUnreachableTargetStateException("Cannot start in unknown state: "
-          + this.currentState.name());
+          + this.currentState.toString());
       }
       throw new UnknownOrUnreachableTargetStateException("Unknown/Unhandled state: "
-        + this.currentState.name());
+        + this.currentState.toString());
     }
     if (!nextStateInfo.validState()) {
       if (isInitialState) {
         throw new UnknownOrUnreachableTargetStateException("Invalid starting state: "
-          + this.currentState.name() + " (Not a part of the flow)");
+          + this.currentState.toString() + " (Not a part of the flow)");
       }
       throw new UnknownOrUnreachableTargetStateException("We reached the state "
-        + this.currentState.name() + ", which was defined to be unreachable/invalid");
+        + this.currentState.toString() + ", which was defined to be unreachable/invalid");
     }
     this.currentState = newState;
     this.stateInfo = nextStateInfo;
@@ -58,24 +58,24 @@ public class DFA<S extends Enum<S>> {
       // this exception and provide a better (contextual) error message.  Like
       // "It is not possible to change a canceled booking".
       if (successors.isEmpty()) {
-        throw new CannotLeaveTerminalStateException("Invalid transition: " + this.currentState.name()
+        throw new CannotLeaveTerminalStateException("Invalid transition: " + this.currentState.toString()
           + " is a terminal state."
         );
       }
       DFAStateInfo<S> targetStateInfo = definition.getStateInfoForState(intendedSuccessor);
       if (targetStateInfo == null || !targetStateInfo.validState()) {
         if (targetStateInfo != null) {
-          throw new UnknownOrUnreachableTargetStateException("The state " + intendedSuccessor.name()
+          throw new UnknownOrUnreachableTargetStateException("The state " + intendedSuccessor.toString()
             + " explicitly declared unreachable.  Verify whether the operation make sense.");
         }
         throw new UnknownOrUnreachableTargetStateException("Cannot transition to unknown/undeclared state "
-          + intendedSuccessor.name() + ". Consider adding the state or explicitly declaring it as unreachable.");
+          + intendedSuccessor.toString() + ". Consider adding the state or explicitly declaring it as unreachable.");
       }
       String detail = "The following states are valid: " + successors.stream()
-        .map(S::name)
+        .map(S::toString)
         .collect(Collectors.joining(", ", "[", "]"));
       throw new TargetStateIsNotSuccessorException("Invalid transition: "
-        + this.currentState.name() + " *CANNOT* got to " + intendedSuccessor.name() + ": " + detail);
+        + this.currentState.toString() + " *CANNOT* got to " + intendedSuccessor.toString() + ": " + detail);
     }
   }
 }
