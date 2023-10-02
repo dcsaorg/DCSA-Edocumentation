@@ -323,7 +323,9 @@ CREATE TABLE transport_document (
     carrier_id uuid NOT NULL REFERENCES carrier(id),
     shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
     number_of_rider_pages integer NULL,
-    issuing_party_id uuid NOT NULL REFERENCES party(id)
+    issuing_party_id uuid NOT NULL REFERENCES party(id),
+    declared_value_currency_code varchar(3) NULL,
+    declared_value real NULL
 );
 
 ALTER TABLE shipping_instruction
