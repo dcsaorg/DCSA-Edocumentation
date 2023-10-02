@@ -160,21 +160,22 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
 
     ConsignmentItem firstconsignmentItem = state.getValue().getConsignmentItems().get(0);
     List<AdvanceManifestFiling> advanceManifestFilingBase = firstconsignmentItem.getShipment().getAdvanceManifestFilings();
-    List<AdvanceManifestFiling> misMatchedManifestFilings = new ArrayList<>();
+    Map<String,List<AdvanceManifestFiling>> misMatchedConsignmentManifestFilings = new HashMap<>();
 
     for(ConsignmentItem ci: consignmentItems) {
       List<AdvanceManifestFiling> advanceManifestFilings = ci.getShipment().getAdvanceManifestFilings();
-      misMatchedManifestFilings = advanceManifestFilingBase.stream()
+      List<AdvanceManifestFiling> misMatchedManifestFilings = advanceManifestFilingBase.stream()
         .filter(two -> advanceManifestFilings.stream()
           .noneMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())
-            && two.getCountryCode().equals(one.getCountryCode())))
+            && one.getCountryCode().equals(two.getCountryCode())))
         .toList();
+      if (!misMatchedManifestFilings.isEmpty()) {
+        misMatchedConsignmentManifestFilings.put(ci.getShipment().getCarrierBookingReference(),misMatchedManifestFilings);
+      }
     }
 
-    if (!misMatchedManifestFilings.isEmpty()) {
-      List<String> carrierBookingRefs = misMatchedManifestFilings.stream()
-        .map(mf -> mf.getShipment().getCarrierBookingReference() )
-        .toList();
+    if (!misMatchedConsignmentManifestFilings.isEmpty()) {
+      List<String> carrierBookingRefs = misMatchedConsignmentManifestFilings.keySet().stream().toList();
       state.getContext().buildConstraintViolationWithTemplate(
         "Mismatch advance Manifest filings in carrier Booking References " + carrierBookingRefs)
         .addPropertyNode("advanceManifestFilings")
@@ -186,7 +187,7 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
     List<AdvanceManifestFiling> misMatchedManifestFilingsSI =  advanceManifestFilingBase.stream()
       .filter(two -> advanceManifestFilingSIs.stream()
         .noneMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())
-          && two.getCountryCode().equals(one.getCountryCode())))
+          && one.getCountryCode().equals(two.getCountryCode())))
       .toList();
 
     if (!misMatchedManifestFilingsSI.isEmpty()) {
