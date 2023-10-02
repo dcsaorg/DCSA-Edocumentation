@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.AdvanceManifestFilingsHouseBLPerformedBy;
 import org.dcsa.edocumentation.domain.validations.AdvanceManifestFilingEBLValidation;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 
@@ -34,8 +35,9 @@ public class AdvanceManifestFilingEBL {
   private String countryCode;
 
   @Column(name = "filing_performed_by")
+  @Enumerated(EnumType.STRING)
   @NotNull
-  private String advanceManifestFilingsPerformedBy;
+  private AdvanceManifestFilingsHouseBLPerformedBy advanceManifestFilingsPerformedBy;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

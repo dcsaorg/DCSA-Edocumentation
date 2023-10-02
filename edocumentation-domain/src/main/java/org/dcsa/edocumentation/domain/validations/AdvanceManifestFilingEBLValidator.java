@@ -15,24 +15,39 @@ public class AdvanceManifestFilingEBLValidator implements ConstraintValidator<Ad
     if (value == null) {
       return true;
     }
-    boolean validChecks = VALID_MANIFEST_CODES.isValid(value.getManifestTypeCode(),value.getCountryCode());
+    context.disableDefaultConstraintViolation();
     var state = ValidationState.of(value, context);
+    validateManifestTypeAndCountryCodes(state);
     validateManifestFiling(state);
-    return state.isValid() && validChecks ;
+    return state.isValid();
   }
+
+  private void validateManifestTypeAndCountryCodes(ValidationState<AdvanceManifestFilingEBL> state) {
+    AdvanceManifestFilingEBL advanceManifestFilingEBL =  state.getValue();
+    if (!VALID_MANIFEST_CODES.isValid(advanceManifestFilingEBL.getManifestTypeCode(),advanceManifestFilingEBL.getCountryCode())) {
+      state.getContext().buildConstraintViolationWithTemplate("Mandatory to provide manifestTypeCode and countryCode for "
+          + advanceManifestFilingEBL.getShippingInstruction().getShippingInstructionReference())
+        // Match the TO path
+        .addPropertyNode("manifestTypeCode")
+        .addPropertyNode("countryCode")
+        .addConstraintViolation();
+      state.invalidate();
+    }
+  }
+
 
   private void validateManifestFiling(ValidationState<AdvanceManifestFilingEBL> state) {
     AdvanceManifestFilingEBL advanceManifestFilingEBL =  state.getValue();
-    if ( ("ACE".equalsIgnoreCase(advanceManifestFilingEBL.getManifestTypeCode())
-      && "US".equalsIgnoreCase(advanceManifestFilingEBL.getCountryCode())) ||
-      ("ACI".equalsIgnoreCase(advanceManifestFilingEBL.getManifestTypeCode())
-        && "CA".equalsIgnoreCase(advanceManifestFilingEBL.getCountryCode())) ) {
-      if ( "SHIPPER".equalsIgnoreCase(advanceManifestFilingEBL.getAdvanceManifestFilingsPerformedBy())) {
+    if ( ("ACE".equals(advanceManifestFilingEBL.getManifestTypeCode())
+      && "US".equals(advanceManifestFilingEBL.getCountryCode())) ||
+      ("ACI".equals(advanceManifestFilingEBL.getManifestTypeCode())
+        && "CA".equals(advanceManifestFilingEBL.getCountryCode())) ) {
+      if ( "SHIPPER".equals(advanceManifestFilingEBL.getAdvanceManifestFilingsPerformedBy().name())) {
         if (advanceManifestFilingEBL.getSelfFilerCode() == null) {
           state.getContext().buildConstraintViolationWithTemplate("Mandatory to provide selfFilerCode for "
-              + advanceManifestFilingEBL.getShippingInstruction().getShippingInstructionReference() + " is ")
+              + advanceManifestFilingEBL.getShippingInstruction().getShippingInstructionReference())
             // Match the TO path
-            .addPropertyNode("advanceManifestFilings")
+            .addPropertyNode("selfFilerCode")
             .addConstraintViolation();
           state.invalidate();
         }

@@ -3,10 +3,8 @@ package org.dcsa.edocumentation.domain.validations;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -156,24 +154,47 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
   }
 
   private void validateManifestFilings(ValidationState<ShippingInstruction> state) {
+
     List<AdvanceManifestFilingEBL> advanceManifestFilingSIs = state.getValue().getAdvanceManifestFilings();
     List<ConsignmentItem> consignmentItems = state.getValue().getConsignmentItems();
-    for(ConsignmentItem ci : consignmentItems ) {
+
+    ConsignmentItem firstconsignmentItem = state.getValue().getConsignmentItems().get(0);
+    List<AdvanceManifestFiling> advanceManifestFilingBase = firstconsignmentItem.getShipment().getAdvanceManifestFilings();
+    List<AdvanceManifestFiling> misMatchedManifestFilings = new ArrayList<>();
+
+    for(ConsignmentItem ci: consignmentItems) {
       List<AdvanceManifestFiling> advanceManifestFilings = ci.getShipment().getAdvanceManifestFilings();
-      List<AdvanceManifestFiling> matchedManifestFilings = advanceManifestFilings.stream()
-        .filter(two -> advanceManifestFilingSIs.stream()
-          .anyMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())
+      misMatchedManifestFilings = advanceManifestFilingBase.stream()
+        .filter(two -> advanceManifestFilings.stream()
+          .noneMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())
             && two.getCountryCode().equals(one.getCountryCode())))
         .toList();
-      if (matchedManifestFilings.size() != advanceManifestFilingSIs.size()) {
-        state.getContext().buildConstraintViolationWithTemplate(
-            "This SI advance manifest filings mismatch with Shipment advance manifest filings. Make sure they are same" +
-              String.join(", ", advanceManifestFilingSIs.toString())
-          ).addPropertyNode("advanceManifestFilingSIs")
-          .addConstraintViolation();
-        state.invalidate();
-        return;
-      }
+    }
+
+    if (!misMatchedManifestFilings.isEmpty()) {
+      List<String> carrierBookingRefs = misMatchedManifestFilings.stream()
+        .map(mf -> mf.getShipment().getCarrierBookingReference() )
+        .toList();
+      state.getContext().buildConstraintViolationWithTemplate(
+        "Mismatch advance Manifest filings in carrier Booking References " + carrierBookingRefs)
+        .addPropertyNode("advanceManifestFilings")
+        .addConstraintViolation();
+      state.invalidate();
+      return;
+    }
+
+    List<AdvanceManifestFiling> misMatchedManifestFilingsSI =  advanceManifestFilingBase.stream()
+      .filter(two -> advanceManifestFilingSIs.stream()
+        .noneMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())
+          && two.getCountryCode().equals(one.getCountryCode())))
+      .toList();
+
+    if (!misMatchedManifestFilingsSI.isEmpty()) {
+      state.getContext().buildConstraintViolationWithTemplate(
+        "The Advance Manifest Filings in Shipping Instruction " + state.getValue().getShippingInstructionReference() + " doesn't match with the Shipments"
+      ).addPropertyNode("advanceManifestFilings")
+      .addConstraintViolation();
+      state.invalidate();
     }
   }
 
