@@ -16,6 +16,7 @@ public class RequestedEquipmentDataFactory {
         .isShipperOwned(true)
         .isoEquipmentCode("size Type")
         .units(1)
+        .commodities(List.of(CommodityDataFactory.singleCommodity()))
         .build();
   }
 
@@ -29,6 +30,7 @@ public class RequestedEquipmentDataFactory {
       .isoEquipmentCode("GP22")
       .units(1)
       .isShipperOwned(true)
+      .commodities(List.of(CommodityDataFactory.singleCommodityTO()))
       .activeReeferSettings(ActiveReeferSettingsDataFactory.activeReeferSettingsTO())
       .build();
   }
@@ -39,6 +41,7 @@ public class RequestedEquipmentDataFactory {
       .isoEquipmentCode("GP22")
       .units(1)
       .isShipperOwned(false)
+      .commodities(List.of(CommodityDataFactory.singleCommodityTO()))
       .build();
   }
 

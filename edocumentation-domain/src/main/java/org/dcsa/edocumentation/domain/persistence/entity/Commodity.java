@@ -1,5 +1,9 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,12 +14,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.VolumeUnit;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
-
-import jakarta.persistence.*;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Data
 @Builder
@@ -30,12 +28,6 @@ public class Commodity {
   @GeneratedValue
   @Column(name = "id", nullable = false)
   private UUID id;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "booking_id")
-  private Booking booking;
 
   @Column(name = "commodity_type", nullable = false, length = 550)
   private String commodityType;
@@ -71,6 +63,8 @@ public class Commodity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "commodity")
-  private Set<RequestedEquipmentGroup> requestedEquipments;
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "requested_equipment_group_id")
+  @Setter(AccessLevel.PACKAGE)
+  private RequestedEquipmentGroup requestedEquipment;
 }

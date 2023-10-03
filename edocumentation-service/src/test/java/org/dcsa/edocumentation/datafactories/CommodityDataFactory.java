@@ -34,7 +34,6 @@ public class CommodityDataFactory {
       .exportLicenseIssueDate(LocalDate.now())
       .exportLicenseExpiryDate(LocalDate.now().plusMonths(6))
       .numberOfPackages(1)
-      .requestedEquipments(Set.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
       .hsCodes(List.of("123456"));
   }
 
@@ -49,8 +48,6 @@ public class CommodityDataFactory {
       .exportLicenseExpiryDate(LocalDate.now().plusMonths(6))
       .numberOfPackages(1)
       .hsCodes(List.of("123456"))
-      .commodityRequestedEquipmentLink("commodityRequestedEquipmentLink")
-      .requestedEquipments(RequestedEquipmentDataFactory.requestedEquipmentTOList())
       .build();
   }
 }

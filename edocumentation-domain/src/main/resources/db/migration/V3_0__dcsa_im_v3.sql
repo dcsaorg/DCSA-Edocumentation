@@ -231,12 +231,21 @@ CREATE TABLE requested_equipment_group (
     shipment_id uuid NULL REFERENCES shipment (id),
     iso_equipment_code varchar(4) NOT NULL,
     units int NOT NULL,
+    tare_weight real NULL,
+    tare_weight_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (tare_weight_unit IN ('KGM','LBR')),
     is_shipper_owned boolean NOT NULL DEFAULT false,
-    active_reefer_settings_id uuid NULL REFERENCES active_reefer_settings (id)
+    active_reefer_settings_id uuid NULL REFERENCES active_reefer_settings (id),
+    list_order int NOT NULL DEFAULT 0
 );
 
 CREATE INDEX ON requested_equipment_group (booking_id);
 
+CREATE TABLE requested_equipment_group_equipment_references (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    requested_equipment_group_id uuid NOT NULL REFERENCES requested_equipment_group (id),
+    equipment_reference varchar(15),
+    list_order int NOT NULL DEFAULT 0
+);
 
 CREATE TABLE confirmed_equipment (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -249,7 +258,7 @@ CREATE TABLE confirmed_equipment (
 
 CREATE TABLE commodity (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    booking_id uuid NOT NULL REFERENCES booking(id),
+    requested_equipment_group_id uuid NOT NULL REFERENCES requested_equipment_group(id),
     commodity_type varchar(550) NOT NULL,
     cargo_gross_weight real NULL,
     cargo_gross_weight_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (cargo_gross_weight_unit IN ('KGM','LBR')),
@@ -260,14 +269,7 @@ CREATE TABLE commodity (
     export_license_expiry_date date NULL
 );
 
-CREATE INDEX ON commodity (booking_id);
-
-
-CREATE TABLE requested_equipment_commodity (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    requested_equipment_id uuid NOT NULL REFERENCES requested_equipment_group (id),
-    commodity_id uuid NOT NULL REFERENCES commodity(id)
-);
+CREATE INDEX ON commodity (requested_equipment_group_id);
 
 
 CREATE TABLE shipment_cutoff_time (

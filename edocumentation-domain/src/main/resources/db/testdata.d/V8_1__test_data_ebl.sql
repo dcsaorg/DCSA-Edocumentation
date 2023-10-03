@@ -647,52 +647,66 @@ INSERT INTO shipping_instruction (
       DATE '2022-03-07'
 );
 
+INSERT INTO requested_equipment_group (
+    id,
+    booking_id,
+    iso_equipment_code,
+    units,
+    is_shipper_owned
+) VALUES (
+    'd5ca0842-d90a-49fd-b929-1ef3fa375eec',
+    (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
+    '22GP',
+    1,
+    false
+);
+
 
 INSERT INTO commodity (
     id,
-    booking_id,
+    requested_equipment_group_id,
     commodity_type,
     cargo_gross_weight,
     cargo_gross_weight_unit
 ) VALUES (
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
-    (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
+    'd5ca0842-d90a-49fd-b929-1ef3fa375eec',
     'Expensive Shoes',
     4000,
     'KGM'
 ), (
     '2219e859-e3b5-4e87-80b8-32e9f77cca04',
-    (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
+    'd5ca0842-d90a-49fd-b929-1ef3fa375eec',
     'Massive Yacht',
     4000,
     'KGM'
 ), (
     '877ce0f8-3126-45f5-b22e-2d1d27d42d85',
-    (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
+    'd5ca0842-d90a-49fd-b929-1ef3fa375eec',
     'Leather Jackets',
     4000,
     'KGM'
 ), (
     '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
-    (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
+    'd5ca0842-d90a-49fd-b929-1ef3fa375eec',
     'Air ballons',
     4000,
     'KGM'
 ), (
     'cb6354c9-1ceb-452c-aed0-3cb25a04647a',
-    (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
+    'd5ca0842-d90a-49fd-b929-1ef3fa375eec',
     'Leather Jackets',
     4000,
     'KGM'
 ), (
     '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
-    (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
+    'd5ca0842-d90a-49fd-b929-1ef3fa375eec',
     'Leather Jackets',
     4000,
     'KGM'
 ), (
     '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
-    (SELECT booking.id FROM booking JOIN shipment ON booking.id=shipment.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
+    'd5ca0842-d90a-49fd-b929-1ef3fa375eec',
     'Leather Jackets',
     4000,
     'KGM'
@@ -1221,9 +1235,23 @@ INSERT INTO shipment (
     DATE '2020-04-07T12:12:12'
 );
 
-INSERT INTO commodity(
+INSERT INTO requested_equipment_group (
+  id,
+  booking_id,
+  iso_equipment_code,
+  units,
+  is_shipper_owned
+) VALUES (
+    '90ead08c-8e39-4fd9-8006-b2c01a463cb2',
+    (SELECT booking.id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    '22GP',
+    1,
+    false
+);
+
+INSERT INTO commodity (
     id,
-    booking_id,
+    requested_equipment_group_id,
     commodity_type,
     cargo_gross_weight,
     cargo_gross_weight_unit,
@@ -1231,7 +1259,7 @@ INSERT INTO commodity(
     export_license_expiry_date
 ) VALUES (
     'a5b681bf-68a0-4f90-8cc6-79bf77d3b2a1'::uuid,
-    'b521dbdb-a12b-48f5-b489-8594349731bf'::uuid,
+    '90ead08c-8e39-4fd9-8006-b2c01a463cb2',
     'Hand Bags',
     1200.0,
     'KGM',
