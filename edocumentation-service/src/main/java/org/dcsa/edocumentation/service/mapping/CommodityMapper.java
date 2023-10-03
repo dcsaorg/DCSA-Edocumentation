@@ -8,9 +8,9 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
 public interface CommodityMapper {
-  @Mapping(source = "booking", target = "booking")
-  @Mapping(source = "booking.id", target = "id", ignore = true)
-  @Mapping(source = "commodityTO.requestedEquipments", target = "requestedEquipments", ignore = true)
-  Commodity toDAO(CommodityTO commodityTO, Booking booking);
+
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "requestedEquipment", ignore = true)
+  Commodity toDAO(CommodityTO commodityTO);
 
 }

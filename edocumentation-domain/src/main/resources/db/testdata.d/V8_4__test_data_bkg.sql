@@ -201,9 +201,25 @@ INSERT INTO booking (
      NULL,
      DATE '2021-12-01');
 
-INSERT INTO commodity (
+
+INSERT INTO requested_equipment_group (
     id,
     booking_id,
+    iso_equipment_code,
+    units,
+    is_shipper_owned
+) VALUES (
+    '98c4d459-42a3-42bc-992d-e1de670a9c08',
+    (SELECT booking_id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
+    '22GP',
+    1,
+    false
+);
+
+
+INSERT INTO commodity (
+    id,
+    requested_equipment_group_id,
     commodity_type,
     cargo_gross_weight,
     cargo_gross_weight_unit,
@@ -211,7 +227,7 @@ INSERT INTO commodity (
     export_license_expiry_date
     ) VALUES (
     'bf93f6fb-98b8-4268-a4dc-23a40eab95a8'::uuid,
-    (SELECT booking_id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
+    '98c4d459-42a3-42bc-992d-e1de670a9c08',
     'Bloom',
     2000.0,
     'LBR',
