@@ -564,29 +564,6 @@ INSERT INTO utilized_transport_equipment (
     false
 );
 
-INSERT INTO shipping_instruction (
-    id,
-    shipping_instruction_reference,
-    document_status,
-    is_shipped_onboard_type,
-    number_of_copies_with_charges,
-    number_of_originals_with_charges,
-    is_electronic,
-    is_to_order,
-    created_date_time,
-    updated_date_time
-) VALUES (
-    '01670315-a51f-4a11-b947-ce8e245128eb',
-    'SI_REF_1',
-    'RECE',
-    TRUE,
-    2,
-    4,
-    TRUE,
-    TRUE,
-    DATE '2021-12-24',
-    DATE '2021-12-31'
-);
 
 /**
  * Data used in integration tests - Do not modify - make your own data
@@ -1484,35 +1461,6 @@ INSERT INTO hs_code_item (
 ), (
   'cf1798fe-9447-4ea8-a4a6-9515de751d5e',
   '411510'
-);
-
-
-INSERT INTO transport_document (
-    id,
-    transport_document_reference,
-    place_of_issue_id,
-    issue_date,
-    shipped_onboard_date,
-    received_for_shipment_date,
-    carrier_id,
-    shipping_instruction_id,
-    number_of_rider_pages,
-    created_date_time,
-    updated_date_time,
-    issuing_party_id
-) VALUES (
-    'de561650-d43d-46af-88c3-0ab380bb5365'::uuid,
-    '0cc0bef0-a7c8-4c03',
-    '01670315-a51f-4a11-b947-ce8e245128eb',
-    DATE '2020-11-25',
-    DATE '2020-12-24',
-    DATE '2020-12-31',
-    (SELECT id FROM carrier WHERE smdg_code = 'HLC'),
-    'a1c7b95d-3004-40a5-bae1-e379021b7782'::uuid,
-    12,
-    '2021-11-28T14:12:56+01:00'::timestamptz,
-    '2021-12-01T07:41:00+08:30'::timestamptz,
-    '499918a2-d12d-4df6-840c-dd92357002df'
 );
 
 INSERT INTO location (
