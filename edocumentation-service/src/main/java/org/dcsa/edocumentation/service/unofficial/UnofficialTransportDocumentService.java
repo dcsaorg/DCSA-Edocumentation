@@ -71,11 +71,16 @@ public class UnofficialTransportDocumentService {
       .map(Booking::getDeclaredValue)
       .anyMatch(Objects::nonNull);
 
-    if (shouldHaveDeclaredValue ^ transportDocumentRequestTO.declaredValue() != null) {
+    if (shouldHaveDeclaredValue && transportDocumentRequestTO.declaredValue() == null) {
       throw ConcreteRequestErrorMessageException.invalidInput(
         "Please provide declaredValue + declaredValueCurrency for this transport document.  At least one of the"
           + " bookings have declared value and the reference implementation cannot determine how much of it"
           + " should end up in this transport document (vs. other transport documents)"
+      );
+    } else if (!shouldHaveDeclaredValue && transportDocumentRequestTO.declaredValue() == null) {
+      throw ConcreteRequestErrorMessageException.invalidInput(
+        "Please do not provide declaredValue + declaredValueCurrency for this transport document. None of the"
+          + " related bookings had a declared value."
       );
     }
 
