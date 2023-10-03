@@ -1,14 +1,12 @@
 package org.dcsa.edocumentation.domain.booking;
 
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
 import org.dcsa.skernel.errors.exceptions.ConflictException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.OffsetDateTime;
-
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
 
 
 class BookingStateMachineTest {
@@ -18,28 +16,29 @@ class BookingStateMachineTest {
     Booking booking = Booking.builder().build();
     OffsetDateTime now = OffsetDateTime.now();
     booking.receive();
-    Assertions.assertEquals(RECE, booking.getDocumentStatus());
+    Assertions.assertEquals(BookingStatus.RECEIVED, booking.getBookingStatus());
     booking.pendingConfirmation("We provided what you requested. Please review it and confirm the booking", now);
-    Assertions.assertEquals(PENC, booking.getDocumentStatus());
+    Assertions.assertEquals(BookingStatus.PENDING_UPDATES_CONFIRMATION, booking.getBookingStatus());
     booking.pendingUpdate("Please provide foo!", now);
-    Assertions.assertEquals(PENU, booking.getDocumentStatus());
+    Assertions.assertEquals(BookingStatus.PENDING_UPDATE, booking.getBookingStatus());
 
-    booking = Booking.builder().documentStatus(RECE).build();
-    Assertions.assertEquals(RECE, booking.getDocumentStatus());
+    booking = Booking.builder().bookingStatus(BookingStatus.RECEIVED).build();
+    Assertions.assertEquals(BookingStatus.RECEIVED, booking.getBookingStatus());
     booking.pendingConfirmation("We provided what you requested. Please review it and confirm the booking", now);
-    Assertions.assertEquals(PENC, booking.getDocumentStatus());
+    Assertions.assertEquals(BookingStatus.PENDING_UPDATES_CONFIRMATION, booking.getBookingStatus());
   }
 
   @Test
   void loadInvalidStateTransitions() {
-    BkgDocumentStatus[] terminalStates = {
-      CANC,
-      REJE,
-      CMPL
+    String[] terminalStates = {
+      BookingStatus.COMPLETED,
+      BookingStatus.REJECTED,
+      BookingStatus.DECLINED,
+      BookingStatus.CANCELLED
     };
     OffsetDateTime now = OffsetDateTime.now();
-    for (BkgDocumentStatus terminalState : terminalStates) {
-      Booking booking = Booking.builder().documentStatus(terminalState).build();
+    for (String terminalState : terminalStates) {
+      Booking booking = Booking.builder().bookingStatus(terminalState).build();
       Assertions.assertThrows(ConflictException.class,
         () -> booking.cancel("We decided to booking somewhere else.", now));
       Assertions.assertThrows(ConflictException.class, () -> booking.pendingUpdate("Please provide foo!", now));
@@ -52,7 +51,7 @@ class BookingStateMachineTest {
       Assertions.assertThrows(ConflictException.class, () -> booking.reject("We cannot provide the service."));
       Assertions.assertThrows(ConflictException.class, booking::complete);
     }
-    Booking booking = Booking.builder().documentStatus(PENU).build();
+    Booking booking = Booking.builder().bookingStatus(BookingStatus.PENDING_UPDATE).build();
     Assertions.assertThrows(ConflictException.class, () -> booking.confirm(now));
     Assertions.assertThrows(ConflictException.class, booking::complete);
   }

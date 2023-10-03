@@ -5,8 +5,6 @@ import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
 import java.util.*;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.values;
-
 public class DFADefinitionBuilder<S extends Object> {
 
 
@@ -110,7 +108,7 @@ public class DFADefinitionBuilder<S extends Object> {
     int loopCounter = 0;
     // The implementation should visit every state at most once.  If it does not, then someone
     // introduced a bug that (likely) makes it loop forever.
-    final int loopMax = values().length;
+    final int loopMax = definition.stateInfo.size();
     pendingStates.add(initialState);
 
     while (!pendingStates.isEmpty()) {

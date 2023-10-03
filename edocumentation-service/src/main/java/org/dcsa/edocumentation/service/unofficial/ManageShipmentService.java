@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.ShipmentLocationService;
@@ -18,7 +17,6 @@ import org.dcsa.edocumentation.service.ShipmentTransportService;
 import org.dcsa.edocumentation.service.mapping.ConfirmedEquipmentMapper;
 import org.dcsa.edocumentation.service.mapping.ShipmentCutOffTimeMapper;
 import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapper;
-import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapperImpl;
 import org.dcsa.edocumentation.service.mapping.ShipmentMapper;
 import org.dcsa.edocumentation.transferobjects.*;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
@@ -96,7 +94,7 @@ public class ManageShipmentService {
         + shipmentRequestTO.carrierSMDGCode() + "\". Note the code may be valid but not loaded into this system.");
     }
     OffsetDateTime confirmationTime = OffsetDateTime.now();
-    ValidationResult<BkgDocumentStatus> validationResult = bookingValidationService.validateBooking(booking, false);
+    ValidationResult<String> validationResult = bookingValidationService.validateBooking(booking, false);
 
     booking.confirm(confirmationTime);
 
@@ -153,7 +151,7 @@ public class ManageShipmentService {
     shipment = shipmentRepository.save(shipment);
     shipmentLocationService.createShipmentLocations(shipmentRequestTO.shipmentLocations(), shipment);
     shipmentTransportService.createShipmentTransports(shipmentRequestTO.transports(), shipment);
-    return shipmentMapper.toStatusDTO(shipment, booking.getDocumentStatus());
+    return shipmentMapper.toStatusDTO(shipment, booking.getBookingStatus());
   }
 
   private Boolean validateTransportPlans(ManageShipmentRequestTO manageShipmentRequestTO, List<ShipmentLocationTO> shipmentLocationTOS) {

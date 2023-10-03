@@ -391,7 +391,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
   @Override
-  protected RuntimeException errorForAttemptLeavingToLeaveTerminalState(
+  protected RuntimeException errorForAttemptToLeaveTerminalState(
       EblDocumentStatus currentState,
       EblDocumentStatus successorState,
       CannotLeaveTerminalStateException e) {
@@ -407,7 +407,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
   @Override
-  protected RuntimeException errorForTargetStatNotListedAsSuccessor(
+  protected RuntimeException errorForTargetStateNotListedAsSuccessor(
       EblDocumentStatus currentState,
       EblDocumentStatus successorState,
       TargetStateIsNotSuccessorException e) {

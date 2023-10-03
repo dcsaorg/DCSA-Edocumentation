@@ -8,14 +8,7 @@ import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.CommunicationChannelCode;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.IncoTerms;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.ReceiptDeliveryType;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 
 @UtilityClass
@@ -25,7 +18,7 @@ public class BookingDataFactory {
     return Booking.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
         .carrierBookingRequestReference("BOOKING_REQ_REF_01")
-        .documentStatus(BkgDocumentStatus.RECE)
+        .bookingStatus(BookingStatus.RECEIVED)
         .receiptTypeAtOrigin(ReceiptDeliveryType.CY)
         .deliveryTypeAtDestination(ReceiptDeliveryType.CY)
         .cargoMovementTypeAtOrigin(CargoMovementType.FCL)
@@ -59,7 +52,7 @@ public class BookingDataFactory {
     return Booking.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
         .carrierBookingRequestReference("BOOKING_REQ_REF_01")
-        .documentStatus(BkgDocumentStatus.RECE)
+        .bookingStatus(BookingStatus.RECEIVED)
         .receiptTypeAtOrigin(ReceiptDeliveryType.CY)
         .deliveryTypeAtDestination(ReceiptDeliveryType.CY)
         .cargoMovementTypeAtOrigin(CargoMovementType.FCL)
@@ -96,7 +89,7 @@ public class BookingDataFactory {
         Booking.builder()
             .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
             .carrierBookingRequestReference("BOOKING_REQ_REF_01")
-            .documentStatus(BkgDocumentStatus.RECE)
+            .bookingStatus(BookingStatus.RECEIVED)
             .receiptTypeAtOrigin(ReceiptDeliveryType.CY)
             .deliveryTypeAtDestination(ReceiptDeliveryType.CY)
             .cargoMovementTypeAtOrigin(CargoMovementType.FCL)
@@ -129,7 +122,7 @@ public class BookingDataFactory {
         Booking.builder()
             .id(UUID.fromString("3262f836-65d1-43e1-b759-dbeb53ac24ee"))
             .carrierBookingRequestReference("BOOKING_REQ_REF_02")
-            .documentStatus(BkgDocumentStatus.RECE)
+            .bookingStatus(BookingStatus.RECEIVED)
             .receiptTypeAtOrigin(ReceiptDeliveryType.CY)
             .deliveryTypeAtDestination(ReceiptDeliveryType.CY)
             .cargoMovementTypeAtOrigin(CargoMovementType.FCL)
@@ -167,7 +160,7 @@ public class BookingDataFactory {
     return Booking.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
         .carrierBookingRequestReference("BOOKING_REQ_REF_01")
-        .documentStatus(BkgDocumentStatus.RECE)
+        .bookingStatus(BookingStatus.RECEIVED)
         .receiptTypeAtOrigin(ReceiptDeliveryType.CY)
         .deliveryTypeAtDestination(ReceiptDeliveryType.CY)
         .cargoMovementTypeAtOrigin(CargoMovementType.FCL)
@@ -205,7 +198,7 @@ public class BookingDataFactory {
     return Booking.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
         .carrierBookingRequestReference("BOOKING_REQ_REF_01")
-        .documentStatus(BkgDocumentStatus.RECE)
+        .bookingStatus(BookingStatus.RECEIVED)
         .receiptTypeAtOrigin(ReceiptDeliveryType.CY)
         .deliveryTypeAtDestination(ReceiptDeliveryType.CY)
         .cargoMovementTypeAtOrigin(CargoMovementType.FCL)

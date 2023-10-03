@@ -189,7 +189,7 @@ INSERT INTO shipment_carrier_clauses (
 INSERT INTO booking (
     id,
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -221,7 +221,7 @@ INSERT INTO booking (
 ) VALUES (
     'a521dbdb-a12b-48f5-b489-8594349731bf'::uuid,
     'ef223019-ff16-4870-be69-9dbaaaae9b11',
-    'PENU',
+    'PENDING UPDATE',
     'CY',
     'CY',
     'FCL',
@@ -254,7 +254,7 @@ INSERT INTO booking (
 INSERT INTO booking (
     id,
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -286,7 +286,7 @@ INSERT INTO booking (
 ) VALUES (
     '31629725-418b-41e1-9d10-521763c656c4'::uuid,
     '52c2caa0-0137-44b7-9947-68687b3b4ae6',
-    'PENC',
+    'PENDING UPDATES CONFIRMATION',
     'CY',
     'CY',
     'FCL',
@@ -319,7 +319,7 @@ INSERT INTO booking (
 INSERT INTO booking (
     id,
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -351,7 +351,7 @@ INSERT INTO booking (
 ) VALUES (
     '8b78219e-d049-4c68-8d9e-f40bf9a85140'::uuid,
     'a3a34f10-acc5-4e23-b52e-146f63458c90',
-    'CONF',
+    'CONFIRMED',
     'CY',
     'CY',
     'FCL',
@@ -686,7 +686,7 @@ INSERT INTO shipment_location (
 INSERT INTO booking (
     id,
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -718,7 +718,7 @@ INSERT INTO booking (
 ) VALUES (
     'b8376516-0c1c-4b6f-b51f-6707812c8ff4'::uuid, /* id */
     'cbrr-b83765166707812c8ff4', /* carrier_booking_request_reference */
-    'PENU', /* document_status */
+    'PENDING UPDATE', /* booking_status */
     'CY', /* receipt_type_at_origin */
     'CY', /* delivery_type_at_destination */
     'FCL', /* cargo_movement_type_at_origin */

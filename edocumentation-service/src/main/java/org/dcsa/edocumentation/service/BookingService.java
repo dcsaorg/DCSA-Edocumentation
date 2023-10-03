@@ -56,7 +56,7 @@ public class BookingService {
     Booking updatedBooking = toDAOBuilder(bookingRequest)
       // Carry over from the existing booking
       .carrierBookingRequestReference(existingBooking.getCarrierBookingRequestReference())
-      .documentStatus(existingBooking.getDocumentStatus())
+      .bookingStatus(existingBooking.getBookingStatus())
       .bookingRequestCreatedDateTime(existingBooking.getBookingRequestCreatedDateTime())
       .build();
 

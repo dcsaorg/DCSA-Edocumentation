@@ -1,7 +1,5 @@
 package org.dcsa.edocumentation.service.unofficial;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.PENC;
-
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import java.util.Objects;
@@ -10,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.CarrierRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
@@ -85,11 +84,12 @@ public class UnofficialTransportDocumentService {
     };
     var errors = validator.validate(mapped, validations);
     if (!errors.isEmpty()) {
-      var r = new ValidationResult<>(PENC,
-        errors.stream()
-          .map(v -> v.getPropertyPath().toString() + ": " + v.getMessage())
-          .toList()
-      );
+      var r =
+          new ValidationResult<>(
+              BookingStatus.PENDING_UPDATES_CONFIRMATION,
+              errors.stream()
+                  .map(v -> v.getPropertyPath().toString() + ": " + v.getMessage())
+                  .toList());
       throw new AssertionError("Generated draft TD had validation errors. " + r.presentErrors(Integer.MAX_VALUE));
     }
 
@@ -127,6 +127,7 @@ public class UnofficialTransportDocumentService {
     if (transportDocument == null) {
       return Optional.empty();
     }
+
     switch (documentStatusMapper.toDomainEblDocumentStatus(status)) {
       case APPR -> transportDocument.approveFromCarrier();
       case PENA -> transportDocument.pendingApproval();
@@ -137,7 +138,7 @@ public class UnofficialTransportDocumentService {
       case VOID -> transportDocument.voidDocument();
       case DRFT -> throw ConcreteRequestErrorMessageException.invalidInput("Please use the issueDraft endpoint instead!");
       default -> throw ConcreteRequestErrorMessageException.invalidInput("Cannot go to state " + status);
-    };
+    }
 
     // Note this only works for cases where we can update the documentStatus in-place.
     transportDocument = transportDocumentRepository.save(transportDocument);

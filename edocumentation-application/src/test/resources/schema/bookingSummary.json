@@ -10,7 +10,7 @@
       "cargoMovementTypeAtOrigin",
       "carrierBookingRequestReference",
       "deliveryTypeAtDestination",
-      "documentStatus",
+      "bookingStatus",
       "isEquipmentSubstitutionAllowed",
       "isExportDeclarationRequired",
       "isImportLicenseRequired",
@@ -23,7 +23,7 @@
         "type": "string",
         "description": "A reference to the booking during the booking request phase\n"
       },
-      "documentStatus": {
+      "bookingStatus": {
         "type": "string",
         "description": "The status of the booking. Possible values are:\n- RECE (Received)\n- PENU (Pending Update)\n- PENC (Pending Confirmation)\n- CONF (Confirmed)\n- REJE (Rejected)\n- CANC (Cancelled)\n- CMPL (Completed)\n\nMore details can be found on <a href=\"https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv\">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.\n",
         "enum": [

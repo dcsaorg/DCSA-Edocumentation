@@ -1,9 +1,7 @@
 package org.dcsa.edocumentation.transferobjects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 
+import lombok.Builder;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,7 +13,7 @@ public record BookingRefStatusTO(
   String carrierBookingRequestReference,
 
   @NotNull
-  BkgDocumentStatus documentStatus,
+  String bookingStatus,
 
   List<RequestedChangeTO> requestedChanges,
 

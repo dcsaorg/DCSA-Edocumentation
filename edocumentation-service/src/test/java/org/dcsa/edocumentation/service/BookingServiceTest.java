@@ -19,7 +19,7 @@ import org.dcsa.edocumentation.datafactories.VoyageDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.service.mapping.*;
@@ -164,7 +164,7 @@ class BookingServiceTest {
         .carrierBookingRequestReference("carrierBookingRequestRef")
         .bookingRequestCreatedDateTime(now)
         .bookingRequestUpdatedDateTime(now)
-        .documentStatus(BkgDocumentStatus.RECE)
+        .bookingStatus(BookingStatus.RECEIVED)
         .build();
 
       when(voyageService.resolveVoyage(any())).thenReturn(voyage);
@@ -178,7 +178,7 @@ class BookingServiceTest {
       assertEquals("carrierBookingRequestRef", result.carrierBookingRequestReference());
       assertEquals(now, result.bookingRequestCreatedDateTime());
       assertEquals(now, result.bookingRequestUpdatedDateTime());
-      assertEquals(org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE, result.documentStatus());
+      assertEquals(BookingStatus.RECEIVED, result.bookingStatus());
 
       ArgumentCaptor<Booking> bookingArgumentCaptor = ArgumentCaptor.forClass(Booking.class);
       verify(voyageService).resolveVoyage(bookingRequest);
@@ -195,12 +195,12 @@ class BookingServiceTest {
         .carrierBookingRequestReference(null)
         .bookingRequestCreatedDateTime(null)
         .bookingRequestUpdatedDateTime(null)
-        .documentStatus(null)
+        .bookingStatus(null)
         .build());
       assertNotNull(bookingActuallySaved.getCarrierBookingRequestReference());
       assertNotNull(bookingActuallySaved.getBookingRequestCreatedDateTime());
       assertNotNull(bookingActuallySaved.getBookingRequestUpdatedDateTime());
-      assertEquals(BkgDocumentStatus.RECE, bookingActuallySaved.getDocumentStatus());
+      assertEquals(BookingStatus.RECEIVED, bookingActuallySaved.getBookingStatus());
     }
   }
 }

@@ -2,6 +2,7 @@ package org.dcsa.edocumentation.service;
 
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.service.mapping.BookingSummaryMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
@@ -62,12 +63,12 @@ class BookingSummaryServiceTest {
   void testBookingSummary_singleResultWithDocumentStatus() {
     Booking mockBooking = BookingDataFactory.singleShallowBookingWithVesselAndModeOfTransport();
     Page<Booking> pagedResult = new PageImpl<>(List.of(mockBooking));
-    when(bookingRepository.findAllByDocumentStatus(any(), any(Pageable.class)))
+    when(bookingRepository.findAllByBookingStatus(any(), any(Pageable.class)))
         .thenReturn(pagedResult);
 
     PagedResult<BookingSummaryTO> result =
         bookingSummaryService.findBookingSummaries(
-            mockPageRequest, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
+            mockPageRequest, BookingStatus.RECEIVED);
     assertEquals(1, result.totalPages());
     assertEquals(
         mockBooking.getCarrierBookingRequestReference(),
@@ -98,12 +99,12 @@ class BookingSummaryServiceTest {
     List<Booking> mockBookings =
         BookingDataFactory.multipleShallowBookingsWithVesselAndModeOfTransport();
     Page<Booking> pagedResult = new PageImpl<>(mockBookings);
-    when(bookingRepository.findAllByDocumentStatus(any(), any(Pageable.class)))
+    when(bookingRepository.findAllByBookingStatus(any(), any(Pageable.class)))
         .thenReturn(pagedResult);
 
     PagedResult<BookingSummaryTO> result =
         bookingSummaryService.findBookingSummaries(
-            mockPageRequest, org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus.RECE);
+            mockPageRequest, BookingStatus.RECEIVED);
     assertEquals(1, result.totalPages());
     assertEquals(2, result.content().size());
     assertEquals(

@@ -6,7 +6,6 @@ import java.time.OffsetDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
@@ -37,10 +36,10 @@ public class BookingValidationService {
   }
 
   @Transactional
-  public ValidationResult<BkgDocumentStatus> validateBooking(Booking booking, boolean persistOnPENC) {
+  public ValidationResult<String> validateBooking(Booking booking, boolean persistOnPENC) {
     var carrierBookingRequestReference = booking.getCarrierBookingRequestReference();
 
-    ValidationResult<BkgDocumentStatus> validationResult;
+    ValidationResult<String> validationResult;
     try {
       validationResult = booking.asyncValidation(validator);
     } catch (IllegalStateException e) {
