@@ -55,12 +55,6 @@ public class RequestedEquipmentGroup {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "requested_equipment_group_id")
-  private Set<UtilizedTransportEquipment> utilizedTransportEquipments;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "commodity_id")
   private Commodity commodity;

@@ -417,8 +417,7 @@ CREATE TABLE utilized_transport_equipment (
     equipment_reference varchar(15) NOT NULL REFERENCES equipment (equipment_reference),
     cargo_gross_weight real NULL,
     cargo_gross_weight_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (cargo_gross_weight_unit IN ('KGM','LBR')),
-    is_shipper_owned boolean NOT NULL,
-    requested_equipment_group_id uuid NULL REFERENCES requested_equipment_group (id)
+    is_shipper_owned boolean NOT NULL
 );
 
 -- Supporting FK constraints
