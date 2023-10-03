@@ -1486,35 +1486,6 @@ INSERT INTO hs_code_item (
   '411510'
 );
 
-
-INSERT INTO transport_document (
-    id,
-    transport_document_reference,
-    place_of_issue_id,
-    issue_date,
-    shipped_onboard_date,
-    received_for_shipment_date,
-    carrier_id,
-    shipping_instruction_id,
-    number_of_rider_pages,
-    created_date_time,
-    updated_date_time,
-    issuing_party_id
-) VALUES (
-    'de561650-d43d-46af-88c3-0ab380bb5365'::uuid,
-    '0cc0bef0-a7c8-4c03',
-    '01670315-a51f-4a11-b947-ce8e245128eb',
-    DATE '2020-11-25',
-    DATE '2020-12-24',
-    DATE '2020-12-31',
-    (SELECT id FROM carrier WHERE smdg_code = 'HLC'),
-    'a1c7b95d-3004-40a5-bae1-e379021b7782'::uuid,
-    12,
-    '2021-11-28T14:12:56+01:00'::timestamptz,
-    '2021-12-01T07:41:00+08:30'::timestamptz,
-    '499918a2-d12d-4df6-840c-dd92357002df'
-);
-
 INSERT INTO location (
     id,
     location_name,

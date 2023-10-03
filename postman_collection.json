@@ -762,49 +762,6 @@
 											"    pm.expect(jsonData.bookingRequestUpdatedDateTime).to.exist;\r",
 											"    pm.expect(jsonData.invoicePayableAt).to.exist;\r",
 											"    pm.expect(jsonData.commodities).to.exist;\r",
-											"    pm.expect(jsonData.references).to.exist;\r",
-											"    pm.expect(jsonData.documentParties).to.exist;\r",
-											"    pm.expect(jsonData.documentParties[0].party).to.exist;\r",
-											"    pm.expect(jsonData.shipmentLocations).to.exist;\r",
-											"});\r",
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/ef223019-ff16-4870-be69-9dbaaaae9b11",
-									"host": [
-										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
-									],
-									"path": [
-										"bookings",
-										"ef223019-ff16-4870-be69-9dbaaaae9b11"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Booking With ShipmentLocations and commodities",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Response contains carrier provided fields\", () => {\r",
-											"    let carrierBookingRequestReferenceUnderTest = pm.request.url.path[3];\r",
-											"    let jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.carrierBookingRequestReference).to.eql(carrierBookingRequestReferenceUnderTest);\r",
-											"    pm.expect(jsonData.documentStatus).to.exist;\r",
-											"    pm.expect(jsonData.bookingRequestCreatedDateTime).to.exist;\r",
-											"    pm.expect(jsonData.bookingRequestUpdatedDateTime).to.exist;\r",
-											"    pm.expect(jsonData.invoicePayableAt).to.exist;\r",
-											"    pm.expect(jsonData.commodities).to.exist;\r",
 											"    pm.expect(jsonData.shipmentLocations).to.exist;\r",
 											"});"
 										],
