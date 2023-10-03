@@ -6,7 +6,7 @@ import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
 import jakarta.persistence.Transient;
 
-public abstract class AbstractStateMachine<S extends Object> {
+public abstract class AbstractStateMachine<S> {
 
   protected abstract RuntimeException errorForAttemptToLeaveTerminalState(S currentState, S successorState, CannotLeaveTerminalStateException e);
   protected abstract RuntimeException errorForTargetStateNotListedAsSuccessor(S currentState, S successorState, TargetStateIsNotSuccessorException e);

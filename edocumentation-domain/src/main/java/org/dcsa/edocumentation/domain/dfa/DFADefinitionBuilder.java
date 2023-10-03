@@ -5,7 +5,7 @@ import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
 import java.util.*;
 
-public class DFADefinitionBuilder<S extends Object> {
+public class DFADefinitionBuilder<S> {
 
 
   private final Set<S> terminalStates;

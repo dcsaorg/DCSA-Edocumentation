@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DFA<S extends Object> {
+public class DFA<S> {
 
   @Getter
   private final DFADefinition<S> definition;
