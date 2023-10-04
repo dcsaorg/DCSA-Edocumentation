@@ -27,9 +27,6 @@ public class AdvanceManifestFilingEBLValidator implements ConstraintValidator<Ad
     if (!VALID_MANIFEST_CODES.isValid(advanceManifestFilingEBL.getManifestTypeCode(),advanceManifestFilingEBL.getCountryCode())) {
       state.getContext().buildConstraintViolationWithTemplate("Mandatory to provide manifestTypeCode and countryCode for "
           + advanceManifestFilingEBL.getShippingInstruction().getShippingInstructionReference())
-        // Match the TO path
-        .addPropertyNode("manifestTypeCode")
-        .addPropertyNode("countryCode")
         .addConstraintViolation();
       state.invalidate();
     }
