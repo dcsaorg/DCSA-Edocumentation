@@ -570,14 +570,18 @@
 										"exec": [
 											"let jsonResponse = pm.response.json();\r",
 											"\r",
-											"pm.test(\"Response contains only 1 summary\", () => {\r",
-											"    pm.expect(jsonResponse.length).to.eql(1);\r",
+											"pm.test(\"Response contains at least one 1 summary\", () => {\r",
+											"    pm.expect(jsonResponse.length).to.gte(1);\r",
 											"});\r",
 											"\r",
 											"pm.test(\"Carrier booking reference matches filter request\", () => {\r",
-											"    pm.expect(jsonResponse[0].carrierBookingReferences.includes(\"E379021B7782\")).to.eql(true);\r",
-											"    pm.expect(jsonResponse[0].carrierBookingReferences.includes(\"A379021B7782\")).to.eql(true);\r",
-											"});"
+											"    // FIXME: Swagger is unclear here; RI does OR, so the test match that until the swagger gets clarified\r",
+											"    for (const summary of jsonResponse) {\r",
+											"        const carrierBookingReferences = summary.carrierBookingReferences;\r",
+											"        pm.expect(carrierBookingReferences.includes(\"E379021B7782\") || carrierBookingReferences.includes(\"A379021B7782\")).to.eql(true);\r",
+											"    }\r",
+											"});\r",
+											""
 										],
 										"type": "text/javascript"
 									}
