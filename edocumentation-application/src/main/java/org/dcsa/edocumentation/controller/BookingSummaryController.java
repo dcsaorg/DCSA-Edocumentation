@@ -1,6 +1,8 @@
 package org.dcsa.edocumentation.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.validation.StringEnumValidation;
 import org.dcsa.edocumentation.service.BookingSummaryService;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.Pagination;
@@ -28,7 +30,9 @@ public class BookingSummaryController {
   @GetMapping(path = "${spring.application.bkg-context-path}" + "/booking-summaries")
   @ResponseStatus(HttpStatus.OK)
   public List<BookingSummaryTO> getBookingSummaries(
-      @RequestParam(required = false) String bookingStatus,
+      @RequestParam(required = false)
+      @StringEnumValidation(value= BookingStatus.class)
+      String bookingStatus,
       @RequestParam(value = Pagination.DCSA_PAGE_PARAM_NAME, defaultValue = "0", required = false)
           @Min(0)
           int page,

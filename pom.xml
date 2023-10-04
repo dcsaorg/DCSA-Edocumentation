@@ -36,6 +36,7 @@
 	</properties>
 
 	<modules>
+		<module>edocumentation-infra</module>
 		<module>edocumentation-transfer-obj</module>
 		<module>edocumentation-domain</module>
 		<module>edocumentation-service</module>
@@ -76,7 +77,11 @@
 				<version>${testcontainers.version}</version>
 				<scope>test</scope>
 			</dependency>
-
+			<dependency>
+				<groupId>org.dcsa.edocumentation</groupId>
+				<artifactId>dcsa-edocumentation-infra</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.dcsa.edocumentation</groupId>
 				<artifactId>dcsa-edocumentation-transfer-obj</artifactId>

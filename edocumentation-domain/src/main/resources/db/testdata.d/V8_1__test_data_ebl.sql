@@ -1399,7 +1399,7 @@ INSERT INTO booking (
 ), (
     '59ede518-2224-4ecf-a0d0-4d641d365e1b'::uuid,
     'KUBERNETES_IN_ACTION_02',
-    'RECE',
+    'RECEIVED',
     'CY',
     'CFS',
     'FCL',

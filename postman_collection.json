@@ -43,7 +43,7 @@
 							"response": []
 						},
 						{
-							"name": "Booking request summaries CMPL",
+							"name": "Booking request summaries COMPLETED",
 							"event": [
 								{
 									"listen": "test",
@@ -52,7 +52,7 @@
 											"pm.test('All matches must have correct status', () => {\r",
 											"    const response = pm.response.json()\r",
 											"    for (let i = 0; i < response.length ; i++) {\r",
-											"        pm.expect(response[i].documentStatus).to.equal(\"CMPL\");\r",
+											"        pm.expect(response[i].bookingStatus).to.equal(\"COMPLETED\");\r",
 											"    }\r",
 											"});\r",
 											""
@@ -122,24 +122,25 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"const documentStatusses = pm.collectionVariables.get(\"DOCUMENT_STATUSSES\");\r",
+											"const bookingStatusses = pm.collectionVariables.get(\"BOOKING_STATUSSES\");\r",
 											"\r",
-											"if (documentStatusses && documentStatusses.length > 0){\r",
-											"    postman.setNextRequest(\"Booking request status per documentStatus\");\r",
+											"if (bookingStatusses && bookingStatusses.length > 0){\r",
+											"    postman.setNextRequest(\"Booking request status per bookingStatus\");\r",
 											"} else {\r",
 											"    postman.setNextRequest(\"Booking request summaries sort\");\r",
-											"    pm.collectionVariables.unset(\"DOCUMENT_STATUSSES\");\r",
+											"    pm.collectionVariables.unset(\"BOOKING_STATUSSES\");\r",
 											"}\r",
 											"\r",
-											"let documentStatusUnderTest = pm.request.url.query.get(\"documentStatus\");\r",
+											"let bookingStatusUnderTest = pm.request.url.query.get(\"bookingStatus\").replace(/%20/g, \" \");\r",
 											"\r",
-											"if(documentStatusUnderTest) {\r",
-											"    pm.test(\"documentStatus should be \" + documentStatusUnderTest, () => {\r",
-											"        let documentStatusses = pm.response.json().map(({documentStatus}) => documentStatus);\r",
-											"        pm.expect(documentStatusses.every(v => v === documentStatusUnderTest)).to.eql(true);\r",
+											"if(bookingStatusUnderTest) {\r",
+											"    pm.test(\"bookingStatus should be \" + bookingStatusUnderTest, () => {\r",
+											"        let bookingStatusses = pm.response.json().map(({bookingStatus}) => bookingStatus);\r",
+											"        console.log(\"bookingStatusUnderTest='\" + bookingStatusUnderTest + \"'\");\r",
+											"        console.log(\"bookingStatusses=[\" + bookingStatusses + \"]\")\r",
+											"        pm.expect(bookingStatusses.every(v => v === bookingStatusUnderTest)).to.eql(true);\r",
 											"    });\r",
-											"}\r",
-											""
+											"}"
 										],
 										"type": "text/javascript"
 									}
@@ -246,12 +247,13 @@
 											"\r",
 											"pm.test(\"Error reason is invalidParameter\", () => {\r",
 											"    var jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.errors[0].reason).to.eql(\"invalidParameter\");\r",
+											"    pm.expect(jsonData.errors[0].reason).to.eql(\"invalidInput\");\r",
 											"});\r",
 											"\r",
 											"pm.test(\"BookingStatus must contain a valid value\", () => {\r",
 											"    var jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.errors[0].message).to.eql(\"'bookingStatus' must contain valid value\");\r",
+											"    console.log(jsonData.errors[0].message);\r",
+											"    pm.expect(jsonData.errors[0].message).to.contains(\"bookingStatus Unexpected value 'null', should have been one of\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -878,7 +880,7 @@
 											"    pm.expect(jsonData.errors[0].reason).to.eql(\"invalidInput\");\r",
 											"});\r",
 											"\r",
-											"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
+											"pm.test(\"carrierBookingRequestReference must contain a valid value\", () => {\r",
 											"    var jsonData = pm.response.json();\r",
 											"    pm.expect(jsonData.errors[0].message).to.eql(\"getBooking.carrierBookingRequestReference size must be between 0 and 100\");\r",
 											"});"
@@ -2870,9 +2872,9 @@
 													"    pm.expect(jsonData.errors[0].reason).to.eql(\"invalidInput\");\r",
 													"});\r",
 													"\r",
-													"pm.test(\"Error message mentions documentStatus as an issue\", () => {\r",
+													"pm.test(\"Error message mentions bookingStatus as an issue\", () => {\r",
 													"    const jsonData = pm.response.json();\r",
-													"    pm.expect(jsonData.errors[0].message).to.includes(\"documentStatus\");\r",
+													"    pm.expect(jsonData.errors[0].message).to.includes(\"bookingStatus\");\r",
 													"});"
 												],
 												"type": "text/javascript"
@@ -2893,7 +2895,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n    \"carrierBookingRequestReference\": \"{{CARRIER_BOOKING_REQUEST_REFERENCE}}\",\r\n    \"documentStatus\": \"CONF\",\r\n    \"receiptTypeAtOrigin\": \"CY\",\r\n    \"deliveryTypeAtDestination\": \"CY\",\r\n    \"cargoMovementTypeAtOrigin\": \"BB\",\r\n    \"cargoMovementTypeAtDestination\": \"BB\",\r\n    \"serviceContractReference\": \"asdas\",\r\n    \"isPartialLoadAllowed\": false,\r\n    \"isExportDeclarationRequired\": false,\r\n    \"isImportLicenseRequired\": false,\r\n    \"isAMSACIFilingRequired\": false,\r\n    \"isDestinationFilingRequired\": false,\r\n    \"expectedDepartureDate\": \"2022-11-13\",\r\n    \"communicationChannelCode\": \"AO\",\r\n    \"isEquipmentSubstitutionAllowed\": false,\r\n    \"invoicePayableAt\": {\r\n        \"locationName\": \"address location\",\r\n        \"address\": {\r\n            \"name\": \"Henrik\"\r\n        }\r\n    },\r\n    \"placeOfBLIssue\": {\r\n        \"UNLocationCode\": \"DEHAM\",\r\n        \"locationName\": \"unlocation location\"\r\n    },\r\n    \"commodities\": [\r\n        {\r\n            \"commodityType\": \"blah blah blah\",\r\n            \"cargoGrossWeight\": 3.14,\r\n            \"cargoGrossWeightUnit\": \"KGM\"\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"CR\",\r\n            \"value\": \"boink\"\r\n        }\r\n    ],\r\n    \"requestedEquipments\": [\r\n        {\r\n            \"ISOEquipmentCode\": \"22GP\",\r\n            \"units\": 1,\r\n            \"equipmentReferences\": [\r\n                     \"BMOU2149612\"\r\n            ],\r\n            \"isShipperOwned\": true\r\n        }\r\n    ],\r\n    \"shipmentLocations\": [\r\n        {\r\n            \"location\": {\r\n                \"locationName\": \"address location\",\r\n                \"address\": {\r\n                    \"name\": \"Henrik\"\r\n                }\r\n            },\r\n            \"shipmentLocationTypeCode\": \"ECP\",\r\n            \"eventDateTime\": \"2022-11-11T11:09:28.292579+01:00\"\r\n        }\r\n    ]\r\n}",
+											"raw": "{\r\n    \"carrierBookingRequestReference\": \"{{CARRIER_BOOKING_REQUEST_REFERENCE}}\",\r\n    \"bookingStatus\": \"CONFIRMED\",\r\n    \"receiptTypeAtOrigin\": \"CY\",\r\n    \"deliveryTypeAtDestination\": \"CY\",\r\n    \"cargoMovementTypeAtOrigin\": \"BB\",\r\n    \"cargoMovementTypeAtDestination\": \"BB\",\r\n    \"serviceContractReference\": \"asdas\",\r\n    \"isPartialLoadAllowed\": false,\r\n    \"isExportDeclarationRequired\": false,\r\n    \"isImportLicenseRequired\": false,\r\n    \"isAMSACIFilingRequired\": false,\r\n    \"isDestinationFilingRequired\": false,\r\n    \"expectedDepartureDate\": \"2022-11-13\",\r\n    \"communicationChannelCode\": \"AO\",\r\n    \"isEquipmentSubstitutionAllowed\": false,\r\n    \"invoicePayableAt\": {\r\n        \"locationName\": \"address location\",\r\n        \"address\": {\r\n            \"name\": \"Henrik\"\r\n        }\r\n    },\r\n    \"placeOfBLIssue\": {\r\n        \"UNLocationCode\": \"DEHAM\",\r\n        \"locationName\": \"unlocation location\"\r\n    },\r\n    \"commodities\": [\r\n        {\r\n            \"commodityType\": \"blah blah blah\",\r\n            \"cargoGrossWeight\": 3.14,\r\n            \"cargoGrossWeightUnit\": \"KGM\"\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"CR\",\r\n            \"value\": \"boink\"\r\n        }\r\n    ],\r\n    \"requestedEquipments\": [\r\n        {\r\n            \"ISOEquipmentCode\": \"22GP\",\r\n            \"units\": 1,\r\n            \"equipmentReferences\": [\r\n                     \"BMOU2149612\"\r\n            ],\r\n            \"isShipperOwned\": true\r\n        }\r\n    ],\r\n    \"shipmentLocations\": [\r\n        {\r\n            \"location\": {\r\n                \"locationName\": \"address location\",\r\n                \"address\": {\r\n                    \"name\": \"Henrik\"\r\n                }\r\n            },\r\n            \"shipmentLocationTypeCode\": \"ECP\",\r\n            \"eventDateTime\": \"2022-11-11T11:09:28.292579+01:00\"\r\n        }\r\n    ]\r\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -3146,7 +3148,7 @@
 											"    pm.expect(jsonData.errors[0].reason).to.eql(\"notFound\");\r",
 											"});\r",
 											"\r",
-											"pm.test(\"Error message mentions documentStatus as an issue\", () => {\r",
+											"pm.test(\"Error message mentions carrierBookingRequestReference as an issue\", () => {\r",
 											"    const jsonData = pm.response.json();\r",
 											"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking found with carrierBookingRequestReference: IdoNotExist\");\r",
 											"});"
@@ -4882,10 +4884,6 @@
 		},
 		{
 			"key": "SHIPPING_INSTRUCTION_REFERENCE",
-			"value": ""
-		},
-		{
-			"key": "BOOKING_STATUSSES",
 			"value": ""
 		},
 		{

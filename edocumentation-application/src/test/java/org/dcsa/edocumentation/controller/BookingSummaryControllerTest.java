@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.controller;
 
 import org.dcsa.edocumentation.datafactories.BookingSummaryDataFactory;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.service.BookingSummaryService;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
 import org.dcsa.skernel.errors.infrastructure.ConcreteRequestErrorMessageExceptionHandler;
@@ -101,7 +101,7 @@ class BookingSummaryControllerTest {
                 .value(mockBookingSummaryTO.carrierBookingRequestReference()));
   }
 
-  @Ignore // TODO: see if we can fix this unit test once DT-211 is in master (+ change in BookingSummaryTO.java)
+  @Test
   void testBookingSummaryController_getBookingSummariesWithInvalidDocumentStatus()
       throws Exception {
     BookingSummaryTO mockBookingSummaryTO = BookingSummaryDataFactory.singleBookingSummaryTO();
@@ -118,9 +118,9 @@ class BookingSummaryControllerTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.httpMethod").value("GET"))
         .andExpect(jsonPath("$.requestUri").value(path))
-        .andExpect(jsonPath("$.errors[0].reason").value("invalidParameter"))
+        .andExpect(jsonPath("$.errors[0].reason").value("invalidInput"))
         .andExpect(
             jsonPath("$.errors[0].message")
-                .value(containsString("'bookingStatus' must be valid")));
+                .value(containsString("bookingStatus Unexpected value 'INVALID', should have been one of")));
   }
 }

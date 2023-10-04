@@ -1,6 +1,6 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus.*;
+import static org.dcsa.edocumentation.infra.enums.BookingStatus.*;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -23,6 +23,8 @@ import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.validations.*;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.validation.StringEnumValidation;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 
@@ -106,6 +108,7 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
   private String carrierBookingRequestReference;
 
   @Column(name = "booking_status")
+  @StringEnumValidation(value= BookingStatus.class)
   private String bookingStatus;
 
   @ToString.Exclude
@@ -323,35 +326,35 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
 
 
   /**
-   * Transition the booking into its {@link BookingStatus.RECEIVED} state.
+   * Transition the booking into its {@link BookingStatus#RECEIVED} state.
    */
   public void receive() {
     processTransition(RECEIVED, null, false);
   }
 
   /**
-   * Transition the booking into its {@link BookingStatus.CANCELLED} state.
+   * Transition the booking into its {@link BookingStatus#CANCELLED} state.
    */
   public void cancel(String reason, OffsetDateTime updateTime) {
     processTransition(CANCELLED, reason, updateTime, false);
   }
 
   /**
-   * Transition the booking into its {@link BookingStatus.REJECTED} state.
+   * Transition the booking into its {@link BookingStatus#REJECTED} state.
    */
   public void reject(String reason) {
     processTransition(REJECTED, reason, false);
   }
 
   /**
-   * Transition the booking into its {@link BookingStatus.PENDING_UPDATE} state.
+   * Transition the booking into its {@link BookingStatus#PENDING_UPDATE} state.
    */
   public void pendingUpdate(String reason, OffsetDateTime updateTime) {
     processTransition(PENDING_UPDATE, reason, updateTime, false);
   }
 
   /**
-   * Transition the booking into its {@link BookingStatus.PENDING_UPDATES_CONFIRMATION} state.
+   * Transition the booking into its {@link BookingStatus#PENDING_UPDATES_CONFIRMATION} state.
    */
   public void pendingConfirmation(String reason, OffsetDateTime updateTime) {
     // TODO: implement separate logic for PENDING_UPDATES_CONFIRMATION and PENDING_AMENDMENTS_APPROVAL state
@@ -361,14 +364,14 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
   // TODO: implement logic for DECLINED state
 
   /**
-   * Transition the booking into its {@link BookingStatus.CONFIRMED} state.
+   * Transition the booking into its {@link BookingStatus#CONFIRMED} state.
    */
   public void confirm(OffsetDateTime confirmationTime) {
     processTransition(CONFIRMED, null, confirmationTime, true);
   }
 
   /**
-   * Transition the booking into its {@link BookingStatus.COMPLETED} state.
+   * Transition the booking into its {@link BookingStatus#COMPLETED} state.
    */
   public void complete() {
     processTransition(COMPLETED, null, true);

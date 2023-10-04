@@ -19,7 +19,7 @@ import org.dcsa.edocumentation.datafactories.VoyageDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.service.mapping.*;

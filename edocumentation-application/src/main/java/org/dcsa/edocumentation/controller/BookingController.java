@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.service.BookingService;
 import org.dcsa.edocumentation.transferobjects.BookingCancelRequestTO;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;

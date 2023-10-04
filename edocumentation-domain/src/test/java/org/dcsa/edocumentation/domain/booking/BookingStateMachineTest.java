@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.domain.booking;
 
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.skernel.errors.exceptions.ConflictException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

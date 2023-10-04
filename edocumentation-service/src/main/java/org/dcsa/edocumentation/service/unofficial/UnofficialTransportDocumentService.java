@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.CarrierRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;

@@ -10,6 +10,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 
 @UtilityClass
 public class BookingDataFactory {

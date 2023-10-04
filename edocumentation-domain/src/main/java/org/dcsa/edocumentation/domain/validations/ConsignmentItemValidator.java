@@ -4,7 +4,7 @@ package org.dcsa.edocumentation.domain.validations;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 
 public class ConsignmentItemValidator implements ConstraintValidator<ConsignmentItemValidation, ConsignmentItem> {
 

@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
 import org.dcsa.edocumentation.transferobjects.enums.*;
 
