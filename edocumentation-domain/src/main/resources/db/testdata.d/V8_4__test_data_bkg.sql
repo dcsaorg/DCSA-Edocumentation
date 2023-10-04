@@ -201,88 +201,6 @@ INSERT INTO booking (
      NULL,
      DATE '2021-12-01');
 
-INSERT INTO booking (
-    id,
-    carrier_booking_request_reference,
-    document_status,
-    receipt_type_at_origin,
-    delivery_type_at_destination,
-    cargo_movement_type_at_origin,
-    cargo_movement_type_at_destination,
-    booking_request_datetime,
-    service_contract_reference,
-    payment_term_code,
-    is_partial_load_allowed,
-    is_export_declaration_required,
-    export_declaration_reference,
-    is_import_license_required,
-    import_license_reference,
-    is_ams_aci_filing_required,
-    is_destination_filing_required,
-    contract_quotation_reference,
-    incoterms,
-    invoice_payable_at_id,
-    expected_departure_date,
-    transport_document_type_code,
-    transport_document_reference,
-    booking_channel_reference,
-    communication_channel_code,
-    is_equipment_substitution_allowed,
-    vessel_id,
-    declared_value_currency_code,
-    declared_value,
-    place_of_issue_id,
-    updated_date_time
-) VALUES (
-    '8b78219e-d049-4c68-8d9e-f40bf9a85140'::uuid,
-    'a3a34f10-acc5-4e23-b52e-146f63458c90',
-    'CONF',
-    'CY',
-    'CY',
-    'FCL',
-    'LCL',
-    '2021-12-20 02:11:00.000',
-    'Test',
-     NULL,
-     true,
-     true,
-     'Export declaration reference',
-     true,
-     'Import declaration reference',
-     true,
-     true,
-     NULL,
-     NULL,
-     'c703277f-84ca-4816-9ccf-fad8e202d3b6',
-     DATE '2020-03-07',
-     NULL,
-     NULL,
-     NULL,
-     'AO',
-     true,
-     NULL,
-    'WTK',
-    12.12,
-     NULL,
-     DATE '2021-12-01');
-
-INSERT INTO commodity (
-    id,
-    booking_id,
-    commodity_type,
-    cargo_gross_weight,
-    cargo_gross_weight_unit,
-    export_license_issue_date,
-    export_license_expiry_date
-    ) VALUES (
-    'bf93f6fb-98b8-4268-a4dc-23a40eab95a9'::uuid,
-    '8b78219e-d049-4c68-8d9e-f40bf9a85140'::uuid,
-    'Bloom',
-    2000.0,
-    'LBR',
-    NULL,
-    NULL);
-
 INSERT INTO commodity (
     id,
     booking_id,
@@ -304,9 +222,6 @@ INSERT INTO hs_code_item (
   commodity_id,
   hs_code
 ) VALUES (
-  'bf93f6fb-98b8-4268-a4dc-23a40eab95a9'::uuid,
-  '720711'
-), (
   'bf93f6fb-98b8-4268-a4dc-23a40eab95a8'::uuid,
   '720711'
 );
