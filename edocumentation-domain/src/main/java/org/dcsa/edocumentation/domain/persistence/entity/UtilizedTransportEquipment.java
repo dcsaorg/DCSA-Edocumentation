@@ -40,12 +40,6 @@ public class UtilizedTransportEquipment {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "requested_equipment_group_id")
-  private RequestedEquipmentGroup requestedEquipmentGroup;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "utilized_transport_equipment_id", nullable = false)
   private Set<@Valid Seal> seals;

@@ -8,6 +8,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.LocationSubType;
 import org.dcsa.edocumentation.domain.validations.LocationValidation;
+import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -97,6 +98,12 @@ public class TransportDocument implements Persistable<UUID> {
 
   @Column(name = "received_for_shipment_date")
   private LocalDate receivedForShipmentDate;
+
+  @Column(name = "declared_value_currency_code", length = 3)
+  private String declaredValueCurrency;
+
+  @Column(name = "declared_value")
+  private Float declaredValue;
 
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_id")

@@ -25,8 +25,6 @@ public interface RequestedEquipmentGroupMapper {
   @Mapping(source = "requestedEquipment.isoEquipmentCode", target = "isoEquipmentCode")
   @Mapping(source = "requestedEquipment.units", target = "units")
   @Mapping(source = "commodity", target = "commodity")
-  // FIXME: The RequestedEquipmentGroup should probably not have a utilizedTransportEquipments
-  @Mapping(target = "utilizedTransportEquipments", ignore = true)
   RequestedEquipmentGroup toDAO(
     RequestedEquipmentTO requestedEquipment,
     Booking booking,

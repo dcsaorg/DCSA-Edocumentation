@@ -1,5 +1,14 @@
 package org.dcsa.edocumentation.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.datafactories.CommodityDataFactory;
 import org.dcsa.edocumentation.datafactories.EquipmentDataFactory;
@@ -8,7 +17,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Commodity;
 import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
 import org.dcsa.edocumentation.domain.persistence.repository.RequestedEquipmentGroupRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.UtilizedTransportEquipmentRepository;
 import org.dcsa.edocumentation.service.mapping.EquipmentMapper;
 import org.dcsa.edocumentation.service.mapping.RequestedEquipmentGroupMapper;
 import org.dcsa.edocumentation.transferobjects.RequestedEquipmentTO;
@@ -21,22 +29,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 public class RequestedEquipmentGroupServiceTest {
   @Mock private EquipmentService equipmentService;
   @Mock private ActiveReeferSettingsService activeReeferSettingsService;
   @Mock private RequestedEquipmentGroupRepository requestedEquipmentGroupRepository;
-  @Mock private UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
   @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
   @Spy private EquipmentMapper equipmentMapper = Mappers.getMapper(EquipmentMapper.class);
 
@@ -44,7 +41,7 @@ public class RequestedEquipmentGroupServiceTest {
 
   @BeforeEach
   public void resetMocks() {
-    reset(equipmentService, activeReeferSettingsService, requestedEquipmentGroupRepository, utilizedTransportEquipmentRepository);
+    reset(equipmentService, activeReeferSettingsService, requestedEquipmentGroupRepository);
   }
 
   @Test
@@ -82,6 +79,5 @@ public class RequestedEquipmentGroupServiceTest {
     verify(equipmentService).resolveEquipments(eq(List.of(requestedEquipmentTO)), any(), any());
     verify(requestedEquipmentGroupRepository).save(expectedGroup);
     verify(activeReeferSettingsService).createActiveReeferSettings(requestedEquipmentTO.activeReeferSettings());
-    verify(utilizedTransportEquipmentRepository).saveAll(any());
   }
 }

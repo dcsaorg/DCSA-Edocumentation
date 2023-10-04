@@ -30,13 +30,8 @@ public interface ConsignmentItemMapper {
     return shipment.getCarrierBookingReference();
   }
 
-  default List<String> mapCommodityToHsCodes(Commodity commodity) {
-    return commodity.getHsCodes();
-  }
-
 
   @Mapping(source = "shipment", target = "carrierBookingReference")
-  @Mapping(source = "commodity", target = "hsCodes")
   @Mapping(target = "weight", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME
   @Mapping(target = "weightUnit", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME
   @Mapping(target = "volume", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME

@@ -4580,7 +4580,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\r\n    \"shippingInstructionReference\": \"{{SHIPPING_INSTRUCTION_REFERENCE}}\",\r\n    \"issuingParty\": {\r\n        \"partyContactDetails\": [\r\n            {\r\n                \"name\": \"Jane Møller\",\r\n                \"email\": \"jane.moeller@maersk.example.com\"\r\n            }\r\n        ],\r\n        \"identifyingCodes\": [\r\n            {\r\n                \"partyCode\": \"MSK\",\r\n                \"DCSAResponsibleAgencyCode\": \"SMDG\",\r\n                \"codeListName\": \"LCL\"\r\n            }\r\n        ]\r\n    }\r\n}\r\n",
+											"raw": "{\r\n    \"shippingInstructionReference\": \"{{SHIPPING_INSTRUCTION_REFERENCE}}\",\r\n    \"declaredValue\": 3.14,\r\n    \"declaredValueCurrency\": \"DKK\",\r\n    \"issuingParty\": {\r\n        \"partyContactDetails\": [\r\n            {\r\n                \"name\": \"Jane Møller\",\r\n                \"email\": \"jane.moeller@maersk.example.com\"\r\n            }\r\n        ],\r\n        \"identifyingCodes\": [\r\n            {\r\n                \"partyCode\": \"MSK\",\r\n                \"DCSAResponsibleAgencyCode\": \"SMDG\",\r\n                \"codeListName\": \"LCL\"\r\n            }\r\n        ]\r\n    }\r\n}\r\n",
 											"options": {
 												"raw": {
 													"language": "json"
