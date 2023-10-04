@@ -560,10 +560,19 @@ CREATE TABLE shipment_transport (
     universal_export_voyage_reference varchar(5) NULL,
     universal_service_reference varchar(8) NULL
 );
-  CREATE TABLE advance_manifest_filing (
+CREATE TABLE advance_manifest_filing (
 	manifest_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    shipment_id uuid NOT NULL REFERENCES shipment(id),
-    manifest_type_code varchar(50) NOT NULL,
-    country_code varchar(2) NOT NULL,
+  shipment_id uuid NOT NULL REFERENCES shipment(id),
+  manifest_type_code varchar(50) NOT NULL,
+  country_code varchar(2) NOT NULL,
+	list_order int NOT NULL default 0
+);
+CREATE TABLE advance_manifest_filing_ebl (
+	manifest_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  shipping_instruction_id uuid REFERENCES shipping_instruction (id),
+  manifest_type_code varchar(50) NOT NULL,
+  country_code varchar(2) NOT NULL,
+  filing_performed_by varchar(10) NOT NULL,
+  self_filer_code varchar(100),
 	list_order int NOT NULL default 0
 );
