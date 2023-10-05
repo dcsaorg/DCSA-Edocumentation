@@ -576,3 +576,15 @@ CREATE TABLE advance_manifest_filing_ebl (
   self_filer_code varchar(100),
 	list_order int NOT NULL default 0
 );
+
+CREATE TABLE requested_carrier_certificate (
+    shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
+    requested_certificate varchar(100) NOT NULL,
+    element_order int NOT NULL default 0
+);
+
+CREATE TABLE requested_carrier_clause (
+    shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
+    requested_clause varchar(100) NOT NULL,
+    element_order int NOT NULL default 0
+);
