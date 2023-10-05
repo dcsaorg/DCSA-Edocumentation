@@ -227,16 +227,16 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @ElementCollection
   @Column(name = "requested_certificate", nullable = false)
   @CollectionTable(name = "requested_carrier_certificate", joinColumns = @JoinColumn(name = "shipping_instruction_id"))
-  @RequestedCarrierCertificateValidation( groups = AsyncShipperProvidedDataValidation.class)
   @OrderColumn(name = "element_order")
-  private @Valid List<String> requestedCarrierCertificates;
+  private List<@Valid @PseudoEnum(value = "carriercertificates.csv", column = "Carrier Certificate Code",groups = AsyncShipperProvidedDataValidation.class)
+    String> requestedCarrierCertificates;
 
   @ElementCollection
   @Column(name = "requested_clause", nullable = false)
   @CollectionTable(name = "requested_carrier_clause", joinColumns = @JoinColumn(name = "shipping_instruction_id"))
-  @RequestedCarrierClauseValidation( groups = AsyncShipperProvidedDataValidation.class)
   @OrderColumn(name = "element_order")
-  private @Valid List<String> requestedCarrierClauses;
+  private List<@Valid @PseudoEnum(value = "carrierclauses.csv", column = "Carrier Clause Code",groups = AsyncShipperProvidedDataValidation.class)
+    String> requestedCarrierClauses;
 
   // certain characteristics like the transport plan, are share among all shipments in the shipping
   // instruction, so it is beneficial to be able to retrieve one
