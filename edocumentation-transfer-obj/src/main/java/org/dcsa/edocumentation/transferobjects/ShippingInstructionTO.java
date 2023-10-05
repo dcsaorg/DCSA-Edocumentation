@@ -90,7 +90,11 @@ public record ShippingInstructionTO(
   @Valid
   List<@Valid @NotNull CustomsReferenceTO> customsReferences,
 
-  List<@Valid @NotNull AdvanceManifestFilingEBLTO> advanceManifestFilings
+  List<@Valid @NotNull AdvanceManifestFilingEBLTO> advanceManifestFilings,
+
+  List<@Size(max = 100) @Pattern(regexp = "^\\S+(\\S+\\S+)$") String> requestedCarrierCertificates,
+
+  List<@Size(max = 100) @Pattern(regexp = "^\\S+(\\S+\\S+)$") String> requestedCarrierClauses
 ) {
   @Builder
   public ShippingInstructionTO{}
