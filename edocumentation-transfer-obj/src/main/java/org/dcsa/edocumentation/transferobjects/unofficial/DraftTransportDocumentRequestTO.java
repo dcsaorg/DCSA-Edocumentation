@@ -7,8 +7,12 @@ import org.dcsa.edocumentation.transferobjects.PartyTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.dcsa.skernel.infrastructure.validation.AllOrNone;
+import org.dcsa.skernel.infrastructure.validation.PseudoEnum;
+
 import java.time.LocalDate;
 
+@AllOrNone({"declaredValueCurrency", "declaredValue"})
 public record DraftTransportDocumentRequestTO(
 
 
@@ -27,5 +31,10 @@ public record DraftTransportDocumentRequestTO(
   @Valid
   PartyTO issuingParty,
 
-  Integer numberOfRiderPages) {
+  Integer numberOfRiderPages,
+
+  @PseudoEnum(value = "currencycodes.csv")
+  String declaredValueCurrency,
+
+  Float declaredValue) {
 }

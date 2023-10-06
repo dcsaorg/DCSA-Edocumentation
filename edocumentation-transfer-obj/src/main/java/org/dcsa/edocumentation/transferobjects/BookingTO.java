@@ -143,8 +143,8 @@ public record BookingTO(
   @Valid
   LocationTO placeOfBLIssue,
 
-  @NotEmpty @Valid
-  List<CommodityTO> commodities,
+  @NotEmpty
+  List<@Valid RequestedEquipmentTO> requestedEquipments,
 
   @Valid
   List<ReferenceTO> references,

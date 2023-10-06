@@ -1,7 +1,8 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.ShipmentLocation;
+import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
+import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.mapstruct.Mapper;
@@ -9,12 +10,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
 @Mapper(
     componentModel = "spring",
     config = EDocumentationMappingConfig.class,
-    unmappedTargetPolicy = ReportingPolicy.WARN,  // FIXME: Remove this when we are ready to do ERROR level reporting
     uses = {
       LocationMapper.class,
       DisplayedAddressMapper.class,
@@ -28,10 +26,17 @@ import java.util.List;
 )
 public interface BookingMapper {
 
-  @Mapping(source = "commodities", target = "commodities", ignore = true)
+  @Mapping(target = "requestedEquipments", ignore = true)
   @Mapping(target = "shipmentLocations", ignore = true)
-  @Mapping(source = "documentParties", target = "documentParties", ignore = true)
-  Booking toDAO(BookingTO bookingTO);
+  @Mapping(target = "documentParties", ignore = true)
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "isNew", ignore = true)
+  @Mapping(target = "validUntil", ignore = true)
+  // To make it pick up the parameter
+  @Mapping(source = "voyage", target = "voyage")
+  // TODO: Align names between TO and DAO
+  @Mapping(source = "bookingTO.placeOfBLIssue", target = "placeOfIssue")
+  Booking toDAO(BookingTO bookingTO, Voyage voyage, Vessel vessel);
 
   @Mapping(source = "placeOfIssue", target = "placeOfBLIssue")
   @Mapping(source = "voyage.universalVoyageReference", target = "universalExportVoyageReference")

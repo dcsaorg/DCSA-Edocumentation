@@ -102,10 +102,16 @@ public class PseudoEnumValidator implements ConstraintValidator<PseudoEnum, Stri
     }
     constraintValidatorContext.disableDefaultConstraintViolation();
     String values = String.join(", ", this.allowedValues);
-    constraintValidatorContext.buildConstraintViolationWithTemplate(
-      "The value should have been one of: " + values
-    ).addConstraintViolation();
-
+    if (this.allowedValues.size() > 20 ) {
+      constraintValidatorContext.buildConstraintViolationWithTemplate(
+        "The value can not be recognised."
+      ).addConstraintViolation();
+    }
+    else {
+      constraintValidatorContext.buildConstraintViolationWithTemplate(
+        "The value should have been one of: " + values
+      ).addConstraintViolation();
+    }
     return false;
   }
 }

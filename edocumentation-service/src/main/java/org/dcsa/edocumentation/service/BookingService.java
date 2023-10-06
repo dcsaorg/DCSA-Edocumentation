@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
+import org.dcsa.edocumentation.service.mapping.RequestedEquipmentGroupMapper;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 public class BookingService {
   private final VoyageService voyageService;
   private final VesselService vesselService;
-  private final CommodityService commodityService;
   private final ReferenceService referenceService;
   private final DocumentPartyService documentPartyService;
   private final ShipmentLocationService shipmentLocationService;
@@ -25,6 +25,8 @@ public class BookingService {
   private final BookingRepository bookingRepository;
 
   private final BookingMapper bookingMapper;
+
+  private final RequestedEquipmentGroupMapper requestedEquipmentGroupMapper;
 
   @Transactional
   public Optional<BookingTO> getBooking(String carrierBookingRequestReference) {
@@ -35,7 +37,7 @@ public class BookingService {
 
   @Transactional
   public BookingRefStatusTO createBooking(BookingTO bookingRequest) {
-    Booking booking = toDAOBuilder(bookingRequest).build();
+    Booking booking = mapToBooking(bookingRequest);
 
     booking.receive();
     booking = saveBooking(booking, bookingRequest);
@@ -53,13 +55,8 @@ public class BookingService {
     }
     OffsetDateTime updateTime = OffsetDateTime.now();
     existingBooking.lockVersion(updateTime);
-    Booking updatedBooking = toDAOBuilder(bookingRequest)
-      // Carry over from the existing booking
-      .carrierBookingRequestReference(existingBooking.getCarrierBookingRequestReference())
-      .documentStatus(existingBooking.getDocumentStatus())
-      .bookingRequestCreatedDateTime(existingBooking.getBookingRequestCreatedDateTime())
-      .build();
 
+    var updatedBooking = mapToBooking(bookingRequest, existingBooking);
     updatedBooking.pendingConfirmation(null, updateTime);
     // We have to flush the existing booking. Otherwise, JPA might be tempted to re-order that
     // write/save until after the updatedBooking is saved (which triggers the unique constraint
@@ -76,7 +73,6 @@ public class BookingService {
   }
 
   private void createDeepObjectsForBooking(BookingTO bookingRequest, Booking booking) {
-    commodityService.createCommodities(bookingRequest.commodities(), booking);
     referenceService.createReferences(bookingRequest.references(), booking);
     documentPartyService.createDocumentParties(bookingRequest.documentParties(), booking);
     shipmentLocationService.createShipmentLocations(bookingRequest.shipmentLocations(), booking);
@@ -104,9 +100,29 @@ public class BookingService {
     return updatedBooking;
   }
 
-  private Booking.BookingBuilder toDAOBuilder(BookingTO bookingRequest) {
-    return bookingMapper.toDAO(bookingRequest).toBuilder()
-      .voyage(voyageService.resolveVoyage(bookingRequest))
-      .vessel(vesselService.resolveVessel(bookingRequest));
+  private Booking mapToBooking(BookingTO bookingRequest) {
+    return mapToBooking(bookingRequest, null);
+  }
+
+  private Booking mapToBooking(BookingTO bookingRequest, Booking updateFor) {
+    var voyage = voyageService.resolveVoyage(bookingRequest);
+    var vessel = vesselService.resolveVessel(bookingRequest);
+    var bookingBuilder = bookingMapper.toDAO(bookingRequest, voyage, vessel).toBuilder();
+    if (updateFor != null) {
+      bookingBuilder = bookingBuilder
+        // Carry over from the existing booking
+        // FIXME: This should not be done via a builder.
+        .carrierBookingRequestReference(updateFor.getCarrierBookingRequestReference())
+        .documentStatus(updateFor.getDocumentStatus())
+        .bookingRequestCreatedDateTime(updateFor.getBookingRequestCreatedDateTime());
+    }
+    var booking = bookingBuilder.build();
+    booking.assignRequestedEquipment(
+      bookingRequest.requestedEquipments()
+        .stream()
+        .map(requestedEquipmentGroupMapper::toDAO)
+        .toList()
+    );
+    return booking;
   }
 }

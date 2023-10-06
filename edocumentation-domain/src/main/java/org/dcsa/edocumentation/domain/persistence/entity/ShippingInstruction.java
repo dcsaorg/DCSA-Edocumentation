@@ -219,6 +219,25 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @JoinColumn(name = "shipping_instruction_id")
   private List<CustomsReference> customsReferences;
 
+  @OrderColumn(name = "list_order")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "shipping_instruction_id")
+  private List<@Valid AdvanceManifestFilingEBL> advanceManifestFilings;
+
+  @ElementCollection
+  @Column(name = "requested_certificate", nullable = false)
+  @CollectionTable(name = "requested_carrier_certificate", joinColumns = @JoinColumn(name = "shipping_instruction_id"))
+  @OrderColumn(name = "element_order")
+  private List<@Valid @PseudoEnum(value = "carriercertificates.csv", column = "Carrier Certificate Code",groups = AsyncShipperProvidedDataValidation.class)
+    String> requestedCarrierCertificates;
+
+  @ElementCollection
+  @Column(name = "requested_clause", nullable = false)
+  @CollectionTable(name = "requested_carrier_clause", joinColumns = @JoinColumn(name = "shipping_instruction_id"))
+  @OrderColumn(name = "element_order")
+  private List<@Valid @PseudoEnum(value = "carrierclauses.csv", column = "Carrier Clause Code",groups = AsyncShipperProvidedDataValidation.class)
+    String> requestedCarrierClauses;
+
   // certain characteristics like the transport plan, are share among all shipments in the shipping
   // instruction, so it is beneficial to be able to retrieve one
   public Shipment retrieveOneShipment() {

@@ -11,7 +11,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.CommunicationChannelCode;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.IncoTerms;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ReceiptDeliveryType;
@@ -190,7 +189,7 @@ public class BookingDataFactory {
         .declaredValueCurrency("EUR")
         .declaredValue(10000F)
         .vessel(mockVessel)
-        .commodities(Set.of(CommodityDataFactory.singleCommodity()))
+        .requestedEquipments(List.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
         .references(Set.of(ReferenceDataFactory.singleReference()))
         .documentParties(Set.of(DocumentPartyDataFactory.singleDocumentParty()))
         .shipmentLocations(Set.of(ShipmentLocationDataFactory.singleShipmentLocation()))
@@ -213,7 +212,7 @@ public class BookingDataFactory {
         .isImportLicenseRequired(false)
         .communicationChannelCode(CommunicationChannelCode.AO.name())
         .isEquipmentSubstitutionAllowed(false)
-        .commodities(Set.of(CommodityDataFactory.singleCommodity()))
+        .requestedEquipments(List.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
         .build();
   }
 
@@ -248,7 +247,7 @@ public class BookingDataFactory {
       .vesselIMONumber("1234567")
       .invoicePayableAt(LocationDataFactory.addressLocationTO())
       .placeOfBLIssue(LocationDataFactory.addressLocationTO())
-      .commodities(List.of(CommodityDataFactory.singleCommodityTO()))
+      .requestedEquipments(List.of(RequestedEquipmentDataFactory.requestedEquipmentTORef1()))
       .references(List.of(ReferenceDataFactory.singleReferenceTO()))
       .documentParties(List.of(DocumentPartyDataFactory.fullDocumentPartyTO()))
       .shipmentLocations(List.of(ShipmentLocationDataFactory.shipmentLocationTO()))
