@@ -435,7 +435,7 @@ CREATE INDEX ON utilized_transport_equipment (equipment_reference);
 CREATE TABLE consignment_item (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     description_of_goods text NOT NULL,
-    commodity_subreference varchar(100) NULL,  -- TODO: Will become NOT NULL in a later commit
+    commodity_subreference varchar(100) NOT NULL,
     shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
     shipment_id uuid NOT NULL REFERENCES shipment (id),
     commodity_id uuid NULL REFERENCES commodity (id),

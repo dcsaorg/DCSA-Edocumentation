@@ -70,4 +70,15 @@ public class Commodity {
   @JoinColumn(name = "requested_equipment_group_id")
   @Setter(AccessLevel.PACKAGE)
   private RequestedEquipmentGroup requestedEquipment;
+
+  public void assignSubreference(String s) {
+    if (this.commoditySubreference != null && !this.commoditySubreference.equals(s)) {
+      // If the subreference can change, then it can invalidate any existing SI pointing to this
+      // commodity. Detecting this and cleaning it this up is not really worth for the RI.
+      throw new IllegalStateException("Cannot change the commoditySubreference once assigned " +
+        "(this restriction is a RI implementation detail)"
+      );
+    }
+    this.commoditySubreference = s;
+  }
 }

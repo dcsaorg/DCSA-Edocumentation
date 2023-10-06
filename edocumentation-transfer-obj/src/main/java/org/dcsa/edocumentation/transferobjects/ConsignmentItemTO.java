@@ -19,7 +19,7 @@ public record ConsignmentItemTO(
   @Size(max = 35)
   String carrierBookingReference,
 
-  // Will become @NotNull in a later commit
+  @NotNull
   @Size(max = 100)
   String commoditySubreference,
 

@@ -37,7 +37,9 @@ public record ManageShipmentRequestTO(
 
   List<@Valid ShipmentCutOffTimeTO> shipmentCutOffTimes,
 
-  List<@Valid AdvanceManifestFilingTO> advanceManifestFilings
+  List<@Valid AdvanceManifestFilingTO> advanceManifestFilings,
+
+  List<@Valid List<@Valid @NotBlank @Size(max = 100) String>> commoditySubreferences
   ) {
 
   @Builder(toBuilder = true)
