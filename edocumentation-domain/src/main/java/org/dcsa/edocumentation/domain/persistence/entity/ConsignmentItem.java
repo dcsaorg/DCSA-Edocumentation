@@ -33,7 +33,7 @@ public class ConsignmentItem {
   @Column(name = "description_of_goods", nullable = false)
   private String descriptionOfGoods;
 
-  @Column(name = "commodity_subreference", nullable = true, length = 100)  // Will become NOT NULL later
+  @Column(name = "commodity_subreference", nullable = false, length = 100)
   private String commoditySubreference;
 
   @ElementCollection
