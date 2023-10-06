@@ -32,6 +32,9 @@ public class Commodity {
   @Column(name = "commodity_type", nullable = false, length = 550)
   private String commodityType;
 
+  @Column(name = "commodity_subreference", length = 100)
+  private String commoditySubreference;
+
   @ElementCollection
   @Column(name = "hs_code", nullable = false)
   @CollectionTable(name = "hs_code_item", joinColumns = @JoinColumn(name = "commodity_id"))

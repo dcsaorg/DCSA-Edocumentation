@@ -63,6 +63,7 @@ public class RequestedEquipmentGroup {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
+  @OrderColumn(name = "list_order")
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "requestedEquipment")
   private List<Commodity> commodities;
 
