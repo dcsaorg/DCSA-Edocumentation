@@ -33,6 +33,9 @@ public class ConsignmentItem {
   @Column(name = "description_of_goods", nullable = false)
   private String descriptionOfGoods;
 
+  @Column(name = "commodity_subreference", nullable = true, length = 100)  // Will become NOT NULL later
+  private String commoditySubreference;
+
   @ElementCollection
   @Column(name = "hs_code", nullable = false)
   @CollectionTable(name = "hs_code_item", joinColumns = @JoinColumn(name = "consignment_item_id"))

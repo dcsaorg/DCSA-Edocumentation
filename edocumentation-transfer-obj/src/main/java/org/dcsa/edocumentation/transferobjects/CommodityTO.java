@@ -21,6 +21,10 @@ public record CommodityTO(
   @NotBlank @Size(max = 550)
   String commodityType,
 
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  @Size(max = 100)
+  String commoditySubreference,
+
   @JsonProperty("HSCodes")
   List<@Pattern(regexp = "^[0-9]+$") @Size(min = 6, max = 10) String> hsCodes,
 
