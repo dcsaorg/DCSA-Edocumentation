@@ -88,8 +88,7 @@ public class BookingSummaryController {
       "bookingChannelReference",
       "incoTerms",
       "communicationChannelCode",
-      "isEquipmentSubstitutionAllowed",
-      "preCarriageModeOfTransportCode"
+      "isEquipmentSubstitutionAllowed"
     };
   }
 }

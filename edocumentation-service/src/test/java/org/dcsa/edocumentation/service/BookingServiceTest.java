@@ -19,9 +19,8 @@ import org.dcsa.edocumentation.datafactories.VoyageDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
-import org.dcsa.edocumentation.infra.enums.BookingStatus;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.service.mapping.*;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
@@ -81,7 +80,7 @@ class BookingServiceTest {
 
       BookingTO bookingResult = result.get();
       assertEquals("BOOKING_REQ_REF_01", bookingResult.carrierBookingRequestReference());
-      assertFalse(bookingResult.commodities().isEmpty());
+      assertFalse(bookingResult.requestedEquipments().isEmpty());
       assertFalse(bookingResult.references().isEmpty());
       assertFalse(bookingResult.shipmentLocations().isEmpty());
     }
@@ -96,7 +95,7 @@ class BookingServiceTest {
 
       BookingTO bookingResult = result.get();
       assertEquals("BOOKING_REQ_REF_01", bookingResult.carrierBookingRequestReference());
-      assertFalse(bookingResult.commodities().isEmpty());
+      assertFalse(bookingResult.requestedEquipments().isEmpty());
     }
 
     @Test
@@ -120,8 +119,6 @@ class BookingServiceTest {
   class CreateBooking {
     @Mock private VoyageService voyageService;
     @Mock private VesselService vesselService;
-    @Mock private CommodityService commodityService;
-    @Mock private RequestedEquipmentGroupService requestedEquipmentGroupService;
     @Mock private ReferenceService referenceService;
     @Mock private DocumentPartyService documentPartyService;
     @Mock private ShipmentLocationService shipmentLocationService;
@@ -132,6 +129,9 @@ class BookingServiceTest {
     @Spy private LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
     @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
     @Spy private ReferenceMapper referenceMapper = Mappers.getMapper(ReferenceMapper.class);
+    @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
+    @Spy private CommodityMapper commodityMapper = Mappers.getMapper(CommodityMapper.class);
+    @Spy private ActiveReeferSettingsMapper activeReeferSettingsMapper = Mappers.getMapper(ActiveReeferSettingsMapper.class);
 
     @InjectMocks private BookingService bookingService;
 
@@ -140,8 +140,10 @@ class BookingServiceTest {
       ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
       ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
       ReflectionTestUtils.setField(bookingMapper, "referenceMapper", referenceMapper);
-      reset(voyageService, vesselService, commodityService,
-        requestedEquipmentGroupService, referenceService, documentPartyService, shipmentLocationService,
+      ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
+      ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
+      ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "commodityMapper", commodityMapper);
+      reset(voyageService, vesselService,referenceService, documentPartyService, shipmentLocationService,
         bookingRepository);
     }
 
@@ -153,12 +155,9 @@ class BookingServiceTest {
       OffsetDateTime now = OffsetDateTime.now();
 
       BookingTO bookingRequest = BookingDataFactory.singleFullBookingRequestTO();
-      Booking bookingToSave = bookingMapper.toDAO(bookingRequest).toBuilder()
-        .vessel(vessel)
-        .voyage(voyage)
+      Booking bookingToSave = bookingMapper.toDAO(bookingRequest, voyage, vessel).toBuilder()
         .placeOfIssue(location)
         .invoicePayableAt(location)
-        .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
         .build();
       Booking bookingSaved = bookingToSave.toBuilder()
         .carrierBookingRequestReference("carrierBookingRequestRef")
@@ -184,7 +183,6 @@ class BookingServiceTest {
       verify(voyageService).resolveVoyage(bookingRequest);
       verify(vesselService).resolveVessel(bookingRequest);
       verify(bookingRepository).save(bookingArgumentCaptor.capture());
-      verify(commodityService).createCommodities(eq(bookingRequest.commodities()), any(Booking.class));
       verify(referenceService).createReferences(eq(bookingRequest.references()), any(Booking.class));
       verify(documentPartyService).createDocumentParties(eq(bookingRequest.documentParties()), any(Booking.class));
       verify(shipmentLocationService).createShipmentLocations(eq(bookingRequest.shipmentLocations()), any(Booking.class));

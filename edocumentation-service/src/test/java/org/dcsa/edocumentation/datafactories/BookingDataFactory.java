@@ -8,9 +8,14 @@ import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.CommunicationChannelCode;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.IncoTerms;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.ReceiptDeliveryType;
+import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
+import org.dcsa.edocumentation.transferobjects.BookingTO;
 
 @UtilityClass
 public class BookingDataFactory {
@@ -78,7 +83,6 @@ public class BookingDataFactory {
         .isEquipmentSubstitutionAllowed(false)
         .declaredValueCurrency("EUR")
         .declaredValue(10000F)
-        .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
         .vessel(mockVessel)
         .build();
   }
@@ -115,7 +119,6 @@ public class BookingDataFactory {
             .isEquipmentSubstitutionAllowed(false)
             .declaredValueCurrency("EUR")
             .declaredValue(10000F)
-            .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
             .vessel(mockVessel)
             .build();
 
@@ -148,7 +151,6 @@ public class BookingDataFactory {
             .isEquipmentSubstitutionAllowed(false)
             .declaredValueCurrency("EUR")
             .declaredValue(2000F)
-            .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
             .vessel(mockVessel)
             .build();
 
@@ -186,9 +188,8 @@ public class BookingDataFactory {
         .isEquipmentSubstitutionAllowed(false)
         .declaredValueCurrency("EUR")
         .declaredValue(10000F)
-        .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
         .vessel(mockVessel)
-        .commodities(Set.of(CommodityDataFactory.singleCommodity()))
+        .requestedEquipments(List.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
         .references(Set.of(ReferenceDataFactory.singleReference()))
         .documentParties(Set.of(DocumentPartyDataFactory.singleDocumentParty()))
         .shipmentLocations(Set.of(ShipmentLocationDataFactory.singleShipmentLocation()))
@@ -211,7 +212,7 @@ public class BookingDataFactory {
         .isImportLicenseRequired(false)
         .communicationChannelCode(CommunicationChannelCode.AO.name())
         .isEquipmentSubstitutionAllowed(false)
-        .commodities(Set.of(CommodityDataFactory.singleCommodity()))
+        .requestedEquipments(List.of(RequestedEquipmentDataFactory.singleRequestedEquipment()))
         .build();
   }
 
@@ -244,10 +245,9 @@ public class BookingDataFactory {
       .communicationChannelCode(org.dcsa.edocumentation.transferobjects.enums.CommunicationChannelCode.AO.name())
       .isEquipmentSubstitutionAllowed(true)
       .vesselIMONumber("1234567")
-      .preCarriageUnderShippersResponsibility(org.dcsa.edocumentation.transferobjects.enums.DCSATransportType.VESSEL.name())
       .invoicePayableAt(LocationDataFactory.addressLocationTO())
       .placeOfBLIssue(LocationDataFactory.addressLocationTO())
-      .commodities(List.of(CommodityDataFactory.singleCommodityTO()))
+      .requestedEquipments(List.of(RequestedEquipmentDataFactory.requestedEquipmentTORef1()))
       .references(List.of(ReferenceDataFactory.singleReferenceTO()))
       .documentParties(List.of(DocumentPartyDataFactory.fullDocumentPartyTO()))
       .shipmentLocations(List.of(ShipmentLocationDataFactory.shipmentLocationTO()))

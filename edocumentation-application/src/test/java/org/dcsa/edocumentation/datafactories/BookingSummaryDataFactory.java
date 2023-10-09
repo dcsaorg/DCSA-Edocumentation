@@ -38,7 +38,6 @@ public class BookingSummaryDataFactory {
       .transportDocumentTypeCode(TransportDocumentTypeCode.BOL)
       .communicationChannelCode(CommunicationChannelCode.AO.name())
       .isEquipmentSubstitutionAllowed(false)
-      .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
       .vesselIMONumber("1234567")
       .build();
   }
@@ -69,7 +68,6 @@ public class BookingSummaryDataFactory {
       .transportDocumentTypeCode(TransportDocumentTypeCode.BOL)
       .communicationChannelCode(CommunicationChannelCode.AO.name())
       .isEquipmentSubstitutionAllowed(false)
-      .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
       .vesselIMONumber("1234567")
       .build();
 
@@ -98,7 +96,6 @@ public class BookingSummaryDataFactory {
       .transportDocumentTypeCode(TransportDocumentTypeCode.BOL)
       .communicationChannelCode(CommunicationChannelCode.AO.name())
       .isEquipmentSubstitutionAllowed(false)
-      .preCarriageUnderShippersResponsibility(DCSATransportType.VESSEL.name())
       .vesselIMONumber("1234567")
       .build();
 

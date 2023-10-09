@@ -37,7 +37,6 @@ import org.springframework.data.domain.Persistable;
       @NamedAttributeNode("vessel"),
       @NamedAttributeNode("placeOfIssue"),
       @NamedAttributeNode("invoicePayableAt"),
-      @NamedAttributeNode(value = "commodities", subgraph = "graph.commodities"),
       @NamedAttributeNode("references"),
       @NamedAttributeNode(value = "documentParties", subgraph = "graph.documentParties"),
       @NamedAttributeNode("shipmentLocations")
@@ -52,11 +51,6 @@ import org.springframework.data.domain.Persistable;
       @NamedSubgraph(
           name = "graph.party",
           attributeNodes = {@NamedAttributeNode("partyContactDetails")}),
-      @NamedSubgraph(
-        name = "graph.commodities",
-        attributeNodes = {
-          @NamedAttributeNode("requestedEquipments")
-        })
     })
 @Slf4j
 @Data
@@ -221,12 +215,6 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @JoinColumn(name = "pre_carriage_mode_of_transport_code")
-  @PseudoEnum(value = "modeoftransportcodes.csv", column = "DCSA Transport Type")
-  private String preCarriageUnderShippersResponsibility;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "vessel_id")
   private Vessel vessel;
@@ -244,17 +232,13 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "booking")
-  private Set<Commodity> commodities;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "booking")
   private Set<Reference> references;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "booking")
-  private Set<RequestedEquipmentGroup> requestedEquipments;
+  @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+  @OrderColumn(name = "list_order")
+  private List<RequestedEquipmentGroup> requestedEquipments;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -446,5 +430,14 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
         + currentState + "'",
       e
     );
+  }
+
+  public void assignRequestedEquipment(List<RequestedEquipmentGroup> requestedEquipments) {
+    this.requestedEquipments = requestedEquipments;
+    if (requestedEquipments != null) {
+      for (var re : requestedEquipments) {
+        re.setBooking(this);
+      }
+    }
   }
 }

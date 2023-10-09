@@ -6,9 +6,9 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
-import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.CarrierRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
@@ -16,6 +16,7 @@ import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRe
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.EBLValidation;
 import org.dcsa.edocumentation.domain.validations.PaperBLValidation;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.service.PartyService;
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
@@ -63,6 +64,27 @@ public class UnofficialTransportDocumentService {
     if (carrier == null) {
       throw ConcreteRequestErrorMessageException.notFound("Unknown carrier SMDG code: " + carrierSMDGCode);
     }
+
+    boolean shouldHaveDeclaredValue = shippingInstruction.getConsignmentItems()
+      .stream()
+      .map(ConsignmentItem::getShipment)
+      .map(Shipment::getBooking)
+      .map(Booking::getDeclaredValue)
+      .anyMatch(Objects::nonNull);
+
+    if (shouldHaveDeclaredValue && transportDocumentRequestTO.declaredValue() == null) {
+      throw ConcreteRequestErrorMessageException.invalidInput(
+        "Please provide declaredValue + declaredValueCurrency for this transport document.  At least one of the"
+          + " bookings have declared value and the reference implementation cannot determine how much of it"
+          + " should end up in this transport document (vs. other transport documents)"
+      );
+    } else if (!shouldHaveDeclaredValue && transportDocumentRequestTO.declaredValue() == null) {
+      throw ConcreteRequestErrorMessageException.invalidInput(
+        "Please do not provide declaredValue + declaredValueCurrency for this transport document. None of the"
+          + " related bookings had a declared value."
+      );
+    }
+
     // FIXME: We need to "freeze" the transport document such that changes to the SI does *NOT* change
     //  the transport document. This affects basically any non-trivial object associated with the
     //  transport document.
@@ -75,6 +97,8 @@ public class UnofficialTransportDocumentService {
       .numberOfRiderPages(transportDocumentRequestTO.numberOfRiderPages())
       .carrier(carrier)
       .issuingParty(partyService.createParty(transportDocumentRequestTO.issuingParty()))
+      .declaredValueCurrency(transportDocumentRequestTO.declaredValueCurrency())
+      .declaredValue(transportDocumentRequestTO.declaredValue())
       .build();
 
     TransportDocumentTO mapped = transportDocumentMapper.toDTO(document);

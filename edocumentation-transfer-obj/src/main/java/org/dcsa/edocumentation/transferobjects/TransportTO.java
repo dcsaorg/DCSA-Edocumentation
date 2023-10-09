@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
+import org.dcsa.skernel.infrastructure.validation.PseudoEnum;
 import org.dcsa.skernel.infrastructure.validation.UniversalServiceReference;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
@@ -30,6 +31,7 @@ public record TransportTO(
   LocalDate plannedArrivalDate,
 
   @Size(max = 10)
+  @PseudoEnum(value = "modeoftransportcodes.csv", column = "DCSA Transport Type")
   String modeOfTransport,
   @Size(max = 35, message = "The attribute vesselName has a max size of 35.") String vesselName,
   @ValidVesselIMONumber(allowNull = true, message = "The attribute vesselIMONumber is invalid.")
@@ -47,8 +49,7 @@ public record TransportTO(
     String carrierServiceCode,
 
   @UniversalServiceReference
-    String universalServiceReference,
-  boolean isUnderShippersResponsibility) {
+    String universalServiceReference) {
 
   @Builder(toBuilder = true)
   public TransportTO {}

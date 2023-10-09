@@ -37,7 +37,7 @@ public record ManageShipmentRequestTO(
 
   List<@Valid ShipmentCutOffTimeTO> shipmentCutOffTimes,
 
-  List<@Valid AdvanceManifestFilingTO> advanceManifestFiling
+  List<@Valid AdvanceManifestFilingTO> advanceManifestFilings
   ) {
 
   @Builder(toBuilder = true)

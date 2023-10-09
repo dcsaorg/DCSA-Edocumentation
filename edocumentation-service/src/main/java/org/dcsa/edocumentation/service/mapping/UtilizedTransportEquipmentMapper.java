@@ -20,7 +20,6 @@ public interface UtilizedTransportEquipmentMapper {
   @Mapping(source = "utilizedTransportEquipmentTO.isShipperOwned", target = "isShipperOwned")
   @Mapping(source = "equipment", target = "equipment")
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "requestedEquipmentGroup", ignore = true)
   UtilizedTransportEquipment toDAO(UtilizedTransportEquipmentTO utilizedTransportEquipmentTO, Equipment equipment);
 
   @Mapping(target = "equipmentReference", expression = "java(null)")  // FIXME: In TD, always absent. In other cases, conditional on "isSOC"!

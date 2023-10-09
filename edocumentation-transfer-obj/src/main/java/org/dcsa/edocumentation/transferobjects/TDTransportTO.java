@@ -4,14 +4,19 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.Builder;
+import org.dcsa.skernel.infrastructure.validation.PseudoEnum;
 
 public record TDTransportTO(
   @NotNull
-  LocalDate plannedArrivalDate,  // TODO: TransportDocumentMapper does not map this field yet
+  LocalDate plannedArrivalDate,
   @NotNull
-  LocalDate plannedDepartureDate, // TODO: TransportDocumentMapper does not map this field yet
+  LocalDate plannedDepartureDate,
   @Size(max = 10)
-  String preCarriedBy,  // TODO: TransportDocumentMapper does not map this field yet
+  @PseudoEnum(value = "modeoftransportcodes.csv", column = "DCSA Transport Type")
+  String preCarriageBy,
+  @Size(max = 10)
+  @PseudoEnum(value = "modeoftransportcodes.csv", column = "DCSA Transport Type")
+  String onCarriageBy,
   LocationTO placeOfReceipt,
   @NotNull
   LocationTO portOfLoading,

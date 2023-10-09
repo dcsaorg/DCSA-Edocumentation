@@ -137,17 +137,14 @@ public record BookingTO(
   @ValidVesselIMONumber(allowNull = true)
   String vesselIMONumber,
 
-  @Size(max = 10)
-  String preCarriageUnderShippersResponsibility,
-
   @Valid
   LocationTO invoicePayableAt,
 
   @Valid
   LocationTO placeOfBLIssue,
 
-  @NotEmpty @Valid
-  List<CommodityTO> commodities,
+  @NotEmpty
+  List<@Valid RequestedEquipmentTO> requestedEquipments,
 
   @Valid
   List<ReferenceTO> references,

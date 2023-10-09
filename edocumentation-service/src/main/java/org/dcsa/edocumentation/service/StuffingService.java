@@ -1,8 +1,10 @@
 package org.dcsa.edocumentation.service;
 
+import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
-import org.dcsa.edocumentation.domain.persistence.repository.CommodityRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ConsignementItemRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
 import org.dcsa.edocumentation.service.mapping.CargoItemMapper;
@@ -12,10 +14,6 @@ import org.dcsa.edocumentation.transferobjects.ConsignmentItemTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.Map;
-
 @Service
 @RequiredArgsConstructor
 public class StuffingService {
@@ -24,7 +22,6 @@ public class StuffingService {
   private final ConsignmentItemMapper consignmentItemMapper;
   private final ConsignementItemRepository consignementItemRepository;
   private final CargoItemMapper cargoItemMapper;
-  private final CommodityRepository commodityRepository;
 
   @Transactional(Transactional.TxType.MANDATORY)
   public void createStuffing(
@@ -38,14 +35,7 @@ public class StuffingService {
                 consignmentItemTO -> {
                   ConsignmentItem consignmentItem = consignmentItemMapper.toDAO(consignmentItemTO);
                   Shipment shipment = addShipment(consignmentItemTO.carrierBookingReference());
-                  Commodity commodity = commodityRepository.save(Commodity.builder()
-                    .booking(shipment.getBooking())
-                    .commodityType(consignmentItem.getDescriptionOfGoods())
-                    .hsCodes(consignmentItemTO.hsCodes())
-                    .build()
-                  );
                   return consignmentItem.toBuilder()
-                      .commodity(commodity)
                       .shipment(shipment)
                       .shippingInstruction(shippingInstruction)
                       .cargoItems(

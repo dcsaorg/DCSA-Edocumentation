@@ -3,12 +3,15 @@ package org.dcsa.edocumentation.domain.validations;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Set;
+
+import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.dcsa.edocumentation.domain.persistence.entity.AdvanceManifestFiling;
+import org.dcsa.edocumentation.domain.persistence.entity.AdvanceManifestFilingEBL;
+import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.PartyFunction;
@@ -82,6 +85,7 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
     emitConsignmentItemsConstraintIfNotOk(cargoMovementTypeAtDestinationChecker, state, "All referenced bookings must have the same cargoMovementTypeAtDestination");
     emitConsignmentItemsConstraintIfNotOk(termAndConditionsChecker, state, "All referenced bookings must have the same termsAndConditions");
     emitConsignmentItemsConstraintIfNotOk(serviceContractReferenceChecker, state, "All referenced bookings must have the same serviceContractReference");
+    validateManifestFilings(state);
   }
 
   private void validateStraightBL(ValidationState<ShippingInstruction> state) {
@@ -146,6 +150,52 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
     if (validateAtLeastOneOfIsPresent(state, Set.of(PartyFunction.OS.name(), PartyFunction.DDR.name()))) {
       validateAtMostOncePartyFunction(state, PartyFunction.OS);
       validateAtMostOncePartyFunction(state, PartyFunction.DDR);
+    }
+  }
+
+  private void validateManifestFilings(ValidationState<ShippingInstruction> state) {
+
+    List<AdvanceManifestFilingEBL> advanceManifestFilingSIs = state.getValue().getAdvanceManifestFilings();
+    List<ConsignmentItem> consignmentItems = state.getValue().getConsignmentItems();
+
+    ConsignmentItem firstconsignmentItem = state.getValue().getConsignmentItems().get(0);
+    List<AdvanceManifestFiling> advanceManifestFilingBase = firstconsignmentItem.getShipment().getAdvanceManifestFilings();
+    Map<String,List<AdvanceManifestFiling>> misMatchedConsignmentManifestFilings = new HashMap<>();
+
+    for(ConsignmentItem ci: consignmentItems) {
+      List<AdvanceManifestFiling> advanceManifestFilings = ci.getShipment().getAdvanceManifestFilings();
+      List<AdvanceManifestFiling> misMatchedManifestFilings = advanceManifestFilingBase.stream()
+        .filter(two -> advanceManifestFilings.stream()
+          .noneMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())
+            && one.getCountryCode().equals(two.getCountryCode())))
+        .toList();
+      if (!misMatchedManifestFilings.isEmpty()) {
+        misMatchedConsignmentManifestFilings.put(ci.getShipment().getCarrierBookingReference(),misMatchedManifestFilings);
+      }
+    }
+
+    if (!misMatchedConsignmentManifestFilings.isEmpty()) {
+      List<String> carrierBookingRefs = misMatchedConsignmentManifestFilings.keySet().stream().toList();
+      state.getContext().buildConstraintViolationWithTemplate(
+        "Mismatch advance Manifest filings in carrier Booking References " + carrierBookingRefs)
+        .addPropertyNode("advanceManifestFilings")
+        .addConstraintViolation();
+      state.invalidate();
+      return;
+    }
+
+    List<AdvanceManifestFiling> misMatchedManifestFilingsSI =  advanceManifestFilingBase.stream()
+      .filter(two -> advanceManifestFilingSIs.stream()
+        .noneMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())
+          && one.getCountryCode().equals(two.getCountryCode())))
+      .toList();
+
+    if (!misMatchedManifestFilingsSI.isEmpty()) {
+      state.getContext().buildConstraintViolationWithTemplate(
+        "The Advance Manifest Filings in Shipping Instruction " + state.getValue().getShippingInstructionReference() + " doesn't match with the Shipments"
+      ).addPropertyNode("advanceManifestFilings")
+      .addConstraintViolation();
+      state.invalidate();
     }
   }
 

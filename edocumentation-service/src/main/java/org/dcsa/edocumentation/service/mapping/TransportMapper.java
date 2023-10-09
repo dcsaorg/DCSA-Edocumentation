@@ -14,6 +14,5 @@ public interface TransportMapper {
   @Mapping(
     source = "transportPlanStageCode",
     target = "transportPlanStage")
-  @Mapping(target = "isUnderShippersResponsibility", ignore = true)  // FIXME: Verify if this should be mapped
   TransportTO shipmentTransportToTransportTO(ShipmentTransport shipmentTransport);
 }

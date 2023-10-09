@@ -9,7 +9,7 @@ public class AdvanceManifestFilingValidator implements ConstraintValidator<Advan
 
 
   private static final CodeCache VALID_MANIFEST_CODES =
-    CodeCache.of("advancedmanifestfilings.csv", "Advance Manifest Filing Type Code", "Country Code");
+    CodeCache.of("advancemanifestfilings.csv", "Advance Manifest Filing Type Code", "Country Code");
   @Override
   public boolean isValid(AdvanceManifestFilingTO value, ConstraintValidatorContext context) {
     if (value == null) {
