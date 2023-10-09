@@ -31,7 +31,7 @@ public class BookingSummaryController {
   @ResponseStatus(HttpStatus.OK)
   public List<BookingSummaryTO> getBookingSummaries(
       @RequestParam(required = false)
-      @StringEnumValidation(value= BookingStatus.class)
+      @StringEnumValidation(value = BookingStatus.class)
       String bookingStatus,
       @RequestParam(value = Pagination.DCSA_PAGE_PARAM_NAME, defaultValue = "0", required = false)
           @Min(0)

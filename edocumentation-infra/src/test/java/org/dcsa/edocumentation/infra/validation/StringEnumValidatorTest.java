@@ -1,5 +1,7 @@
 package org.dcsa.edocumentation.infra.validation;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.dcsa.edocumentation.infra.enums.StringEnum;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,12 +32,12 @@ public class StringEnumValidatorTest {
   }
 
   @Test
-  public void givenBookingStatusString_whenBookingStatusStringValid_thenNoViolation() {
-    assertTrue(validate(new TestRecord("RECEIVED", "PENDING UPDATE")).isEmpty());
+  public void givenTestRecord_whenBookingStatusStringNullOrValid_thenNoViolation() {
+    assertTrue(validate(new TestRecord(null, "PENDING UPDATE")).isEmpty());
   }
 
   @Test
-  void givenBookingStatusString_whenBookingStatusStringInalid_thenViolation() {
+  void givenTestRecord_whenBookingStatusStringInvalid_thenViolation() {
     var violations = validate(new TestRecord("RECEIVED", "DUMMY"));
     assertEquals(1, violations.size());
     var violation = violations.iterator().next();
@@ -49,6 +51,7 @@ public class StringEnumValidatorTest {
     return validatorFactory.getValidator().validate(value);
   }
 
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
   public class TestStatus extends StringEnum {
     public static final String RECEIVED = "RECEIVED";
     public static final String PENDING_UPDATE = "PENDING UPDATE";

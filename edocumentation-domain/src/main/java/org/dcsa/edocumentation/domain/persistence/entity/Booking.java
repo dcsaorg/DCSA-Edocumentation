@@ -72,6 +72,7 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
   // TODO: validate this set since PENC has been broken into PENDING_UPDATES_CONFIRMATION and PENDING_AMENDMENTS_APPROVAL
   private static final Set<String> CAN_BE_VALIDATED = Set.of(RECEIVED, PENDING_UPDATES_CONFIRMATION);
 
+  //TODO: remove commented out code once we are done with all state transition changes
 //  private static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION_OLD = DFADefinition.builder(RECE)
 //    .nonTerminalState(RECE).successorNodes(REJE, CANC, PENU, PENC, CONF)
 //    .nonTerminalState(PENU).successorNodes(REJE, CANC, PENU, PENC)

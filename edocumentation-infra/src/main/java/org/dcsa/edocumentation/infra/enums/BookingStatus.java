@@ -1,5 +1,9 @@
 package org.dcsa.edocumentation.infra.enums;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingStatus extends StringEnum {
   public static final String RECEIVED = "RECEIVED";
   public static final String PENDING_UPDATE = "PENDING UPDATE";
