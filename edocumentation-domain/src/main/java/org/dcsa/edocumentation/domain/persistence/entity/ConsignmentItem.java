@@ -33,6 +33,9 @@ public class ConsignmentItem {
   @Column(name = "description_of_goods", nullable = false)
   private String descriptionOfGoods;
 
+  @Column(name = "carrier_booking_reference", nullable = false, length = 35)
+  private String carrierBookingReference;
+
   @Column(name = "commodity_subreference", nullable = false, length = 100)
   private String commoditySubreference;
 
