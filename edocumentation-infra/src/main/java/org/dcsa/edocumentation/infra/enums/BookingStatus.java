@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class BookingStatus extends StringEnum {
+public class BookingStatus implements StringEnum {
   public static final String RECEIVED = "RECEIVED";
   public static final String PENDING_UPDATE = "PENDING UPDATE";
   public static final String PENDING_UPDATES_CONFIRMATION = "PENDING UPDATES CONFIRMATION";

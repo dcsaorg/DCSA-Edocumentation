@@ -52,7 +52,7 @@ public class StringEnumValidatorTest {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public class TestStatus extends StringEnum {
+  public class TestStatus implements StringEnum {
     public static final String RECEIVED = "RECEIVED";
     public static final String PENDING_UPDATE = "PENDING UPDATE";
     public static final String COMPLETED = "COMPLETED";
