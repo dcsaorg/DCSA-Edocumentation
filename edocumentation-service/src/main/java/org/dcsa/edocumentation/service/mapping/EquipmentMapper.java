@@ -21,8 +21,6 @@ public interface EquipmentMapper {
       .map(reference -> EquipmentTO.builder()
         .equipmentReference(reference)
         .isoEquipmentCode(requestedEquipmentTO.isoEquipmentCode())
-        .tareWeight(requestedEquipmentTO.tareWeight() == null ? null : requestedEquipmentTO.tareWeight().doubleValue())
-        .weightUnit(requestedEquipmentTO.tareWeightUnit())
         .build());
   }
 }

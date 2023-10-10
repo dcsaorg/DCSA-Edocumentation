@@ -34,7 +34,6 @@ import org.springframework.data.domain.Persistable;
       @NamedAttributeNode("vessel"),
       @NamedAttributeNode("placeOfIssue"),
       @NamedAttributeNode("invoicePayableAt"),
-      @NamedAttributeNode(value = "commodities", subgraph = "graph.commodities"),
       @NamedAttributeNode("references"),
       @NamedAttributeNode(value = "documentParties", subgraph = "graph.documentParties"),
       @NamedAttributeNode("shipmentLocations")
@@ -49,11 +48,6 @@ import org.springframework.data.domain.Persistable;
       @NamedSubgraph(
           name = "graph.party",
           attributeNodes = {@NamedAttributeNode("partyContactDetails")}),
-      @NamedSubgraph(
-        name = "graph.commodities",
-        attributeNodes = {
-          @NamedAttributeNode("requestedEquipments")
-        })
     })
 @Data
 @Builder(toBuilder = true)
@@ -215,17 +209,13 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "booking")
-  private Set<Commodity> commodities;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "booking")
   private Set<Reference> references;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "booking")
-  private Set<RequestedEquipmentGroup> requestedEquipments;
+  @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+  @OrderColumn(name = "list_order")
+  private List<RequestedEquipmentGroup> requestedEquipments;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -401,5 +391,14 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
         + currentState.name() + ").",
       e
     );
+  }
+
+  public void assignRequestedEquipment(List<RequestedEquipmentGroup> requestedEquipments) {
+    this.requestedEquipments = requestedEquipments;
+    if (requestedEquipments != null) {
+      for (var re : requestedEquipments) {
+        re.setBooking(this);
+      }
+    }
   }
 }

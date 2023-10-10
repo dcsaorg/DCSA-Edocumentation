@@ -5,13 +5,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
 import org.dcsa.skernel.infrastructure.validation.DisallowIfBoolean;
 import org.dcsa.skernel.infrastructure.validation.ISO6346EquipmentReference;
 import org.dcsa.skernel.infrastructure.validation.RequiredIfTrue;
-
-import java.util.List;
 
 @DisallowIfBoolean(ifField = "isShipperOwned", hasValue = false, thenDisallow = {"tareWeight", "tareWeightUnit"})
 @RequiredIfTrue(isFieldReferenceRequired = "isShipperOwned", fieldReference = "tareWeight")
@@ -33,8 +32,7 @@ public record RequestedEquipmentTO(
   @NotNull
   Boolean isShipperOwned,
 
-  @Size(max = 100)
-  String commodityRequestedEquipmentLink,
+  List<@Valid CommodityTO> commodities,
 
   @Valid
   ActiveReeferSettingsTO activeReeferSettings
