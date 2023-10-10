@@ -132,7 +132,7 @@ public class ManageShipmentService {
         }
         var j = 0;
         for (var commodity : commodities) {
-          var ref = refs.get(j);
+          var ref = refs.get(j++);
           if (commodity.getCommoditySubreference() != null && !commodity.getCommoditySubreference().equals(ref)) {
             throw ConcreteRequestErrorMessageException.invalidInput("The commodity at index [" + i + ", " + j
               + "] was already assigned the commodity subreference \"" + commodity.getCommoditySubreference()
@@ -140,15 +140,29 @@ public class ManageShipmentService {
               + " When (re-)confirming the booking, you must reuse the same commodity subreference for commodities"
               + " that where already assigned a commodity subreference.");
           }
-          commodity.assignSubreference(refs.get(j++));
+          commodity.assignSubreference(ref);
         }
       }
     } else {
+      Set<String> seen = new HashSet<>();
       booking.getRequestedEquipments().stream()
         .map(RequestedEquipmentGroup::getCommodities)
         .flatMap(Collection::stream)
         .filter(c -> c.getCommoditySubreference() == null)
-        .forEach(commodity -> commodity.assignSubreference(generateCommoditySubreference()));
+        .forEach(commodity -> {
+          var ref = generateCommoditySubreference();
+          int failures = 0;
+          while(seen.contains(ref)) {
+            if (failures++ > 3) {
+              throw ConcreteRequestErrorMessageException.internalServerError(
+                "Could not generate a unique commodity subreference within a few attempts." +
+                  " This should not happen unless someone broke the subreference generator."
+              );
+            }
+          }
+          commodity.assignSubreference(ref);
+          seen.add(ref);
+        });
     }
   }
 
