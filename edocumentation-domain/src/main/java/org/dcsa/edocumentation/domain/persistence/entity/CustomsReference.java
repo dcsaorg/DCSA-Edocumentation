@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import lombok.*;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.CustomsReferenceValidation;
 
 @Data
 @Builder(toBuilder = true)
@@ -12,6 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
 @Entity
+@CustomsReferenceValidation(groups = AsyncShipperProvidedDataValidation.class)
 @Table(name = "customs_reference")
 public class CustomsReference {
 
@@ -47,5 +50,10 @@ public class CustomsReference {
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private ConsignmentItem consignmentItem;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private CargoItem cargoItem;
 
 }

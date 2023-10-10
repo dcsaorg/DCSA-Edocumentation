@@ -31,7 +31,11 @@ public record CargoItemTO(
   // TODO: Missing outerPackaging (DG)
 
   @Valid
-  List<@Valid @Size(max =  500) String> shippingMarks
+  List<@Valid @Size(max =  500) String> shippingMarks,
+
+  @Valid
+  List<@Valid @NotNull CustomsReferenceTO> customsReferences
+
 ) {
   @Builder
   public CargoItemTO{}

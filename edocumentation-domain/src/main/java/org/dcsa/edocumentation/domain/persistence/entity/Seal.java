@@ -31,12 +31,12 @@ public class Seal {
 
   @Column(name = "seal_source_code")
   @Size(max = 5)
-  @PseudoEnum(value = "sealtypecodes.csv", groups = AsyncShipperProvidedDataValidation.class)
+  @PseudoEnum(value = "sealsourcecodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   private String source;
 
   @Column(name = "seal_type_code")
   @Size(max = 5)
-  @PseudoEnum(value = "sealsourcecodes.csv", groups = AsyncShipperProvidedDataValidation.class)
+  @PseudoEnum(value = "sealtypecodes.csv", groups = AsyncShipperProvidedDataValidation.class)
   @NotNull
   private String type;
 }

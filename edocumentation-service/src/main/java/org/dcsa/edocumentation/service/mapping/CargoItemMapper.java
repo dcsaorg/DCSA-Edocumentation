@@ -10,6 +10,9 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(
   componentModel = "spring",
   config = EDocumentationMappingConfig.class,
+  uses = {
+    CustomsReferenceMapper.class
+  },
   unmappedTargetPolicy = ReportingPolicy.WARN  // FIXME: Remove this line when we are ready for ERROR.
 )
 public interface CargoItemMapper {

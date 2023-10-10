@@ -3,39 +3,26 @@ package org.dcsa.edocumentation.domain.validations;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
+import org.dcsa.edocumentation.domain.persistence.entity.CargoItem;
 import org.dcsa.edocumentation.domain.persistence.entity.CustomsReference;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
+import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
 
 import java.util.List;
 
-public class ConsignmentItemValidator extends AbstractCustomsReferenceListValidator implements ConstraintValidator<ConsignmentItemValidation, ConsignmentItem> {
+public class CargoItemValidator extends AbstractCustomsReferenceListValidator implements ConstraintValidator<CargoItemValidation, CargoItem> {
 
   @Override
-  public boolean isValid(ConsignmentItem value, ConstraintValidatorContext context) {
+  public boolean isValid(CargoItem value, ConstraintValidatorContext context) {
     if (value == null) {
       return true;
     }
     context.disableDefaultConstraintViolation();
-
     var state = ValidationState.of(value, context);
-    validateConfirmedBookings(state);
     validateCustomsReference(state);
     return state.isValid();
   }
 
-  private void validateConfirmedBookings(ValidationState<ConsignmentItem> state) {
-    var shipment = state.getValue().getShipment();
-    if (shipment.getBooking().getDocumentStatus() != BkgDocumentStatus.CONF) {
-      state.getContext().buildConstraintViolationWithTemplate("The booking " + shipment.getCarrierBookingReference() + " is not in state CONF")
-        // Match the TO path
-        .addPropertyNode("carrierBookingReference")
-        .addConstraintViolation();
-      state.invalidate();
-    }
-  }
-
-  private void validateCustomsReference(ValidationState<ConsignmentItem> state) {
+  private void validateCustomsReference(ValidationState<CargoItem> state) {
     if (state.getValue().getCustomsReferences() == null) {
       return;
     }

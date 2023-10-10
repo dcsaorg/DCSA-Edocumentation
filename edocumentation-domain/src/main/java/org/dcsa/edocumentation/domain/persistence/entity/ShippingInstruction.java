@@ -5,7 +5,6 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumen
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.function.Function;
 
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -217,7 +216,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "shipping_instruction_id")
-  private List<CustomsReference> customsReferences;
+  private List<@Valid CustomsReference> customsReferences;
 
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

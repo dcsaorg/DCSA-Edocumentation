@@ -9,15 +9,12 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.AdvanceManifestFiling;
-import org.dcsa.edocumentation.domain.persistence.entity.AdvanceManifestFilingEBL;
-import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
-import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
+import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.PartyFunction;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ReceiptDeliveryType;
 
-public class ShippingInstructionValidator implements ConstraintValidator<ShippingInstructionValidation, ShippingInstruction> {
+public class ShippingInstructionValidator extends AbstractCustomsReferenceListValidator implements ConstraintValidator<ShippingInstructionValidation, ShippingInstruction> {
 
   @Override
   public boolean isValid(ShippingInstruction value, ConstraintValidatorContext context) {
@@ -86,6 +83,7 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
     emitConsignmentItemsConstraintIfNotOk(termAndConditionsChecker, state, "All referenced bookings must have the same termsAndConditions");
     emitConsignmentItemsConstraintIfNotOk(serviceContractReferenceChecker, state, "All referenced bookings must have the same serviceContractReference");
     validateManifestFilings(state);
+    validateCustomsReference(state);
   }
 
   private void validateStraightBL(ValidationState<ShippingInstruction> state) {
@@ -211,6 +209,21 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
       .addPropertyNode("consignmentItems")
       .addConstraintViolation();
   }
+
+  private void validateCustomsReference(ValidationState<ShippingInstruction> state) {
+    if (state.getValue().getCustomsReferences() == null) {
+      return;
+    }
+    List<CustomsReference> duplicateCustomsReference = checkReferencesDuplicates(state.getValue().getCustomsReferences());
+    if (duplicateCustomsReference.size() >1 ) {
+      state.getContext().buildConstraintViolationWithTemplate("The customsreferences contains duplicate combination of Type code and Country code." )
+        // Match the TO path
+        .addPropertyNode("customsReference")
+        .addConstraintViolation();
+      state.invalidate();
+    }
+  }
+
 
   @RequiredArgsConstructor
   private static class EnsureEqual<T> {

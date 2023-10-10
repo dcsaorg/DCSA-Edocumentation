@@ -5,6 +5,8 @@ import lombok.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 
 import jakarta.persistence.*;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.UtilizedTransportEquipmentValidation;
 
 import java.util.List;
 import java.util.Set;
@@ -17,6 +19,7 @@ import java.util.UUID;
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "utilized_transport_equipment")
+@UtilizedTransportEquipmentValidation(groups = AsyncShipperProvidedDataValidation.class)
 public class UtilizedTransportEquipment {
 
   @Id
@@ -47,6 +50,6 @@ public class UtilizedTransportEquipment {
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "utilized_transport_equipment_id")
-  private List<CustomsReference> customsReferences;
+  private List<@Valid CustomsReference> customsReferences;
 
 }
