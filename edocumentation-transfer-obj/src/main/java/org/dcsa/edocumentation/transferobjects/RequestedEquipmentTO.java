@@ -9,7 +9,6 @@ import java.util.List;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.WeightUnit;
 import org.dcsa.skernel.infrastructure.validation.DisallowIfBoolean;
-import org.dcsa.skernel.infrastructure.validation.ISO6346EquipmentReference;
 import org.dcsa.skernel.infrastructure.validation.RequiredIfTrue;
 
 @DisallowIfBoolean(ifField = "isShipperOwned", hasValue = false, thenDisallow = {"tareWeight", "tareWeightUnit"})
@@ -27,7 +26,7 @@ public record RequestedEquipmentTO(
   @NotNull
   Integer units,
 
-  List<@NotBlank @ISO6346EquipmentReference String> equipmentReferences,
+  List<@Valid @NotBlank String> equipmentReferences,
 
   @NotNull
   Boolean isShipperOwned,
