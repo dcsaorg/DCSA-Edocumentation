@@ -209,13 +209,13 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "booking")
-  private Set<Reference> references;
+  private Set<@Valid Reference> references;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
   @OrderColumn(name = "list_order")
-  private List<RequestedEquipmentGroup> requestedEquipments;
+  private List<@Valid RequestedEquipmentGroup> requestedEquipments;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
