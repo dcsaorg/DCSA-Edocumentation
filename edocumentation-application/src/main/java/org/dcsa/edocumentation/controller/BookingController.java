@@ -90,8 +90,6 @@ public class BookingController {
       @Valid @PathVariable("carrierBookingRequestReference") @NotNull @Size(max = 100)
           String carrierBookingRequestReference,
       @Valid @RequestBody BookingCancelRequestTO bookingCancelRequestTO) {
-    // Fail-safe: The @Valid + @EnumSubset should have covered this. But it felt weird
-    // just to ignore the bookingStatus field...
     if (!bookingCancelRequestTO.bookingStatus().equals(BookingStatus.CANCELLED)) {
       throw ConcreteRequestErrorMessageException.invalidInput("bookingStatus must be CANCELLED");
     }

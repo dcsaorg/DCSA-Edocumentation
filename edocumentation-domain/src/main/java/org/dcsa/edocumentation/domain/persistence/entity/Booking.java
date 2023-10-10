@@ -63,17 +63,9 @@ import org.springframework.data.domain.Persistable;
 @BookingValidation(groups = AsyncShipperProvidedDataValidation.class)
 public class Booking extends AbstractStateMachine<String> implements Persistable<UUID> {
 
-  // TODO: validate this set since PENC has been broken into PENDING_UPDATES_CONFIRMATION and PENDING_AMENDMENTS_APPROVAL
-  private static final Set<String> CAN_BE_VALIDATED = Set.of(RECEIVED, PENDING_UPDATES_CONFIRMATION);
-
-  //TODO: remove commented out code once we are done with all state transition changes
-//  private static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION_OLD = DFADefinition.builder(RECE)
-//    .nonTerminalState(RECE).successorNodes(REJE, CANC, PENU, PENC, CONF)
-//    .nonTerminalState(PENU).successorNodes(REJE, CANC, PENU, PENC)
-//    .nonTerminalState(PENC).successorNodes(REJE, CANC, PENU, PENC, CONF)
-//    .nonTerminalState(CONF).successorNodes(REJE, CMPL, PENU, PENC)
-//    .terminalStates(CANC, CMPL, REJE)
-//    .build();
+  private static final Set<String> CAN_BE_VALIDATED = Set.of(RECEIVED,
+    PENDING_UPDATES_CONFIRMATION,
+    PENDING_AMENDMENTS_APPROVAL);
 
   private static final DFADefinition<String> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECEIVED)
     .nonTerminalState(RECEIVED)
@@ -293,12 +285,10 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
       validationErrors.add(violation.getPropertyPath().toString() + ": " +  violation.getMessage());
     }
 
-    // TODO: check if this logic has to change,
-    //  since PENC has been broken into PENDING_UPDATES_CONFIRMATION and PENDING_AMENDMENTS_APPROVAL
-    var proposedStatus = validationErrors.isEmpty()
-      ? PENDING_UPDATES_CONFIRMATION   // before changes this was PENC
-      : PENDING_UPDATE
-      ;
+    // TODO: according to the latest Booking State Transition Diagram (STD),
+    //  PENDING_UPDATES_CONFIRMATION should be replaced with CONFIRMED, but this change should be done together
+    // with other STD-related changes so that new BOOKING_DFA_DEFINITION does not get broken
+    var proposedStatus = validationErrors.isEmpty() ? PENDING_UPDATES_CONFIRMATION : PENDING_UPDATE;
 
     return new ValidationResult<>(proposedStatus, validationErrors);
   }
@@ -332,6 +322,13 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
   }
 
   /**
+   * Transition the booking into its {@link BookingStatus#REJECTED} state.
+   */
+  public void decline(String reason) {
+    processTransition(DECLINED, reason, false);
+  }
+
+  /**
    * Transition the booking into its {@link BookingStatus#PENDING_UPDATE} state.
    */
   public void pendingUpdate(String reason, OffsetDateTime updateTime) {
@@ -341,12 +338,16 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
   /**
    * Transition the booking into its {@link BookingStatus#PENDING_UPDATES_CONFIRMATION} state.
    */
-  public void pendingConfirmation(String reason, OffsetDateTime updateTime) {
-    // TODO: implement separate logic for PENDING_UPDATES_CONFIRMATION and PENDING_AMENDMENTS_APPROVAL state
+  public void pendingUpdatesConfirmation(String reason, OffsetDateTime updateTime) {
     processTransition(PENDING_UPDATES_CONFIRMATION, reason, updateTime, true);
   }
 
-  // TODO: implement logic for DECLINED state
+  /**
+   * Transition the booking into its {@link BookingStatus#PENDING_AMENDMENTS_APPROVAL} state.
+   */
+  public void pendingAmendmentsApproval(String reason, OffsetDateTime updateTime) {
+    processTransition(PENDING_AMENDMENTS_APPROVAL, reason, updateTime, true);
+  }
 
   /**
    * Transition the booking into its {@link BookingStatus#CONFIRMED} state.

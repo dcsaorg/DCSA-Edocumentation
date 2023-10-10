@@ -34,7 +34,7 @@ public class ManageShipmentService {
   private final BookingRepository bookingRepository;
   private final ShipmentMapper shipmentMapper;
   private final CarrierRepository carrierRepository;
-  private final BookingValidationService bookingValidationService;
+  private final UnofficialBookingService unofficialBookingService;
   private final ShipmentLocationService shipmentLocationService;
   private final ShipmentTransportService shipmentTransportService;
   private final ConfirmedEquipmentMapper confirmedEquipmentMapper;
@@ -94,7 +94,7 @@ public class ManageShipmentService {
         + shipmentRequestTO.carrierSMDGCode() + "\". Note the code may be valid but not loaded into this system.");
     }
     OffsetDateTime confirmationTime = OffsetDateTime.now();
-    ValidationResult<String> validationResult = bookingValidationService.validateBooking(booking, false);
+    ValidationResult<String> validationResult = unofficialBookingService.validateBooking(booking, false);
 
     booking.confirm(confirmationTime);
 

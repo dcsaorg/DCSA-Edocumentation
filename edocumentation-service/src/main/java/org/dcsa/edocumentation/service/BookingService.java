@@ -57,7 +57,7 @@ public class BookingService {
     existingBooking.lockVersion(updateTime);
 
     var updatedBooking = mapToBooking(bookingRequest, existingBooking);
-    updatedBooking.pendingConfirmation(null, updateTime);
+    updatedBooking.pendingUpdatesConfirmation(null, updateTime);
     // We have to flush the existing booking. Otherwise, JPA might be tempted to re-order that
     // write/save until after the updatedBooking is saved (which triggers the unique constraint
     // in the database).

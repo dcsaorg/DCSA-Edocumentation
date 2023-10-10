@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 public record BookingCancelRequestTO(
   @NotNull
-  @EnumSubset(anyOf = "CANCELLED")
+  @EnumSubset(anyOf = "CANCELLED,REJECTED,DECLINED")
   String bookingStatus,
   @Size(max = 250)
   String reason

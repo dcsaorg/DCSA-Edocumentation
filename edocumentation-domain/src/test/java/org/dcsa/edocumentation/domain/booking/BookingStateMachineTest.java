@@ -17,14 +17,14 @@ class BookingStateMachineTest {
     OffsetDateTime now = OffsetDateTime.now();
     booking.receive();
     Assertions.assertEquals(BookingStatus.RECEIVED, booking.getBookingStatus());
-    booking.pendingConfirmation("We provided what you requested. Please review it and confirm the booking", now);
+    booking.pendingUpdatesConfirmation("We provided what you requested. Please review it and confirm the booking", now);
     Assertions.assertEquals(BookingStatus.PENDING_UPDATES_CONFIRMATION, booking.getBookingStatus());
     booking.pendingUpdate("Please provide foo!", now);
     Assertions.assertEquals(BookingStatus.PENDING_UPDATE, booking.getBookingStatus());
 
     booking = Booking.builder().bookingStatus(BookingStatus.RECEIVED).build();
     Assertions.assertEquals(BookingStatus.RECEIVED, booking.getBookingStatus());
-    booking.pendingConfirmation("We provided what you requested. Please review it and confirm the booking", now);
+    booking.pendingUpdatesConfirmation("We provided what you requested. Please review it and confirm the booking", now);
     Assertions.assertEquals(BookingStatus.PENDING_UPDATES_CONFIRMATION, booking.getBookingStatus());
   }
 
@@ -44,7 +44,7 @@ class BookingStateMachineTest {
       Assertions.assertThrows(ConflictException.class, () -> booking.pendingUpdate("Please provide foo!", now));
       Assertions.assertThrows(ConflictException.class, booking::complete);
       Assertions.assertThrows(ConflictException.class,
-        () -> booking.pendingConfirmation(
+        () -> booking.pendingUpdatesConfirmation(
           "We provided what you requested. Please review it and confirm the booking",
           now
       ));
