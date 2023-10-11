@@ -1,12 +1,15 @@
 package org.dcsa.edocumentation.service.mapping;
 
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.Commodity;
 import org.dcsa.edocumentation.transferobjects.CommodityTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
+@Mapper(componentModel = "spring",
+  config = EDocumentationMappingConfig.class,
+  uses = {
+    OuterPackagingMapper.class
+  })
 public interface CommodityMapper {
 
   @Mapping(target = "id", ignore = true)

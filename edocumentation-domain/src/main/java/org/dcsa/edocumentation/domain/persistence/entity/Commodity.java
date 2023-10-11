@@ -55,9 +55,6 @@ public class Commodity {
   @Enumerated(EnumType.STRING)
   private VolumeUnit cargoGrossVolumeUnit;
 
-  @Column(name = "number_of_packages")
-  private Integer numberOfPackages;
-
   @Column(name = "export_license_issue_date")
   private LocalDate exportLicenseIssueDate;
 
@@ -70,6 +67,10 @@ public class Commodity {
   @JoinColumn(name = "requested_equipment_group_id")
   @Setter(AccessLevel.PACKAGE)
   private RequestedEquipmentGroup requestedEquipment;
+
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "outer_packaging_id")
+  private OuterPackaging outerPackaging;
 
   public void assignSubreference(String s) {
     if (this.commoditySubreference != null && !this.commoditySubreference.equals(s)) {

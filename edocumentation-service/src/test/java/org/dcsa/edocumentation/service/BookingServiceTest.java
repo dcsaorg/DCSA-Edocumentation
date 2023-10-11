@@ -133,6 +133,8 @@ class BookingServiceTest {
     @Spy private CommodityMapper commodityMapper = Mappers.getMapper(CommodityMapper.class);
     @Spy private ActiveReeferSettingsMapper activeReeferSettingsMapper = Mappers.getMapper(ActiveReeferSettingsMapper.class);
 
+    @Spy private OuterPackagingMapper outerPackagingMapper = Mappers.getMapper(OuterPackagingMapper.class);
+
     @InjectMocks private BookingService bookingService;
 
     @BeforeEach
@@ -143,6 +145,7 @@ class BookingServiceTest {
       ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "commodityMapper", commodityMapper);
+      ReflectionTestUtils.setField(commodityMapper, "outerPackagingMapper", outerPackagingMapper);
       reset(voyageService, vesselService,referenceService, documentPartyService, shipmentLocationService,
         bookingRepository);
     }

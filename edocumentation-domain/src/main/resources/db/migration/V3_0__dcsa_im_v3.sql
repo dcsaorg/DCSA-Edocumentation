@@ -255,6 +255,13 @@ CREATE TABLE confirmed_equipment (
   list_order int NOT NULL DEFAULT 0
 );
 
+CREATE TABLE outer_packaging (
+	id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  package_code varchar(2),
+  imo_packaging_code varchar(5),
+  number_of_packages int default 1,
+  description varchar(100)
+);
 
 CREATE TABLE commodity (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -272,7 +279,9 @@ CREATE TABLE commodity (
     -- actually, the uniqueness must be across the entire booking.  However, we cannot
     -- enforce that SQL-wise.  We can discover a more narrow case and we might as well
     -- do that.
-    UNIQUE (requested_equipment_group_id, commodity_subreference)
+    UNIQUE (requested_equipment_group_id, commodity_subreference),
+    outer_packaging_id uuid NULL REFERENCES outer_packaging(id)
+
 );
 
 CREATE INDEX ON commodity (requested_equipment_group_id);
@@ -597,3 +606,4 @@ CREATE TABLE requested_carrier_clause (
     requested_clause varchar(100) NOT NULL,
     element_order int NOT NULL default 0
 );
+

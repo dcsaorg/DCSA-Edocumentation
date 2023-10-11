@@ -38,7 +38,7 @@ public record CommodityTO(
 
   VolumeUnit cargoGrossVolumeUnit,
 
-  Integer numberOfPackages,
+  @Valid OuterPackagingTO outerPackaging,
 
   LocalDate exportLicenseIssueDate,
 
