@@ -32,11 +32,77 @@
 			<groupId>org.dcsa.shared-kernel</groupId>
 			<artifactId>dcsa-shared-kernel-infrastructure</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>0.2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>2.2.8</version>
+		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>6.6.0</version>
+				<configuration>
+					<configOptions>
+						<hideGenerationTimestamp>true</hideGenerationTimestamp>
+						<interfaceOnly>true</interfaceOnly>
+						<openApiNullable>false</openApiNullable>
+					</configOptions>
+				</configuration>
+				<executions>
+					<execution>
+						<id>BKG-TO</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${basedir}/src/main/resources/dcsaorg-DCSA_BKG-2.0.0-Beta-1-resolved.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<modelNameSuffix>BKG</modelNameSuffix>
+							<modelPackage>org.dcsa.edocumentation.transferobjects.generated</modelPackage>
+							<generateApis>false</generateApis>
+							<generateModelDocumentation>false</generateModelDocumentation>
+							<generateSupportingFiles>false</generateSupportingFiles>
+							<configOptions>
+								<useSpringBoot3>true</useSpringBoot3>
+							</configOptions>
+						</configuration>
+					</execution>
+					<execution>
+						<id>EBL-TO</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${basedir}/src/main/resources/dcsaorg-DCSA_EBL-3.0.0-Beta-1-resolved.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<modelNameSuffix>EBL</modelNameSuffix>
+							<modelPackage>org.dcsa.edocumentation.transferobjects.generated</modelPackage>
+							<generateApis>false</generateApis>
+							<generateModelDocumentation>false</generateModelDocumentation>
+							<generateSupportingFiles>false</generateSupportingFiles>
+							<configOptions>
+								<useSpringBoot3>true</useSpringBoot3>
+							</configOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

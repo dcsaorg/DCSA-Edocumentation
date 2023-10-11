@@ -1,0 +1,4031 @@
+---
+openapi: 3.0.3
+info:
+  title: DCSA OpenAPI specification for Electronic Bill of Lading
+  description: |
+    API specification issued by DCSA.org.
+
+    For explanation to specific values or objects please refer to the [Information Model v2023.Q3]() *** _Will be updated_ ***. This API does not define the business rules regarding what is allowed to update at what time. For this the [Electronic Bill of Lading IFS]() *** _Will be updated_ *** should be consulted. **All UseCases mentioned in this API refer to UseCases defined in this EBL IFS**.
+
+    All other documents related to the Electronic Bill of Lading publication can be found [here](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8lPQAS)
+
+    It is possible to use this API as a standalone API. In order to do so it is necessary to use one of the poll-endPoints:
+
+        GET /v3/shipping-instructions-summaries
+        GET /v3/shipping-instructions/{shippingInstructionReference}
+
+    in order to poll information about status changes.
+
+    It is possible to have notifications pushed to you whenever the provider needs input. This is defined outside the scope of this API. For this to work a WebHook must be set up.
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#v300B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 3.0.0-Beta-1
+servers:
+- url: /
+tags:
+- name: Shipping Instructions
+  description: |
+    The initial steps by the Shipper to create a Bill of Lading
+- name: Transport Documents
+  description: The Transport Document as agreed by both parties
+paths:
+  /v3/shipping-instructions-summaries:
+    get:
+      tags:
+      - Shipping Instructions
+      summary: Get shipping instructions
+      description: |
+        Retrieves the `Shipping Instruction` _metadata_. This endPoint can be used to list all `Shipping Instructions` accessable to you.
+
+        The order of the list is defined by the implementor.
+      operationId: getShippingInstructionSummeries
+      parameters:
+      - name: carrierBookingReference
+        in: query
+        description: |
+          The bookingReference in the Bill of Lading process to filter by.
+
+          It is possible to insert multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example
+
+              carrierBookingReference=ABC123123,DEF987987
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/carrierBookingReference'
+        example:
+        - ABC123123
+        - DEF987987
+      - name: documentStatus
+        in: query
+        description: |
+          Filter by the status of the Shipping Instruction in the process. Possible values are:
+          - RECEIVED
+          - PENDING UPDATE
+          - INITIAL DRAFT
+          - PENDING CHANGES APPROVAL
+          - DRAFT
+          - PENDING AMENDMENTS APPROVAL
+          - APPROVED
+          - AUTO-APPROVED
+          - ISSUED
+          - AMENDMENTS APPROVED
+          - PENDING SURRENDER FOR AMENDMENTS
+          - PENDING SURRENDER FOR DELIVERY
+          - SURRENDERED FOR AMENDMENTS
+          - SURRENDERED FOR DELIVERY
+          - VOIDED
+          - REJECTED
+
+          More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/eblStatus'
+      - name: limit
+        in: query
+        description: |
+          Maximum number of items to return.
+        required: false
+        schema:
+          minimum: 1
+          type: integer
+          format: int32
+          default: 100
+        example: 100
+      - name: sort
+        in: query
+        description: |
+          A comma-separated (`,`) list of field names is used to define the sort order. To specify the sort order for each field name required, use a colon (`:`) between the field name and the keyword `ASC` (ascending) or `DESC` (descening). If the keyword is not used, ascending (`ASC`) order is applied by default.
+        required: false
+        schema:
+          type: string
+        example: carrierBookingReference:DESC
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      responses:
+        "200":
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+            Current-Page:
+              $ref: '#/components/headers/Current-Page'
+            Next-Page:
+              $ref: '#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: '#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: '#/components/headers/Last-Page'
+            First-Page:
+              $ref: '#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/shippingInstructionSummary'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many requests to Shipping Instruction Summaries
+                  description: "Calling the endPoint\n\n    GET /v3/shipping-instructions-summaries\n    \ntoo many times within a timeperiod.\n\n**NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a \"random example\"\n"
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/shipping-instructions-summaries
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    errorMessage: Too many request to fetch list of Shipping Instruction Summaries. Please try again in 1 hour
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Max Shipping Instructions requests reached
+                      message: A maximum of 1000 requests for Shipping Instructions Summaries can be querried for per hour
+  /v3/shipping-instructions:
+    post:
+      tags:
+      - Shipping Instructions
+      summary: Post a shipping instruction
+      description: "Creates a new Shipping Instruction. This endPoint corresponds with **UseCase 1 - Submit Shipping Instruction**.\n\n## Precondition\nThe consumer has information for a `Shipping Instruction`.\n\n## Postcondition\nThe provider has received the `Shipping Instruction`.\n\nThe consumer will receive a `201` (Created) if the payload schema-validates or a `400` (Bad Request) if it does not.\n\nThe provider can **optionally** do a full validation as part of the response. The full validation can also be done asynchroniously in which case a `Notification` will be sent to any subscribers once the validation is complete.\n\n## Process\nThe following occurs when a provider recieves a `Shipping Instruction`:\n1. The payload (`Shipping Instruction`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.\n\n   **The process stops here!**\n2. The payload is schema-valid which means\n    - all required fields are provided\n    - all values provided have correct data type\n\n    A `shippingInstructionReference` (as a reference to the `Shipping Instruction`) is created and stored along with the payload in the provider system.\n  \n**For the rest of this description and in all examples the value `si-123` will be used as `shippingInstructionReference`**\n\nThe provider can now choose to either do **(A) No Validation** or make a **(B) Full Validation**\n\n\n### No validation\nNo validation means the provider will just store the `Shipping Instruction` and send back a success message with `documentStatus=RECEIVED`. Any further processing (validation) will continue asynchroniously\n\n3. A `201` (Created) response is returned with the following payload\n    ```\n    {\n      shippingInstructionReference: 'si-123',\n      documentStatus: 'RECEIVED'\n    }\n    ```\nFor `POST` `Shipping Instruction` the process for **NO Validation** ends here. The `Shipping Instruction`\n\n  - is now stored in the provider system\n  - has status `RECEIVED`\n  - awaits further processing by the provider\n  - a `201` (Created) response is sent to the consumer with a payload containing `documentStatus=RECEIVED`\n\nAsynchronious processing will now start by the provider - once processed the new status of the `Shipping Instruction` will be communicated via a `Notification`. In case the consumer does not subscribe to `Notifications` it is necessary for the consumer to poll on the\n\n    GET /shipping-instructions/{shippingInstructionReference}\n    \n  endPoint in order to check if the `documentStatus` of the `Shipping Instruction` has changed.\n\n### Full validation\nFull validation means the provider has stored the `Shipping Instruction` and a full validation of the payload has completed.\n3. Do full validation of the payload. Some examples could be:\n    - correct `Advance Manifest Filings` have been provided\n    - check Equipment References specified\n    - make sure Bookings linked to have `bookingState='CONFIRMED'`\n    - etc\n    \n    Making a full validation requires the provider to check against all business rules (_the list above is just examples_)\n4. Depending on the result of step 3 the following will happen:\n    - **Update to `Shipping Instruction` required**\n       \n      If an update to the `Shipping Instruction` is required (equivalent to **UseCase 2 - Request update to Shipping instruction** ) the `documentStatus=PENDING UPDATE` in a `201` (Created) respose is returned\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'PENDING UPDATE',\n        requestedChanges: [\n          {\n            path: \"equipmentReference\",\n            message: \"The equipmentReference used does not exist\"\n          }\n        ]\n      }\n      ```\n      The `requestedChanges` structure will contain the changes that the provider requires the consumer to update in order for the `Shipping Instruction` to be valid.\n      \n    - **Initial Draft of the Transport Document**\n    \n      If the `Shipping Instruction` is accepted an **Initial Draft Transport Document** is published (equivalent to **UseCase 4 - Publish Draft Transport Document**) the `documentStatus=INITIAL DRAFT` in a `201` (Created) respose is returned\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'INITIAL DRAFT'\n      }\n      ```\n\nFor a full validation the `POST` Shipping Instruction ends here. The Shipping Instruction\n    \n- is now stored in the provider system\n- a full validation has been done\n- the consumer has receved a 201 (Created) response from the provider with the status of the Shipping Instruction request with one of the following values:\n  - `PENDING UPDATE` in case the provider requires the consumer to make an update to the `Shipping Instruction` (equivalent to **UseCase 2 - Request update to Shipping Instruction**)\n  - `INITIAL DRAFT` in case the provider accepts the `Shipping Instruction` and **Drafts** a `Transport Document` (equivalent to **UseCase 4 - Publish Draft Transport Document**)\n\nThe provider is now awaiting further action by the consumer.\n"
+      operationId: postShippingInstruction
+      parameters:
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      requestBody:
+        description: Parameters used to create the Shipping Instruction
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/shippingInstructionRequest'
+        required: true
+      responses:
+        "201":
+          description: |
+            `Shipping Instruction` has been successfully created in the provider system. Depending on the level of validation done by the provider - the status of the `Shipping Instruction` will be one of the following:
+            - `RECEIVED` in case asynchronous processing of the `Shipping Instruction` begins. The `Shipping Instruction` is now awaiting the provider to finish the validation
+            - `PENDING UPDATE` in case provider needs the `Shipping Instruction` to be updated and awaits further input from consumer
+            - `INITAL DRAFT` in case provider has accepted the `Shipping Instruction` and drafted a `Transport Document`
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shippingInstructionRefStatus'
+              examples:
+                receExample:
+                  summary: |
+                    Shipping Instruction received
+                  description: |
+                    A `Shipping Instruction` has been received (`documentStatus='RECEIVED'`) and stored in provider system but not yet fully validated (only schema validated)
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: RECEIVED
+                penuExample:
+                  summary: |
+                    Shipping Instruction pending update
+                  description: |
+                    A `Shipping Instruction` received and stored in provider system and fully validated. The result of the full validation has resulted in the provider requiring the consumer to make some updates (`documentStatus='PENDING UPDATE'`)
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: PENDING UPDATE
+                    requestedChanges:
+                    - path: carrierBookingReference
+                      message: Linked booking does not exist
+                initalDraftExample:
+                  summary: |
+                    Transport Document Inital Draft
+                  description: |
+                    A `Shipping Instruction` received and stored in provider system, fully validated and accepted. A `Transport Document` has been drafted (`documentStatus='INITAL DRAFT'`).
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: INITAL DRAFT
+        "400":
+          description: |
+            In case the `Shipping Instruction` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Shipping Instruction missing isElectronic
+                  description: |
+                    `isElectronic` is a mandoatry field in the `Shipping Instruction`. This is an example of how the error object would look in case this field is missing
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v3/shipping-instructions
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    errorMessage: isElectronic not found - it is a mandatory field in Shipping Instruction
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-10-03T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      field: isElectronic
+                      reason: mandatory field missing
+                      message: isElectronic must be provided as part of a Shipping Instruction
+        "500":
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Shipping Instruction
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationID` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v3/shipping-instructions
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    errorMessage: Internal Server Error occurred while processing Booking request
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Internal Error occurred
+                      message: Internal Error occurred
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Shipping Instructions
+                  description: "Calling the endPoint\n\n    POST /v3/shipping-instructions\n    \ntoo many times within a timeperiod.\n\n**NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a \"random example\"\n"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v3/shipping-instructions
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    errorMessage: Too many request to create a Shipping Instruction has been requested. Please try again in 1 hour
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Max Shipping Instructions reached
+                      message: A maximum of 10 Shipping Instructions can be created per hour
+  /v3/shipping-instructions/{shippingInstructionReference}:
+    get:
+      tags:
+      - Shipping Instructions
+      summary: Get shipping instruction
+      description: |
+        Retrieves the Shipping Instruction with the `shippingInstructionReference` in the path. It is recommended to use this endPoint to `GET` data before an update is made to make sure latest version is being updated.
+
+        In case no subscription (`Notification`) has been set up - it is possbile to use this endPoint to poll on in order to detect if `documentStatus` has changed.
+      operationId: getShippingInstructions
+      parameters:
+      - name: shippingInstructionReference
+        in: path
+        description: |
+          The identifier for a shipping instruction provided by the carrier
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/shippingInstructionReference'
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      responses:
+        "200":
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shippingInstructionResponse'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                getError:
+                  summary: |
+                    GET non-existing Shipping Instruction
+                  description: "Calling\n\n    GET /v3/shipping-instructions/si-123\n    \nresults in an error as Shipping Instruction `si-123` does not exist.\n\n**NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a \"random example\"\n"
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/shipping-instructions/si-123
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    errorMessage: The requested shippingInstructionReference does not exist
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Non existent shippingInstructionReference
+                      message: shippingInstructionReference `si-123` does not exist
+    put:
+      tags:
+      - Shipping Instructions
+      summary: Put shipping instruction
+      description: "Updates the `Shipping Instruction` with the `shippingInstructionReference` in the path. This endPoint corresponds with either\n\n- **UseCase 3 - Submit updated Shipping Instruction**\n- **UseCase 5 - Request changes to Draft Transport Document**\n- **UseCase 7 - Request amendments to Draft Transport Document**\n- **UseCase 10 - Request amendments to Transport Document**\n\nThis endPoint is to be used in response to\n\n- **UseCase 2 - Request to update Shipping Instruction** in which case the `documentStatus='PENDING UPDATE'`\n- **UseCase 4 - Publish Draft Transport Document** in which case the `documentStatus='INITIAL DRAFT'`\n- **UseCase 8 - Approve amendments to Draft Transport Document** in which case the `documentStatus='DRAFT'`\n- **UseCase 9 - Issue Transport Document** in which case the `documentStatus='ISSUED'`\n- **UseCase 12 - Approve changes to Draft Transport Document** in which case the `documentStatus='DRAFT'`\n\nthe endPoint can also be used in case `documentStatus='RECEIVED'` and the consumer has an update to the `Shipping Instruction`.\n\n### Precondition\nIn order to update a `Shipping Instruction`, the status of the `Shipping Instruction` needs to be in state\n\n- `RECEIVED` in case the consumer has updated information for the `Shipping Instruction`\n- `PENDING UPDATE` in case the provider has requested the consumer to update the `Shipping Instruction` (a result of **UseCase 2 - Request to update Shipping Instruction**)\n- `INITIAL DRAFT` in case the consumer has a change to the `Draft Transport Document` (**UseCase 5 - Request changes to Draft Transport Document**)\n- `DRAFT` in case the consumer has an amendment to the `Draft Transport Document` (**UseCase 7 - Request amendments to Draft Transport Document**)\n- `ISSUED` in case the consumer has an amendment to the `Transport Document` (**UseCase 10 - Request amendments to Transport Document**)\n\n## Postcondition\nThe provider has received an update to the Shipping Instruction (**UseCase 3 - Submit updated Shipping Instruction**), a change to the Draft Transport Document (**UseCase 5 - Request changes to Draft Transport Document**), an amendment to the Draft Transport Document (**UseCase 7 - Request amendments to Draft Transport Document**) or  an amendment to the Transport Document (**UseCase 10 - Request amendments to Transport Document**).\n\nThe consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.\n\nThe provider can **optionally** do a full validation as part of the response. The full validation can also be done asynchroniously in which case a `Notification` will be sent to any subscribers once the validation is complete.\n\n## Process\nThe following occurs when a provider recieves an **update** to a `Shipping Instruction`\n1. The payload (`Shipping Instruction`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.\n\n   **The process stops here!**\n2. The payload is schema-valid which means\n    - all required fields are provided\n    - all values provided have correct data type\n  \n    The updated `Shipping Instruction` is stored in the provider system.\n\n**For the rest of this description and in all examples the value `si-123` will be used as `shippingInstructionReference`**\n\nThe provider can now choose to either do **(A) No Validation** or make a **(B) Full Validation**\n\n### A). No validation\n\nNo validation means the provider will just store the **updated** `Shipping Instruction` and send back a success message. Any further processing (validation) will continue asynchroniously.\n\n3. The response depends on which useCase is the reason for calling this endPoint (what the `documentStatus` is):\n\n    - If `documentStatus` **is** `RECEIVED` then this endPoint is being used in addition to **UseCase 1 - Submit Shipping Instruction**. In this case the consumer would like to make an update to an already sent `Shipping Instruction` - this is done via **UseCase 3 - Submit updated Shipping Instruction**. The `documentStatus` stays as `RECEIVED`\n    \n      A `200` (OK) response corresponding to the following payload is returned\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'RECEIVED'\n      }\n      ```\n\n    - If `documentStatus` is `PENDING UPDATE` then this endPoint is being used as a reponse to **UseCase 2 - Request to update Shipping Instruction** in this case the provider has requested an update to a `Shipping Instruction`. The `documentStatus` changes to `RECEIVED`.\n      \n      A `200` (OK) response corresponding to the following payload is returned\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'RECEIVED'\n      }\n      ```\n    \n    - If `documentStatus` is `INITIAL DRAFT` then this endPoint is being used in order to request a **change** to a `Draft Transport Document` this is done via **UseCase 5 - Request changes to Draft Transport Document**. The `documentStatus` now changes to `PENDING CHANGES APPROVAL`.\n    \n      A `200` (OK) response corresponding to the following payload is returned\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'PENDING CHANGES APPROVAL'\n      }\n      ```\n    \n    - If `documentStatus` is `DRAFT` then this endPoint is being used in order to request an **amendment** to a `Draft Transport Document` this is done via **UseCase 7 - Request Amendments to Draft Transport Document**. The `documentStatus` now changes to `PENDING AMENDMENTS APPROVAL`.\n    \n      A `200` (OK) response corresponding to the following payload is returned\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'PENDING AMENDMENTS APPROVAL'\n      }\n      ```\n    \n    - If `documentStatus` is `ISSUED` then this endPoint is being used in order to request an **amendment** to a `Transport Document` this is done via **UseCase 10 - Request Amendments to Transport Document**. The `documentStatus` now changes to `PENDING AMENDMENTS APPROVAL`.\n    \n      A `200` (OK) response corresponding to the following payload is returned\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'PENDING AMENDMENTS APPROVAL'\n      }\n      ```\n    \nFor `PUT` `Shipping Instruction` the process for **No Validation** ends here. The **updated** `Shipping Instruction`\n\n  - is now stored in the provider system\n  - a `200` (OK) response is sent to the consumer with the status of the `Shipping Instruction` with one of the following values (depending on the useCase):\n    - `documentStatus='RECEIVED'` (if endPoint used as a response to **UseCase 3 - Submit updated Booking Request** or if it is used to make an update to a Submitted Shipping Instruction - **UseCase 1 - Submit Shipping Instruction**)\n    - `documentStatus='PENDING CHANGES APPROVAL'` (if endPoint used as a response to **UseCase 4 - Publish Draft Transport Document**)\n    - `documentStatus='PENDING AMENDMENTS APPROVAL'` (if endPoint used as a response to **UseCase 8 - Approve Amendments to Draft Transport Document** **Usecase 12 - Approve changes to Draft Transport Document** or **UseCase 9 - Issue Transport Document**)\n  - awaits further processing by the provider\n\nAsynchronious processing will now start by the provider - once processed the new status of the `Shipping Instruction` will be communicated via a `Notification`. In case the consumer does not subscribe to `Notifications` it is necessary for the consumer to poll on the\n\n    GET /shipping-instructions/{shippingInstructionReference}\n    \n  endPoint in order to check if the `documentStatus` of the Shipping Instruction has changed.\n\n### B). Full validation\nFull validation means the provider has stored the **updated** `Shipping Instruction` and a full validation of the payload has completed.\n\n3. Do full validation of the payload. Some examples could be:\n    - correct `Advance Manifest Filings` have been provided\n    - check Equipment References specified\n    - make sure Bookings linked to have `bookingStatus='CONFIRMED'`\n    - etc\n\n    Making a full validation requires the provider to check against all business rules (_the list above is just examples_)\n4. Depending on the result of step 3 the following will happen:\n    \n    - **Update to Shipping Instruction**\n    \n      If an update to the `Shipping Instruction` is required (equivalent to **UseCase 2 - Request to update Shipping Instruction** in this case `documentStatus='RECEIVED'`)) then `documentStatus='PENDING UPDATE'` is returned in a `200` (OK) response with the following **example** payload\n\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'PENDING UPDATE',\n        requestedChanges: [\n          {\n            path: \"advanceManifestFilings\",\n            message: \"Advance Manifest Filings provided does not match Advance Manifest Filings in linked Bookings\"\n          }\n        ]\n      }\n      ```\n\n    - **Accept Shipping Instruction**\n    \n      If the `Shipping Instruction` is accepted by the provider and a `Transport Document` can be Drafted (equivalent to **UseCase 4 - Publish Draft Transport Document** in this case `documentStatus='RECEIVED'`)) then `documentStatus='INITAL DRAFT'` is returned in a `200` (OK) response with the following payload\n\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'INITAL DRAFT'\n        ]\n      }\n      ```\n\n    - **Amendments to Draft Transport Document**\n    \n      If amendments to the `Draft Transport Document` is requested (equivalent to **UseCase 5 - Request changes to Draft Transport Document** in this case `documentStatus='INITIAL DRAFT'` or **UseCase 7 - Request amendments to Draft Transport Document** in this case `bookingStatus='DRAFT'` ) then `bookingStatus='DRAFT'` is returned in a `200` (OK) response with the following payload\n\n      ```\n      {\n        shippingInstructionReference: 'si-123',\n        documentStatus: 'DRAFT'\n      }\n      ```\n      \n      In case the changes are approved - the `Draft Transport Document` will contain the requested changes.\n      \n      In case the changes are rejected - the `Draft Transport Document` stays unchanged.\n\n    - **Amendments to Transport Document**\n    \n      If amendments to the `Transport Document` is requested (equivalent to **UseCase 10 - Request amendments to Transport Document** in this case `documentStatus='ISSUED'`) then:\n      \n        - in case the amendments are rejected `documentStatus='REJECTED'` is returned in a `200` (OK) response with the following payload\n\n          ```\n          {\n            shippingInstructionReference: 'si-123',\n            documentStatus: 'REJECTED'\n          }\n          ```\n        \n      - in case the amendments are accepted `documentStatus='AMENDMENTS APPROVAL'` is returned in a `200` (OK) response with the following payload\n\n        ```\n        {\n          shippingInstructionReference: 'si-123',\n          documentStatus: 'AMENDMENTS APPROVAL'\n        }\n        ```\n\nFor `PUT` `Shipping Instruction` the process for **Full Validation** ends here. The **updated** `Shipping Instruction`\n    \n- is now stored in the provider system\n- a full validation has been done\n- the consumer has receved a `200` (OK) response from the provider with the status of the `Shipping Instruction` with one of the following values:\n  - `PENDING UPDATE` in case provider awaits further input from consumer\n  - `INITIAL DRAFT` in case provider has accepted the `Shipping Instruction` and drafted a `Transport Document`\n  - `DRAFT` in case the provider has accepted or rejected an update to the `Draft Transport Document`\n  - `REJECTED` in case the provider has rejected an amendment to a `Transport Document`\n  - `AMENDMENTS APPROVAL` in case the provider has accepted an amendment to a `Transport Document`\n\nThe provider is now awaiting further action by the consumer.\n"
+      operationId: putShippingInstructions
+      parameters:
+      - name: shippingInstructionReference
+        in: path
+        description: |
+          The identifier for a shipping instruction provided by the carrier
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/shippingInstructionReference'
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      requestBody:
+        description: Parameters used to update the shipping instruction
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/shippingInstruction'
+        required: true
+      responses:
+        "200":
+          description: |
+            The `Shipping Instruction` has been successfully updated in the provider system. Depending on the level of validation done by the provider - the status of the `Shipping Instruction` will be one of the following:
+            - `RECEIVED` in case the consumer has provided an update to a `Shipping Instruction` and is awaiting the provider to take action (start a full validation)
+            - `PENDING UPDATE` in case provider awaits further input from consumer
+            - `INITIAL DRAFT` in case provider has accepted the `Shipping Instruction` and drafted a `Transport Document`
+            - `PENDING CHANGES APPROVAL` in case the consumer has provided a first update to a `Draft Transport Document` and is awaiting the provider to take action (start a full validation)
+            - `DRAFT` in case the provider has accepted or rejected an update to the `Draft Transport Document`
+            - `PENDING AMENDMENTS APPROVAL` in case the consumer has provided a subsequent update to a `Draft Transport Document` and is awaiting the provider to take action (start a full validation)
+            - `REJECTED` in case the provider has rejected an amendment to a `Transport Document`
+            - `AMENDMENTS APPROVAL` in case the provider has accepted an amendment to a `Transport Document`
+
+            The status of the `Shipping Instruction` can be monitored on the
+
+                GET /shipping-instructions/{shippingInstructionReference}
+
+              endPoint by the consumer.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shippingInstructionRefStatus'
+              examples:
+                receivedExample:
+                  summary: |
+                    Shipping Instruction updated
+                  description: |
+                    An updated `Shipping Instruction` received and stored in provider system but not yet fully validated (only schema validated) - the `Shipping Instruction` now awaits provider action
+
+                        documentStatus='RECEIVED'
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: RECEIVED
+                pendingUpdateExample:
+                  summary: |
+                    Shipping Instruction updated and validated
+                  description: |
+                    An updated `Shipping Instruction` received and stored in provider system but as part of the provider validation some changes are needed (in the example the Advance Manifest Filings do not match the Advance Manifest Filings in linked Bookings)
+
+                        documentStatus='PENDING UPDATE'
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: PENDING UPDATE
+                    requestedChanges:
+                    - path: advanceManifestFilings
+                      message: Advance Manifest Filings provided does not match Advance Manifest Filings in linked Bookings
+                initalDraftExample:
+                  summary: |
+                    Transport Document drafted
+                  description: |
+                    An updated `Shipping Instruction` received and stored in provider system and fully validated and accepted by the provider who has drafted a `Transport Document`. Provider is now awaiting the consumer to approve the `Draft Transport Document`
+
+                        documentStatus='INITIAL DRAFT'
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: INITIAL DRAFT
+                pendingChangesApprovalExample:
+                  summary: |
+                    Draft Transport Document updates
+                  description: |
+                    An updated `Shipping Instruction` received and stored in provider system but not yet fully validated (only schema validated) - the `Shipping Instruction` now awaits provider action
+
+                        documentStatus='PENDING CHANGES APPROVAL'
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: PENDING CHANGES APPROVAL
+                draftExample:
+                  summary: |
+                    Draft Transport Document updates
+                  description: |
+                    An updated `Shipping Instruction` received and stored in provider system and fully validated and accepted by the provider who has drafted a `Transport Document`. Provider is now awaiting the consumer to approve the `Draft Transport Document`
+
+                        documentStatus='DRAFT'
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: DRAFT
+                pendingAmendmentsApprovalExample:
+                  summary: |
+                    Subsequent Draft Transport Document updates
+                  description: |
+                    An updated `Shipping Instruction` received and stored in provider system but not yet fully validated (only schema validated) - the `Shipping Instruction` now awaits provider action
+
+                        documentStatus='PENDING AMENDMENTS APPROVAL'
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: PENDING AMENDMENTS APPROVAL
+                rejectExample:
+                  summary: |
+                    Draft Transport Document rejected
+                  description: |
+                    An updated `Shipping Instruction` received and stored in provider system and fully validated but rejected by the provider.
+
+                        documentStatus='REJECTED'
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: REJECTED
+                amendmentsApprovalExample:
+                  summary: |
+                    Transport Document updates
+                  description: |
+                    An updated `Shipping Instruction` received and stored in provider system and fully validated and accepted by the provider who has amended the `Transport Document`. Provider is now awaiting the consumer to approve the new `Transport Document`
+
+                        documentStatus='DRAFT'
+                  value:
+                    shippingInstructionReference: si-123
+                    documentStatus: AMENDMENTS APPROVAL
+        "400":
+          description: |
+            In case the updated `Shipping Instruction` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Shipping Instruction missing isElectronic
+                  description: |
+                    `isElectronic` is a mandoatry field in the `Shipping Instruction`. This is an example of how the error object would look in case this field is missing
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/shipping-instructions/si-123
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    errorMessage: isElectronic not found - it is a mandatory field in Shipping Instruction
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      field: isElectronic
+                      reason: mandatory field missing
+                      message: isElectronic must be provided as part of a Shipping Instruction
+        "500":
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing `Shipping Instruction`
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationID` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/shipping-instructions/si-123
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    errorMessage: Internal Server Error occurred while processing Shipping Instruction
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Internal Error occurred
+                      message: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Updating too many Shipping Instructions
+                  description: |
+                    Calling the endPoint PUT /v3/shipping-instructions/si-123 too many times within a timeperiod.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/shipping-instructions/si-123
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    errorMessage: Too many request to update a Shipping Instruction has been requested. Please try again in 1 hour
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Max Shipping Instruction requests reached
+                      message: A maximum of 10 Shipping Instructions can be updated per hour
+  /v3/transport-documents/{transportDocumentReference}:
+    get:
+      tags:
+      - Transport Documents
+      summary: Get Transport Document
+      description: |
+        Retrieves the Transport Document with the `transportDocumentReference` in the path.
+      operationId: getTransportDocument
+      parameters:
+      - name: transportDocumentReference
+        in: path
+        description: |
+          The transportDocumentReference of the Transport Document
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/transportDocumentReference'
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      responses:
+        "200":
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transportDocument'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    patch:
+      tags:
+      - Transport Documents
+      summary: Approve a Transport Document
+      description: |
+        A way for the consumer to Approve the `Draft Transport Document`. This endPoint corresponds with **UseCase 6 - Approve Draft Transport Document**.
+
+        ## Precondition
+        In order to approve a `Draft Transport Document`, the status of the `Shipping Instruction` needs to be either
+        - `INITAL DRAFT`
+        - `DRAFT`
+
+        ## Postcondition
+        The provider has received an approval from the consumer for a `Draft Transport Document`.
+
+        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
+
+        ## Process
+        The following occurs when a provider recieves an approval:
+        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+
+           **The process stops here!**
+        2. The payload is schema-valid
+        3. The `documentStatus` is set to `APPROVED`.
+        4. Once the provider is ready the `documentStatus` will change to `ISSUED`
+      operationId: approveTransportDocument
+      parameters:
+      - name: transportDocumentReference
+        in: path
+        description: |
+          The transportDocumentReference of the Transport Document
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/transportDocumentReference'
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transportdocuments_transportDocumentReference_body'
+      responses:
+        "200":
+          description: The Transport Document
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transportDocumentRefStatus'
+              examples:
+                approveExample:
+                  summary: |
+                    Approve Draft Transport Document
+                  description: |
+                    Shipper approves the drafted `Transport Document`.
+                  value:
+                    transportDocumentReference: TR-987
+                    documentStatus: APPROVED
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+components:
+  schemas:
+    carrierBookingReference:
+      maxLength: 35
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: A set of unique characters provided by carrier to identify a booking.
+      example: ABC709951
+    eblStatus:
+      maxLength: 50
+      type: string
+      description: |
+        The status of the ebl. Possible values are:
+        - RECEIVED
+        - PENDING UPDATE
+        - DRAFT
+        - PENDING APPROVAL
+        - APPROVED
+        - ISSUED
+        - REQUESTED TO SURRENDER FOR DELIVERY
+        - REQUESTED TO SURRENDER FOR AMENDMENT
+        - SURRENDERED
+        - VOID
+        - REJECTED
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
+      example: RECEIVED
+    shippingInstructionSummary:
+      required:
+      - shippingInstructionReference
+      type: object
+      description: |
+        A 'shallow' representation of the Shipping Instruction. This version of the Shipping Instruction does not contain nested objects. For a 'rich' version of the Shipping Instruction please use the `GET` endPoint.
+      allOf:
+      - $ref: '#/components/schemas/shippingInstructionRefStatus'
+      - type: object
+        properties:
+          transportDocumentReference:
+            maxLength: 20
+            pattern: ^\S+(\s+\S+)*$
+            type: string
+            description: |
+              The transportDocumentReference if known. Often this will not be known until the Transport Document has been `DRAFTED`. Is available during a Transport Document amendment.
+            example: HHL71800000
+      - $ref: '#/components/schemas/shippingInstructionShallow'
+      - $ref: '#/components/schemas/carrierBookingReferences'
+    shippingInstructionRefStatus:
+      required:
+      - documentStatus
+      - shippingInstructionReference
+      type: object
+      properties:
+        shippingInstructionReference:
+          $ref: '#/components/schemas/shippingInstructionReference'
+        documentStatus:
+          $ref: '#/components/schemas/eblStatus'
+        requestedChanges:
+          $ref: '#/components/schemas/requestedChanges'
+      description: |
+        The `shippingInstructionReference` along with the `documentStatus`, created and updated timestamps is returned
+    shippingInstructionReference:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The identifier for a shipping instruction provided by the carrier for system purposes.
+      example: e0559d83-00e2-438e-afd9-fdd610c1a008
+    requestedChanges:
+      type: array
+      description: |
+        A list of changes requirested by the carrier to the document in order for it to be accepted.
+      items:
+        $ref: '#/components/schemas/requestedChange'
+    requestedChange:
+      required:
+      - message
+      type: object
+      properties:
+        path:
+          maxLength: 500
+          type: string
+          description: |
+            A [JSONpath](https://github.com/json-path/JsonPath) describing where in the payload structure a particular error exists.
+          example: location.facilityCode
+        message:
+          maxLength: 500
+          type: string
+          description: |
+            A description of the problem that needs attention.
+          example: Spaces not allowed in facility code
+      description: |
+        A change required to the document in order for the carrier to accepted it
+    shippingInstructionShallow:
+      required:
+      - freightPaymentTermCode
+      - invoicePayableAt
+      - isElectronic
+      - isShippedOnBoardType
+      - isToOrder
+      - transportDocumentTypeCode
+      type: object
+      description: |
+        The part of the ShippingInstruction that contains simple fields (no nested objects)
+      allOf:
+      - type: object
+        properties:
+          transportDocumentTypeCode:
+            $ref: '#/components/schemas/transportDocumentTypeCode'
+      - type: object
+        properties:
+          isShippedOnBoardType:
+            $ref: '#/components/schemas/isShippedOnBoardType'
+      - type: object
+        properties:
+          numberOfCopiesWithCharges:
+            $ref: '#/components/schemas/numberOfCopiesWithCharges'
+      - type: object
+        properties:
+          numberOfCopiesWithoutCharges:
+            $ref: '#/components/schemas/numberOfCopiesWithoutCharges'
+      - type: object
+        properties:
+          numberOfOriginalsWithCharges:
+            $ref: '#/components/schemas/numberOfOriginalsWithCharges'
+      - type: object
+        properties:
+          numberOfOriginalsWithoutCharges:
+            $ref: '#/components/schemas/numberOfOriginalsWithoutCharges'
+      - type: object
+        properties:
+          freightPaymentTermCode:
+            $ref: '#/components/schemas/freightPaymentTermCode'
+      - type: object
+        properties:
+          originChargesPaymentTermCode:
+            $ref: '#/components/schemas/originChargesPaymentTermCode'
+      - type: object
+        properties:
+          destinationChargesPaymentTermCode:
+            $ref: '#/components/schemas/destinationChargesPaymentTermCode'
+      - type: object
+        properties:
+          invoicePayableAt:
+            type: object
+            description: |
+              General purpose object to capture `Invoice Payable At` location specified as: location where payment by the customer will take place. Usually refers to Basic Ocean Freight alone.
+
+              The location can be specified in **one** of the following ways: `UN Location Code` or an `Address`.
+            example:
+              locationName: Eiffel Tower
+              locationType: UNLO
+              UNLocationCode: FRPAR
+            discriminator:
+              propertyName: locationType
+              mapping:
+                ADDR: '#/components/schemas/addressLocation'
+                UNLO: '#/components/schemas/unLocationLocation'
+            oneOf:
+            - $ref: '#/components/schemas/addressLocation'
+            - $ref: '#/components/schemas/unLocationLocation'
+      - type: object
+        properties:
+          isElectronic:
+            $ref: '#/components/schemas/isElectronic'
+      - type: object
+        properties:
+          isToOrder:
+            $ref: '#/components/schemas/isToOrder'
+      - type: object
+        properties:
+          displayedNameForPlaceOfReceipt:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              The name to be used in order to specify how the `Place of Receipt` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+            items:
+              $ref: '#/components/schemas/displayedName'
+      - type: object
+        properties:
+          displayedNameForPortOfLoad:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              The name to be used in order to specify how the `Port of Load` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+            items:
+              $ref: '#/components/schemas/displayedName'
+      - type: object
+        properties:
+          displayedNameForPortOfDischarge:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              The name to be used in order to specify how the `Port of Discharge` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+            items:
+              $ref: '#/components/schemas/displayedName'
+      - type: object
+        properties:
+          displayedNameForPlaceOfDelivery:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              The name to be used in order to specify how the `Place of Delivery` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+            items:
+              $ref: '#/components/schemas/displayedName'
+    transportDocumentTypeCode:
+      type: string
+      description: |
+        Specifies the type of the transport document
+        - BOL (Bill of Lading)
+        - SWB (Sea Waybill)
+      example: SWB
+      enum:
+      - BOL
+      - SWB
+    isShippedOnBoardType:
+      type: boolean
+      description: "Specifies whether the Transport document is a received for shipment, or shipped on board."
+      example: true
+    numberOfCopiesWithCharges:
+      minimum: 0
+      type: integer
+      description: The requested number of copies of the Transport document to be issued by the carrier including charges. Only applicable for physical (paper) documents
+      format: int32
+      example: 2
+    numberOfCopiesWithoutCharges:
+      minimum: 0
+      type: integer
+      description: The requested number of copies of the Transport document to be issued by the carrier **NOT** including charges. Only applicable for physical (paper) documents
+      format: int32
+      example: 2
+    numberOfOriginalsWithCharges:
+      minimum: 0
+      type: integer
+      description: |
+        Number of originals of the bill of lading that has been requested by the customer with charges. Only applicable for physical documents.
+      format: int32
+      example: 1
+    numberOfOriginalsWithoutCharges:
+      minimum: 0
+      type: integer
+      description: |
+        Number of originals of the bill of lading that has been requested by the customer without charges. Only applicable for physical documents.
+      format: int32
+      example: 1
+    freightPaymentTermCode:
+      type: string
+      description: |
+        An indicator of whether freight and charges for the main transport are prepaid or collect.
+        - PRE (Prepaid)
+        - COL (Collect)
+      example: PRE
+      enum:
+      - PRE
+      - COL
+    originChargesPaymentTermCode:
+      type: string
+      description: |
+        An indicator of whether origin charges are prepaid or collect.
+        - PRE (Prepaid)
+        - COL (Collect)
+      example: PRE
+      enum:
+      - PRE
+      - COL
+    destinationChargesPaymentTermCode:
+      type: string
+      description: |
+        An indicator of whether destination charges are prepaid or collect.
+        - PRE (Prepaid)
+        - COL (Collect)
+      example: PRE
+      enum:
+      - PRE
+      - COL
+    addressLocation:
+      required:
+      - address
+      - locationType
+      type: object
+      properties:
+        locationName:
+          $ref: '#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `Address Location` interface
+          example: ADDR
+        address:
+          $ref: '#/components/schemas/address'
+      description: |
+        An interface used to express a location using an `Address` object
+    locationName:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The name of the location.
+      example: Port of Amsterdam
+    address:
+      required:
+      - country
+      - name
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/addressName'
+        street:
+          $ref: '#/components/schemas/streetName'
+        streetNumber:
+          $ref: '#/components/schemas/streetNumber'
+        floor:
+          $ref: '#/components/schemas/floor'
+        postCode:
+          $ref: '#/components/schemas/postCode'
+        city:
+          $ref: '#/components/schemas/cityName'
+        stateRegion:
+          $ref: '#/components/schemas/stateRegion'
+        country:
+          $ref: '#/components/schemas/country'
+      description: |
+        An object for storing address related information
+    addressName:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Name of the address
+      example: Henrik
+    streetName:
+      maxLength: 100
+      type: string
+      description: The name of the street of the party’s address.
+      example: Kronprinsessegade
+    streetNumber:
+      maxLength: 50
+      type: string
+      description: The number of the street of the party’s address.
+      example: "54"
+    floor:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The floor of the party’s street number.
+      example: 5. sal
+    postCode:
+      maxLength: 50
+      type: string
+      description: The post code of the party’s address.
+      example: "1306"
+    cityName:
+      maxLength: 65
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The city name of the party’s address.
+      example: København
+    stateRegion:
+      maxLength: 65
+      type: string
+      description: The state/region of the party’s address.
+      nullable: true
+      example: Copenhagen
+    country:
+      maxLength: 75
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The country of the party’s address.
+      example: Denmark
+    unLocationLocation:
+      required:
+      - UNLocationCode
+      - locationType
+      type: object
+      properties:
+        locationName:
+          $ref: '#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `UNLocation` location interface
+          example: UNLO
+        UNLocationCode:
+          $ref: '#/components/schemas/UNLocationCode'
+      description: |
+        An interface used to express a location using a `Un Location Code`
+    UNLocationCode:
+      maxLength: 5
+      minLength: 5
+      pattern: "^[A-Z]{2}[A-Z2-9]{3}$"
+      type: string
+      description: |
+        The UN Location code specifying where the place is located. The pattern used must be
+        - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+        - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+        More info can be found here:  [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)
+      example: FRPAR
+    isElectronic:
+      type: boolean
+      description: |
+        An indicator whether the transport document is electronically transferred.
+      example: true
+      default: false
+    isToOrder:
+      type: boolean
+      description: |
+        Indicates whether the transport document is issued `to order` or not
+      example: false
+    displayedName:
+      maxLength: 35
+      type: string
+      description: |
+        A line of the address to be displayed on the transport document.
+    carrierBookingReferences:
+      type: object
+      properties:
+        carrierBookingReferences:
+          minLength: 1
+          type: array
+          description: |
+            A list of all `carrierBookingReferences` used. The `carrierBookingReferences` are sourced from the `CargoItems` or the root object of the SI.
+          items:
+            $ref: '#/components/schemas/carrierBookingReference'
+    error:
+      required:
+      - errorDateTime
+      - errors
+      - httpMethod
+      - requestUri
+      - statusCode
+      - statusCodeText
+      type: object
+      properties:
+        httpMethod:
+          type: string
+          description: |
+            The http request method type e.g. GET, POST
+          example: POST
+          enum:
+          - GET
+          - HEAD
+          - POST
+          - PUT
+          - DELETE
+          - OPTION
+          - PATCH
+        requestUri:
+          type: string
+          description: |
+            The request URI as it was sent
+          example: /v1/events
+        statusCode:
+          type: integer
+          description: |
+            The HTTP status code
+          format: int32
+          example: 400
+        statusCodeText:
+          maxLength: 50
+          type: string
+          description: |
+            The textual representation of the status code
+          example: Bad Request
+        errorMessage:
+          maxLength: 200
+          type: string
+          description: |
+            Other error information
+          example: The supplied data could not be accepted
+        providerCorrelationID:
+          maxLength: 100
+          type: string
+          description: |
+            A unique identifier for the transaction, e.g. a UUID
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          type: string
+          description: |
+            The date and time (in ISO 8601 format) the error occurred.
+          format: date-time
+          example: 2019-11-12T07:41:00+08:30
+        errors:
+          minItems: 1
+          type: array
+          description: |
+            List of detailed errors, e.g. fields that could not pass validation
+          items:
+            allOf:
+            - $ref: '#/components/schemas/detailedError'
+    detailedError:
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        errorCode:
+          maximum: 9999
+          minimum: 7000
+          type: integer
+          description: |
+            Standard error code see http://dcsa.org/error-codes (to be created). Examples: 7003 – out or range value, 7004 -  invalid type
+          format: int32
+          example: 7003
+        field:
+          maxLength: 500
+          type: string
+          description: |
+            The field that caused the error, e.g. a failed validation. The field can be expressed as a [JSONpath](https://github.com/json-path/JsonPath)
+          example: location.facilityCode
+        value:
+          maxLength: 500
+          type: string
+          description: |
+            The value of the field that caused the error
+          example: SG SIN WHS
+        reason:
+          maxLength: 100
+          type: string
+          description: |
+            High level error message
+          example: invalidData
+        message:
+          maxLength: 200
+          type: string
+          description: |
+            Additional information as to why the error occured
+          example: Spaces not allowed in facility code
+    shippingInstructionRequest:
+      required:
+      - consignmentItems
+      - documentParties
+      - partyContactDetails
+      - utilizedTransportEquipments
+      type: object
+      description: |
+        The Shipping Instruction is an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.
+      allOf:
+      - $ref: '#/components/schemas/shippingInstructionShallow'
+      - type: object
+        properties:
+          placeOfIssue:
+            type: object
+            description: |
+              General purpose object to capture where the original Transport Document (`Bill of Lading`) will be issued.
+
+              The location can be specified in **one** of the following ways: `UN Location Code` or an `Address`.
+            example:
+              locationName: DCSA Headquarters
+              locationType: UNLO
+              UNLocationCode: NLAMS
+            discriminator:
+              propertyName: locationType
+              mapping:
+                ADDR: '#/components/schemas/addressLocation'
+                UNLO: '#/components/schemas/unLocationLocation'
+            oneOf:
+            - $ref: '#/components/schemas/addressLocation'
+            - $ref: '#/components/schemas/unLocationLocation'
+      - $ref: '#/components/schemas/consignmentItems'
+      - $ref: '#/components/schemas/utilizedTransportEquipments'
+      - $ref: '#/components/schemas/documentParties'
+      - type: object
+        properties:
+          partyContactDetails:
+            type: array
+            description: "The contact details of the person(s) to contact in relation to the **Transport Document** (changes, notifications etc.) \n"
+            items:
+              allOf:
+              - $ref: '#/components/schemas/partyContactDetail'
+      - $ref: '#/components/schemas/references'
+      - $ref: '#/components/schemas/customsReferences'
+      - $ref: '#/components/schemas/advanceManifestFilings_EBL'
+      - $ref: '#/components/schemas/requestedCarrierCertificates'
+      - $ref: '#/components/schemas/requestedCarrierClauses'
+    consignmentItems:
+      type: object
+      properties:
+        consignmentItems:
+          minItems: 1
+          type: array
+          description: |
+            A list of `ConsignmentItems`.
+          items:
+            $ref: '#/components/schemas/consignmentItem'
+    consignmentItem:
+      required:
+      - cargoItems
+      type: object
+      description: |
+        Defines a list of `CargoItems` belonging together and the associated `Booking`. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
+      allOf:
+      - type: object
+        properties:
+          commoditySubreference:
+            maxLength: 100
+            pattern: ^\S+(\s+\S+)*$
+            type: string
+            description: |
+              A unique reference to the commodity object assigned by the carrier in the booking confirmation. The reference must be provided by the shipper as part of the Shipping Instructions for the carrier to link this consignment item to the commodity. A commodity reference is only unique in the context of a booking.
+            example: COM-001
+      - $ref: '#/components/schemas/consignmentItem_Base'
+      - $ref: '#/components/schemas/cargoItems'
+    consignmentItem_Base:
+      required:
+      - HSCodes
+      - cargoItems
+      - carrierBookingReference
+      - commoditySubreference
+      - descriptionOfGoods
+      - weight
+      - weightUnit
+      type: object
+      description: |
+        Defines a list of `CargoItems` belonging together and the associated `Booking`. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
+      allOf:
+      - type: object
+        properties:
+          carrierBookingReference:
+            maxLength: 35
+            pattern: ^\S+(\s+\S+)*$
+            type: string
+            description: |
+              The associated booking number provided by the carrier for this `Consignment Item`.
+
+              When multiple `carrierBookingReferences` are used then the bookings referred to must all contain the same:
+              - transportPlan
+              - shipmentLocations
+              - receiptTypeAtOrigin
+              - deliveryTypeAtDestination
+              - cargoMovementTypeAtOrigin
+              - cargoMovementTypeAtDestination
+              - serviceContractReference
+              - termsAndConditions
+              - Invoice Payable At (if provided)
+              - Place of B/L Issue (if provided)
+            example: ABC709951
+      - type: object
+        properties:
+          weight:
+            minimum: 0
+            exclusiveMinimum: true
+            type: number
+            description: |
+              The total weight of all the `CargoItems` listed in the `ConsignmentItem`. Excludes the tare weight of the container(s).
+            format: float
+            example: 13000.3
+      - type: object
+        properties:
+          volume:
+            minimum: 0
+            exclusiveMinimum: true
+            type: number
+            description: |
+              The total volume of all the `CargoItems` listed in the `ConsignmentItem`.
+            format: float
+            example: 12
+      - type: object
+        properties:
+          weightUnit:
+            $ref: '#/components/schemas/weightUnit'
+      - type: object
+        properties:
+          volumeUnit:
+            $ref: '#/components/schemas/volumeUnit'
+      - type: object
+        properties:
+          descriptionOfGoods:
+            $ref: '#/components/schemas/descriptionOfGoods'
+      - type: object
+        properties:
+          HSCodes:
+            minLength: 1
+            type: array
+            description: |
+              A list of `HS Codes` that apply to this `consignmentItem`
+            items:
+              $ref: '#/components/schemas/HSCode'
+      - $ref: '#/components/schemas/references'
+      - $ref: '#/components/schemas/customsReferences'
+    weightUnit:
+      type: string
+      description: |
+        The unit of measure which can be expressed in imperial or metric terms
+        - KGM (Kilograms)
+        - LBR (Pounds)
+      example: KGM
+      enum:
+      - KGM
+      - LBR
+    volumeUnit:
+      type: string
+      description: |
+        The unit of measure which can be expressed in either imperial or metric terms
+        - FTQ (Cubic foot)
+        - MTQ (Cubic meter)
+      example: MTQ
+      enum:
+      - MTQ
+      - FTQ
+    descriptionOfGoods:
+      maxLength: 5000
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: The cargo description are details which accurately and properly describe the cargo being shipped in the container(s) as provided by the shipper.
+      example: 300 boxes of blue shoes size 47
+    HSCode:
+      maxLength: 10
+      minLength: 6
+      pattern: "^\\d{6,10}$"
+      type: string
+      description: |
+        Used by customs to classify the product being shipped. More information can be found here: [Harmonized Commodity Description and Coding Systems (HS)](https://unstats.un.org/wiki/pages/viewpage.action?pageId=87426301) or here: [Harmonized System Codes](https://www.foreign-trade.com/reference/hscode.htm)
+      example: "851712"
+    references:
+      type: object
+      properties:
+        references:
+          minLength: 1
+          type: array
+          description: |
+            A list of `General Prurpose References`
+          items:
+            $ref: '#/components/schemas/reference'
+    reference:
+      required:
+      - type
+      - value
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/referenceType'
+        value:
+          $ref: '#/components/schemas/referenceValue'
+      description: |
+        References provided by the shipper or freight forwarder at the time of booking or at the time of providing shipping instruction. Carriers share it back when providing track and trace event updates, some are also printed on the B/L. Customers can use these references to track shipments in their internal systems.
+    referenceType:
+      maxLength: 3
+      type: string
+      description: |
+        The reference type codes defined by DCSA.
+        - FF (Freight Forwarder’s Reference)
+        - SI (Shipper’s Reference)
+        - SPO (Shippers Purchase Order Reference)
+        - CPO (Consignees Purchase Order Reference)
+        - CR (Customer’s Reference)
+        - AAO (Consignee’s Reference)
+        - ECR (Empty container release reference)
+        - CSI (Customer shipment ID)
+        - BPR (Booking party reference number)
+        - BID (Booking Request ID)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/referencetypes.csv).
+      example: FF
+    referenceValue:
+      maxLength: 100
+      type: string
+      description: "The actual value of the reference. \n"
+      example: HHL00103004
+    customsReferences:
+      type: object
+      properties:
+        customsReferences:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Customs references`
+          items:
+            $ref: '#/components/schemas/customsReference'
+    customsReference:
+      required:
+      - countryCode
+      - type
+      - value
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/customsReferenceType'
+        countryCode:
+          $ref: '#/components/schemas/countryCode'
+        value:
+          $ref: '#/components/schemas/customsReferenceValue'
+      description: |
+        Reference associated with customs and/or excise purposes required by the relevant authorities for the import, export, or transit of the goods.
+
+        A (small) list of examples:
+
+        | Type  | Country | Description |
+        |-------|:-------:|-------------|
+        |ACID|EG|Advance Cargo Information Declaration in Egypt|
+        |CERS|CA|Canadian Export Reporting System|
+        |ITN|US|Internal Transaction Number in US|
+        |PEB|ID|PEB reference number|
+        |CSN|IN|Cargo Summary Notification (CSN)|
+
+        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/customsreferences.csv).
+    customsReferenceType:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The reference type code as defined in the relevant customs jurisdiction.
+      example: ACID
+    countryCode:
+      maxLength: 2
+      minLength: 2
+      pattern: "^[A-Z]{2}$"
+      type: string
+      description: |
+        The 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+      example: DK
+    customsReferenceValue:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The value of the `customsReference`
+      example: "4988470982020120017"
+    cargoItems:
+      type: object
+      properties:
+        cargoItems:
+          minItems: 1
+          type: array
+          description: |
+            A list of all `cargoItems`
+          items:
+            $ref: '#/components/schemas/cargoItem'
+    cargoItem:
+      required:
+      - equipmentReference
+      - outerPackaging
+      - weight
+      - weightUnit
+      type: object
+      description: |
+        A `cargoItem` is the smallest unit used by stuffing. A `cargoItem` cannot be split across containers.
+      allOf:
+      - $ref: '#/components/schemas/shippingMarks'
+      - type: object
+        properties:
+          equipmentReference:
+            $ref: '#/components/schemas/equipmentReference'
+      - type: object
+        properties:
+          weight:
+            $ref: '#/components/schemas/weight'
+      - type: object
+        properties:
+          volume:
+            $ref: '#/components/schemas/volume'
+      - type: object
+        properties:
+          weightUnit:
+            $ref: '#/components/schemas/weightUnit'
+      - type: object
+        properties:
+          volumeUnit:
+            $ref: '#/components/schemas/volumeUnit'
+      - type: object
+        properties:
+          outerPackaging:
+            $ref: '#/components/schemas/outerPackaging_Shipper'
+      - $ref: '#/components/schemas/customsReferences'
+    shippingMarks:
+      type: object
+      properties:
+        shippingMarks:
+          minItems: 1
+          type: array
+          description: |
+            A list of the `ShippingMarks` applicable to this `cargoItem`
+          items:
+            maxLength: 500
+            type: string
+            description: |
+              The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
+            example: Made in China
+    equipmentReference:
+      maxLength: 11
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+        According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+        If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+      example: APZU4812090
+    weight:
+      minimum: 0
+      exclusiveMinimum: true
+      type: number
+      description: |
+        The total weight of the cargo including packaging items being carried in the container(s). Excludes the tare weight of the container(s).
+      format: float
+      example: 13000.3
+    volume:
+      minimum: 0
+      exclusiveMinimum: true
+      type: number
+      description: |
+        Calculated by multiplying the width, height, and length of the packed cargo.
+      format: float
+      example: 12
+    outerPackaging_Shipper:
+      required:
+      - numberOfPackages
+      type: object
+      properties:
+        packageCode:
+          $ref: '#/components/schemas/packageCode'
+        numberOfPackages:
+          minimum: 1
+          type: integer
+          description: |
+            Specifies the number of outer packagings/overpacks associated with this `Cargo Item`.
+          format: int32
+          example: 18
+        description:
+          maxLength: 100
+          type: string
+          description: |
+            Description of the outer packaging/overpack.
+          example: "Drum, steel"
+      description: |
+        Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport. It is an array of the attributes below.
+    packageCode:
+      pattern: "^[A-Z0-9]{2}$"
+      type: string
+      description: |
+        A code identifying the outer packaging/overpack. `PackageCode` must follow the codes specified in [Recommendation N°21 - Revision 12  Annexes V and VI](https://unece.org/sites/default/files/2021-06/rec21_Rev12e_Annex-V-VI_2021.xls)
+
+        **Condition:** only applicable to dangerous goods if the `IMO packaging code` is not available.
+      example: 5H
+    utilizedTransportEquipments:
+      type: object
+      properties:
+        utilizedTransportEquipments:
+          minItems: 1
+          type: array
+          description: |
+            A list of `Utilized Transport Equipments` describing the equipment being used.
+          items:
+            $ref: '#/components/schemas/utilizedTransportEquipment'
+    utilizedTransportEquipment:
+      required:
+      - cargoGrossWeight
+      - cargoGrossWeightUnit
+      - seals
+      type: object
+      description: |
+        Specifies the container (`equipment`), the total weight and the `seals` used
+      allOf:
+      - type: object
+        discriminator:
+          propertyName: isShipperOwned
+          mapping:
+            "true": '#/components/schemas/utEquipment'
+            "false": '#/components/schemas/utnonEquipment'
+        oneOf:
+        - $ref: '#/components/schemas/utEquipment'
+        - $ref: '#/components/schemas/utEquipmentReference'
+      - type: object
+        properties:
+          cargoGrossWeight:
+            $ref: '#/components/schemas/cargoGrossWeight'
+      - type: object
+        properties:
+          cargoGrossWeightUnit:
+            $ref: '#/components/schemas/weightUnit'
+      - type: object
+        properties:
+          cargoGrossVolume:
+            minimum: 0
+            exclusiveMinimum: true
+            type: number
+            description: |
+              The grand total volume of the cargo per container, which can be expressed in imperial or metric terms, as provided by the carrier.
+            format: float
+            example: 120
+      - type: object
+        properties:
+          cargoGrossVolumeUnit:
+            $ref: '#/components/schemas/volumeUnit'
+      - type: object
+        properties:
+          numberOfPackages:
+            minimum: 1
+            type: integer
+            description: |
+              Specifies the number of packages associated with an equipment (container)
+            format: int32
+            example: 18
+      - $ref: '#/components/schemas/seals'
+      - $ref: '#/components/schemas/references'
+      - $ref: '#/components/schemas/customsReferences'
+    utEquipment:
+      title: Shipper Owned Equipment (SoC)
+      required:
+      - equipment
+      - isShipperOwned
+      type: object
+      properties:
+        isShipperOwned:
+          $ref: '#/components/schemas/isShipperOwned'
+        equipment:
+          $ref: '#/components/schemas/equipment'
+      description: |
+        To be used for SoC (Shipper owned Containers). If `isShipperOwned` is true then the equipment used needs to be specified
+    isShipperOwned:
+      type: boolean
+      description: Indicates whether the container is shipper owned (SOC).
+      example: true
+    equipment:
+      required:
+      - equipmentReference
+      type: object
+      properties:
+        equipmentReference:
+          $ref: '#/components/schemas/equipmentReference'
+        ISOEquipmentCode:
+          $ref: '#/components/schemas/ISOEquipmentCode'
+        tareWeight:
+          $ref: '#/components/schemas/tareWeight'
+        weightUnit:
+          $ref: '#/components/schemas/weightUnit'
+      description: |
+        Used for storing cargo in/on during transport. The equipment size/type is defined by the ISO 6346 code. The most common equipment size/type is 20'/40'/45' DRY Freight Container, but several different versions exist.
+    ISOEquipmentCode:
+      maxLength: 4
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+      example: 22GP
+    tareWeight:
+      minimum: 0
+      exclusiveMinimum: true
+      type: number
+      description: |
+        The weight of an empty container (gross container weight).
+      format: float
+      example: 4800
+    utEquipmentReference:
+      title: Carrier Owned Equipment
+      required:
+      - equipmentReference
+      - isShipperOwned
+      type: object
+      properties:
+        isShipperOwned:
+          type: boolean
+          description: Indicates whether the container is shipper owned (SOC).
+          example: false
+        equipmentReference:
+          allOf:
+          - $ref: '#/components/schemas/equipmentReference'
+      description: |
+        To be used when referring to carrier owned containers (`isShipperOwned` is false). In this case it is only necessary to provide `equipmentReference`
+    cargoGrossWeight:
+      minimum: 0
+      exclusiveMinimum: true
+      type: number
+      description: |
+        The grand total weight of the cargo and weight per container(s) including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper. Excludes the tare weight of the container(s).'
+      format: float
+      example: 12000
+    seals:
+      type: object
+      properties:
+        seals:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Seals`
+          items:
+            $ref: '#/components/schemas/seal'
+    seal:
+      required:
+      - number
+      type: object
+      properties:
+        number:
+          $ref: '#/components/schemas/sealNumber'
+        source:
+          $ref: '#/components/schemas/sealSource'
+        type:
+          $ref: '#/components/schemas/sealType'
+      description: |
+        Addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination.
+    sealNumber:
+      maxLength: 15
+      type: string
+      description: Identifies a seal affixed to the container.
+    sealSource:
+      maxLength: 5
+      type: string
+      description: |
+        The source of the seal, namely who has affixed the seal. This attribute links to the Seal Source ID defined in the Seal Source reference data entity.
+        - CAR (Carrier)
+        - SHI (Shipper)
+        - PHY (Phytosanitary)
+        - VET (Veterinary)
+        - CUS (Customs)
+
+        **Condition:** Conditional on type of commodity
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/sealsourcecodes.csv)
+      example: CUS
+    sealType:
+      maxLength: 5
+      type: string
+      description: |
+        The type of seal. This attribute links to the Seal Type ID defined in the Seal Type reference data entity.
+        - KLP (Keyless padlock)
+        - BLT (Bolt)
+        - WIR (Wire)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/sealtypecodes.csv)
+      example: WIR
+    documentParties:
+      type: object
+      properties:
+        documentParties:
+          minLength: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/documentParty'
+    documentParty:
+      required:
+      - isToBeNotified
+      - party
+      - partyFunction
+      type: object
+      description: stores the parties involved in the transport document.
+      allOf:
+      - type: object
+        properties:
+          party:
+            allOf:
+            - $ref: '#/components/schemas/party'
+      - type: object
+        properties:
+          partyFunction:
+            $ref: '#/components/schemas/partyFunction'
+      - type: object
+        properties:
+          displayedAddress:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              If switch to paper is needed then the `displayedAddress` object **MUST** be provided. In case it is missing it is not possible to switch the B/L to paper later in the process.
+            items:
+              $ref: '#/components/schemas/addressLine'
+      - type: object
+        properties:
+          isToBeNotified:
+            $ref: '#/components/schemas/isToBeNotified'
+    party:
+      required:
+      - partyContactDetails
+      - partyName
+      type: object
+      description: refers to a company or a legal entity.
+      allOf:
+      - type: object
+        properties:
+          partyName:
+            $ref: '#/components/schemas/partyName'
+      - type: object
+        properties:
+          address:
+            allOf:
+            - $ref: '#/components/schemas/address'
+      - type: object
+        properties:
+          partyContactDetails:
+            minItems: 1
+            type: array
+            description: |
+              A list of contact details - the list cannot be empty
+            items:
+              allOf:
+              - $ref: '#/components/schemas/partyContactDetail'
+      - type: object
+        properties:
+          identifyingCodes:
+            type: array
+            items:
+              allOf:
+              - $ref: '#/components/schemas/identifyingCode'
+      - $ref: '#/components/schemas/taxLegalReferences'
+    partyName:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Name of the party.
+      example: Asseco Denmark
+    partyContactDetail:
+      required:
+      - name
+      properties:
+        name:
+          $ref: '#/components/schemas/contactName'
+      description: |
+        The contact details of the person to contact. It is mandatory to provide either `phone` or `email` along with the `name`.
+      example:
+        name: Henrik
+        phone: +45 51801234
+      oneOf:
+      - required:
+        - phone
+        type: object
+        properties:
+          phone:
+            $ref: '#/components/schemas/contactPhone'
+          email:
+            $ref: '#/components/schemas/email'
+        description: |
+          `Phone` is mandatory to provide - `email` is optional
+      - required:
+        - email
+        type: object
+        properties:
+          phone:
+            $ref: '#/components/schemas/contactPhone'
+          email:
+            $ref: '#/components/schemas/email'
+        description: |
+          `Email` is mandatory to provide - `phone` is optional
+    contactName:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Name of the contact
+      example: Henrik
+    identifyingCode:
+      required:
+      - DCSAResponsibleAgencyCode
+      - partyCode
+      type: object
+      allOf:
+      - type: object
+        properties:
+          DCSAResponsibleAgencyCode:
+            $ref: '#/components/schemas/DCSAResponsibleAgencyCode'
+      - type: object
+        properties:
+          partyCode:
+            $ref: '#/components/schemas/partyCode'
+      - type: object
+        properties:
+          codeListName:
+            $ref: '#/components/schemas/codeListName'
+    DCSAResponsibleAgencyCode:
+      maxLength: 5
+      type: string
+      description: |
+        A DCSA provided code for [UN/CEFACT](https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred3055.htm) code list providers:
+        - ISO (International Standards Organization)
+        - UNECE (United Nations Economic Commission for Europe)
+        - LLOYD (Lloyd's register of shipping)
+        - BIC (Bureau International des Containeurs)
+        - IMO (International Maritime Organization)
+        - SCAC (Standard Carrier Alpha Code)
+        - ITIGG (International Transport Implementation Guidelines Group)
+        - ITU (International Telecommunication Union)
+        - SMDG (Shipplanning Message Development Group)
+        - EXIS (Exis Technologies Ltd.)
+        - FMC (Federal Maritime Commission)
+        - CBSA (Canada Border Services Agency)
+        - DCSA (Digitial Container Shipping Association)
+        - DID (Decentralized Identifier)
+        - LEI (Legal Entity Identifier)
+        - EPI (EBL Platform Identifier)
+        - ZZZ (Mutually defined)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/codelistresponsibleagencycodes.csv).
+      example: SMDG
+    partyCode:
+      maxLength: 100
+      type: string
+      description: |
+        Code to identify the party as provided by the agency
+      example: MSK
+    codeListName:
+      maxLength: 100
+      type: string
+      description: |
+        The name of the list, provided by the responsible agency
+      example: LCL
+    taxLegalReferences:
+      type: object
+      properties:
+        taxLegalReferences:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Tax References` for a `Party`
+          items:
+            $ref: '#/components/schemas/taxLegalReference'
+    taxLegalReference:
+      required:
+      - countryCode
+      - type
+      - value
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/taxLegalReferenceType'
+        countryCode:
+          $ref: '#/components/schemas/countryCode'
+        value:
+          $ref: '#/components/schemas/taxLegalReferenceValue'
+      description: |
+        Reference that uniquely identifies a party for tax and/or legal purposes in accordance with the relevant jurisdiction.
+
+        A list of examples:
+
+        | Type  | Country | Description |
+        |-------|:-------:|-------------|
+        |PAN|IN|Goods and Services Tax Identification Number in India|
+        |GSTIN|IN|Goods and Services Tax Identification Number in India|
+        |IEC|IN|Importer-Exported Code in India|
+        |RUC|EC|Registro Único del Contribuyente in Ecuador|
+        |RUC|PE|Registro Único del Contribuyente in Peru|
+        |NIF|MG|Numéro d’Identification Fiscal in Madagascar|
+        |NIF|DZ|Numéro d’Identification Fiscal in Algeria|
+
+        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/taxandlegalreferences.csv).
+    taxLegalReferenceType:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The reference type code as defined by the relevant tax and/or legal authority.
+      example: PAN
+    taxLegalReferenceValue:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The value of the `taxLegalReference`
+      example: AAAAA0000A
+    partyFunction:
+      maxLength: 3
+      type: string
+      description: |
+        Specifies the role of the party in a given context
+        - OS (Original shipper)
+        - CN (Consignee)
+        - COW (Invoice payer on behalf of the consignor (shipper))
+        - COX (Invoice payer on behalf of the consignee)
+        - MS (Document/message issuer/sender)
+        - N1 (First Notify Party)
+        - N2 (Second Notify Party)
+        - NI (Other Notify Party)
+        - DDR (Consignor's freight forwarder)
+        - DDS (Consignee's freight forwarder)
+        - HE (Carrier booking office (transportation office))
+        - SCO (Service contract owner - Defined by DCSA)
+        - BA (Booking Agency)
+        - END (Endorsee Party)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/partyfunctioncodes.csv)
+      example: DDS
+    addressLine:
+      maxLength: 35
+      type: string
+      description: |
+        A single address line to be used when a B/L needs to be printed.
+      example: Kronprincessegade 54
+    isToBeNotified:
+      type: boolean
+      description: Used to decide whether the party will be notified of the arrival of the cargo.
+      example: true
+    advanceManifestFilings_EBL:
+      type: object
+      properties:
+        advanceManifestFilings:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
+          items:
+            $ref: '#/components/schemas/advanceManifestFiling_EBL'
+    advanceManifestFiling_EBL:
+      required:
+      - advanceManifestFilingsHouseBLPerformedBy
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/advanceManifestFiling_BKG'
+      - type: object
+        properties:
+          advanceManifestFilingsHouseBLPerformedBy:
+            type: string
+            description: |
+              Indicates whether the shipper (`SHIPPER`) will perform the advance manifest filing(s) for the House BL directly or if the carrier (`CARRIER`) should file them on their behalf. Allowed values are:
+
+              - `SHIPPER` (the shipper does the filing)
+              - `CARRIER` (the carrier does the filing)
+
+              In case of self-filing (`SHIPPER`), the shipper can provide their `selfFilerCode` for each manifest.
+
+              **Condition:** The `selfFilerCode` must be provided when `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and the `advanceManifestFilingsHouseBLPerformedBy` is set to `SHIPPER`.
+            example: SHIPPER
+            enum:
+            - SHIPPER
+            - CARRIER
+      - type: object
+        properties:
+          selfFilerCode:
+            $ref: '#/components/schemas/selfFilerCode'
+    advanceManifestFiling_BKG:
+      required:
+      - countryCode
+      - manifestTypeCode
+      type: object
+      properties:
+        manifestTypeCode:
+          $ref: '#/components/schemas/manifestTypeCode'
+        countryCode:
+          $ref: '#/components/schemas/countryCode'
+      description: |
+        An Advance Maifest Filing defined by a Manifest type code in combination with a country code.
+
+        A list of `manifestTypeCodes` together with `countryCode` is maintained in [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/advancedmanifestfilings.csv). A (small) subset can be seen here:
+
+        | manifestTypeCode | countryCode | Description |
+        |-----------------------|:-------------:|-------------|
+        |ACI|EG|Advance Cargo Information in Egypt|
+        |ACE|US|Automated Commercial Environment in the United States|
+        |AFR|JP|Cargo Summary Notification (CSN)|
+      example:
+        manifestTypeCode: ACE
+        countryCode: US
+    manifestTypeCode:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The Manifest type code as defined by the provider. A list of `manifestTypeCodes` together with `countryCode` is maintained in [GitHub (to be created)]()
+      example: ACE
+    selfFilerCode:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Code identifying the party who will submit the advance manifest filing(s) for the House BL.
+
+        **Mandatory** if `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and `advanceManifestFilingsHouseBLPerformedBy` is set to `SHIPPER`.
+      example: FLXP
+    requestedCarrierCertificates:
+      type: object
+      properties:
+        requestedCarrierCertificates:
+          type: array
+          description: |
+            Certificate(s) requested by the Shipper for the Carrier to include as part of the shipment documentation pack
+          items:
+            maxLength: 100
+            type: string
+            description: |
+              Name of the certificate. Possible values are:
+              - `SHIPMENT_VOYAGE_PARTICULARS_1` (Shipment-Voyage Particulars 1)
+              - `SHIPMENT_VOYAGE_PARTICULARS_2` (Shipment-Voyage Particulars 2)
+              - `SHIPMENT_VOYAGE_PARTICULARS_3` (Shipment-Voyage Particulars 3)
+              - `SHIPMENT_VOYAGE_PARTICULARS_4` (Shipment-Voyage Particulars 4)
+              - `SHIPMENT_VOYAGE_PARTICULARS_5` (Shipment-Voyage Particulars 5)
+              - `SHIPMENT_VOYAGE_PARTICULARS_6` (Shipment-Voyage Particulars 6)
+              - `SHIPMENT_VOYAGE_PARTICULARS_7` (Shipment-Voyage Particulars 7)
+              - `VESSEL_PARTICULARS_1` (Vessel Particulars 1)
+              - `VESSEL_PARTICULARS_2` (Vessel Particulars 2)
+              - `VESSEL_PARTICULARS_3` (Vessel Particulars 3)
+              - `VESSEL_PARTICULARS_4` (Vessel Particulars 4)
+              - `VESSEL_PARTICULARS_5` (Vessel Particulars 5)
+              - `VESSEL_PARTICULARS_6` (Vessel Particulars 6)
+              - `VESSEL_PARTICULARS_7` (Vessel Particulars 7)
+              - `VESSEL_PARTICULARS_8` (Vessel Particulars 8)
+              - `VESSEL_PARTICULARS_9` (Vessel Particulars 9)
+              - `VESSEL_PARTICULARS_10` (Vessel Particulars 10)
+              - `VESSEL_PARTICULARS_11` (Vessel Particulars 11)
+              - `VESSEL_PARTICULARS_12` (Vessel Particulars 12)
+              - `VESSEL_PARTICULARS_13` (Vessel Particulars 13)
+              - `VESSEL_PARTICULARS_14` (Vessel Particulars 14)
+              - `VESSEL_PARTICULARS_15` (Vessel Particulars 15)
+              - `VESSEL_PARTICULARS_16` (Vessel Particulars 16)
+              - `VESSEL_PARTICULARS_17` (Vessel Particulars 17)
+              - `VESSEL_PARTICULARS_18` (Vessel Particulars 18)
+
+              More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/carriercertificates.csv).
+            example: VESSEL_PARTICULARS_1
+    requestedCarrierClauses:
+      type: object
+      properties:
+        requestedCarrierClauses:
+          type: array
+          description: |
+            Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
+          items:
+            maxLength: 100
+            type: string
+            description: |
+              A clause to request from the carrier. Possible values are:
+              - `CARGO_CARGOSPECIFICS` (Cargo/Cargo specifics)
+              - `VESSELCONVEYANCE_COUNTRYSPECIFIC` (Vessel conveyance/Country Specific)
+              - `CARGO_RETURNOFEMPTYCONTAINER` (Cargo/Return of Empty Container)
+              - `CARGO_CARGOVALUE` (Cargo/Cargo value)
+              - `CARGO_REEFERTEMPERATURE` (Cargo/Reefer temperature)
+              - `CARGO_CONFLICTINGTEMPERATURES_MIXEDLOADS` (Cargo/Conflicting temperatures / Mixed loads)
+
+              More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/carrierclauses.csv).
+            example: CARGO_CARGOSPECIFICS
+    shippingInstructionResponse:
+      required:
+      - consignmentItems
+      - documentParties
+      - utilizedTransportEquipments
+      type: object
+      description: |
+        The entire Shipping Instruction object with all nested objects.
+      allOf:
+      - $ref: '#/components/schemas/shippingInstructionRefStatus'
+      - type: object
+        properties:
+          transportDocumentReference:
+            maxLength: 20
+            pattern: ^\S+(\s+\S+)*$
+            type: string
+            description: |
+              The transportDocumentReference if know. Often this will not be known until the Transport Document has been `DRAFTED`. Is available during a Transport Document amendment.
+            example: HHL71800000
+      - $ref: '#/components/schemas/shippingInstructionShallow'
+      - type: object
+        properties:
+          placeOfIssue:
+            type: object
+            description: |
+              General purpose object to capture where the original Transport Document (`Bill of Lading`) will be issued.
+
+              The location can be specified in **one** of the following ways: `UN Location Code` or an `Address`.
+            example:
+              locationName: DCSA Headquarters
+              locationType: UNLO
+              UNLocationCode: NLAMS
+            discriminator:
+              propertyName: locationType
+              mapping:
+                ADDR: '#/components/schemas/addressLocation'
+                UNLO: '#/components/schemas/unLocationLocation'
+            oneOf:
+            - $ref: '#/components/schemas/addressLocation'
+            - $ref: '#/components/schemas/unLocationLocation'
+      - $ref: '#/components/schemas/consignmentItems_Carrier'
+      - $ref: '#/components/schemas/utilizedTransportEquipments_Carrier'
+      - $ref: '#/components/schemas/documentParties'
+      - $ref: '#/components/schemas/references'
+      - $ref: '#/components/schemas/customsReferences'
+      - $ref: '#/components/schemas/advanceManifestFilings_EBL'
+      - $ref: '#/components/schemas/requestedCarrierCertificates'
+      - $ref: '#/components/schemas/requestedCarrierClauses'
+    consignmentItems_Carrier:
+      type: object
+      properties:
+        consignmentItems:
+          minItems: 1
+          type: array
+          description: |
+            A list of `ConsignmentItems`.
+          items:
+            $ref: '#/components/schemas/consignmentItem_Carrier'
+    consignmentItem_Carrier:
+      required:
+      - cargoItems
+      type: object
+      description: |
+        Defines a list of `CargoItems` belonging together and the associated `Booking`. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
+      allOf:
+      - $ref: '#/components/schemas/consignmentItem_Base'
+      - $ref: '#/components/schemas/cargoItems_Carrier'
+    cargoItems_Carrier:
+      type: object
+      properties:
+        cargoItems:
+          minItems: 1
+          type: array
+          description: |
+            A list of all `cargoItems`
+          items:
+            $ref: '#/components/schemas/cargoItem_Carrier'
+    cargoItem_Carrier:
+      required:
+      - equipmentReference
+      - outerPackaging
+      - weight
+      - weightUnit
+      type: object
+      description: |
+        A `cargoItem` is the smallest unit used by stuffing. A `cargoItem` cannot be split across containers.
+      allOf:
+      - $ref: '#/components/schemas/shippingMarks'
+      - type: object
+        properties:
+          equipmentReference:
+            $ref: '#/components/schemas/equipmentReference'
+      - type: object
+        properties:
+          weight:
+            $ref: '#/components/schemas/weight'
+      - type: object
+        properties:
+          volume:
+            $ref: '#/components/schemas/volume'
+      - type: object
+        properties:
+          weightUnit:
+            $ref: '#/components/schemas/weightUnit'
+      - type: object
+        properties:
+          volumeUnit:
+            $ref: '#/components/schemas/volumeUnit'
+      - type: object
+        properties:
+          outerPackaging:
+            $ref: '#/components/schemas/outerPackaging_Carrier'
+      - $ref: '#/components/schemas/customsReferences'
+    outerPackaging_Carrier:
+      required:
+      - numberOfPackages
+      type: object
+      properties:
+        packageCode:
+          $ref: '#/components/schemas/packageCode'
+        numberOfPackages:
+          minimum: 1
+          type: integer
+          description: |
+            Specifies the number of outer packagings/overpacks associated with this `Cargo Item`.
+          format: int32
+          example: 18
+        imoPackagingCode:
+          pattern: "^[A-Z0-9]{1-5}$"
+          type: string
+          description: |
+            The code of the packaging as per IMO.
+
+            **Condition:** only applicable to dangerous goods if specified in the IMO IMDG code amendment version 41-22. If not available, the package code as per UN recommendation 21 should be used.
+          example: 1A2
+        description:
+          maxLength: 100
+          type: string
+          description: |
+            Description of the outer packaging/overpack.
+          example: "Drum, steel"
+        dangerousGoods:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Dangerous Goods`
+          items:
+            $ref: '#/components/schemas/dangerousGoods_EBL'
+      description: |
+        Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport. It is an array of the attributes below.
+    dangerousGoods_EBL:
+      required:
+      - imoClass
+      - properShippingName
+      type: object
+      description: |
+        Specification for `Dangerous Goods`. It is mandatory to either provide the `unNumber` or the `naNumber`. Dangerous Goods is based on **IMDG Amendment Version 41-22**.
+      allOf:
+      - $ref: '#/components/schemas/dangerousGoods_Base'
+    dangerousGoods_Base:
+      type: object
+      properties:
+        codedVariantList:
+          $ref: '#/components/schemas/codedVariantList'
+        properShippingName:
+          $ref: '#/components/schemas/properShippingName'
+        technicalName:
+          $ref: '#/components/schemas/technicalName'
+        imoClass:
+          $ref: '#/components/schemas/imoClass'
+        subsidiaryRisk1:
+          $ref: '#/components/schemas/subsidiaryRisk'
+        subsidiaryRisk2:
+          $ref: '#/components/schemas/subsidiaryRisk'
+        isMarinePollutant:
+          $ref: '#/components/schemas/isMarinePollutant'
+        packingGroup:
+          $ref: '#/components/schemas/packingGroup'
+        isLimitedQuantity:
+          $ref: '#/components/schemas/isLimitedQuantity'
+        isExceptedQuantity:
+          $ref: '#/components/schemas/isExceptedQuantity'
+        isSalvagePackings:
+          $ref: '#/components/schemas/isSalvagePackings'
+        isEmptyUncleanedResidue:
+          $ref: '#/components/schemas/isEmptyUncleanedResidue'
+        isWaste:
+          $ref: '#/components/schemas/isWaste'
+        isHot:
+          $ref: '#/components/schemas/isHot'
+        isCompetentAuthorityApprovalProvided:
+          $ref: '#/components/schemas/isCompetentAuthorityApprovalProvided'
+        competentAuthorityApproval:
+          $ref: '#/components/schemas/competentAuthorityApproval'
+        segregationGroups:
+          minLength: 1
+          type: array
+          description: |
+            List of the segregation groups applicable to specific hazardous goods according to the IMO IMDG Code.
+
+            **Condition:** only applicable to specific hazardous goods.
+          items:
+            maxLength: 2
+            type: string
+            description: |
+              Grouping of Dangerous Goods having certain similar chemical properties. Possible values are:
+
+              - `1` (Acids)
+              - `2` (Ammonium Compounds)
+              - `3` (Bromates)
+              - `4` (Chlorates)
+              - `5` (Chlorites)
+              - `6` (Cyanides)
+              - `7` (Heavy metals and their salts)
+              - `8` (Hypochlorites)
+              - `9` (Lead and its compounds)
+              - `10` (Liquid halogenated hydrocarbons)
+              - `11` (Mercury and mercury compounds)
+              - `12` (Nitrites and their mixtures)
+              - `13` (Perchlorates)
+              - `14` (Permanganates)
+              - `15` (Powdered metals)
+              - `16` (Peroxides),
+              - `17` (Azides)
+              - `18` (Alkalis)
+
+              More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/segregationgroups.csv)
+            example: "12"
+        innerPackagings:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Inner Packings` contained inside this `outer packaging/overpack`.
+          items:
+            $ref: '#/components/schemas/innerPackaging'
+        emergencyContactDetails:
+          $ref: '#/components/schemas/emergencyContactDetails'
+        EMSNumber:
+          $ref: '#/components/schemas/EMSNumber'
+        endOfHoldingTime:
+          $ref: '#/components/schemas/endOfHoldingTime'
+        fumigationDateTime:
+          $ref: '#/components/schemas/fumigationDateTime'
+        isReportableQuantity:
+          $ref: '#/components/schemas/isReportableQuantity'
+        inhalationZone:
+          $ref: '#/components/schemas/inhalationZone'
+        grossWeight:
+          $ref: '#/components/schemas/dangerousGoods_Base_grossWeight'
+        netWeight:
+          $ref: '#/components/schemas/dangerousGoods_Base_netWeight'
+        netExplosiveContent:
+          $ref: '#/components/schemas/dangerousGoods_Base_netExplosiveContent'
+        volume:
+          $ref: '#/components/schemas/dangerousGoods_Base_volume'
+        limits:
+          $ref: '#/components/schemas/limits'
+      oneOf:
+      - title: UN Number
+        required:
+        - unNumber
+        type: object
+        properties:
+          unNumber:
+            $ref: '#/components/schemas/unNumber'
+      - title: NA Number
+        required:
+        - naNumber
+        type: object
+        properties:
+          naNumber:
+            $ref: '#/components/schemas/naNumber'
+    codedVariantList:
+      pattern: "^[0-3][0-9A-Z]{3}$"
+      type: string
+      description: |
+        Four-character code supplied by Exis Technologies that assists to remove ambiguities when identifying a variant within a single UN number or NA number that may occur when two companies exchange DG information.
+
+        Character | Valid Characters | Description
+        :--------:|------------------|------------
+        1| 0, 1, 2, 3|The packing group. Code 0 indicates there is no packing group
+        2|0 to 9 and A to Z|A sequence letter for the PSN, or 0 if there were no alternative PSNs
+        3 and 4|0 to 9 and A to Z|Two sequence letters for other information, for the cases where the variant is required because of different in subrisks, packing instruction etc.
+      example: "2200"
+    properShippingName:
+      maxLength: 250
+      type: string
+      description: |
+        The proper shipping name for goods under IMDG Code, or the product name for goods under IBC Code and IGC Code, or the bulk cargo shipping name for goods under IMSBC Code, or the name of oil for goods under Annex I to the MARPOL Convention.
+      example: "Chromium Trioxide, anhydrous"
+    technicalName:
+      maxLength: 250
+      type: string
+      description: |
+        The recognized chemical or biological name or other name currently used for the referenced dangerous goods as described in chapter 3.1.2.8 of the IMDG Code.
+    imoClass:
+      maxLength: 4
+      type: string
+      description: "The hazard class code of the referenced dangerous goods according to the specified regulation. Examples of possible values are:\n      \n      - `1.1A` (Substances and articles which have a mass explosion hazard)\n      - `1.6N` (Extremely insensitive articles which do not have a mass explosion hazard)\n      - `2.1` (Flammable gases)\n      - `8` (Corrosive substances)\n\nThe value must comply with one of the values in the [DG IMO Class value table](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/imoclasses.csv)\n"
+      example: 1.4S
+    subsidiaryRisk:
+      pattern: "^[0-9](\\.[0-9])?$"
+      type: string
+      description: |
+        Any risk in addition to the class of the referenced dangerous goods according to the IMO IMDG Code.
+      example: "1.2"
+    isMarinePollutant:
+      type: boolean
+      description: |
+        Indicates if the goods belong to the classification of Marine Pollutant.
+      example: false
+    packingGroup:
+      maximum: 3
+      minimum: 1
+      type: integer
+      description: |
+        The packing group according to the UN Recommendations on the Transport of Dangerous Goods and IMO IMDG Code.
+      format: int32
+      example: 3
+    isLimitedQuantity:
+      type: boolean
+      description: |
+        Indicates if the dangerous goods can be transported as limited quantity in accordance with Chapter 3.4 of the IMO IMDG Code.
+      example: false
+    isExceptedQuantity:
+      type: boolean
+      description: |
+        Indicates if the dangerous goods can be transported as excepted quantity in accordance with Chapter 3.5 of the IMO IMDG Code.
+      example: false
+    isSalvagePackings:
+      type: boolean
+      description: |
+        Indicates if the cargo has special packaging for the transport, recovery or disposal of damaged, defective, leaking or nonconforming hazardous materials packages, or hazardous materials that have spilled or leaked.
+      example: false
+    isEmptyUncleanedResidue:
+      type: boolean
+      description: |
+        Indicates if the cargo is residue.
+      example: false
+    isWaste:
+      type: boolean
+      description: |
+        Indicates if waste is being shipped
+      example: false
+    isHot:
+      type: boolean
+      description: |
+        Indicates if high temperature cargo is shipped.
+      example: false
+    isCompetentAuthorityApprovalProvided:
+      type: boolean
+      description: |
+        Indicates if the cargo require approval from authorities
+      example: false
+    competentAuthorityApproval:
+      maxLength: 70
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Name and reference number of the competent authority providing the approval.
+      example: "{Name and reference...}"
+    innerPackaging:
+      required:
+      - description
+      - material
+      - quantity
+      type: object
+      properties:
+        quantity:
+          type: integer
+          description: |
+            Count of `Inner Packagings` of the referenced `Dangerous Goods`.
+          format: int32
+          example: 20
+        material:
+          maxLength: 100
+          type: string
+          description: |
+            The `material` used for the `Inner Packaging` of the referenced `Dangerous Goods`.
+          example: Plastic
+        description:
+          maxLength: 100
+          type: string
+          description: |
+            Description of the packaging.
+          example: Wowen plastic water resistant Bag
+      description: |
+        Object for inner packaging specification
+    emergencyContactDetails:
+      required:
+      - contact
+      - phone
+      type: object
+      properties:
+        contact:
+          maxLength: 255
+          type: string
+          description: |
+            Name of the Contact person during an emergency.
+          example: Henrik Larsen
+        provider:
+          maxLength: 255
+          type: string
+          description: |
+            Name of the third party vendor providing emergency support
+          example: GlobeTeam
+        phone:
+          allOf:
+          - $ref: '#/components/schemas/contactPhone'
+        referenceNumber:
+          maxLength: 255
+          type: string
+          description: |
+            Contract reference for the emergency support provided by an external third party vendor.
+          example: "12234"
+      description: |
+        24 hr emergency contact details
+    contactPhone:
+      maxLength: 30
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Phone number for the contact
+      example: +45 70262970
+    EMSNumber:
+      maxLength: 7
+      type: string
+      description: |
+        The emergency schedule identified in the IMO EmS Guide – Emergency Response Procedures for Ships Carrying Dangerous Goods. Comprises 2 values; 1 for spillage and 1 for fire. Possible values spillage: S-A to S-Z. Possible values fire: F-A to F-Z.
+      example: F-A S-Q
+    endOfHoldingTime:
+      type: string
+      description: |
+        Date by when the refrigerated liquid needs to be delivered.
+      format: date
+      example: 2021-09-03
+    fumigationDateTime:
+      type: string
+      description: |
+        Date & time when the container was fumigated
+      format: date-time
+      example: 2021-09-03T09:03:00-02:00
+    isReportableQuantity:
+      type: boolean
+      description: |
+        Indicates if a container of hazardous material is at the reportable quantity level. If `TRUE`, a report to the relevant authority must be made in case of spill.
+      example: false
+    inhalationZone:
+      maxLength: 1
+      minLength: 1
+      type: string
+      description: |
+        The zone classification of the toxicity of the inhalant. Possible values are:
+        - `A` (Hazard Zone A) can be asigned to specific gases and liquids
+        - `B` (Hazard Zone B) can be asigned to specific gases and liquids
+        - `C` (Hazard Zone C) can **only** be asigned to specific gases
+        - `D` (Hazard Zone D) can **only** be asigned to specific gases
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/inhalationzones.csv)
+      example: A
+    dgGrossWeight:
+      minimum: 0
+      exclusiveMinimum: true
+      type: number
+      description: |
+        The grand total weight of the DG cargo and weight per UNNumber/NANumber including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
+      format: float
+      example: 12000
+    netWeight:
+      type: number
+      description: |
+        Total weight of the goods carried, excluding packaging.
+      format: float
+      example: 2.4
+    netWeightUnit:
+      type: string
+      description: |
+        Unit of measure used to describe the `netWeight`. Possible values are
+        - KGM (Kilograms)
+        - LBR (Pounds)
+      example: KGM
+      enum:
+      - KGM
+      - LBR
+    netExplosiveContent:
+      type: number
+      description: |
+        The total weight of the explosive substances, without the packaging’s, casings, etc.
+      format: float
+      example: 2.4
+    netExplosiveContentUnit:
+      type: string
+      description: |
+        Unit of measure used to describe the `netExplosiveWeight`. Possible values are
+        - KGM (Kilograms)
+        - GRM (Grams)
+      example: KGM
+      enum:
+      - KGM
+      - GRM
+    dgVolume:
+      type: number
+      description: |
+        The volume of the referenced dangerous goods.
+      format: float
+      example: 2.4
+    volumeUnitDG:
+      type: string
+      description: |
+        The unit of measure which can be expressed in either imperial or metric terms
+        - FTQ (Cubic foot)
+        - MTQ (Cubic meter)
+        - LTR (Litre)
+      example: MTQ
+      enum:
+      - MTQ
+      - FTQ
+      - LTR
+    limits:
+      required:
+      - temperatureUnit
+      type: object
+      properties:
+        temperatureUnit:
+          type: string
+          description: |
+            The unit for **all attributes in the limits structure** in Celsius or Fahrenheit
+
+            - CEL (Celsius)
+            - FAH (Fahrenheit)
+          example: CEL
+          enum:
+          - CEL
+          - FAH
+        flashPoint:
+          $ref: '#/components/schemas/flashPoint'
+        transportControlTemperature:
+          $ref: '#/components/schemas/transportControlTemperature'
+        transportEmergencyTemperature:
+          $ref: '#/components/schemas/transportEmergencyTemperature'
+        SADT:
+          $ref: '#/components/schemas/sadt'
+        SAPT:
+          $ref: '#/components/schemas/sapt'
+      description: |
+        Limits for the Dangerous Goods. The same `Temperature Unit` needs to apply to all attributes in this structure.
+    flashPoint:
+      type: number
+      description: |
+        The flashpoint of the referenced dangerous goods according to the IMO IMDG Code expressed in degrees Celsius or Fahrenheit.
+      format: float
+      example: 42
+    transportControlTemperature:
+      type: number
+      description: |
+        Maximum temperature at which certain substance (such as organic peroxides and self-reactive and related substances) can be safely transported for a prolonged period.
+      format: float
+      example: 24.1
+    transportEmergencyTemperature:
+      type: number
+      description: |
+        Temperature at which emergency procedures shall be implemented
+      format: float
+      example: 74.1
+    sadt:
+      type: number
+      description: |
+        Lowest temperature in which self-accelerating decomposition may occur in a substance
+      format: float
+      example: 54.1
+    sapt:
+      type: number
+      description: |
+        Lowest temperature in which self-accelerating polymerization may occur in a substance
+      format: float
+      example: 70
+    utilizedTransportEquipments_Carrier:
+      type: object
+      properties:
+        utilizedTransportEquipments:
+          minItems: 1
+          type: array
+          description: |
+            A list of `Utilized Transport Equipments` describing the equipment being used.
+          items:
+            $ref: '#/components/schemas/utilizedTransportEquipment_Carrier'
+    utilizedTransportEquipment_Carrier:
+      required:
+      - cargoGrossWeight
+      - cargoGrossWeightUnit
+      - equipment
+      - isShipperOwned
+      - seals
+      type: object
+      description: |
+        Specifies the container (`equipment`), the total `weight`, total `volume`, `numberOfPacakges`, possible `ActiveReeferSettings` and the `seals` used
+      allOf:
+      - type: object
+        properties:
+          equipment:
+            allOf:
+            - $ref: '#/components/schemas/equipment'
+      - type: object
+        properties:
+          cargoGrossWeight:
+            $ref: '#/components/schemas/cargoGrossWeight'
+      - type: object
+        properties:
+          cargoGrossWeightUnit:
+            $ref: '#/components/schemas/weightUnit'
+      - type: object
+        properties:
+          cargoGrossVolume:
+            minimum: 0
+            exclusiveMinimum: true
+            type: number
+            description: |
+              The grand total volume of the cargo per container, which can be expressed in imperial or metric terms, as provided by the carrier.
+            format: float
+            example: 120
+      - type: object
+        properties:
+          cargoGrossVolumeUnit:
+            $ref: '#/components/schemas/volumeUnit'
+      - type: object
+        properties:
+          numberOfPackages:
+            minimum: 1
+            type: integer
+            description: |
+              Specifies the number of packages associated with an equipment (container)
+            format: int32
+            example: 18
+      - type: object
+        properties:
+          isShipperOwned:
+            $ref: '#/components/schemas/isShipperOwned'
+      - type: object
+        properties:
+          isNonOperatingReefer:
+            $ref: '#/components/schemas/isNonOperatingReefer'
+      - type: object
+        properties:
+          activeReeferSettings:
+            description: |
+              The specifications for a Reefer equipment.
+
+              **Condition:** Only applicable when`isNonOperatingReefer` is set to `false`
+            allOf:
+            - $ref: '#/components/schemas/activeReeferSettings'
+      - $ref: '#/components/schemas/seals'
+      - $ref: '#/components/schemas/references'
+      - $ref: '#/components/schemas/customsReferences'
+    isNonOperatingReefer:
+      type: boolean
+      description: |
+        If the equipment is a Reefer Container then setting this attribute will indicate that the container should be treated as a `DRY` container.
+
+        **Condition:** Only applicable if `ISOEquipmentCode` shows a Reefer type.
+      example: false
+    activeReeferSettings:
+      type: object
+      properties:
+        temperatureSetpoint:
+          $ref: '#/components/schemas/temperatureSetpoint'
+        temperatureUnit:
+          $ref: '#/components/schemas/temperatureUnit'
+        o2Setpoint:
+          $ref: '#/components/schemas/o2Setpoint'
+        co2Setpoint:
+          $ref: '#/components/schemas/co2Setpoint'
+        humiditySetpoint:
+          $ref: '#/components/schemas/humiditySetpoint'
+        airExchangeSetpoint:
+          $ref: '#/components/schemas/airExchangeSetpoint'
+        airExchangeUnit:
+          $ref: '#/components/schemas/airExchangeUnit'
+        isVentilationOpen:
+          $ref: '#/components/schemas/isVentilationOpen'
+        isDrainholesOpen:
+          $ref: '#/components/schemas/isDrainholesOpen'
+        isBulbMode:
+          $ref: '#/components/schemas/isBulbMode'
+        isColdTreatmentRequired:
+          $ref: '#/components/schemas/isColdTreatmentRequired'
+        isControlledAtmosphereRequired:
+          $ref: '#/components/schemas/isControlledAtmosphereRequired'
+    temperatureSetpoint:
+      type: number
+      description: |
+        Target value of the temperature for the Reefer based on the cargo requirement.
+      format: float
+      example: -15
+    temperatureUnit:
+      type: string
+      description: |
+        The unit for temperature in Celsius or Fahrenheit
+
+        - CEL (Celsius)
+        - FAH (Fahrenheit)
+      example: CEL
+      enum:
+      - CEL
+      - FAH
+    o2Setpoint:
+      maximum: 100
+      minimum: 0
+      type: number
+      description: |
+        The percentage of the controlled atmosphere O<sub>2</sub> target value
+      format: float
+      example: 75.3
+    co2Setpoint:
+      maximum: 100
+      minimum: 0
+      type: number
+      description: |
+        The percentage of the controlled atmosphere CO<sub>2</sub> target value
+      format: float
+      example: 25
+    humiditySetpoint:
+      maximum: 100
+      minimum: 0
+      type: number
+      description: |
+        The percentage of the controlled atmosphere humidity target value
+      format: float
+      example: 95.6
+    airExchangeSetpoint:
+      minimum: 0
+      type: number
+      description: |
+        Target value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container
+      format: float
+      example: 15.4
+    airExchangeUnit:
+      type: string
+      description: |
+        The unit for `airExchange` in metrics- or imperial- units per hour
+
+        - MQH (Cubic metre per hour)
+        - FQH (Cubic foot per hour)
+
+        **NB:** This is a conditional field. If `airExchange` is specified then this field is required
+      example: MQH
+      enum:
+      - MQH
+      - FQH
+    isVentilationOpen:
+      type: boolean
+      description: |
+        If `true` the ventilation orifice is `Open` - if `false` the ventilation orifice is `closed`
+      example: true
+    isDrainholesOpen:
+      type: boolean
+      description: |
+        Is drainholes open on the container
+      example: true
+    isBulbMode:
+      type: boolean
+      description: |
+        Is special container setting for handling flower bulbs active
+      example: true
+    isColdTreatmentRequired:
+      type: boolean
+      description: |
+        Indicator whether cargo requires cold treatment prior to loading at origin or during transit, but prior arrival at POD
+      example: true
+    isControlledAtmosphereRequired:
+      type: boolean
+      description: |
+        Indicator of whether cargo requires Controlled Atmosphere.
+      example: true
+    shippingInstruction:
+      type: object
+      description: |
+        The Shipping Instruction is an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.
+      allOf:
+      - type: object
+        properties:
+          shippingInstructionReference:
+            $ref: '#/components/schemas/shippingInstructionReference'
+      - $ref: '#/components/schemas/shippingInstructionRequest'
+    transportDocumentReference:
+      maxLength: 20
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+      example: HHL71800000
+    transportDocument:
+      required:
+      - cargoMovementTypeAtDestination
+      - cargoMovementTypeAtOrigin
+      - carrierCode
+      - carrierCodeListProvider
+      - consignmentItems
+      - deliveryTypeAtDestination
+      - documentParties
+      - documentStatus
+      - invoicePayableAt
+      - isElectronic
+      - isShippedOnBoardType
+      - isToOrder
+      - issuingParty
+      - partyContactDetails
+      - receiptTypeAtOrigin
+      - shippingInstruction
+      - shippingInstructionReference
+      - termsAndConditions
+      - transportDocumentReference
+      - transportDocumentTypeCode
+      - transportLeg
+      - transports
+      - utilizedTransportEquipments
+      type: object
+      description: "The document that governs the terms of carriage between shipper and carrier for maritime transportation. Two distinct types of transport documents exist:\n- Bill of Lading\n- Sea Waybill. \n"
+      allOf:
+      - type: object
+        properties:
+          transportDocumentReference:
+            $ref: '#/components/schemas/transportDocumentReference'
+      - type: object
+        properties:
+          transportDocumentTypeCode:
+            $ref: '#/components/schemas/transportDocumentTypeCode'
+      - type: object
+        properties:
+          documentStatus:
+            $ref: '#/components/schemas/eblStatus'
+      - type: object
+        properties:
+          shippingInstructionReference:
+            $ref: '#/components/schemas/shippingInstructionReference'
+      - type: object
+        properties:
+          issueDate:
+            $ref: '#/components/schemas/issueDate'
+      - type: object
+        properties:
+          shippedOnBoardDate:
+            $ref: '#/components/schemas/shippedOnBoardDate'
+      - type: object
+        properties:
+          receivedForShipmentDate:
+            $ref: '#/components/schemas/receivedForShipmentDate'
+      - type: object
+        properties:
+          carrierCode:
+            $ref: '#/components/schemas/carrierCode'
+      - type: object
+        properties:
+          carrierCodeListProvider:
+            $ref: '#/components/schemas/carrierCodeListProvider'
+      - type: object
+        properties:
+          issuingParty:
+            allOf:
+            - $ref: '#/components/schemas/party'
+      - type: object
+        properties:
+          numberOfRiderPages:
+            $ref: '#/components/schemas/numberOfRiderPages'
+      - type: object
+        properties:
+          termsAndConditions:
+            $ref: '#/components/schemas/termsAndConditions'
+      - type: object
+        properties:
+          isShippedOnBoardType:
+            $ref: '#/components/schemas/isShippedOnBoardType'
+      - type: object
+        properties:
+          receiptTypeAtOrigin:
+            $ref: '#/components/schemas/receiptTypeAtOrigin'
+      - type: object
+        properties:
+          deliveryTypeAtDestination:
+            $ref: '#/components/schemas/deliveryTypeAtDestination'
+      - type: object
+        properties:
+          cargoMovementTypeAtOrigin:
+            $ref: '#/components/schemas/cargoMovementTypeAtOrigin'
+      - type: object
+        properties:
+          cargoMovementTypeAtDestination:
+            $ref: '#/components/schemas/cargoMovementTypeAtDestination'
+      - type: object
+        properties:
+          serviceContractReference:
+            $ref: '#/components/schemas/serviceContractReference'
+      - type: object
+        properties:
+          contractQuotationReference:
+            $ref: '#/components/schemas/contractQuotationReference'
+      - type: object
+        properties:
+          declaredValue:
+            $ref: '#/components/schemas/declaredValue'
+      - type: object
+        properties:
+          declaredValueCurrency:
+            $ref: '#/components/schemas/declaredValueCurrency'
+      - type: object
+        properties:
+          invoicePayableAt:
+            type: object
+            description: |
+              General purpose object to capture `Invoice Payable At` location specified as: location where payment by the customer will take place. Usually refers to Basic Ocean Freight alone.
+
+              The location can be specified in **one** of the following ways: `UN Location Code` or an `Address`.
+            example:
+              locationName: Eiffel Tower
+              locationType: UNLO
+              UNLocationCode: FRPAR
+            discriminator:
+              propertyName: locationType
+              mapping:
+                ADDR: '#/components/schemas/addressLocation'
+                UNLO: '#/components/schemas/unLocationLocation'
+            oneOf:
+            - $ref: '#/components/schemas/addressLocation'
+            - $ref: '#/components/schemas/unLocationLocation'
+      - type: object
+        properties:
+          numberOfCopiesWithCharges:
+            $ref: '#/components/schemas/numberOfCopiesWithCharges'
+      - type: object
+        properties:
+          numberOfCopiesWithoutCharges:
+            $ref: '#/components/schemas/numberOfCopiesWithoutCharges'
+      - type: object
+        properties:
+          numberOfOriginalsWithCharges:
+            $ref: '#/components/schemas/numberOfOriginalsWithCharges'
+      - type: object
+        properties:
+          numberOfOriginalsWithoutCharges:
+            $ref: '#/components/schemas/numberOfOriginalsWithoutCharges'
+      - type: object
+        properties:
+          freightPaymentTermCode:
+            $ref: '#/components/schemas/freightPaymentTermCode'
+      - type: object
+        properties:
+          originChargesPaymentTermCode:
+            $ref: '#/components/schemas/originChargesPaymentTermCode'
+      - type: object
+        properties:
+          destinationChargesPaymentTermCode:
+            $ref: '#/components/schemas/destinationChargesPaymentTermCode'
+      - type: object
+        properties:
+          isElectronic:
+            $ref: '#/components/schemas/isElectronic'
+      - type: object
+        properties:
+          isToOrder:
+            $ref: '#/components/schemas/isToOrder'
+      - type: object
+        properties:
+          displayedNameForPlaceOfReceipt:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              The name to be used in order to specify how the `Place of Receipt` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+            items:
+              $ref: '#/components/schemas/displayedName'
+      - type: object
+        properties:
+          displayedNameForPortOfLoad:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              The name to be used in order to specify how the `Port of Load` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+            items:
+              $ref: '#/components/schemas/displayedName'
+      - type: object
+        properties:
+          displayedNameForPortOfDischarge:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              The name to be used in order to specify how the `Port of Discharge` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+            items:
+              $ref: '#/components/schemas/displayedName'
+      - type: object
+        properties:
+          displayedNameForPlaceOfDelivery:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              The name to be used in order to specify how the `Place of Delivery` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+            items:
+              $ref: '#/components/schemas/displayedName'
+      - type: object
+        properties:
+          placeOfIssue:
+            type: object
+            description: |
+              General purpose object to capture where the original Transport Document (`Bill of Lading`) will be issued.
+
+              The location can be specified in **one** of the following ways: `UN Location Code` or an `Address`.
+            example:
+              locationName: DCSA Headquarters
+              locationType: UNLO
+              UNLocationCode: NLAMS
+            discriminator:
+              propertyName: locationType
+              mapping:
+                ADDR: '#/components/schemas/addressLocation'
+                UNLO: '#/components/schemas/unLocationLocation'
+            oneOf:
+            - $ref: '#/components/schemas/addressLocation'
+            - $ref: '#/components/schemas/unLocationLocation'
+      - $ref: '#/components/schemas/consignmentItems_Carrier'
+      - $ref: '#/components/schemas/utilizedTransportEquipments_Carrier'
+      - $ref: '#/components/schemas/documentParties'
+      - type: object
+        properties:
+          partyContactDetails:
+            type: array
+            description: "The contact details of the person to contact in relation to the **Transport Document** (changes, notifications etc.) \n"
+            items:
+              allOf:
+              - $ref: '#/components/schemas/partyContactDetail'
+      - type: object
+        properties:
+          transports:
+            $ref: '#/components/schemas/transportDocument_transports'
+      - $ref: '#/components/schemas/references'
+      - $ref: '#/components/schemas/customsReferences'
+      - $ref: '#/components/schemas/charges'
+      - $ref: '#/components/schemas/carrierClauses'
+    issueDate:
+      type: string
+      description: |
+        Local date when the transport document has been issued.
+
+        Can be omitted on draft transport documents, but must be provided when the document has been issued.
+      format: date
+      example: 2020-12-12
+    shippedOnBoardDate:
+      type: string
+      description: |
+        Date when the last container that is linked to the transport document is physically loaded onboard the vessel indicated on the transport document.
+
+        When provided on a transport document, the transportDocument is a `Shipped On Board` B/L.
+
+        Exactly one of `shippedOnBoard` and `receiveForShipmentDate` must be provided on an issued B/L.
+      format: date
+      example: 2020-12-12
+    receivedForShipmentDate:
+      type: string
+      description: |
+        Date when the last container linked to the transport document is physically in the terminal (customers cleared against the intended vessel).
+
+        When provided on a transport document, the transportDocument is a `Received For Shipment` B/L.
+
+        Exactly one of `shippedOnBoard` and `receiveForShipmentDate` must be provided on an issued B/L.
+      format: date
+      example: 2020-12-12
+    carrierCode:
+      maxLength: 4
+      pattern: ^\S+$
+      type: string
+      description: |
+        The code containing the SCAC and/or the SMDG code to specify the issuing carrier.  Details about the issuer can be given in the Document Parties entity using the party function code MS.
+      example: MMCU
+    carrierCodeListProvider:
+      type: string
+      description: |
+        The provider used for identifying the issuer Code. Possible values are:
+        - SMDG (Ship Message Design Group)
+        - NMFTA (National Motor Freight Traffic Association) _includes SPLC (Standard Point Location Code)_
+      example: NMFTA
+      enum:
+      - SMDG
+      - NMFTA
+    numberOfRiderPages:
+      minimum: 0
+      type: integer
+      description: The number of additional pages required to contain the goods description on a transport document. Only applicable for physical transport documents.
+      format: int32
+      example: 2
+    termsAndConditions:
+      maxLength: 20000
+      type: string
+      description: |
+        Carrier terms and conditions of transport.
+    receiptTypeAtOrigin:
+      maxLength: 3
+      type: string
+      description: |
+        Indicates the type of service offered at Origin. Options are defined in the Receipt/Delivery entity.
+        - CY (Container yard (incl. rail ramp))
+        - SD (Store Door)
+        - CFS (Container Freight Station)
+      example: CY
+      enum:
+      - CY
+      - SD
+      - CFS
+    deliveryTypeAtDestination:
+      maxLength: 3
+      type: string
+      description: |
+        Indicates the type of service offered at Destination. Options are defined in the Receipt/Delivery entity.
+        - CY (Container yard (incl. rail ramp))
+        - SD (Store Door)
+        - CFS (Container Freight Station)
+      example: CY
+      enum:
+      - CY
+      - SD
+      - CFS
+    cargoMovementTypeAtOrigin:
+      maxLength: 3
+      type: string
+      description: |
+        Refers to the shipment term at the loading of the cargo into the container. Options are defined in the Cargo Movement Type entity.
+        - FCL (Full Container Load)
+        - LCL (Less than Container Load)
+        - BB (Break Bulk)
+      example: FCL
+      enum:
+      - FCL
+      - LCL
+      - BB
+    cargoMovementTypeAtDestination:
+      maxLength: 3
+      type: string
+      description: |
+        Refers to the shipment term at the unloading of the cargo out of the container. Options are defined in the Cargo Movement Type entity.
+        - FCL (Full Container Load)
+        - LCL (Less than Container Load)
+        - BB (Break Bulk)
+      example: FCL
+      enum:
+      - FCL
+      - LCL
+      - BB
+    serviceContractReference:
+      maxLength: 30
+      type: string
+      description: "Reference number for agreement between shipper and carrier through which the shipper commits to provide a certain minimum quantity of cargo over a fixed period, and the carrier commits to a certain rate or rate schedule."
+      example: HHL51800000
+    contractQuotationReference:
+      maxLength: 35
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Information provided by the shipper to identify whether pricing for the shipment has been agreed via a contract or a quotation reference. Mandatory if service contract (owner) is not provided.
+      example: HHL1401
+    declaredValue:
+      minimum: 0
+      type: number
+      description: |
+        The value of the cargo that the shipper declares to avoid the carrier's limitation of liability and "Ad Valorem" freight, i.e. freight which is calculated based on the value of the goods declared by the shipper.
+      format: float
+      example: 1231.1
+    declaredValueCurrency:
+      maxLength: 3
+      pattern: "^[A-Z]{3}$"
+      type: string
+      description: |
+        The currency used for the declared value, using the 3-character code defined by [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217).
+      example: DKK
+    plannedArrivalDate:
+      type: string
+      description: |
+        The planned date of arrival.
+      format: date
+    plannedDepartureDate:
+      type: string
+      description: |
+        The planned date of departure.
+      format: date
+    placeOfReceipt:
+      description: |
+        General purpose object to capture `Place of Receipt` location specified as: the location where the cargo is handed over by the shipper, or his agent, to the shipping line. This indicates the point at which the shipping line takes on responsibility for carriage of the container.
+
+        **Condition:** Only when pre-carriage is done by the carrier.
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: '#/components/schemas/addressLocation'
+          FACI: '#/components/schemas/facilityLocation'
+          UNLO: '#/components/schemas/unLocationLocation'
+      oneOf:
+      - $ref: '#/components/schemas/addressLocation'
+      - $ref: '#/components/schemas/facilityLocation'
+      - $ref: '#/components/schemas/unLocationLocation'
+    facilityLocation:
+      required:
+      - facilityCode
+      - facilityCodeListProvider
+      - locationType
+      type: object
+      properties:
+        locationName:
+          $ref: '#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `Facility Location` interface
+          example: FACI
+        UNLocationCode:
+          allOf:
+          - $ref: '#/components/schemas/UNLocationCode'
+          - description: |
+              The UN Location code specifying where the place is located.
+
+              This field is **conditionally mandatory** depending on the value of the `facilityCodeListProvider` field.
+        facilityCode:
+          allOf:
+          - $ref: '#/components/schemas/facilityCode'
+          - description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\n\nThe definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:\n\n- for `SMDG` - the codeList used is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx) \n- for `BIC` - the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/)\n"
+        facilityCodeListProvider:
+          $ref: '#/components/schemas/facilityCodeListProvider'
+      description: |
+        An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+    facilityCode:
+      maxLength: 6
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The code used for identifying the specific facility. This code does <b>not</b> include the UN Location Code.
+      nullable: false
+      example: ADT
+    facilityCodeListProvider:
+      type: string
+      description: |
+        The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`
+        - BIC (Requires a UN Location Code)
+        - SMDG (Requires a UN Location Code)
+      example: SMDG
+      enum:
+      - BIC
+      - SMDG
+    portOfLoading:
+      description: |
+        General purpose object to capture `Port of Loading` location specified as: the location where the cargo is loaded onto a first sea-going vessel for water transportation.
+
+        The location can be specified in **one** of the following ways: `UN Location Code` or `City and Country`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      discriminator:
+        propertyName: locationType
+        mapping:
+          CITY: '#/components/schemas/cityLocation'
+          UNLO: '#/components/schemas/unLocationLocation'
+      oneOf:
+      - $ref: '#/components/schemas/cityLocation'
+      - $ref: '#/components/schemas/unLocationLocation'
+    cityLocation:
+      required:
+      - city
+      - locationType
+      type: object
+      properties:
+        locationName:
+          $ref: '#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `City Location` interface
+          example: CITY
+        city:
+          $ref: '#/components/schemas/city'
+      description: |
+        An interface used to express a location using a `City`, `state/region` and `country`
+    city:
+      required:
+      - city
+      - country
+      type: object
+      properties:
+        city:
+          $ref: '#/components/schemas/cityName'
+        stateRegion:
+          $ref: '#/components/schemas/stateRegion'
+        country:
+          $ref: '#/components/schemas/country'
+      description: |
+        An object for storing city, state/region and coutry related information
+    portOfDischarge:
+      description: |
+        General purpose object to capture `Port of Discharge` location specified as: the location where the cargo is discharged from the last sea-going vessel.
+
+        The location can be specified in **one** of the following ways: `UN Location Code` or `City and Country`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      discriminator:
+        propertyName: locationType
+        mapping:
+          CITY: '#/components/schemas/cityLocation'
+          UNLO: '#/components/schemas/unLocationLocation'
+      oneOf:
+      - $ref: '#/components/schemas/cityLocation'
+      - $ref: '#/components/schemas/unLocationLocation'
+    placeOfDelivery:
+      description: |
+        General purpose object to capture `Place of Delivery` location specified as: the location where the cargo is handed over to the consignee, or his agent, by the shipping line and where responsibility of the shipping line ceases.
+
+        **Condition:** Only when onward transport is done by the carrier
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: '#/components/schemas/addressLocation'
+          FACI: '#/components/schemas/facilityLocation'
+          UNLO: '#/components/schemas/unLocationLocation'
+      oneOf:
+      - $ref: '#/components/schemas/addressLocation'
+      - $ref: '#/components/schemas/facilityLocation'
+      - $ref: '#/components/schemas/unLocationLocation'
+    onwardInlandRouting:
+      description: |
+        General purpose object to capture `Onward Inland Routing` location specified as the end location of the inland movement that takes place after the container(s) being delivered to the port of discharge/place of delivery for account and risk of merchant (merchant haulage).
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: '#/components/schemas/addressLocation'
+          FACI: '#/components/schemas/facilityLocation'
+          UNLO: '#/components/schemas/unLocationLocation'
+      oneOf:
+      - $ref: '#/components/schemas/addressLocation'
+      - $ref: '#/components/schemas/facilityLocation'
+      - $ref: '#/components/schemas/unLocationLocation'
+    carrierExportVoyageNumber:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+      example: 2103S
+    universalExportVoyageReference:
+      pattern: "^\\d{2}[0-9A-Z]{2}[NEWSR]$"
+      type: string
+      description: |
+        A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+        - `2 digits` for the year
+        - `2 alphanumeric characters` for the sequence number of the voyage
+        - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+      example: 2103N
+    charges:
+      type: object
+      properties:
+        charges:
+          maxLength: 1
+          type: array
+          description: |
+            A list of `Charges`
+          items:
+            $ref: '#/components/schemas/charge'
+    charge:
+      required:
+      - calculationBasis
+      - chargeName
+      - currencyAmount
+      - currencyCode
+      - paymentTermCode
+      - quantity
+      - unitPrice
+      type: object
+      properties:
+        chargeName:
+          $ref: '#/components/schemas/chargeName'
+        currencyAmount:
+          $ref: '#/components/schemas/currencyAmount'
+        currencyCode:
+          $ref: '#/components/schemas/currencyCode'
+        paymentTermCode:
+          $ref: '#/components/schemas/paymentTermCode'
+        calculationBasis:
+          $ref: '#/components/schemas/calculationBasis'
+        unitPrice:
+          $ref: '#/components/schemas/unitPrice'
+        quantity:
+          $ref: '#/components/schemas/quantity'
+      description: |
+        addresses the monetary value of freight and other service charges for a transport document.
+    chargeName:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Free text field describing the charge to apply
+      example: Documentation fee - Destination
+    currencyAmount:
+      minimum: 0
+      type: number
+      description: |
+        The monetary value of all freight and other service charges for a transport document, with a maximum of 2-digit decimals.
+      format: float
+      example: 1012.12
+    currencyCode:
+      maxLength: 3
+      pattern: "^[A-Z]{3}$"
+      type: string
+      description: |
+        The currency for the charge, using a 3-character code ([ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)).
+      example: DKK
+    paymentTermCode:
+      type: string
+      description: |
+        Indicates whether freight & charges are due for payment before the shipment is effected, practically before the transport document is released to shipper (Prepaid) or before the shipment is finalized meaning cargo released to consignee (Collect)
+        - PRE (Prepaid)
+        - COL (Collect)
+      example: PRE
+      enum:
+      - PRE
+      - COL
+    calculationBasis:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: "The code specifying the measure unit used for the corresponding unit price for this cost, such as per day, per ton, per square metre."
+      example: Per day
+    unitPrice:
+      minimum: 0
+      type: number
+      description: |
+        The unit price of this charge item in the currency of the charge.
+      format: float
+      example: 3456.6
+    quantity:
+      minimum: 0
+      type: number
+      description: |
+        The amount of unit for this charge item.
+      format: float
+      example: 34.4
+    carrierClauses:
+      type: object
+      properties:
+        carrierClauses:
+          type: array
+          description: |
+            Additional clauses for a specific shipment added by the carrier to the Bill of Lading, subject to local rules / guidelines or certain mandatory information required to be shared with the customer.
+          items:
+            $ref: '#/components/schemas/clauseContent'
+    clauseContent:
+      maxLength: 20000
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The content of the clause.
+      example: It is not allowed to...
+    approvedDocumentStatus:
+      maxLength: 50
+      type: string
+      description: |
+        The status of the ebl. It can only be `APPROVED`
+      example: APPROVED
+    transportDocumentRefStatus:
+      type: object
+      properties:
+        transportDocumentReference:
+          $ref: '#/components/schemas/transportDocumentReference'
+        documentStatus:
+          $ref: '#/components/schemas/eblStatus'
+    email:
+      maxLength: 100
+      pattern: ^.+@\S+$
+      type: string
+      description: |
+        `E-mail` address to be used
+      example: info@dcsa.org
+    unNumber:
+      pattern: "^\\d{4}$"
+      type: string
+      description: |
+        United Nations Dangerous Goods Identifier (UNDG) assigned by the UN Sub-Committee of Experts on the Transport of Dangerous Goods and shown in the IMO IMDG.
+      example: "1463"
+    naNumber:
+      pattern: "^\\d{4}$"
+      type: string
+      description: |
+        Four-digit number that is assigned to dangerous, hazardous, and harmful substances by the United States Department of Transportation.
+      example: "9037"
+    transportdocuments_transportDocumentReference_body:
+      required:
+      - documentStatus
+      type: object
+      properties:
+        documentStatus:
+          $ref: '#/components/schemas/approvedDocumentStatus'
+    dangerousGoods_Base_grossWeight:
+      required:
+      - unit
+      - value
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/dgGrossWeight'
+        unit:
+          $ref: '#/components/schemas/weightUnit'
+      description: |
+        Total weight of the goods carried, including packaging.
+    dangerousGoods_Base_netWeight:
+      required:
+      - unit
+      - value
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/netWeight'
+        unit:
+          $ref: '#/components/schemas/netWeightUnit'
+      description: |
+        Total weight of the goods carried, excluding packaging.
+    dangerousGoods_Base_netExplosiveContent:
+      required:
+      - unit
+      - value
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/netExplosiveContent'
+        unit:
+          $ref: '#/components/schemas/netExplosiveContentUnit'
+      description: |
+        The total weight of the explosive substances, without the packaging’s, casings, etc.
+    dangerousGoods_Base_volume:
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/dgVolume'
+        unit:
+          $ref: '#/components/schemas/volumeUnitDG'
+      description: |
+        The volume of the referenced dangerous goods.
+
+        **Condition:** only applicable to liquids and gas.
+    transportDocument_transports:
+      required:
+      - carrierExportVoyageNumber
+      - plannedArrivalDate
+      - plannedDepartureDate
+      - portOfDischarge
+      - portOfLoading
+      - vesselName
+      type: object
+      properties:
+        plannedArrivalDate:
+          $ref: '#/components/schemas/plannedArrivalDate'
+        plannedDepartureDate:
+          $ref: '#/components/schemas/plannedDepartureDate'
+        preCarriageBy:
+          maxLength: 50
+          type: string
+          description: |
+            Mode of transportation for pre-carriage when transport to the port of loading is organized by the carrier. If this attributes is populated, then a Place of Receipt must also be defined.. The currently supported values include:
+            - VESSEL
+            - RAIL
+            - TRUCK
+            - BARGE
+
+            More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/modeoftransportcodes.csv)
+          example: RAIL
+        onCarriageBy:
+          maxLength: 50
+          type: string
+          description: |
+            Mode of transportation for on-carriage when transport from the port of discharge is organized by the carrier. If this attributes is populated, then a Place of Delivery must also be defined. The currently supported values include:
+            - VESSEL
+            - RAIL
+            - TRUCK
+            - BARGE
+
+            More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/modeoftransportcodes.csv)
+          example: TRUCK
+        placeOfReceipt:
+          $ref: '#/components/schemas/placeOfReceipt'
+        portOfLoading:
+          $ref: '#/components/schemas/portOfLoading'
+        portOfDischarge:
+          $ref: '#/components/schemas/portOfDischarge'
+        placeOfDelivery:
+          $ref: '#/components/schemas/placeOfDelivery'
+        onwardInlandRouting:
+          $ref: '#/components/schemas/onwardInlandRouting'
+        vesselName:
+          maxLength: 35
+          pattern: ^\S+(\s+\S+)*$
+          type: string
+          description: |
+            The name of the first sea going Vessel on board which the cargo is loaded or intended to be loaded
+          example: King of the Seas
+        carrierExportVoyageNumber:
+          $ref: '#/components/schemas/carrierExportVoyageNumber'
+        universalExportVoyageReference:
+          $ref: '#/components/schemas/universalExportVoyageReference'
+  parameters:
+    shippingInstructionReference:
+      name: shippingInstructionReference
+      in: path
+      description: |
+        The identifier for a shipping instruction provided by the carrier
+      required: true
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/shippingInstructionReference'
+    transportDocumentReference:
+      name: transportDocumentReference
+      in: path
+      description: |
+        The transportDocumentReference of the Transport Document
+      required: true
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/transportDocumentReference'
+    carrierBookingReferences:
+      name: carrierBookingReference
+      in: query
+      description: |
+        The bookingReference in the Bill of Lading process to filter by.
+
+        It is possible to insert multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example
+
+            carrierBookingReference=ABC123123,DEF987987
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/carrierBookingReference'
+      example:
+      - ABC123123
+      - DEF987987
+    documentStatus:
+      name: documentStatus
+      in: query
+      description: |
+        Filter by the status of the Shipping Instruction in the process. Possible values are:
+        - RECEIVED
+        - PENDING UPDATE
+        - INITIAL DRAFT
+        - PENDING CHANGES APPROVAL
+        - DRAFT
+        - PENDING AMENDMENTS APPROVAL
+        - APPROVED
+        - AUTO-APPROVED
+        - ISSUED
+        - AMENDMENTS APPROVED
+        - PENDING SURRENDER FOR AMENDMENTS
+        - PENDING SURRENDER FOR DELIVERY
+        - SURRENDERED FOR AMENDMENTS
+        - SURRENDERED FOR DELIVERY
+        - VOIDED
+        - REJECTED
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
+      required: false
+      style: form
+      explode: true
+      schema:
+        $ref: '#/components/schemas/eblStatus'
+    limit:
+      name: limit
+      in: query
+      description: |
+        Maximum number of items to return.
+      required: false
+      schema:
+        minimum: 1
+        type: integer
+        format: int32
+        default: 100
+      example: 100
+    sort:
+      name: sort
+      in: query
+      description: |
+        A comma-separated (`,`) list of field names is used to define the sort order. To specify the sort order for each field name required, use a colon (`:`) between the field name and the keyword `ASC` (ascending) or `DESC` (descening). If the keyword is not used, ascending (`ASC`) order is applied by default.
+      required: false
+      schema:
+        type: string
+      example: carrierBookingReference:DESC
+    Api-Version-Major:
+      name: API-Version
+      in: header
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+      required: false
+      schema:
+        type: string
+        example: "1"
+  headers:
+    API-Version:
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+      schema:
+        type: string
+        example: 1.0.0
+    Current-Page:
+      description: |
+        The `Current-Page` header is optional to implement. If provided it **MUST** link to the current page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the current page **MUST** be accepted when used.
+
+        The example represents a link to a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?pageNumber=fE9mZnNldHw9NSZsaW1pdD01
+    Next-Page:
+      description: |
+        The `Next-Page` header is mandatory to implement but **MAY** be omitted in case there are not any more items in the collection for a next page. If provided it **MUST** link to the next page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the next page **MUST** be accepted when used.
+
+        The example represents a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NSZsaW1pdD01
+    Prev-Page:
+      description: |
+        The `Prev-Page` header is optional to implement. If provided it **MUST** link to the previous page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the previous page **MUST** be accepted when used.
+
+        The example represents a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NSZsaW1pdD01
+    Last-Page:
+      description: |
+        The `Last-Page` header is optional to implement. If provided it **MUST** link to the last page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the last page **MUST** be accepted when used.
+
+
+        The example represents a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NTkmbGltaXQ9NQ==
+    First-Page:
+      description: |
+        The `First-Page` header is optional to implement. If provided it **MUST** link to the first page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the first page **MUST** be accepted when used.
+
+        The example represents a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NTkmbGltaXQ9NQ==

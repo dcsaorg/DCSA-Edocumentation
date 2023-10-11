@@ -1,0 +1,3503 @@
+---
+openapi: 3.0.3
+info:
+  title: DCSA OpenAPI specification for Booking
+  description: |
+    API specification issued by DCSA.org.
+
+    For explanation to specific values or objects please refer to the [Information Model 2023.Q3](https://dcsa.org/wp-content/uploads/2022/02/DCSA-Information-Model-2023.Q1.pdf) *** _Will be updated_ ***. This API does not define the business rules regarding what is allowed to update at what time. For this the [Booking Interface Standard (IFS)]() *** _Will be updated_ *** document should be consulted. **All UseCases mentioned in this API refer to UseCases defined in this Booking IFS**.
+
+    All other documents related to the Booking publication can be found [here](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8mmQAC)
+
+    It is possible to use this API as a standalone API. In order to do so it is necessary to use one of the poll-endPoints:
+
+        GET /v2/booking-summaries
+        GET /v2/bookings/{carrierBookingRequestReference}
+
+    in order to poll information.
+
+    It is possible to have notifications pushed to you whenever the provider needs input. This is defined outside the scope of this API. For this to work a WebHook must be set up.
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v200B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 2.0.0-Beta-1
+servers:
+- url: /
+tags:
+- name: Booking Request
+  description: |
+    The initial steps by the Shipper to create a Booking
+- name: Shipment
+  description: |
+    The shipment as agreed by both parties
+- name: Cancellation
+  description: |
+    Shipper initiated cancellation of a booking
+paths:
+  /v2/booking-summaries:
+    get:
+      tags:
+      - Booking Request
+      summary: Get booking requests
+      description: |
+        Retrieves the booking request _metadata_. This endPoint can be used to list all bookings accessable to you.
+
+        The order of the list is defined by the implementor.
+      operationId: getBookingSummeries
+      parameters:
+      - name: bookingStatus
+        in: query
+        description: |
+          Filter by the status of the booking. Possible values are:
+          - RECEIVED
+          - PENDING UPDATE
+          - PENDING UPDATES CONFIRMATION
+          - PENDING AMENDMENTS APPROVAL
+          - CONFIRMED
+          - REJECTED
+          - DECLINED
+          - CANCELLED
+          - COMPLETED
+
+          More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/bookingStatus'
+      - name: limit
+        in: query
+        description: |
+          Maximum number of items to return.
+        required: false
+        schema:
+          minimum: 1
+          type: integer
+          format: int32
+          default: 100
+        example: 100
+      - name: sort
+        in: query
+        description: |
+          A comma-separated (`,`) list of field names is used to define the sort order. To specify the sort order for each field name required, use a colon (`:`) between the field name and the keyword `ASC` (ascending) or `DESC` (descening). If the keyword is not used, ascending (`ASC`) order is applied by default.
+        required: false
+        schema:
+          type: string
+        example: carrierBookingReference:DESC
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      responses:
+        "200":
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+            Current-Page:
+              $ref: '#/components/headers/Current-Page'
+            Next-Page:
+              $ref: '#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: '#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: '#/components/headers/Last-Page'
+            First-Page:
+              $ref: '#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/bookingSummary'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v2/bookings:
+    post:
+      tags:
+      - Booking Request
+      summary: Post a booking request
+      description: "Creates a new booking request. This endPoint corresponds with **UseCase 1 - Submit booking request**.\n\n## Precondition\nThe consumer has information for a `Booking Request`\n\n## Postcondition\nThe provider has received the `Booking Request`. \n\nThe consumer will receive a `201` (Created) if the request payload schema-validates or a `400` (Bad Request) if it does not.\n\nThe provider can **optionally** do a full validation as part of the response. The full validation can also be done asynchroniously in which case a `Notification` will be sent to any subscribers once the validation is complete.\n\n## Process\nThe following occurs when a provider recieves a `Booking Request`\n1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.\n\n   **The process stops here!**\n2. The payload is schema-valid which means\n    - all required fields are provided\n    - all values provided have correct data type\n\n    A `carrierBookingRequestReference` (as a reference to the `Booking Request`) is created and stored along with the payload in the provider system.\n  \n**For the rest of this description and in all examples the value `cbrr-123` will be used as `carrierBookingRequestReference`**\n\nThe provider can now choose to either do **(A) No Validation** or make a **(B) Full Validation**\n\n### A). No validation\n\nNo validation means the provider will just store the `Booking Request` and send back a success message with `bookingStatus=RECEIVED`. Any further processing (validation) will continue asynchroniously\n\n3. A `201` (Created) response is returned with the following payload\n    ```\n    {\n      carrierBookingRequestReference: 'cbrr-123',\n      bookingStatus: 'RECEIVED'\n    }\n    ```\nFor `POST` `Booking Request` the process for **No Validation** ends here. The `Booking Request`\n\n  - is now stored in the provider system\n  - has status `RECEIVED`\n  - awaits further processing by the provider\n  - a `201` (Created) response is sent to the consumer with a payload containing `bookingStatus='RECEIVED'`\n\nAsynchronious processing will now start by the provider - once processed the new status of the `Booking Request` will be communicated via a `Notification`. In case the consumer does not subscribe to `Notifications` it is necessary for the consumer to poll on the\n\n    GET /bookings/{carrierBookingRequestReference}\n    \n  endPoint in order to check if the `bookingStatus` of the booking has changed.\n\n### B). Full validation\n\nFull validation means the provider has stored the `Booking Request` and a full validation of the payload has completed.\n\n3. Do full validation of the payload. Some examples could be:\n    - check equipment and space availability\n    - check that `HS Codes` match the `Commodity` descriptions\n    - Make a KYC on all provided `Parties`\n    - etc\n    \n    Making a full validation requires the provider to check against all business rules (_the list above is just examples_)\n4. Depending on the result of step 3 the following will happen:\n\n    - **Update to Booking Request required**\n       \n      If an update to the `Booking Request` is required (equivalent to **UseCase 2 - Request to update Booking request**) the `bookingStatus='PENDING UPDATE'` in a `201` (Created) response is returned\n\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'PENDING UPDATE',\n        requestedChanges: [\n          {\n            path: \"carrierServiceName\",\n            message: \"Service does not exist\"\n          }\n        ]\n      }\n      ```\n      The `requestedChanges` structure will contain the changes that the provider requires the consumer to update in order for the `Booking Request` to be valid.\n      \n    - **Confirm Booking request**\n    \n      If the `Booking Request` can be confirmed (equivalent to **UseCase 5 - Confirm Booking request**) the `bookingStatus='CONFIRMED'` in a `201` (Created) response is returned\n\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'CONFIRMED'\n      }\n      ```\n\n    - **Reject Booking Request**\n    \n      If the `Booking Request` needs to be rejected (equivalent to **UseCase 4 - Reject Booking request**) the `bookingStatus='REJECTED'` in a `201` (Created) response is returned with the following payload\n\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'REJECTED'\n      }\n      ```\n\nFor `POST` `Booking Request` the process for **Full Validation** ends here. The `Booking Request`\n    \n- is now stored in the provider system\n- a full validation has been done\n- the consumer has receved a `201` (Created) response from the provider with the status of the `Booking request` with one of the following statuses:\n  - `PENDING UPDATE` in case provider awaits further input from consumer\n  - `CONFIRMED` in case provider has confirmed the `Booking Request` and the `Booking Request` is ready to be used in a `Shipping Instruction`\n  - `REJECTED` in case the provider has rejected the `Booking Request`.\n\nThe provider is now awaiting further action by the consumer.\n"
+      operationId: getBookings
+      parameters:
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      requestBody:
+        description: The payload used to create a `Booking Request`
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2_bookings_body'
+        required: true
+      responses:
+        "201":
+          description: |
+            `Booking Request` has been successfully created in the provider system. Depending on the level of validation done by the provider - the status of the `Booking Request` will be one of the following:
+            - `RECEIVED` in case asynchronous processing of the `Booking Request` begins. The `Booking Request` is now awaiting the provider to continue the validation
+            - `PENDING UPDATE` in case provider has performed a **Full Validation** and needs the `Booking Request` to be updated
+            - `CONFIRMED` in case provider has performed a **Full Validation** and confirmed the `Booking Request`. The `Booking Request` is ready to be used in a `Shipping Instruction`
+            - `REJECTED` in case the provider has performed a **Full Validation** and has rejected the `Booking Request`. The `Booking Request`can no longer be updated
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bookingRefStatus'
+              examples:
+                receExample:
+                  summary: |
+                    Booking request received
+                  description: |
+                    A `Booking Request` has been received (`bookingStatus='RECEIVED'`) and stored in provider system but not yet fully validated (only schema validated)
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: RECEIVED
+                penuExample:
+                  summary: |
+                    Booking request pending update
+                  description: |
+                    A `Booking Request` received and stored in provider system and fully validated. The result of the full validation has resulted in the provider requiring the consumer to make some updates (`bookingStatus='PENDING UPDATE'`)
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: PENDING UPDATE
+                    requestedChanges:
+                    - path: carrierServiceName
+                      message: Service does not exist
+                confExample:
+                  summary: |
+                    Confirmed Booking request
+                  description: |
+                    A `Booking Request` received and stored in provider system, fully validated and Confirmed (`bookingStatus='CONFIRMED'`).
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: CONFIRMED
+                rejeExample:
+                  summary: |
+                    Rejected Booking request
+                  description: |
+                    A `Booking Request` received and stored in provider system but has been rejected (`bookingStatus='REJECTED'`).
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: REJECTED
+        "400":
+          description: |
+            In case the `Booking Request` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Booking missing receiptTypeAtOrigin
+                  description: |
+                    `receiptTypeAtOrigin` is a mandoatry field in the `Booking Request`. This is an example of how the error object would look in case this field is missing
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/bookings
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    errorMessage: |
+                      receiptTypeAtOrigin not found - it is a mandatory field in Booking request
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      field: receiptTypeAtOrigin
+                      reason: mandatory field missing
+                      message: receiptTypeAtOrigin must be provided as part of a Booking request
+        "500":
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Booking Request
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationID` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/bookings
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    errorMessage: Internal Server Error occurred while processing Booking request
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Internal Error occurred
+                      message: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Bookings Requests
+                  description: "Calling the endPoint\n\n    POST /v2/bookings\n    \ntoo many times within a timeperiod.\n\n**NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a \"random example\"\n"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/bookings
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    errorMessage: Too many request to create a booking has been requested. Please try again in 1 hour
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Max Booking requests reached
+                      message: A maximum of 10 Bookings can be created per hour
+  /v2/bookings/{carrierBookingRequestReference}:
+    get:
+      tags:
+      - Booking Request
+      summary: Get booking requests
+      description: |
+        Retrieves the `Booking Request` with the `carrierBookingRequestReference` in the path. It is recommended to use this endPoint to `GET` data before an update is made to make sure latest version is being updated.
+
+        In case no subscription (`Notification`) has been set up - it is possbile to use this endPoint to poll on in order to detect if `bookingStatus` has changed.
+      operationId: getBooking
+      parameters:
+      - name: carrierBookingRequestReference
+        in: path
+        description: |
+          The `carrierBookingRequestReference` of the booking request to match
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/carrierBookingRequestReference'
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      responses:
+        "200":
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bookingResponse'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                getError:
+                  summary: |
+                    GET non-existing Booking Request
+                  description: "Calling\n\n    GET /v2/bookings/cbrr-123\n    \nresults in an error as booking `cbrr-123` does not exist.\n\n**NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a \"random example\"\n"
+                  value:
+                    httpMethod: GET
+                    requestUri: /v2/bookings/cbrr-123
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    errorMessage: The requested carrierBookingRequestReference does not exist
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Non existent carrierBookingRequestReference
+                      message: carrierBookingRequestReference `cbrr-123` does not exist
+    put:
+      tags:
+      - Booking Request
+      summary: Put booking requests
+      description: "Updates the `Booking Request` with the `carrierBookingRequestReference` in the path. This endPoint corresponds with either\n\n- **UseCase 3 - Submit updated Booking request**\n- **UseCase 7 - Request amendments to confirmed Booking**\n\nThis endPoint is to be used in response to\n\n- **UseCase 2 - Request to update Booking request**\n- **UseCase 6 - Request to update confirmed Booking**\n\nthe endPoint can also be used in case `bookingStatus='RECEIVED'` and the consumer has an update to the `Booking Request`.\n\n### Precondition\nIn order to update a `Booking Request`, the status of the `Booking Request` needs to be in state\n\n- `RECEIVED` in case the consumer has updated information for the `Booking Request`\n- `PENDING UPDATE` in case the provider has requested the consumer to update the `Booking Request` (a result of **UseCase 2 - Request to update Booking request** or **UseCase 6 - Request to update confirmed Booking**)\n- `CONFIRMED` in case the consumer has an amendment to the `Booking Request` (**UseCase 7 - Request amendments to confirmed Booking**)\n\n## Postcondition\nThe provider has received an update (**UseCase 3 - Submit updated Booking request**) or an amendment (**UseCase 7 - Request amendments to confirmed Booking**) to the `Booking Request`.\n\nThe consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.\n\nThe provider can **optionally** do a full validation as part of the response. The full validation can also be done asynchroniously in which case a `Notification` will be sent to any subscribers once the validation is complete.\n\n## Process\nThe following occurs when a provider recieves an **update** to a `Booking Request`\n1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.\n\n   **The process stops here!**\n2. The payload is schema-valid which means\n    - all required fields are provided\n    - all values provided have correct data type\n  \n    The updated `Booking Request` is stored in the provider system.\n\n**For the rest of this description and in all examples the value `cbrr-123` will be used as `carrierBookingRequestReference`**\n\nThe provider can now choose to either do **(A) No Validation** or make a **(B) Full Validation**\n\n### A). No validation\n\nNo validation means the provider will just store the **updated** `Booking Request` and send back a success message. Any further processing (validation) will continue asynchroniously.\n\n3. The response depends on which useCase is the reason for calling this endPoint (what the `bookingStatus` is):\n\n    - If `bookingStatus` **is** `RECEIVED` then this endPoint is being used in addition to **UseCase 1 - Submit booking request**. In this case the consumer would like to make an update to an already sent `Booking Request` - this is done via **UseCase 3 - Submit updated Booking Request**. The `bookingStatus` now changes to `PENDING UPDATES CONFIRMATION`\n    \n      A `200` (OK) response corresponding to the following payload is returned\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'PENDING UPDATES CONFIRMATION'\n      }\n      ```\n\n    - If `bookingStatus` is `PENDING UPDATE` then this endPoint is being used as a reponse to either:\n      - **UseCase 2 - Request to update Booking request** in this case the provider has requested an update to a `Booking Request`\n      - **UseCase 6 - Request to update Confirmed Booking** in this case the provider has requested an update to a `Booking Amendment`.\n    \n      In both cases the `bookingStatus` changes to `PENDING UPDATES CONFIRMATION`.\n      \n      A `200` (OK) response corresponding to the following payload is returned\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'PENDING UPDATES CONFIRMATION'\n      }\n      ```\n    \n    - If `bookingStatus` is `CONFIRMED` then this endPoint is being used in order to request an amendment to a `Confirmed Booking` this is done via **UseCase 7 - Request Amendments to Confirmed Booking**. The `bookingStatus` now changes to `PENDING AMENDMENTS APPROVAL`.\n    \n      A `200` (OK) response corresponding to the following payload is returned\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'PENDING AMENDMENTS APPROVAL'\n      }\n      ```\n    \n    \nFor `PUT` `Booking Request` the process for **No Validation** ends here. The **updated** `Booking Request`\n\n  - is now stored in the provider system\n  - a `200` (OK) response is sent to the consumer with the status of the `Booking Request` with one of the following values (depending on the useCase):\n    - `bookingStatus='PENDING UPDATES CONFIRMATION'` (if endPoint used as a response to **UseCase 3 - Submit updated Booking Request**)\n    - `bookingStatus='PENDING AMENDMENTS APPROVAL'` (if endPoint used as a response to **UseCase 7 - Request amendments to Confirmed Booking**)\n  - awaits further processing by the provider\n\nAsynchronious processing will now start by the provider - once processed the new status of the `Booking Request` will be communicated via a `Notification`. In case the consumer does not subscribe to `Notifications` it is necessary for the consumer to poll on the\n\n    GET /bookings/{carrierBookingRequestReference}\n    \n  endPoint in order to check if the `bookingStatus` of the booking has changed.\n\n### B). Full validation\nFull validation means the provider has stored the **updated** `Booking Request` and a full validation of the payload has completed.\n\n3. Do full validation of the payload. Some examples could be:\n    - check equipment and space availability\n    - check that `HS Codes` match the `Commodity` descriptions\n    - Make a KYC on all provided `Parties`\n    - etc\n    \n    Making a full validation requires the provider to check against all business rules (_the list above is just examples_)\n4. Depending on the result of step 3 the following will happen:\n    \n    - **Update to Booking required**\n       \n      If an update to the `Booking Request` is required (equivalent to **UseCase 2 - Request to update Booking request** in this case `bookingStatus='PENDING UPDATES CONFIRMATION'`) or an update to a `Confrimed Booking` (equivalent to **UseCase 6 - Request to update confirmed Booking** in this case `bookingStatus='PENDING AMENDMENTS APPROVAL'`) then `bookingStatus='PENDING UPDATE'` is returned in a `200` (OK) response with the following **example** payload\n\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'PENDING UPDATE',\n        requestedChanges: [\n          {\n            path: \"carrierServiceName\",\n            message: \"Service does not exist\"\n          }\n        ]\n      }\n      ```\n\n    - **Confirm Booking request**\n    \n      If the `Booking Request` can be confirmed (equivalent to **UseCase 5 - Confirm Booking request** in this case `bookingStatus='PENDING UPDATES CONFIRMATION'`) or an amendment to a `Confirmed Booking` can be confirmed (equivalent to **UseCase 8 - Approve amendments to confirmed Booking** in this case `bookingStatus='PENDING AMENDMENTS APPROVAL'`) then `bookingStatus='CONFIRMED'` is returned in a `200` (OK) response with the following payload\n\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'CONFIRMED'\n      }\n      ```\n\n    - **Reject Booking Request**\n    \n      If the `Booking Request` needs to be rejected (equivalent to **UseCase 4 - Reject Booking request** in this case `bookingStatus='PENDING UPDATES CONFIRMATION'`) then `bookingStatus='REJECTED'` is returned in a `200` (OK) response with the following payload\n\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'REJECTED'\n      }\n      ```\n\n    - **Decline Booking Request**\n    \n      If the `Confirmed Booking` needs to be declined (equivalent to **UseCase 10 - Decline Booking by Carrier** in this case `bookingStatus='PENDING AMENDMENTS APPROVAL'`) then `bookingStatus='DECLINED'` is returned in a `200` (OK) response with the following payload\n\n      ```\n      {\n        carrierBookingRequestReference: 'cbrr-123',\n        bookingStatus: 'DECLINED'\n      }\n      ```\n\nFor `PUT` `Booking Request`/`Confirmed Booking` the process for **Full Validation** ends here. The **updated** Booking\n    \n- is now stored in the provider system\n- a full validation has been done\n- the consumer has receved a `200` (OK) response from the provider with the status of the Booking with one of the following values:\n  - `PENDING UPDATE` in case provider awaits further input from consumer\n  - `CONFIRMED` in case provider has confirmed the `Booking Request` or approved the amendment and the `Booking Request` is ready to be used in a `Shipping Instruction`\n  - `REJECTED` in case the provider has rejected the `Booking Request`\n  - `DECLINED` in case the provider has declined the `Confirmed Booking`\n\nThe provider is now awaiting further action by the consumer.\n"
+      operationId: putBooking
+      parameters:
+      - name: carrierBookingRequestReference
+        in: path
+        description: |
+          The `carrierBookingRequestReference` of the booking request to match
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/carrierBookingRequestReference'
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      requestBody:
+        description: Parameters used to update the booking request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/booking'
+        required: true
+      responses:
+        "200":
+          description: |
+            The `Booking request` has been successfully updated in the provider system. Depending on the level of validation done by the provider - the status of the `Booking request` will be one of the following:
+            - `PENDING UPDATES CONFIRMATION` in case the consumer has provided an update to a `Booking request` and is awaiting the provider to take action (start a full validation)
+            - `PENDING AMENDMENTS APPROVAL` in case the consumer has provided an amendments to a `Confirmed Booking` and is awaiting the provider to take action (start a full validation)
+            - `PENDING UPDATE` in case provider needs the `Booking request` to be updated and awaits further input from consumer
+            - `CONFIRMED` in case provider has confirmed the `Booking request` or confirmed the amendments to a `Confirmed Booking` and the Booking request is ready to be used in a `Shipping Instruction`
+            - `REJECTED` in case the provider has rejected the `Booking request`. The `Booking request` can no longer be updated
+            - `DECLINED` in case the provider has declined the `Confirmed Booking`. The `Confirmed Booking` can no longer be updated
+
+            The status of the `Booking request` can be monitored on the
+
+                GET /bookings/{carrierBookingRequestReference}
+
+              endPoint by the consumer.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bookingRefStatus'
+              examples:
+                pendingUpdatesConfirmationExample:
+                  summary: |
+                    Booking request updated
+                  description: |
+                    An updated `Booking request` received and stored in provider system but not yet fully validated (only schema validated) - the Booking now awaits provider action
+
+                        bookingStatus='PENDING UPDATES CONFIRATION'
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: PENDING UPDATES CONFIRATION
+                pendingAmendmentsApprovalExample:
+                  summary: |
+                    Confirmed Booking updated
+                  description: |
+                    An update to a `Confirmed Booking` received and stored in provider system but not yet fully validated (only schema validated) - the Booking now awaits provider action
+
+                        bookingStatus='PENDING AMENDMENTS APPROVAL'
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: PENDING AMENDMENTS APPROVAL
+                pendingUpdateExample:
+                  summary: |
+                    Booking request pending update
+                  description: |
+                    An updated `Booking request` or an amendment to a `Confirmed Booking` is received and stored in provider system and fully validated. The result of the full validation is that the provider requires the consumer to make some updates (`PENDING UPDATE`) - the Booking now awauts consumer action
+
+                        bookingStatus='PENDING UPDATE'
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: PENDING UPDATE
+                    requestedChanges:
+                    - path: carrierServiceName
+                      message: Service does not exist
+                confirmedExample:
+                  summary: |
+                    Confirmed Booking request
+                  description: |
+                    An updated `Booking request` or amendments to a `Confirmed Booking` is received and stored in provider system, fully validated and Confirmed. The Booking can be used in a `Shipping Instruction`
+
+                        bookingStatus='CONFIRMED'
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: CONFIRMED
+                rejectedExample:
+                  summary: |
+                    Rejected Booking request
+                  description: |
+                    An updated `Booking request` received and stored in provider system but has been rejected - the `Booking request` can no longer be used.
+
+                        bookingStatus='REJECTED'
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: REJECTED
+                declinedExample:
+                  summary: |
+                    Declined Booking request
+                  description: |
+                    An updated `Booking request` received and stored in provider system but has been declined - the `Booking request` can no longer be used.
+
+                        bookingStatus='DECLINED'
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: DECLINED
+        "400":
+          description: |
+            In case the updated Booking request does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Booking missing receiptTypeAtOrigin
+                  description: |
+                    `receiptTypeAtOrigin` is a mandoatry field in the Booking request. This is an example of how the error object would look in case this field is missing
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v2/bookings/cbrr-123
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    errorMessage: receiptTypeAtOrigin not found - it is a mandatory field in Booking request
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      field: receiptTypeAtOrigin
+                      reason: mandatory field missing
+                      message: receiptTypeAtOrigin must be provided as part of a Booking request
+        "500":
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Booking request
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationID` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v2/bookings/cbrr-123
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    errorMessage: Internal Server Error occurred while processing Booking request
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Internal Error occurred
+                      message: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Updating too many Bookings requests
+                  description: |
+                    Calling the endPoint PUT /v2/bookings/cbrr-123 too many times within a timeperiod.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v2/bookings/cbrr-123
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    errorMessage: Too many request to update a booking has been requested. Please try again in 1 hour
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2023-04-13T07:41:00+08:30
+                    errors:
+                    - errorCode: 7003
+                      reason: Max Booking requests reached
+                      message: A maximum of 10 Bookings can be updated per hour
+    patch:
+      tags:
+      - Cancellation
+      summary: Cancel a booking
+      description: |
+        A shipper initiated cancellation of the Booking. This endPoint corresponds with **UseCase 9 - Cancel Booking by shipper**.
+
+        ## Precondition
+        In order to cancel a booking, the status of the booking needs to be either
+        - `RECEIVED`
+        - `PENDING UPDATE`
+        - `PENDING UPDATES CONFIRMED`
+        - `PENDING AMENDMENTS APPROVAL`
+        - `CONFIRMED`
+
+        ## Postcondition
+        The provider has received a cancellation from the consumer for a `Booking request` or for a `Confirmed Booking`.
+
+        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
+
+        ## Process
+        The following occurs when a provider recieves a cancellation request:
+        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned. The process stops.
+        2. The payload is schema-valid
+        3. The `bookingStatus` is set to `CANCELLED` and the `Booking request` or the `Confirmed Booking` can no longer be used.
+      operationId: patchBooking
+      parameters:
+      - name: carrierBookingRequestReference
+        in: path
+        description: |
+          The `carrierBookingRequestReference` of the booking request to match
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/carrierBookingRequestReference'
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bookings_carrierBookingRequestReference_body'
+      responses:
+        "200":
+          description: |
+            Booking has been cancellated
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bookingRefCancelledStatus'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v2/shipments/{carrierBookingReference}:
+    get:
+      tags:
+      - Shipment
+      summary: Get shipment
+      description: |
+        Retrieves the shipment with the `carrierBookingReference` in the path.
+      operationId: getShipment
+      parameters:
+      - name: carrierBookingReference
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/carrierBookingReference'
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: "1"
+      responses:
+        "200":
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shipment'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+components:
+  schemas:
+    bookingStatus:
+      maxLength: 50
+      type: string
+      description: |
+        The status of the booking. Possible values are:
+        - RECEIVED
+        - PENDING UPDATE
+        - PENDING UPDATES CONFIRMATION
+        - PENDING AMENDMENTS APPROVAL
+        - CONFIRMED
+        - REJECTED
+        - DECLINED
+        - CANCELLED
+        - COMPLETED
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
+      example: RECEIVED
+    bookingSummary:
+      type: object
+      description: |
+        Includes the information requested in a booking, service terms and types as well as the assigned booking reference by the carrier.
+      allOf:
+      - $ref: '#/components/schemas/bookingRefStatus'
+      - type: object
+        properties:
+          carrierBookingReference:
+            maxLength: 35
+            pattern: ^\S+(\s+\S+)*$
+            type: string
+            description: |
+              The carrierBookingReference if know. Often this will not be known until the booking has been confirmed. Is available during a booking amendment.
+            example: ABC709951
+      - $ref: '#/components/schemas/bookingShallow'
+    bookingRefStatus:
+      required:
+      - bookingStatus
+      - carrierBookingRequestReference
+      type: object
+      properties:
+        carrierBookingRequestReference:
+          $ref: '#/components/schemas/carrierBookingRequestReference'
+        bookingStatus:
+          $ref: '#/components/schemas/bookingStatus'
+        requestedChanges:
+          $ref: '#/components/schemas/requestedChanges'
+      description: |
+        The `carrierBookingRequestReference` along with the `bookingStatus` is returned
+    carrierBookingRequestReference:
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        A reference to the booking during the booking request phase
+      example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+    requestedChanges:
+      type: array
+      description: |
+        A list of changes requirested by the carrier to the document in order for it to be accepted.
+      items:
+        $ref: '#/components/schemas/requestedChange'
+    requestedChange:
+      required:
+      - message
+      type: object
+      properties:
+        path:
+          maxLength: 500
+          type: string
+          description: |
+            A [JSONpath](https://github.com/json-path/JsonPath) describing where in the payload structure a particular error exists.
+          example: location.facilityCode
+        message:
+          maxLength: 500
+          type: string
+          description: |
+            A description of the problem that needs attention.
+          example: Spaces not allowed in facility code
+      description: |
+        A change required to the document in order for the carrier to accepted it
+    bookingShallow:
+      required:
+      - cargoMovementTypeAtDestination
+      - cargoMovementTypeAtOrigin
+      - communicationChannelCode
+      - deliveryTypeAtDestination
+      - isEquipmentSubstitutionAllowed
+      - isExportDeclarationRequired
+      - isImportLicenseRequired
+      - isPartialLoadAllowed
+      - receiptTypeAtOrigin
+      type: object
+      description: |
+        The shallow structure of the booking
+      allOf:
+      - type: object
+        properties:
+          receiptTypeAtOrigin:
+            $ref: '#/components/schemas/receiptTypeAtOrigin'
+      - type: object
+        properties:
+          deliveryTypeAtDestination:
+            $ref: '#/components/schemas/deliveryTypeAtDestination'
+      - type: object
+        properties:
+          cargoMovementTypeAtOrigin:
+            $ref: '#/components/schemas/cargoMovementTypeAtOrigin'
+      - type: object
+        properties:
+          cargoMovementTypeAtDestination:
+            $ref: '#/components/schemas/cargoMovementTypeAtDestination'
+      - type: object
+        properties:
+          serviceContractReference:
+            $ref: '#/components/schemas/serviceContractReference'
+      - type: object
+        properties:
+          contractQuotationReference:
+            $ref: '#/components/schemas/contractQuotationReference'
+      - type: object
+        properties:
+          vessel:
+            $ref: '#/components/schemas/bookingShallow_vessel'
+      - type: object
+        properties:
+          carrierServiceName:
+            $ref: '#/components/schemas/carrierServiceName'
+      - type: object
+        properties:
+          carrierServiceCode:
+            $ref: '#/components/schemas/carrierServiceCode'
+      - type: object
+        properties:
+          universalServiceReference:
+            $ref: '#/components/schemas/universalServiceReference'
+      - type: object
+        properties:
+          carrierExportVoyageNumber:
+            $ref: '#/components/schemas/carrierExportVoyageNumber'
+      - type: object
+        properties:
+          universalExportVoyageReference:
+            $ref: '#/components/schemas/universalExportVoyageReference'
+      - type: object
+        properties:
+          declaredValue:
+            $ref: '#/components/schemas/declaredValue'
+      - type: object
+        properties:
+          declaredValueCurrency:
+            $ref: '#/components/schemas/declaredValueCurrency'
+      - type: object
+        properties:
+          freightPaymentTermCode:
+            $ref: '#/components/schemas/freightPaymentTermCode'
+      - type: object
+        properties:
+          originChargesPaymentTermCode:
+            $ref: '#/components/schemas/originChargesPaymentTermCode'
+      - type: object
+        properties:
+          destinationChargesPaymentTermCode:
+            $ref: '#/components/schemas/destinationChargesPaymentTermCode'
+      - type: object
+        properties:
+          isPartialLoadAllowed:
+            $ref: '#/components/schemas/isPartialLoadAllowed'
+      - type: object
+        properties:
+          isExportDeclarationRequired:
+            $ref: '#/components/schemas/isExportDeclarationRequired'
+      - type: object
+        properties:
+          exportDeclarationReference:
+            $ref: '#/components/schemas/exportDeclarationReference'
+      - type: object
+        properties:
+          isImportLicenseRequired:
+            $ref: '#/components/schemas/isImportLicenseRequired'
+      - type: object
+        properties:
+          importLicenseReference:
+            $ref: '#/components/schemas/importLicenseReference'
+      - type: object
+        properties:
+          expectedDepartureDate:
+            $ref: '#/components/schemas/expectedDepartureDate'
+      - type: object
+        properties:
+          expectedArrivalAtPlaceOfDeliveryStartDate:
+            $ref: '#/components/schemas/expectedArrivalAtPlaceOfDeliveryStartDate'
+      - type: object
+        properties:
+          expectedArrivalAtPlaceOfDeliveryEndDate:
+            $ref: '#/components/schemas/expectedArrivalAtPlaceOfDeliveryEndDate'
+      - type: object
+        properties:
+          transportDocumentTypeCode:
+            $ref: '#/components/schemas/transportDocumentTypeCode'
+      - type: object
+        properties:
+          transportDocumentReference:
+            maxLength: 20
+            pattern: ^\S+(\s+\S+)*$
+            type: string
+            description: |
+              A unique reference allocated by the shipping line to the Transport Document that the booking concerns.
+            example: reserved-HHL123
+      - type: object
+        properties:
+          bookingChannelReference:
+            $ref: '#/components/schemas/bookingChannelReference'
+      - type: object
+        properties:
+          incoTerms:
+            $ref: '#/components/schemas/incoTerms'
+      - type: object
+        properties:
+          communicationChannelCode:
+            $ref: '#/components/schemas/communicationChannelCode'
+      - type: object
+        properties:
+          isEquipmentSubstitutionAllowed:
+            $ref: '#/components/schemas/isEquipmentSubstitutionAllowed'
+    receiptTypeAtOrigin:
+      maxLength: 3
+      type: string
+      description: |
+        Indicates the type of service offered at Origin. Options are defined in the Receipt/Delivery entity.
+        - CY (Container yard (incl. rail ramp))
+        - SD (Store Door)
+        - CFS (Container Freight Station)
+      example: CY
+      enum:
+      - CY
+      - SD
+      - CFS
+    deliveryTypeAtDestination:
+      maxLength: 3
+      type: string
+      description: |
+        Indicates the type of service offered at Destination. Options are defined in the Receipt/Delivery entity.
+        - CY (Container yard (incl. rail ramp))
+        - SD (Store Door)
+        - CFS (Container Freight Station)
+      example: CY
+      enum:
+      - CY
+      - SD
+      - CFS
+    cargoMovementTypeAtOrigin:
+      maxLength: 3
+      type: string
+      description: |
+        Refers to the shipment term at the loading of the cargo into the container. Options are defined in the Cargo Movement Type entity.
+        - FCL (Full Container Load)
+        - LCL (Less than Container Load)
+        - BB (Break Bulk)
+      example: FCL
+      enum:
+      - FCL
+      - LCL
+      - BB
+    cargoMovementTypeAtDestination:
+      maxLength: 3
+      type: string
+      description: |
+        Refers to the shipment term at the unloading of the cargo out of the container. Options are defined in the Cargo Movement Type entity.
+        - FCL (Full Container Load)
+        - LCL (Less than Container Load)
+        - BB (Break Bulk)
+      example: FCL
+      enum:
+      - FCL
+      - LCL
+      - BB
+    serviceContractReference:
+      maxLength: 30
+      type: string
+      description: "Reference number for agreement between shipper and carrier through which the shipper commits to provide a certain minimum quantity of cargo over a fixed period, and the carrier commits to a certain rate or rate schedule."
+      example: HHL51800000
+    contractQuotationReference:
+      maxLength: 35
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Information provided by the shipper to identify whether pricing for the shipment has been agreed via a contract or a quotation reference. Mandatory if service contract (owner) is not provided.
+      example: HHL1401
+    vesselName:
+      maxLength: 35
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The name of the Vessel given by the Vessel Operator and registered with IMO.
+      example: King of the Seas
+    vesselIMONumber:
+      maxLength: 7
+      pattern: "^\\d{7}$"
+      type: string
+      description: |
+        The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel
+      example: "9321483"
+    carrierServiceName:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The name of a service as specified by the carrier
+      example: Great Lion Service
+    carrierServiceCode:
+      maxLength: 11
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The carrier-specific code of the service for which the schedule details are published.
+      example: FE1
+    universalServiceReference:
+      maxLength: 8
+      pattern: "^SR\\d{5}[A-Z]$"
+      type: string
+      description: |
+        A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
+      example: SR12345A
+    carrierExportVoyageNumber:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+      example: 2103S
+    universalExportVoyageReference:
+      pattern: "^\\d{2}[0-9A-Z]{2}[NEWSR]$"
+      type: string
+      description: |
+        A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+        - `2 digits` for the year
+        - `2 alphanumeric characters` for the sequence number of the voyage
+        - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+      example: 2103N
+    declaredValue:
+      minimum: 0
+      type: number
+      description: |
+        The value of the cargo that the shipper declares to avoid the carrier's limitation of liability and "Ad Valorem" freight, i.e. freight which is calculated based on the value of the goods declared by the shipper.
+      format: float
+      example: 1231.1
+    declaredValueCurrency:
+      maxLength: 3
+      pattern: "^[A-Z]{3}$"
+      type: string
+      description: |
+        The currency used for the declared value, using the 3-character code defined by [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217).
+      example: DKK
+    freightPaymentTermCode:
+      type: string
+      description: |
+        An indicator of whether freight and charges for the main transport are prepaid or collect.
+        - PRE (Prepaid)
+        - COL (Collect)
+      example: PRE
+      enum:
+      - PRE
+      - COL
+    originChargesPaymentTermCode:
+      type: string
+      description: |
+        An indicator of whether origin charges are prepaid or collect.
+        - PRE (Prepaid)
+        - COL (Collect)
+      example: PRE
+      enum:
+      - PRE
+      - COL
+    destinationChargesPaymentTermCode:
+      type: string
+      description: |
+        An indicator of whether destination charges are prepaid or collect.
+        - PRE (Prepaid)
+        - COL (Collect)
+      example: PRE
+      enum:
+      - PRE
+      - COL
+    isPartialLoadAllowed:
+      type: boolean
+      description: |
+        Indication whether the shipper agrees to load part of the shipment in case where not all of the cargo is delivered within cut-off.
+      example: true
+    isExportDeclarationRequired:
+      type: boolean
+      description: |
+        Information provided by the shipper whether an export declaration is required for this particular shipment/commodity/destination.
+      example: true
+    exportDeclarationReference:
+      maxLength: 35
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        A government document permitting designated goods to be shipped out of the country.  Reference number assigned by an issuing authority to an Export License. The export license must be valid at time of departure. Required if Export declaration required is ‘True’.
+      example: ABC123123
+    isImportLicenseRequired:
+      type: boolean
+      description: |
+        Information provided by the shipper whether an import permit or license is required for this particular shipment/commodity/destination.
+      example: true
+    importLicenseReference:
+      maxLength: 35
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        A certificate, issued by countries exercising import controls, that permits importation of the articles stated in the license. Reference number assigned by an issuing authority to an Import License. The import license number must be valid at time of arrival. Required if import license required is ‘True’.
+      example: ABC123123
+    expectedDepartureDate:
+      type: string
+      description: |
+        The date when the shipment is expected to be loaded on board a vessel as provided by the shipper or its agent. If vessel/voyage or expected date of arrival is not provided, this is mandatory
+      format: date
+      example: 2021-05-17
+    expectedArrivalAtPlaceOfDeliveryStartDate:
+      type: string
+      description: |
+        The start date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryEndDate`) for when the shipment is expected to arrive at final destination. If vessel/voyage or `expectedDepartureDate` is not provided, this is mandatory together with `expectedArrivalAtPlaceOfDeliveryEndDate`
+      format: date
+      example: 2021-05-17
+    expectedArrivalAtPlaceOfDeliveryEndDate:
+      type: string
+      description: |
+        The end date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryStartDate`) for when the shipment is expected to arrive at final destination. If vessel/voyage or `expectedDepartureDate` is not provided, this is mandatory together with `expectedArrivalAtPlaceOfDeliveryStartDate`
+      format: date
+      example: 2021-05-19
+    transportDocumentTypeCode:
+      type: string
+      description: |
+        Specifies the type of the transport document
+        - BOL (Bill of Lading)
+        - SWB (Sea Waybill)
+      example: SWB
+      enum:
+      - BOL
+      - SWB
+    bookingChannelReference:
+      maxLength: 20
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Identification number provided by the platform/channel used for booking request/confirmation, ex: Inttra booking reference, or GTNexus, other. Conditional on booking channel being used
+      example: Inttra reference
+    incoTerms:
+      maxLength: 3
+      type: string
+      description: |
+        Transport obligations, costs and risks as agreed between buyer and seller as defined by [ICC](https://iccwbo.org/business-solutions/incoterms-rules/). A list of possible values:
+        - EXW (Ex-Works)
+        - FCA (Free Carrier)
+        - FAS (Free Alongside Ship)
+        - FOB (Free On Board)
+        - CFR (Cost and Freight)
+        - CIF (Cost, Insurance and Freigh)
+        - CPT (Carriage Paid To)
+        - CIP (Carriage And Insurance Paid To)
+        - DAP (Delivered At Place)
+        - DPU (Delivered At Place Unloaded)
+        - DDP (Delivered Duty Paid)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/incotermscodes.csv)
+      example: FCA
+    communicationChannelCode:
+      maxLength: 2
+      type: string
+      description: |
+        Specifying which communication channel is to be used for this booking e.g.
+        - EI (EDI transmission)
+        - EM (Email)
+        - AO (API)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/communicationchannelqualifier.csv)
+      example: AO
+    isEquipmentSubstitutionAllowed:
+      type: boolean
+      description: |
+        Indicates if an alternate equipment type can be provided by the carrier.
+      example: true
+    error:
+      required:
+      - errorDateTime
+      - errors
+      - httpMethod
+      - requestUri
+      - statusCode
+      - statusCodeText
+      type: object
+      properties:
+        httpMethod:
+          type: string
+          description: |
+            The http request method type e.g. GET, POST
+          example: POST
+          enum:
+          - GET
+          - HEAD
+          - POST
+          - PUT
+          - DELETE
+          - OPTION
+          - PATCH
+        requestUri:
+          type: string
+          description: |
+            The request URI as it was sent
+          example: /v1/events
+        statusCode:
+          type: integer
+          description: |
+            The HTTP status code
+          format: int32
+          example: 400
+        statusCodeText:
+          maxLength: 50
+          type: string
+          description: |
+            The textual representation of the status code
+          example: Bad Request
+        errorMessage:
+          maxLength: 200
+          type: string
+          description: |
+            Other error information
+          example: The supplied data could not be accepted
+        providerCorrelationID:
+          maxLength: 100
+          type: string
+          description: |
+            A unique identifier for the transaction, e.g. a UUID
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          type: string
+          description: |
+            The date and time (in ISO 8601 format) the error occurred.
+          format: date-time
+          example: 2019-11-12T07:41:00+08:30
+        errors:
+          minItems: 1
+          type: array
+          description: |
+            List of detailed errors, e.g. fields that could not pass validation
+          items:
+            allOf:
+            - $ref: '#/components/schemas/detailedError'
+    detailedError:
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        errorCode:
+          maximum: 9999
+          minimum: 7000
+          type: integer
+          description: |
+            Standard error code see http://dcsa.org/error-codes (to be created). Examples: 7003 – out or range value, 7004 -  invalid type
+          format: int32
+          example: 7003
+        field:
+          maxLength: 500
+          type: string
+          description: |
+            The field that caused the error, e.g. a failed validation. The field can be expressed as a [JSONpath](https://github.com/json-path/JsonPath)
+          example: location.facilityCode
+        value:
+          maxLength: 500
+          type: string
+          description: |
+            The value of the field that caused the error
+          example: SG SIN WHS
+        reason:
+          maxLength: 100
+          type: string
+          description: |
+            High level error message
+          example: invalidData
+        message:
+          maxLength: 200
+          type: string
+          description: |
+            Additional information as to why the error occured
+          example: Spaces not allowed in facility code
+    bookingRequest:
+      type: object
+      description: |
+        includes the information requested in a booking, service terms and types as well as the assigned booking reference by the carrier.
+      allOf:
+      - $ref: '#/components/schemas/bookingShallow'
+      - $ref: '#/components/schemas/bookingDeep'
+    bookingDeep:
+      type: object
+      description: |
+        The deep structure of the booking
+      allOf:
+      - $ref: '#/components/schemas/bookingDeep_BASE'
+      - $ref: '#/components/schemas/shipmentLocations'
+      - $ref: '#/components/schemas/requestedEquipments'
+    bookingDeep_BASE:
+      type: object
+      description: |
+        The deep structure of the booking
+      allOf:
+      - type: object
+        properties:
+          invoicePayableAt:
+            type: object
+            description: |
+              General purpose object to capture `Invoice Payable At` location.
+
+              The location can be specified in **one** of the following ways: `UN Location Code` or an `Address`.
+            example:
+              locationName: Eiffel Tower
+              locationType: UNLO
+              UNLocationCode: FRPAR
+            discriminator:
+              propertyName: locationType
+              mapping:
+                ADDR: '#/components/schemas/addressLocation'
+                UNLO: '#/components/schemas/unLocationLocation'
+            oneOf:
+            - $ref: '#/components/schemas/addressLocation'
+            - $ref: '#/components/schemas/unLocationLocation'
+      - type: object
+        properties:
+          placeOfBLIssue:
+            type: object
+            description: |
+              General purpose object to capture `Place of B/L Issue` location.
+
+              The location can be specified in **one** of the following ways: `UN Location Code` or an `Address`.
+            example:
+              locationName: DCSA Headquarters
+              locationType: UNLO
+              UNLocationCode: NLAMS
+            discriminator:
+              propertyName: locationType
+              mapping:
+                ADDR: '#/components/schemas/addressLocation'
+                UNLO: '#/components/schemas/unLocationLocation'
+            oneOf:
+            - $ref: '#/components/schemas/addressLocation'
+            - $ref: '#/components/schemas/unLocationLocation'
+      - $ref: '#/components/schemas/references'
+      - $ref: '#/components/schemas/documentParties_BKG'
+      - type: object
+        properties:
+          partyContactDetails:
+            type: array
+            description: "The contact details of the person(s) to contact in relation to the **Booking** (changes, notifications etc.) \n"
+            items:
+              allOf:
+              - $ref: '#/components/schemas/partyContactDetail'
+    addressLocation:
+      required:
+      - address
+      - locationType
+      type: object
+      properties:
+        locationName:
+          $ref: '#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `Address Location` interface
+          example: ADDR
+        address:
+          $ref: '#/components/schemas/address'
+      description: |
+        An interface used to express a location using an `Address` object
+    locationName:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The name of the location.
+      example: Port of Amsterdam
+    address:
+      required:
+      - country
+      - name
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/addressName'
+        street:
+          $ref: '#/components/schemas/streetName'
+        streetNumber:
+          $ref: '#/components/schemas/streetNumber'
+        floor:
+          $ref: '#/components/schemas/floor'
+        postCode:
+          $ref: '#/components/schemas/postCode'
+        city:
+          $ref: '#/components/schemas/cityName'
+        stateRegion:
+          $ref: '#/components/schemas/stateRegion'
+        country:
+          $ref: '#/components/schemas/country'
+      description: |
+        An object for storing address related information
+    addressName:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Name of the address
+      example: Henrik
+    streetName:
+      maxLength: 100
+      type: string
+      description: The name of the street of the party’s address.
+      example: Kronprinsessegade
+    streetNumber:
+      maxLength: 50
+      type: string
+      description: The number of the street of the party’s address.
+      example: "54"
+    floor:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The floor of the party’s street number.
+      example: 5. sal
+    postCode:
+      maxLength: 50
+      type: string
+      description: The post code of the party’s address.
+      example: "1306"
+    cityName:
+      maxLength: 65
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The city name of the party’s address.
+      example: København
+    stateRegion:
+      maxLength: 65
+      type: string
+      description: The state/region of the party’s address.
+      nullable: true
+      example: Copenhagen
+    country:
+      maxLength: 75
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The country of the party’s address.
+      example: Denmark
+    unLocationLocation:
+      required:
+      - UNLocationCode
+      - locationType
+      type: object
+      properties:
+        locationName:
+          $ref: '#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `UNLocation` location interface
+          example: UNLO
+        UNLocationCode:
+          $ref: '#/components/schemas/UNLocationCode'
+      description: |
+        An interface used to express a location using a `Un Location Code`
+    UNLocationCode:
+      maxLength: 5
+      minLength: 5
+      pattern: "^[A-Z]{2}[A-Z2-9]{3}$"
+      type: string
+      description: |
+        The UN Location code specifying where the place is located. The pattern used must be
+        - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+        - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+        More info can be found here:  [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)
+      example: FRPAR
+    references:
+      type: object
+      properties:
+        references:
+          minLength: 1
+          type: array
+          description: |
+            A list of `General Prurpose References`
+          items:
+            $ref: '#/components/schemas/reference'
+    reference:
+      required:
+      - type
+      - value
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/referenceType'
+        value:
+          $ref: '#/components/schemas/referenceValue'
+      description: |
+        References provided by the shipper or freight forwarder at the time of booking or at the time of providing shipping instruction. Carriers share it back when providing track and trace event updates, some are also printed on the B/L. Customers can use these references to track shipments in their internal systems.
+    referenceType:
+      maxLength: 3
+      type: string
+      description: |
+        The reference type codes defined by DCSA.
+        - FF (Freight Forwarder’s Reference)
+        - SI (Shipper’s Reference)
+        - SPO (Shippers Purchase Order Reference)
+        - CPO (Consignees Purchase Order Reference)
+        - CR (Customer’s Reference)
+        - AAO (Consignee’s Reference)
+        - ECR (Empty container release reference)
+        - CSI (Customer shipment ID)
+        - BPR (Booking party reference number)
+        - BID (Booking Request ID)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/referencetypes.csv).
+      example: FF
+    referenceValue:
+      maxLength: 100
+      type: string
+      description: "The actual value of the reference. \n"
+      example: HHL00103004
+    documentParties_BKG:
+      type: object
+      properties:
+        documentParties:
+          type: array
+          items:
+            $ref: '#/components/schemas/documentParty'
+    documentParty:
+      required:
+      - isToBeNotified
+      - party
+      - partyFunction
+      type: object
+      description: stores the parties involved in the transport document.
+      allOf:
+      - type: object
+        properties:
+          party:
+            allOf:
+            - $ref: '#/components/schemas/party'
+      - type: object
+        properties:
+          partyFunction:
+            $ref: '#/components/schemas/partyFunction'
+      - type: object
+        properties:
+          displayedAddress:
+            maxItems: 5
+            minItems: 1
+            type: array
+            description: |
+              If switch to paper is needed then the `displayedAddress` object **MUST** be provided. In case it is missing it is not possible to switch the B/L to paper later in the process.
+            items:
+              $ref: '#/components/schemas/addressLine'
+      - type: object
+        properties:
+          isToBeNotified:
+            $ref: '#/components/schemas/isToBeNotified'
+    party:
+      required:
+      - partyContactDetails
+      - partyName
+      type: object
+      description: refers to a company or a legal entity.
+      allOf:
+      - type: object
+        properties:
+          partyName:
+            $ref: '#/components/schemas/partyName'
+      - type: object
+        properties:
+          address:
+            allOf:
+            - $ref: '#/components/schemas/address'
+      - type: object
+        properties:
+          partyContactDetails:
+            minItems: 1
+            type: array
+            description: |
+              A list of contact details - the list cannot be empty
+            items:
+              allOf:
+              - $ref: '#/components/schemas/partyContactDetail'
+      - type: object
+        properties:
+          identifyingCodes:
+            type: array
+            items:
+              allOf:
+              - $ref: '#/components/schemas/identifyingCode'
+      - $ref: '#/components/schemas/taxLegalReferences'
+    partyName:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Name of the party.
+      example: Asseco Denmark
+    partyContactDetail:
+      required:
+      - name
+      properties:
+        name:
+          $ref: '#/components/schemas/contactName'
+      description: |
+        The contact details of the person to contact. It is mandatory to provide either `phone` or `email` along with the `name`.
+      example:
+        name: Henrik
+        phone: +45 51801234
+      oneOf:
+      - required:
+        - phone
+        type: object
+        properties:
+          phone:
+            $ref: '#/components/schemas/contactPhone'
+          email:
+            $ref: '#/components/schemas/email'
+        description: |
+          `Phone` is mandatory to provide - `email` is optional
+      - required:
+        - email
+        type: object
+        properties:
+          phone:
+            $ref: '#/components/schemas/contactPhone'
+          email:
+            $ref: '#/components/schemas/email'
+        description: |
+          `Email` is mandatory to provide - `phone` is optional
+    contactName:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Name of the contact
+      example: Henrik
+    identifyingCode:
+      required:
+      - DCSAResponsibleAgencyCode
+      - partyCode
+      type: object
+      allOf:
+      - type: object
+        properties:
+          DCSAResponsibleAgencyCode:
+            $ref: '#/components/schemas/DCSAResponsibleAgencyCode'
+      - type: object
+        properties:
+          partyCode:
+            $ref: '#/components/schemas/partyCode'
+      - type: object
+        properties:
+          codeListName:
+            $ref: '#/components/schemas/codeListName'
+    DCSAResponsibleAgencyCode:
+      maxLength: 5
+      type: string
+      description: |
+        A DCSA provided code for [UN/CEFACT](https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred3055.htm) code list providers:
+        - ISO (International Standards Organization)
+        - UNECE (United Nations Economic Commission for Europe)
+        - LLOYD (Lloyd's register of shipping)
+        - BIC (Bureau International des Containeurs)
+        - IMO (International Maritime Organization)
+        - SCAC (Standard Carrier Alpha Code)
+        - ITIGG (International Transport Implementation Guidelines Group)
+        - ITU (International Telecommunication Union)
+        - SMDG (Shipplanning Message Development Group)
+        - EXIS (Exis Technologies Ltd.)
+        - FMC (Federal Maritime Commission)
+        - CBSA (Canada Border Services Agency)
+        - DCSA (Digitial Container Shipping Association)
+        - DID (Decentralized Identifier)
+        - LEI (Legal Entity Identifier)
+        - EPI (EBL Platform Identifier)
+        - ZZZ (Mutually defined)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/codelistresponsibleagencycodes.csv).
+      example: SMDG
+    partyCode:
+      maxLength: 100
+      type: string
+      description: |
+        Code to identify the party as provided by the agency
+      example: MSK
+    codeListName:
+      maxLength: 100
+      type: string
+      description: |
+        The name of the list, provided by the responsible agency
+      example: LCL
+    taxLegalReferences:
+      type: object
+      properties:
+        taxLegalReferences:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Tax References` for a `Party`
+          items:
+            $ref: '#/components/schemas/taxLegalReference'
+    taxLegalReference:
+      required:
+      - countryCode
+      - type
+      - value
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/taxLegalReferenceType'
+        countryCode:
+          $ref: '#/components/schemas/countryCode'
+        value:
+          $ref: '#/components/schemas/taxLegalReferenceValue'
+      description: |
+        Reference that uniquely identifies a party for tax and/or legal purposes in accordance with the relevant jurisdiction.
+
+        A list of examples:
+
+        | Type  | Country | Description |
+        |-------|:-------:|-------------|
+        |PAN|IN|Goods and Services Tax Identification Number in India|
+        |GSTIN|IN|Goods and Services Tax Identification Number in India|
+        |IEC|IN|Importer-Exported Code in India|
+        |RUC|EC|Registro Único del Contribuyente in Ecuador|
+        |RUC|PE|Registro Único del Contribuyente in Peru|
+        |NIF|MG|Numéro d’Identification Fiscal in Madagascar|
+        |NIF|DZ|Numéro d’Identification Fiscal in Algeria|
+
+        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/taxandlegalreferences.csv).
+    taxLegalReferenceType:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The reference type code as defined by the relevant tax and/or legal authority.
+      example: PAN
+    countryCode:
+      maxLength: 2
+      minLength: 2
+      pattern: "^[A-Z]{2}$"
+      type: string
+      description: |
+        The 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+      example: DK
+    taxLegalReferenceValue:
+      maxLength: 100
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The value of the `taxLegalReference`
+      example: AAAAA0000A
+    partyFunction:
+      maxLength: 3
+      type: string
+      description: |
+        Specifies the role of the party in a given context
+        - OS (Original shipper)
+        - CN (Consignee)
+        - COW (Invoice payer on behalf of the consignor (shipper))
+        - COX (Invoice payer on behalf of the consignee)
+        - MS (Document/message issuer/sender)
+        - N1 (First Notify Party)
+        - N2 (Second Notify Party)
+        - NI (Other Notify Party)
+        - DDR (Consignor's freight forwarder)
+        - DDS (Consignee's freight forwarder)
+        - HE (Carrier booking office (transportation office))
+        - SCO (Service contract owner - Defined by DCSA)
+        - BA (Booking Agency)
+        - END (Endorsee Party)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/partyfunctioncodes.csv)
+      example: DDS
+    addressLine:
+      maxLength: 35
+      type: string
+      description: |
+        A single address line to be used when a B/L needs to be printed.
+      example: Kronprincessegade 54
+    isToBeNotified:
+      type: boolean
+      description: Used to decide whether the party will be notified of the arrival of the cargo.
+      example: true
+    shipmentLocations:
+      type: object
+      properties:
+        shipmentLocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/shipmentLocation'
+    shipmentLocation:
+      required:
+      - location
+      - locationTypeCode
+      type: object
+      properties:
+        location:
+          description: |
+            General purpose object to capture the location in the `ShipmentLocation`.
+
+            The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+          example:
+            locationName: CMP Container Terminal Copenhagen
+            locationType: FACI
+            UNLocationCode: DKCPH
+            facilityCode: CMPDK
+            facilityCodeListProvider: SMDG
+          discriminator:
+            propertyName: locationType
+            mapping:
+              ADDR: '#/components/schemas/addressLocation'
+              FACI: '#/components/schemas/facilityLocation'
+              UNLO: '#/components/schemas/unLocationLocation'
+          oneOf:
+          - $ref: '#/components/schemas/addressLocation'
+          - $ref: '#/components/schemas/unLocationLocation'
+          - $ref: '#/components/schemas/facilityLocation'
+        locationTypeCode:
+          $ref: '#/components/schemas/shipmentLocationTypeCode'
+        eventDateTime:
+          $ref: '#/components/schemas/eventLocationDateTime'
+      description: |
+        maps the relationship between Shipment and Location, e.g., the `Place of Receipt` and the `Place of Delivery` for a specific shipment. This is a reusable object between `Booking` and `Transport Document`
+    facilityLocation:
+      required:
+      - facilityCode
+      - facilityCodeListProvider
+      - locationType
+      type: object
+      properties:
+        locationName:
+          $ref: '#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `Facility Location` interface
+          example: FACI
+        UNLocationCode:
+          allOf:
+          - $ref: '#/components/schemas/UNLocationCode'
+          - description: |
+              The UN Location code specifying where the place is located.
+
+              This field is **conditionally mandatory** depending on the value of the `facilityCodeListProvider` field.
+        facilityCode:
+          allOf:
+          - $ref: '#/components/schemas/facilityCode'
+          - description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\n\nThe definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:\n\n- for `SMDG` - the codeList used is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx) \n- for `BIC` - the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/)\n"
+        facilityCodeListProvider:
+          $ref: '#/components/schemas/facilityCodeListProvider'
+      description: |
+        An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+    facilityCode:
+      maxLength: 6
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The code used for identifying the specific facility. This code does <b>not</b> include the UN Location Code.
+      nullable: false
+      example: ADT
+    facilityCodeListProvider:
+      type: string
+      description: |
+        The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`
+        - BIC (Requires a UN Location Code)
+        - SMDG (Requires a UN Location Code)
+      example: SMDG
+      enum:
+      - BIC
+      - SMDG
+    shipmentLocationTypeCode:
+      maxLength: 3
+      type: string
+      description: |
+        Links to the Location Type Code defined by DCSA.
+        - PRE (Place of Receipt)
+        - POL (Port of Loading)
+        - POD (Port of Discharge)
+        - PDE (Place of Delivery)
+        - PCF (Pre-carriage From)
+        - OIR (Onward In-land Routing)
+        - DRL (Depot release location)
+        - ORI (Origin of goods)
+        - IEL (Container intermediate export stop off location)
+        - PTP (Prohibited transshipment port)
+        - RTP (Requested transshipment port)
+        - FCD (Full container drop-off location)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/shipmentlocationtypes.csv)
+      example: PRE
+    eventLocationDateTime:
+      type: string
+      description: |
+        A date when the event is taking place at the location
+      format: date-time
+      example: 2021-11-03T10:23:00-01:00
+    requestedEquipments:
+      type: object
+      properties:
+        requestedEquipments:
+          minLength: 1
+          type: array
+          description: |
+            List of `Requested Equipments`. Multiple containers can be requested within the same booking. For each Requested Equipment object with 2 or more units, it is a condition that the commodity (or list of commodities) defined within the same Requested Equipment object is the same for each requested unit.
+
+            **Example:** 2 x 20' containing 50% shoes and 50% t-shirts can be requested within the same Requested Equipment object only if each 20' will contain 50% shoes and 50% t-shirts. If 1 x 20' will contain 100% shoes and the other 20' will be 100% t-shirts, 2 separate Requested Equipment objects must be defined.
+          items:
+            $ref: '#/components/schemas/requestedEquipment'
+    requestedEquipment:
+      type: object
+      description: |
+        If needed - it is **only** possible to specify a single Reefer setting. If multiple settings are required for the same `equipmentSizeType` then multiple `requestedEquipment` should be specified (one for each Reefer setting).
+      allOf:
+      - $ref: '#/components/schemas/requestedEquipment_BASE'
+      - $ref: '#/components/schemas/commodities'
+    requestedEquipment_BASE:
+      required:
+      - ISOEquipmentCode
+      - units
+      type: object
+      description: |
+        If needed - it is **only** possible to specify a single Reefer setting. If multiple settings are required for the same `equipmentSizeType` then multiple `requestedEquipment` should be specified (one for each Reefer setting).
+      allOf:
+      - type: object
+        properties:
+          ISOEquipmentCode:
+            maxLength: 4
+            pattern: ^\S+(\s+\S+)*$
+            type: string
+            description: |
+              Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+            example: 22RT
+      - type: object
+        discriminator:
+          propertyName: isShipperOwned
+          mapping:
+            "true": '#/components/schemas/socEquipment'
+            "false": '#/components/schemas/nonSocEquipment'
+        oneOf:
+        - $ref: '#/components/schemas/socEquipment'
+        - $ref: '#/components/schemas/nonSocEquipment'
+      - type: object
+        properties:
+          units:
+            $ref: '#/components/schemas/requestedEquipmentUnits'
+      - type: object
+        properties:
+          equipmentReferences:
+            type: array
+            description: |
+              A list of equipments to be used by the shipper if known at the time of booking
+            items:
+              $ref: '#/components/schemas/equipmentReference'
+      - type: object
+        properties:
+          isNonOperatingReefer:
+            $ref: '#/components/schemas/isNonOperatingReefer'
+      - type: object
+        properties:
+          activeReeferSettings:
+            required:
+            - temperatureSetpoint
+            - temperatureUnit
+            description: |
+              The specifications for a Reefer equipment.
+
+              **Condition:** Only applicable when`isNonOperatingReefer` is set to `false`
+            allOf:
+            - $ref: '#/components/schemas/activeReeferSettings_BKG'
+      - $ref: '#/components/schemas/references'
+    socEquipment:
+      title: Shipper owned Equipment
+      required:
+      - isShipperOwned
+      - tareWeight
+      - tareWeightUnit
+      type: object
+      properties:
+        tareWeight:
+          $ref: '#/components/schemas/tareWeight'
+        tareWeightUnit:
+          $ref: '#/components/schemas/weightUnit'
+        isShipperOwned:
+          $ref: '#/components/schemas/isShipperOwned'
+    tareWeight:
+      minimum: 0
+      exclusiveMinimum: true
+      type: number
+      description: |
+        The weight of an empty container (gross container weight).
+      format: float
+      example: 4800
+    weightUnit:
+      type: string
+      description: |
+        The unit of measure which can be expressed in imperial or metric terms
+        - KGM (Kilograms)
+        - LBR (Pounds)
+      example: KGM
+      enum:
+      - KGM
+      - LBR
+    isShipperOwned:
+      type: boolean
+      description: Indicates whether the container is shipper owned (SOC).
+      example: true
+    nonSocEquipment:
+      title: Carrier owned Equipment
+      required:
+      - isShipperOwned
+      type: object
+      properties:
+        isShipperOwned:
+          type: boolean
+          description: Indicates whether the container is shipper owned (SOC).
+          example: false
+    requestedEquipmentUnits:
+      minimum: 1
+      type: integer
+      description: |
+        Number of requested equipment units.
+      format: int32
+      example: 3
+    equipmentReference:
+      maxLength: 11
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+        According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+        If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+      example: APZU4812090
+    isNonOperatingReefer:
+      type: boolean
+      description: |
+        If the equipment is a Reefer Container then setting this attribute will indicate that the container should be treated as a `DRY` container.
+
+        **Condition:** Only applicable if `ISOEquipmentCode` shows a Reefer type.
+      example: false
+    activeReeferSettings_BKG:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/activeReeferSettings'
+      - type: object
+        properties:
+          isPreCoolingRequired:
+            $ref: '#/components/schemas/isPreCoolingRequired'
+      - type: object
+        properties:
+          isGeneratorSetRequired:
+            $ref: '#/components/schemas/isGeneratorSetRequired'
+    activeReeferSettings:
+      type: object
+      properties:
+        temperatureSetpoint:
+          $ref: '#/components/schemas/temperatureSetpoint'
+        temperatureUnit:
+          $ref: '#/components/schemas/temperatureUnit'
+        o2Setpoint:
+          $ref: '#/components/schemas/o2Setpoint'
+        co2Setpoint:
+          $ref: '#/components/schemas/co2Setpoint'
+        humiditySetpoint:
+          $ref: '#/components/schemas/humiditySetpoint'
+        airExchangeSetpoint:
+          $ref: '#/components/schemas/airExchangeSetpoint'
+        airExchangeUnit:
+          $ref: '#/components/schemas/airExchangeUnit'
+        isVentilationOpen:
+          $ref: '#/components/schemas/isVentilationOpen'
+        isDrainholesOpen:
+          $ref: '#/components/schemas/isDrainholesOpen'
+        isBulbMode:
+          $ref: '#/components/schemas/isBulbMode'
+        isColdTreatmentRequired:
+          $ref: '#/components/schemas/isColdTreatmentRequired'
+        isControlledAtmosphereRequired:
+          $ref: '#/components/schemas/isControlledAtmosphereRequired'
+    temperatureSetpoint:
+      type: number
+      description: |
+        Target value of the temperature for the Reefer based on the cargo requirement.
+      format: float
+      example: -15
+    temperatureUnit:
+      type: string
+      description: |
+        The unit for temperature in Celsius or Fahrenheit
+
+        - CEL (Celsius)
+        - FAH (Fahrenheit)
+      example: CEL
+      enum:
+      - CEL
+      - FAH
+    o2Setpoint:
+      maximum: 100
+      minimum: 0
+      type: number
+      description: |
+        The percentage of the controlled atmosphere O<sub>2</sub> target value
+      format: float
+      example: 75.3
+    co2Setpoint:
+      maximum: 100
+      minimum: 0
+      type: number
+      description: |
+        The percentage of the controlled atmosphere CO<sub>2</sub> target value
+      format: float
+      example: 25
+    humiditySetpoint:
+      maximum: 100
+      minimum: 0
+      type: number
+      description: |
+        The percentage of the controlled atmosphere humidity target value
+      format: float
+      example: 95.6
+    airExchangeSetpoint:
+      minimum: 0
+      type: number
+      description: |
+        Target value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container
+      format: float
+      example: 15.4
+    airExchangeUnit:
+      type: string
+      description: |
+        The unit for `airExchange` in metrics- or imperial- units per hour
+
+        - MQH (Cubic metre per hour)
+        - FQH (Cubic foot per hour)
+
+        **NB:** This is a conditional field. If `airExchange` is specified then this field is required
+      example: MQH
+      enum:
+      - MQH
+      - FQH
+    isVentilationOpen:
+      type: boolean
+      description: |
+        If `true` the ventilation orifice is `Open` - if `false` the ventilation orifice is `closed`
+      example: true
+    isDrainholesOpen:
+      type: boolean
+      description: |
+        Is drainholes open on the container
+      example: true
+    isBulbMode:
+      type: boolean
+      description: |
+        Is special container setting for handling flower bulbs active
+      example: true
+    isColdTreatmentRequired:
+      type: boolean
+      description: |
+        Indicator whether cargo requires cold treatment prior to loading at origin or during transit, but prior arrival at POD
+      example: true
+    isControlledAtmosphereRequired:
+      type: boolean
+      description: |
+        Indicator of whether cargo requires Controlled Atmosphere.
+      example: true
+    isPreCoolingRequired:
+      type: boolean
+      description: |
+        Indicator whether reefer container should be pre-cooled to the temperature setting required at time of release from depot
+      example: true
+    isGeneratorSetRequired:
+      type: boolean
+      description: |
+        Indicator whether reefer container should have a generator set attached at time of release from depot
+      example: true
+    commodities:
+      type: object
+      properties:
+        commodities:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/commodity'
+    commodity:
+      required:
+      - cargoGrossWeight
+      - cargoGrossWeightUnit
+      - commodityType
+      type: object
+      description: |
+        Type of goods, defined by its commodity type
+      allOf:
+      - type: object
+        properties:
+          commodityType:
+            $ref: '#/components/schemas/commodityType'
+      - type: object
+        properties:
+          HSCodes:
+            type: array
+            description: |
+              A list of `HS Codes` that apply to this `commodity`
+            items:
+              $ref: '#/components/schemas/HSCode'
+      - type: object
+        properties:
+          cargoGrossWeight:
+            $ref: '#/components/schemas/cargoGrossWeight'
+      - type: object
+        properties:
+          cargoGrossWeightUnit:
+            $ref: '#/components/schemas/weightUnit'
+      - type: object
+        properties:
+          cargoGrossVolume:
+            $ref: '#/components/schemas/cargoGrossVolume'
+      - type: object
+        properties:
+          cargoGrossVolumeUnit:
+            $ref: '#/components/schemas/volumeUnit'
+      - type: object
+        properties:
+          exportLicenseIssueDate:
+            $ref: '#/components/schemas/exportLicenseIssueDate'
+      - type: object
+        properties:
+          exportLicenseExpiryDate:
+            $ref: '#/components/schemas/exportLicenseExpiryDate'
+      - type: object
+        properties:
+          outerPackaging:
+            $ref: '#/components/schemas/outerPackaging'
+      - $ref: '#/components/schemas/references'
+    commodityType:
+      maxLength: 550
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        High-level description of goods to be shipped which allow the carrier to confirm acceptance and commercial terms. To be replaced by "description of goods" upon submission of shipping instruction
+      example: Mobile phones
+    HSCode:
+      maxLength: 10
+      minLength: 6
+      pattern: "^\\d{6,10}$"
+      type: string
+      description: |
+        Used by customs to classify the product being shipped. More information can be found here: [Harmonized Commodity Description and Coding Systems (HS)](https://unstats.un.org/wiki/pages/viewpage.action?pageId=87426301) or here: [Harmonized System Codes](https://www.foreign-trade.com/reference/hscode.htm)
+      example: "851712"
+    cargoGrossWeight:
+      minimum: 0
+      exclusiveMinimum: true
+      type: number
+      description: |
+        The grand total weight of the cargo and weight per container(s) including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper. Excludes the tare weight of the container(s).'
+      format: float
+      example: 12000
+    cargoGrossVolume:
+      minimum: 0
+      exclusiveMinimum: true
+      type: number
+      description: |
+        The grand total volume of the commodity
+      format: float
+      example: 120
+    volumeUnit:
+      type: string
+      description: |
+        The unit of measure which can be expressed in either imperial or metric terms
+        - FTQ (Cubic foot)
+        - MTQ (Cubic meter)
+      example: MTQ
+      enum:
+      - MTQ
+      - FTQ
+    exportLicenseIssueDate:
+      type: string
+      description: |
+        Issue date of the export license applicable to the booking. Mandatory to provide in booking request for specific commodities
+      format: date
+      example: 2021-05-14
+    exportLicenseExpiryDate:
+      type: string
+      description: |
+        Expiry date of the export license applicable to the booking.
+
+        Mandatory to provide in booking request for specific commodities.
+      format: date
+      example: 2021-05-21
+    outerPackaging:
+      type: object
+      properties:
+        packageCode:
+          $ref: '#/components/schemas/packageCode'
+        imoPackagingCode:
+          pattern: "^[A-Z0-9]{1-5}$"
+          type: string
+          description: |
+            The code of the packaging as per IMO.
+
+            **Condition:** only applicable to dangerous goods if specified in the IMO IMDG code amendment version 41-22. If not available, the `packageCode` as per UN recommendation 21 should be used.
+          example: 1A2
+        numberOfPackages:
+          minimum: 1
+          type: integer
+          description: |
+            Specifies the number of outer packagings/overpacks associated with this `Commodity`.
+          format: int32
+          example: 18
+        description:
+          maxLength: 100
+          type: string
+          description: |
+            Description of the outer packaging/overpack.
+          example: "Drum, steel"
+        dangerousGoods:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Dangerous Goods` related to the `Commodity`
+          items:
+            $ref: '#/components/schemas/dangerousGoods_BKG'
+      description: |
+        Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport. It is an array of the attributes below.
+
+        In case of DG (Dangerous Goods) this object is required to specify.
+    packageCode:
+      pattern: "^[A-Z0-9]{2}$"
+      type: string
+      description: |
+        A code identifying the outer packaging/overpack. `PackageCode` must follow the codes specified in [Recommendation N°21 - Revision 12  Annexes V and VI](https://unece.org/sites/default/files/2021-06/rec21_Rev12e_Annex-V-VI_2021.xls)
+
+        **Condition:** only applicable to dangerous goods if the `IMO packaging code` is not available.
+      example: 5H
+    dangerousGoods_BKG:
+      required:
+      - emergencyContactDetails
+      - imoClass
+      - isCompetentAuthorityApprovalProvided
+      - isEmptyUncleanedResidue
+      - isExceptedQuantity
+      - isHot
+      - isLimitedQuantity
+      - isMarinePollutant
+      - isReportableQuantity
+      - isSalvagePackings
+      - isWaste
+      - properShippingName
+      type: object
+      description: |
+        Specification for `Dangerous Goods`. It is mandatory to either provide the `unNumber` or the `naNumber`. Dangerous Goods is based on **IMDG Amendment Version 41-22**.
+      allOf:
+      - $ref: '#/components/schemas/dangerousGoods_Base'
+      - type: object
+        properties:
+          specialCertificateNumber:
+            $ref: '#/components/schemas/specialCertificateNumber'
+      - type: object
+        properties:
+          additionalContainerCargoHandling:
+            $ref: '#/components/schemas/additionalContainerCargoHandling'
+    dangerousGoods_Base:
+      type: object
+      properties:
+        codedVariantList:
+          $ref: '#/components/schemas/codedVariantList'
+        properShippingName:
+          $ref: '#/components/schemas/properShippingName'
+        technicalName:
+          $ref: '#/components/schemas/technicalName'
+        imoClass:
+          $ref: '#/components/schemas/imoClass'
+        subsidiaryRisk1:
+          $ref: '#/components/schemas/subsidiaryRisk'
+        subsidiaryRisk2:
+          $ref: '#/components/schemas/subsidiaryRisk'
+        isMarinePollutant:
+          $ref: '#/components/schemas/isMarinePollutant'
+        packingGroup:
+          $ref: '#/components/schemas/packingGroup'
+        isLimitedQuantity:
+          $ref: '#/components/schemas/isLimitedQuantity'
+        isExceptedQuantity:
+          $ref: '#/components/schemas/isExceptedQuantity'
+        isSalvagePackings:
+          $ref: '#/components/schemas/isSalvagePackings'
+        isEmptyUncleanedResidue:
+          $ref: '#/components/schemas/isEmptyUncleanedResidue'
+        isWaste:
+          $ref: '#/components/schemas/isWaste'
+        isHot:
+          $ref: '#/components/schemas/isHot'
+        isCompetentAuthorityApprovalProvided:
+          $ref: '#/components/schemas/isCompetentAuthorityApprovalProvided'
+        competentAuthorityApproval:
+          $ref: '#/components/schemas/competentAuthorityApproval'
+        segregationGroups:
+          minLength: 1
+          type: array
+          description: |
+            List of the segregation groups applicable to specific hazardous goods according to the IMO IMDG Code.
+
+            **Condition:** only applicable to specific hazardous goods.
+          items:
+            maxLength: 2
+            type: string
+            description: |
+              Grouping of Dangerous Goods having certain similar chemical properties. Possible values are:
+
+              - `1` (Acids)
+              - `2` (Ammonium Compounds)
+              - `3` (Bromates)
+              - `4` (Chlorates)
+              - `5` (Chlorites)
+              - `6` (Cyanides)
+              - `7` (Heavy metals and their salts)
+              - `8` (Hypochlorites)
+              - `9` (Lead and its compounds)
+              - `10` (Liquid halogenated hydrocarbons)
+              - `11` (Mercury and mercury compounds)
+              - `12` (Nitrites and their mixtures)
+              - `13` (Perchlorates)
+              - `14` (Permanganates)
+              - `15` (Powdered metals)
+              - `16` (Peroxides),
+              - `17` (Azides)
+              - `18` (Alkalis)
+
+              More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/segregationgroups.csv)
+            example: "12"
+        innerPackagings:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Inner Packings` contained inside this `outer packaging/overpack`.
+          items:
+            $ref: '#/components/schemas/innerPackaging'
+        emergencyContactDetails:
+          $ref: '#/components/schemas/emergencyContactDetails'
+        EMSNumber:
+          $ref: '#/components/schemas/EMSNumber'
+        endOfHoldingTime:
+          $ref: '#/components/schemas/endOfHoldingTime'
+        fumigationDateTime:
+          $ref: '#/components/schemas/fumigationDateTime'
+        isReportableQuantity:
+          $ref: '#/components/schemas/isReportableQuantity'
+        inhalationZone:
+          $ref: '#/components/schemas/inhalationZone'
+        grossWeight:
+          $ref: '#/components/schemas/dangerousGoods_Base_grossWeight'
+        netWeight:
+          $ref: '#/components/schemas/dangerousGoods_Base_netWeight'
+        netExplosiveContent:
+          $ref: '#/components/schemas/dangerousGoods_Base_netExplosiveContent'
+        volume:
+          $ref: '#/components/schemas/dangerousGoods_Base_volume'
+        limits:
+          $ref: '#/components/schemas/limits'
+      oneOf:
+      - title: UN Number
+        required:
+        - unNumber
+        type: object
+        properties:
+          unNumber:
+            $ref: '#/components/schemas/unNumber'
+      - title: NA Number
+        required:
+        - naNumber
+        type: object
+        properties:
+          naNumber:
+            $ref: '#/components/schemas/naNumber'
+    codedVariantList:
+      pattern: "^[0-3][0-9A-Z]{3}$"
+      type: string
+      description: |
+        Four-character code supplied by Exis Technologies that assists to remove ambiguities when identifying a variant within a single UN number or NA number that may occur when two companies exchange DG information.
+
+        Character | Valid Characters | Description
+        :--------:|------------------|------------
+        1| 0, 1, 2, 3|The packing group. Code 0 indicates there is no packing group
+        2|0 to 9 and A to Z|A sequence letter for the PSN, or 0 if there were no alternative PSNs
+        3 and 4|0 to 9 and A to Z|Two sequence letters for other information, for the cases where the variant is required because of different in subrisks, packing instruction etc.
+      example: "2200"
+    properShippingName:
+      maxLength: 250
+      type: string
+      description: |
+        The proper shipping name for goods under IMDG Code, or the product name for goods under IBC Code and IGC Code, or the bulk cargo shipping name for goods under IMSBC Code, or the name of oil for goods under Annex I to the MARPOL Convention.
+      example: "Chromium Trioxide, anhydrous"
+    technicalName:
+      maxLength: 250
+      type: string
+      description: |
+        The recognized chemical or biological name or other name currently used for the referenced dangerous goods as described in chapter 3.1.2.8 of the IMDG Code.
+    imoClass:
+      maxLength: 4
+      type: string
+      description: "The hazard class code of the referenced dangerous goods according to the specified regulation. Examples of possible values are:\n      \n      - `1.1A` (Substances and articles which have a mass explosion hazard)\n      - `1.6N` (Extremely insensitive articles which do not have a mass explosion hazard)\n      - `2.1` (Flammable gases)\n      - `8` (Corrosive substances)\n\nThe value must comply with one of the values in the [DG IMO Class value table](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/imoclasses.csv)\n"
+      example: 1.4S
+    subsidiaryRisk:
+      pattern: "^[0-9](\\.[0-9])?$"
+      type: string
+      description: |
+        Any risk in addition to the class of the referenced dangerous goods according to the IMO IMDG Code.
+      example: "1.2"
+    isMarinePollutant:
+      type: boolean
+      description: |
+        Indicates if the goods belong to the classification of Marine Pollutant.
+      example: false
+    packingGroup:
+      maximum: 3
+      minimum: 1
+      type: integer
+      description: |
+        The packing group according to the UN Recommendations on the Transport of Dangerous Goods and IMO IMDG Code.
+      format: int32
+      example: 3
+    isLimitedQuantity:
+      type: boolean
+      description: |
+        Indicates if the dangerous goods can be transported as limited quantity in accordance with Chapter 3.4 of the IMO IMDG Code.
+      example: false
+    isExceptedQuantity:
+      type: boolean
+      description: |
+        Indicates if the dangerous goods can be transported as excepted quantity in accordance with Chapter 3.5 of the IMO IMDG Code.
+      example: false
+    isSalvagePackings:
+      type: boolean
+      description: |
+        Indicates if the cargo has special packaging for the transport, recovery or disposal of damaged, defective, leaking or nonconforming hazardous materials packages, or hazardous materials that have spilled or leaked.
+      example: false
+    isEmptyUncleanedResidue:
+      type: boolean
+      description: |
+        Indicates if the cargo is residue.
+      example: false
+    isWaste:
+      type: boolean
+      description: |
+        Indicates if waste is being shipped
+      example: false
+    isHot:
+      type: boolean
+      description: |
+        Indicates if high temperature cargo is shipped.
+      example: false
+    isCompetentAuthorityApprovalProvided:
+      type: boolean
+      description: |
+        Indicates if the cargo require approval from authorities
+      example: false
+    competentAuthorityApproval:
+      maxLength: 70
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Name and reference number of the competent authority providing the approval.
+      example: "{Name and reference...}"
+    innerPackaging:
+      required:
+      - description
+      - material
+      - quantity
+      type: object
+      properties:
+        quantity:
+          type: integer
+          description: |
+            Count of `Inner Packagings` of the referenced `Dangerous Goods`.
+          format: int32
+          example: 20
+        material:
+          maxLength: 100
+          type: string
+          description: |
+            The `material` used for the `Inner Packaging` of the referenced `Dangerous Goods`.
+          example: Plastic
+        description:
+          maxLength: 100
+          type: string
+          description: |
+            Description of the packaging.
+          example: Wowen plastic water resistant Bag
+      description: |
+        Object for inner packaging specification
+    emergencyContactDetails:
+      required:
+      - contact
+      - phone
+      type: object
+      properties:
+        contact:
+          maxLength: 255
+          type: string
+          description: |
+            Name of the Contact person during an emergency.
+          example: Henrik Larsen
+        provider:
+          maxLength: 255
+          type: string
+          description: |
+            Name of the third party vendor providing emergency support
+          example: GlobeTeam
+        phone:
+          allOf:
+          - $ref: '#/components/schemas/contactPhone'
+        referenceNumber:
+          maxLength: 255
+          type: string
+          description: |
+            Contract reference for the emergency support provided by an external third party vendor.
+          example: "12234"
+      description: |
+        24 hr emergency contact details
+    contactPhone:
+      maxLength: 30
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Phone number for the contact
+      example: +45 70262970
+    EMSNumber:
+      maxLength: 7
+      type: string
+      description: |
+        The emergency schedule identified in the IMO EmS Guide – Emergency Response Procedures for Ships Carrying Dangerous Goods. Comprises 2 values; 1 for spillage and 1 for fire. Possible values spillage: S-A to S-Z. Possible values fire: F-A to F-Z.
+      example: F-A S-Q
+    endOfHoldingTime:
+      type: string
+      description: |
+        Date by when the refrigerated liquid needs to be delivered.
+      format: date
+      example: 2021-09-03
+    fumigationDateTime:
+      type: string
+      description: |
+        Date & time when the container was fumigated
+      format: date-time
+      example: 2021-09-03T09:03:00-02:00
+    isReportableQuantity:
+      type: boolean
+      description: |
+        Indicates if a container of hazardous material is at the reportable quantity level. If `TRUE`, a report to the relevant authority must be made in case of spill.
+      example: false
+    inhalationZone:
+      maxLength: 1
+      minLength: 1
+      type: string
+      description: |
+        The zone classification of the toxicity of the inhalant. Possible values are:
+        - `A` (Hazard Zone A) can be asigned to specific gases and liquids
+        - `B` (Hazard Zone B) can be asigned to specific gases and liquids
+        - `C` (Hazard Zone C) can **only** be asigned to specific gases
+        - `D` (Hazard Zone D) can **only** be asigned to specific gases
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/inhalationzones.csv)
+      example: A
+    dgGrossWeight:
+      minimum: 0
+      exclusiveMinimum: true
+      type: number
+      description: |
+        The grand total weight of the DG cargo and weight per UNNumber/NANumber including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
+      format: float
+      example: 12000
+    netWeight:
+      type: number
+      description: |
+        Total weight of the goods carried, excluding packaging.
+      format: float
+      example: 2.4
+    netWeightUnit:
+      type: string
+      description: |
+        Unit of measure used to describe the `netWeight`. Possible values are
+        - KGM (Kilograms)
+        - LBR (Pounds)
+      example: KGM
+      enum:
+      - KGM
+      - LBR
+    netExplosiveContent:
+      type: number
+      description: |
+        The total weight of the explosive substances, without the packaging’s, casings, etc.
+      format: float
+      example: 2.4
+    netExplosiveContentUnit:
+      type: string
+      description: |
+        Unit of measure used to describe the `netExplosiveWeight`. Possible values are
+        - KGM (Kilograms)
+        - GRM (Grams)
+      example: KGM
+      enum:
+      - KGM
+      - GRM
+    dgVolume:
+      type: number
+      description: |
+        The volume of the referenced dangerous goods.
+      format: float
+      example: 2.4
+    volumeUnitDG:
+      type: string
+      description: |
+        The unit of measure which can be expressed in either imperial or metric terms
+        - FTQ (Cubic foot)
+        - MTQ (Cubic meter)
+        - LTR (Litre)
+      example: MTQ
+      enum:
+      - MTQ
+      - FTQ
+      - LTR
+    limits:
+      required:
+      - temperatureUnit
+      type: object
+      properties:
+        temperatureUnit:
+          type: string
+          description: |
+            The unit for **all attributes in the limits structure** in Celsius or Fahrenheit
+
+            - CEL (Celsius)
+            - FAH (Fahrenheit)
+          example: CEL
+          enum:
+          - CEL
+          - FAH
+        flashPoint:
+          $ref: '#/components/schemas/flashPoint'
+        transportControlTemperature:
+          $ref: '#/components/schemas/transportControlTemperature'
+        transportEmergencyTemperature:
+          $ref: '#/components/schemas/transportEmergencyTemperature'
+        SADT:
+          $ref: '#/components/schemas/sadt'
+        SAPT:
+          $ref: '#/components/schemas/sapt'
+      description: |
+        Limits for the Dangerous Goods. The same `Temperature Unit` needs to apply to all attributes in this structure.
+    flashPoint:
+      type: number
+      description: |
+        The flashpoint of the referenced dangerous goods according to the IMO IMDG Code expressed in degrees Celsius or Fahrenheit.
+      format: float
+      example: 42
+    transportControlTemperature:
+      type: number
+      description: |
+        Maximum temperature at which certain substance (such as organic peroxides and self-reactive and related substances) can be safely transported for a prolonged period.
+      format: float
+      example: 24.1
+    transportEmergencyTemperature:
+      type: number
+      description: |
+        Temperature at which emergency procedures shall be implemented
+      format: float
+      example: 74.1
+    sadt:
+      type: number
+      description: |
+        Lowest temperature in which self-accelerating decomposition may occur in a substance
+      format: float
+      example: 54.1
+    sapt:
+      type: number
+      description: |
+        Lowest temperature in which self-accelerating polymerization may occur in a substance
+      format: float
+      example: 70
+    specialCertificateNumber:
+      maxLength: 255
+      type: string
+      description: |
+        Text field to indicate certificate number & segment for specific stowage requirements overulling IMDG code
+      example: 22663:3
+    additionalContainerCargoHandling:
+      maxLength: 255
+      type: string
+      description: |
+        Text field to provide cargo handling information already known at the booking stage.
+      example: To be handled with extreme care
+    bookingResponse:
+      type: object
+      description: |
+        includes the information requested in a booking, service terms and types as well as the assigned booking reference by the carrier.
+      allOf:
+      - $ref: '#/components/schemas/bookingSummary'
+      - type: object
+        properties:
+          carrierBookingReference:
+            maxLength: 35
+            pattern: ^\S+(\s+\S+)*$
+            type: string
+            description: |
+              The carrierBookingReference if know. Often this will not be known until the booking has been confirmed. Is available during a booking amendment.
+            example: ABC709951
+      - $ref: '#/components/schemas/bookingDeep_CONF'
+      - $ref: '#/components/schemas/shipmentLocations'
+    bookingDeep_CONF:
+      type: object
+      description: |
+        The deep structure of the booking
+      allOf:
+      - $ref: '#/components/schemas/bookingDeep_BASE'
+      - $ref: '#/components/schemas/requestedEquipments_CONF'
+    requestedEquipments_CONF:
+      type: object
+      properties:
+        requestedEquipments:
+          minLength: 1
+          type: array
+          description: |
+            List of `Requested Equipments`. Multiple containers can be requested within the same booking. For each Requested Equipment object with 2 or more units, it is a condition that the commodity (or list of commodities) defined within the same Requested Equipment object is the same for each requested unit.
+
+            **Example:** 2 x 20' containing 50% shoes and 50% t-shirts can be requested within the same Requested Equipment object only if each 20' will contain 50% shoes and 50% t-shirts. If 1 x 20' will contain 100% shoes and the other 20' will be 100% t-shirts, 2 separate Requested Equipment objects must be defined.
+          items:
+            $ref: '#/components/schemas/requestedEquipment_CONF'
+    requestedEquipment_CONF:
+      type: object
+      description: |
+        If needed - it is **only** possible to specify a single Reefer setting. If multiple settings are required for the same `equipmentSizeType` then multiple `requestedEquipment` should be specified (one for each Reefer setting).
+      allOf:
+      - $ref: '#/components/schemas/requestedEquipment_BASE'
+      - $ref: '#/components/schemas/commodities_CONF'
+    commodities_CONF:
+      type: object
+      properties:
+        commodities:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/commodity_CONF'
+    commodity_CONF:
+      required:
+      - commoditySubreference
+      type: object
+      description: |
+        Type of goods, defined by its commodity type
+      allOf:
+      - type: object
+        properties:
+          commoditySubreference:
+            maxLength: 100
+            pattern: ^\S+(\s+\S+)*$
+            type: string
+            description: |
+              A unique reference for this commodity object assigned by the carrier in the booking confirmation. The reference must be provided by the shipper as part of the Shipping Instructions for the carrier to link the consignment item to this commodity. A commodity reference is only unique in the context of a booking.
+            example: COM-001
+      - $ref: '#/components/schemas/commodity'
+    booking:
+      required:
+      - carrierBookingRequestReference
+      type: object
+      description: |
+        Includes the information requested in a booking, service terms and types as well as the assigned booking reference by the carrier.
+      allOf:
+      - type: object
+        properties:
+          carrierBookingRequestReference:
+            $ref: '#/components/schemas/carrierBookingRequestReference'
+      - $ref: '#/components/schemas/bookingShallow'
+      - $ref: '#/components/schemas/bookingDeep'
+    bookingStatusCancelled:
+      maxLength: 50
+      type: string
+      description: |
+        The status of the booking can only be set to cancelled:
+        - CANCELLED
+      example: CANCELLED
+    bookingRefCancelledStatus:
+      required:
+      - bookingStatus
+      - carrierBookingRequestReference
+      type: object
+      properties:
+        carrierBookingRequestReference:
+          $ref: '#/components/schemas/carrierBookingRequestReference'
+        bookingStatus:
+          $ref: '#/components/schemas/bookingStatusCancelled'
+      description: |
+        The `carrierBookingRequestReference` along with the `bookingStatus` is returned
+    carrierBookingReference:
+      maxLength: 35
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: A set of unique characters provided by carrier to identify a booking.
+      example: ABC709951
+    shipment:
+      required:
+      - bookingStatus
+      - carrierBookingReference
+      - carrierBookingRequestReference
+      - transportPlan
+      type: object
+      description: |
+        Shipment
+      allOf:
+      - type: object
+        properties:
+          carrierBookingReference:
+            $ref: '#/components/schemas/carrierBookingReference'
+      - type: object
+        properties:
+          carrierBookingRequestReference:
+            $ref: '#/components/schemas/carrierBookingRequestReference'
+      - type: object
+        properties:
+          bookingStatus:
+            $ref: '#/components/schemas/bookingStatus'
+      - type: object
+        properties:
+          termsAndConditions:
+            $ref: '#/components/schemas/termsAndConditions'
+      - $ref: '#/components/schemas/bookingShallow'
+      - $ref: '#/components/schemas/bookingDeep_CONF'
+      - $ref: '#/components/schemas/transportPlan'
+      - $ref: '#/components/schemas/shipmentCutOffTimes'
+      - $ref: '#/components/schemas/shipmentLocations'
+      - $ref: '#/components/schemas/confirmedEquipments'
+      - $ref: '#/components/schemas/advanceManifestFilings_BKG'
+      - $ref: '#/components/schemas/charges'
+      - $ref: '#/components/schemas/carrierClauses'
+    termsAndConditions:
+      maxLength: 20000
+      type: string
+      description: |
+        Carrier terms and conditions of transport.
+    transportPlan:
+      type: object
+      properties:
+        transportPlan:
+          type: array
+          description: |
+            A list of `transport` objects describing the entire transport plan including transshipments.
+          items:
+            $ref: '#/components/schemas/transport'
+    transport:
+      required:
+      - dischargeLocation
+      - loadLocation
+      - plannedArrivalDate
+      - plannedDepartureDate
+      - transportPlanStage
+      - transportPlanStageSequenceNumber
+      type: object
+      properties:
+        transportPlanStage:
+          $ref: '#/components/schemas/transportPlanStage'
+        transportPlanStageSequenceNumber:
+          $ref: '#/components/schemas/transportPlanStageSequenceNumber'
+        loadLocation:
+          $ref: '#/components/schemas/loadLocation'
+        dischargeLocation:
+          $ref: '#/components/schemas/dischargeLocation'
+        plannedDepartureDate:
+          $ref: '#/components/schemas/plannedDepartureDate'
+        plannedArrivalDate:
+          $ref: '#/components/schemas/plannedArrivalDate'
+        modeOfTransport:
+          $ref: '#/components/schemas/modeOfTransport'
+        vessel:
+          $ref: '#/components/schemas/bookingShallow_vessel'
+        carrierSerivceCode:
+          $ref: '#/components/schemas/carrierServiceCode'
+        universalServiceReference:
+          $ref: '#/components/schemas/universalServiceReference'
+        carrierImportVoyageNumber:
+          $ref: '#/components/schemas/carrierImportVoyageNumber'
+        universalImportVoyageReference:
+          $ref: '#/components/schemas/universalImportVoyageReference'
+        carrierExportVoyageNumber:
+          $ref: '#/components/schemas/carrierExportVoyageNumber'
+        universalExportVoyageReference:
+          $ref: '#/components/schemas/universalExportVoyageReference'
+      description: |
+        A list of `transport` objects sorted by ShipmentTransport sequenceNumber
+    transportPlanStage:
+      type: string
+      description: |
+        Code qualifying a specific stage of transport e.g. pre-carriage, main carriage transport or on-carriage transport
+        - PRC (Pre-Carriage)
+        - MNC (Main Carriage Transport)
+        - ONC (On-Carriage Transport)
+      example: PRC
+      enum:
+      - PRC
+      - MNC
+      - ONC
+    transportPlanStageSequenceNumber:
+      type: integer
+      description: |
+        Sequence number of the transport plan stage
+      format: int32
+      example: 5
+    loadLocation:
+      description: |
+        General purpose object to capture the `Load Location`.
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Shanghai Shengdong International Container Terminal
+        locationType: FACI
+        UNLocationCode: CNSGH
+        facilityCode: SHENG
+        facilityCodeListProvider: SMDG
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: '#/components/schemas/addressLocation'
+          FACI: '#/components/schemas/facilityLocation'
+          UNLO: '#/components/schemas/unLocationLocation'
+      oneOf:
+      - $ref: '#/components/schemas/addressLocation'
+      - $ref: '#/components/schemas/unLocationLocation'
+      - $ref: '#/components/schemas/facilityLocation'
+    dischargeLocation:
+      description: |
+        General purpose object to capture the `Discharge Location`.
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Transnet Port Terminals Cape Town
+        locationType: FACI
+        UNLocationCode: ZACPT
+        facilityCode: TNCT
+        facilityCodeListProvider: SMDG
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: '#/components/schemas/addressLocation'
+          FACI: '#/components/schemas/facilityLocation'
+          UNLO: '#/components/schemas/unLocationLocation'
+      oneOf:
+      - $ref: '#/components/schemas/addressLocation'
+      - $ref: '#/components/schemas/unLocationLocation'
+      - $ref: '#/components/schemas/facilityLocation'
+    plannedDepartureDate:
+      type: string
+      description: |
+        The planned date of departure.
+      format: date
+    plannedArrivalDate:
+      type: string
+      description: |
+        The planned date of arrival.
+      format: date
+    modeOfTransport:
+      maxLength: 50
+      type: string
+      description: |
+        The mode of transport as defined by DCSA. The currently supported values include:
+        - VESSEL
+        - RAIL
+        - TRUCK
+        - BARGE
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/modeoftransportcodes.csv)
+      example: VESSEL
+    carrierImportVoyageNumber:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+      example: 2103N
+    universalImportVoyageReference:
+      pattern: "^\\d{2}[0-9A-Z]{2}[NEWSR]$"
+      type: string
+      description: |
+        A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+        - `2 digits` for the year
+        - `2 alphanumeric characters` for the sequence number of the voyage
+        - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+      example: 2103N
+    shipmentCutOffTimes:
+      type: object
+      properties:
+        shipmentCutOffTimes:
+          type: array
+          items:
+            $ref: '#/components/schemas/shipmentCutOffTime'
+    shipmentCutOffTime:
+      required:
+      - cutOffDateTime
+      - cutOffDateTimeCode
+      type: object
+      properties:
+        cutOffDateTimeCode:
+          $ref: '#/components/schemas/cutOffDateTimeCode'
+        cutOffDateTime:
+          $ref: '#/components/schemas/cutOffDateTime'
+      description: |
+        Cut off times
+    cutOffDateTimeCode:
+      maxLength: 3
+      type: string
+      description: |
+        Code for the cut-off time
+        - DCO (Documentation cut-off)
+        - VCO (VGM cut-off)
+        - FCO (FCL delivery cut-off)
+        - LCO (LCL delivery cut-off)
+        - ECP (Empty container pick-up date and time)
+        - EFC (Earliest full-container delivery date)
+
+        **LCO Condition:** only when the `Receipt Type at Origin` is `CFS`
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/cutofftimecodes.csv)
+      example: DCO
+    cutOffDateTime:
+      type: string
+      description: |
+        Actual cut-off time
+      format: date-time
+      example: 2019-11-12T07:41:00-08:30
+    confirmedEquipments:
+      type: object
+      properties:
+        confirmedEquipments:
+          type: array
+          items:
+            $ref: '#/components/schemas/confirmedEquipment'
+    confirmedEquipment:
+      required:
+      - confirmedEquipmentSizeType
+      - confirmedEquipmentUnits
+      type: object
+      properties:
+        ISOEquipmentCode:
+          $ref: '#/components/schemas/ISOEquipmentCode'
+        units:
+          $ref: '#/components/schemas/confirmedEquipmentUnits'
+      description: |
+        The confirmed equipments for the booking
+    ISOEquipmentCode:
+      maxLength: 4
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+      example: 22GP
+    confirmedEquipmentUnits:
+      minimum: 1
+      type: integer
+      description: |
+        Number of confirmed equipment units
+      format: int32
+      example: 3
+    advanceManifestFilings_BKG:
+      type: object
+      properties:
+        advanceManifestFilings:
+          minLength: 1
+          type: array
+          description: |
+            A list of `Advance Manifest Filings` provided by the carrier
+          items:
+            $ref: '#/components/schemas/advanceManifestFiling_BKG'
+    advanceManifestFiling_BKG:
+      required:
+      - countryCode
+      - manifestTypeCode
+      type: object
+      properties:
+        manifestTypeCode:
+          $ref: '#/components/schemas/manifestTypeCode'
+        countryCode:
+          $ref: '#/components/schemas/countryCode'
+      description: |
+        An Advance Maifest Filing defined by a Manifest type code in combination with a country code.
+
+        A list of `manifestTypeCodes` together with `countryCode` is maintained in [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/advancedmanifestfilings.csv). A (small) subset can be seen here:
+
+        | manifestTypeCode | countryCode | Description |
+        |-----------------------|:-------------:|-------------|
+        |ACI|EG|Advance Cargo Information in Egypt|
+        |ACE|US|Automated Commercial Environment in the United States|
+        |AFR|JP|Cargo Summary Notification (CSN)|
+      example:
+        manifestTypeCode: ACE
+        countryCode: US
+    manifestTypeCode:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The Manifest type code as defined by the provider. A list of `manifestTypeCodes` together with `countryCode` is maintained in [GitHub (to be created)]()
+      example: ACE
+    charges:
+      type: object
+      properties:
+        charges:
+          maxLength: 1
+          type: array
+          description: |
+            A list of `Charges`
+          items:
+            $ref: '#/components/schemas/charge'
+    charge:
+      required:
+      - calculationBasis
+      - chargeName
+      - currencyAmount
+      - currencyCode
+      - paymentTermCode
+      - quantity
+      - unitPrice
+      type: object
+      properties:
+        chargeName:
+          $ref: '#/components/schemas/chargeName'
+        currencyAmount:
+          $ref: '#/components/schemas/currencyAmount'
+        currencyCode:
+          $ref: '#/components/schemas/currencyCode'
+        paymentTermCode:
+          $ref: '#/components/schemas/paymentTermCode'
+        calculationBasis:
+          $ref: '#/components/schemas/calculationBasis'
+        unitPrice:
+          $ref: '#/components/schemas/unitPrice'
+        quantity:
+          $ref: '#/components/schemas/quantity'
+      description: |
+        addresses the monetary value of freight and other service charges for a transport document.
+    chargeName:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        Free text field describing the charge to apply
+      example: Documentation fee - Destination
+    currencyAmount:
+      minimum: 0
+      type: number
+      description: |
+        The monetary value of all freight and other service charges for a transport document, with a maximum of 2-digit decimals.
+      format: float
+      example: 1012.12
+    currencyCode:
+      maxLength: 3
+      pattern: "^[A-Z]{3}$"
+      type: string
+      description: |
+        The currency for the charge, using a 3-character code ([ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)).
+      example: DKK
+    paymentTermCode:
+      type: string
+      description: |
+        Indicates whether freight & charges are due for payment before the shipment is effected, practically before the transport document is released to shipper (Prepaid) or before the shipment is finalized meaning cargo released to consignee (Collect)
+        - PRE (Prepaid)
+        - COL (Collect)
+      example: PRE
+      enum:
+      - PRE
+      - COL
+    calculationBasis:
+      maxLength: 50
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: "The code specifying the measure unit used for the corresponding unit price for this cost, such as per day, per ton, per square metre."
+      example: Per day
+    unitPrice:
+      minimum: 0
+      type: number
+      description: |
+        The unit price of this charge item in the currency of the charge.
+      format: float
+      example: 3456.6
+    quantity:
+      minimum: 0
+      type: number
+      description: |
+        The amount of unit for this charge item.
+      format: float
+      example: 34.4
+    carrierClauses:
+      type: object
+      properties:
+        carrierClauses:
+          type: array
+          description: |
+            Additional clauses for a specific shipment added by the carrier to the Bill of Lading, subject to local rules / guidelines or certain mandatory information required to be shared with the customer.
+          items:
+            $ref: '#/components/schemas/clauseContent'
+    clauseContent:
+      maxLength: 20000
+      pattern: ^\S+(\s+\S+)*$
+      type: string
+      description: |
+        The content of the clause.
+      example: It is not allowed to...
+    email:
+      maxLength: 100
+      pattern: ^.+@\S+$
+      type: string
+      description: |
+        `E-mail` address to be used
+      example: info@dcsa.org
+    unNumber:
+      pattern: "^\\d{4}$"
+      type: string
+      description: |
+        United Nations Dangerous Goods Identifier (UNDG) assigned by the UN Sub-Committee of Experts on the Transport of Dangerous Goods and shown in the IMO IMDG.
+      example: "1463"
+    naNumber:
+      pattern: "^\\d{4}$"
+      type: string
+      description: |
+        Four-digit number that is assigned to dangerous, hazardous, and harmful substances by the United States Department of Transportation.
+      example: "9037"
+    v2_bookings_body:
+      allOf:
+      - $ref: '#/components/schemas/bookingRequest'
+    bookings_carrierBookingRequestReference_body:
+      required:
+      - bookingStatus
+      type: object
+      properties:
+        bookingStatus:
+          $ref: '#/components/schemas/bookingStatusCancelled'
+        reason:
+          maxLength: 5000
+          type: string
+          description: |
+            An optional field where a reason for cancelling the booking can be given.
+          example: Booking cancelled due to internal problems
+    bookingShallow_vessel:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/vesselName'
+        vesselIMONumber:
+          $ref: '#/components/schemas/vesselIMONumber'
+    dangerousGoods_Base_grossWeight:
+      required:
+      - unit
+      - value
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/dgGrossWeight'
+        unit:
+          $ref: '#/components/schemas/weightUnit'
+      description: |
+        Total weight of the goods carried, including packaging.
+    dangerousGoods_Base_netWeight:
+      required:
+      - unit
+      - value
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/netWeight'
+        unit:
+          $ref: '#/components/schemas/netWeightUnit'
+      description: |
+        Total weight of the goods carried, excluding packaging.
+    dangerousGoods_Base_netExplosiveContent:
+      required:
+      - unit
+      - value
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/netExplosiveContent'
+        unit:
+          $ref: '#/components/schemas/netExplosiveContentUnit'
+      description: |
+        The total weight of the explosive substances, without the packaging’s, casings, etc.
+    dangerousGoods_Base_volume:
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/dgVolume'
+        unit:
+          $ref: '#/components/schemas/volumeUnitDG'
+      description: |
+        The volume of the referenced dangerous goods.
+
+        **Condition:** only applicable to liquids and gas.
+  parameters:
+    carrierBookingRequestReferencePathParam:
+      name: carrierBookingRequestReference
+      in: path
+      description: |
+        The `carrierBookingRequestReference` of the booking request to match
+      required: true
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/carrierBookingRequestReference'
+    carrierBookingReferencePathParam:
+      name: carrierBookingReference
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/carrierBookingReference'
+    bookingStatus:
+      name: bookingStatus
+      in: query
+      description: |
+        Filter by the status of the booking. Possible values are:
+        - RECEIVED
+        - PENDING UPDATE
+        - PENDING UPDATES CONFIRMATION
+        - PENDING AMENDMENTS APPROVAL
+        - CONFIRMED
+        - REJECTED
+        - DECLINED
+        - CANCELLED
+        - COMPLETED
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
+      required: false
+      style: form
+      explode: true
+      schema:
+        $ref: '#/components/schemas/bookingStatus'
+    limit:
+      name: limit
+      in: query
+      description: |
+        Maximum number of items to return.
+      required: false
+      schema:
+        minimum: 1
+        type: integer
+        format: int32
+        default: 100
+      example: 100
+    sort:
+      name: sort
+      in: query
+      description: |
+        A comma-separated (`,`) list of field names is used to define the sort order. To specify the sort order for each field name required, use a colon (`:`) between the field name and the keyword `ASC` (ascending) or `DESC` (descening). If the keyword is not used, ascending (`ASC`) order is applied by default.
+      required: false
+      schema:
+        type: string
+      example: carrierBookingReference:DESC
+    Api-Version-Major:
+      name: API-Version
+      in: header
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+      required: false
+      schema:
+        type: string
+        example: "1"
+  headers:
+    API-Version:
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+      schema:
+        type: string
+        example: 1.0.0
+    Current-Page:
+      description: |
+        The `Current-Page` header is optional to implement. If provided it **MUST** link to the current page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the current page **MUST** be accepted when used.
+
+        The example represents a link to a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?pageNumber=fE9mZnNldHw9NSZsaW1pdD01
+    Next-Page:
+      description: |
+        The `Next-Page` header is mandatory to implement but **MAY** be omitted in case there are not any more items in the collection for a next page. If provided it **MUST** link to the next page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the next page **MUST** be accepted when used.
+
+        The example represents a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NSZsaW1pdD01
+    Prev-Page:
+      description: |
+        The `Prev-Page` header is optional to implement. If provided it **MUST** link to the previous page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the previous page **MUST** be accepted when used.
+
+        The example represents a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NSZsaW1pdD01
+    Last-Page:
+      description: |
+        The `Last-Page` header is optional to implement. If provided it **MUST** link to the last page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the last page **MUST** be accepted when used.
+
+
+        The example represents a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NTkmbGltaXQ9NQ==
+    First-Page:
+      description: |
+        The `First-Page` header is optional to implement. If provided it **MUST** link to the first page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the first page **MUST** be accepted when used.
+
+        The example represents a `cursor` based pagination
+      required: false
+      schema:
+        type: string
+        example: https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NTkmbGltaXQ9NQ==
