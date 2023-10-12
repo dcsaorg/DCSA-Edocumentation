@@ -11,4 +11,5 @@ public interface OuterPackagingMapper {
   @Mapping(target = "id", ignore = true)
   OuterPackaging toDAO(OuterPackagingTO outerPackagingTO);
 
+  OuterPackagingTO toDTO(OuterPackaging outerPackaging);
 }

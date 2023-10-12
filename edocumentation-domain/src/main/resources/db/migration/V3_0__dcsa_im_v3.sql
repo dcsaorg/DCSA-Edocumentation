@@ -259,7 +259,7 @@ CREATE TABLE outer_packaging (
 	id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   package_code varchar(2),
   imo_packaging_code varchar(5),
-  number_of_packages int default 1,
+  number_of_packages int default NULL,
   description varchar(100)
 );
 
@@ -272,16 +272,14 @@ CREATE TABLE commodity (
     cargo_gross_weight_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (cargo_gross_weight_unit IN ('KGM','LBR')),
     cargo_gross_volume real NULL,
     cargo_gross_volume_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (cargo_gross_volume_unit IN ('MTQ','FTQ')),
-    number_of_packages integer NULL,
     export_license_issue_date date NULL,
     export_license_expiry_date date NULL,
     list_order int NOT NULL DEFAULT 0,
+    outer_packaging_id uuid NULL REFERENCES outer_packaging(id),
     -- actually, the uniqueness must be across the entire booking.  However, we cannot
     -- enforce that SQL-wise.  We can discover a more narrow case and we might as well
     -- do that.
-    UNIQUE (requested_equipment_group_id, commodity_subreference),
-    outer_packaging_id uuid NULL REFERENCES outer_packaging(id)
-
+    UNIQUE (requested_equipment_group_id, commodity_subreference)
 );
 
 CREATE INDEX ON commodity (requested_equipment_group_id);

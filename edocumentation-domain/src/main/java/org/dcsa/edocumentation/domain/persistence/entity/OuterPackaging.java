@@ -18,10 +18,10 @@ public class OuterPackaging {
   @Column(name = "id", nullable = false)
   private UUID id;
 
-  @Column(name = "package_code")
+  @Column(name = "package_code", length = 2)
   private String packageCode;
 
-  @Column(name = "imo_packaging_code")
+  @Column(name = "imo_packaging_code", length = 5)
   private String imoPackagingCode;
 
   @Column(name = "number_of_packages")
