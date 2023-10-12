@@ -932,41 +932,49 @@ INSERT INTO cargo_item (
     consignment_item_id,
     weight,
     weight_unit,
+    equipment_reference,
     utilized_transport_equipment_id
 ) VALUES (
     '10f41e70-0cae-47cd-8eb8-4ee6f05e85c1',
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 ), (
     'c7104528-66d5-4d11-9b82-7af30e84d664',
     1000.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '44068608-da9b-4039-b074-d9ac27ddbfbf'),
     uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '877ce0f8-3126-45f5-b22e-2d1d27d42d85'),
     23.5,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '56812ad8-5d0b-4cbc-afca-e97f2f3c89de'),
     uuid('56812ad8-5d0b-4cbc-afca-e97f2f3c89de')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '877ce0f8-3126-45f5-b22e-2d1d27d42d85'),
     99.9,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '44068608-da9b-4039-b074-d9ac27ddbfbf'),
     uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '770f11e5-aae2-4ae4-b27e-0c689ed2e333'),
     99.9,
     'KGM',
-   uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '44068608-da9b-4039-b074-d9ac27ddbfbf'),
+    uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = 'cb6354c9-1ceb-452c-aed0-3cb25a04647a'),
     23.5,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = 'ca030eb6-009b-411c-985c-527ce008b35a'),
     uuid('ca030eb6-009b-411c-985c-527ce008b35a')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d'),
     23.5,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = 'ca030eb6-009b-411c-985c-527ce008b35a'),
     uuid('ca030eb6-009b-411c-985c-527ce008b35a')
 );
 
@@ -975,12 +983,14 @@ INSERT INTO cargo_item (
   consignment_item_id,
   weight,
   weight_unit,
+  equipment_reference,
   utilized_transport_equipment_id
   ) VALUES (
   '2d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
   (SELECT id FROM consignment_item WHERE shipping_instruction_id = '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d'),
   23.5,
   'KGM',
+  (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = 'aa030eb6-009b-411c-985c-527ce008b35a'),
   uuid('aa030eb6-009b-411c-985c-527ce008b35a')
 );
 
@@ -1596,21 +1606,25 @@ INSERT INTO cargo_item (
     consignment_item_id,
     weight,
     weight_unit,
+    equipment_reference,
     utilized_transport_equipment_id
 ) VALUES (
     '0e98eef4-6ebd-47eb-bd6e-d3878b341b7f'::uuid,
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 ), (
     '06c0e716-3128-4172-be09-7f82b7ec02ca'::uuid,
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 ), (
     'cf1798fe-9447-4ea8-a4a6-9515de751d5e'::uuid,
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 );
 
@@ -1804,11 +1818,13 @@ INSERT INTO cargo_item (
     consignment_item_id,
     weight,
     weight_unit,
+    equipment_reference,
     utilized_transport_equipment_id
 ) VALUES (
     '5d943239-23fc-4d5c-ab70-a33a469f9e59'::uuid,
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 );
 

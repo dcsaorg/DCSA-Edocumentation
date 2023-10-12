@@ -5,7 +5,6 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumen
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.function.Function;
 
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -200,7 +199,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shippingInstruction")
+  @OneToMany(mappedBy = "shippingInstruction", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderColumn(name = "si_entry_order")
   private List<@Valid ConsignmentItem> consignmentItems;
 
@@ -435,5 +434,12 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
             + currentState.name()
             + ").",
         e);
+  }
+
+  public void assignConsignmentItems(List<ConsignmentItem> consignmentItems) {
+    this.consignmentItems = consignmentItems;
+    for (var ci : consignmentItems) {
+      ci.setShippingInstruction(this);
+    }
   }
 }
