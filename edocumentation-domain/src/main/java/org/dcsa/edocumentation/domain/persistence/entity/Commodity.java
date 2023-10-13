@@ -32,6 +32,9 @@ public class Commodity {
   @Column(name = "commodity_type", nullable = false, length = 550)
   private String commodityType;
 
+  @Column(name = "commodity_subreference", length = 100)
+  private String commoditySubreference;
+
   @ElementCollection
   @Column(name = "hs_code", nullable = false)
   @CollectionTable(name = "hs_code_item", joinColumns = @JoinColumn(name = "commodity_id"))
@@ -52,9 +55,6 @@ public class Commodity {
   @Enumerated(EnumType.STRING)
   private VolumeUnit cargoGrossVolumeUnit;
 
-  @Column(name = "number_of_packages")
-  private Integer numberOfPackages;
-
   @Column(name = "export_license_issue_date")
   private LocalDate exportLicenseIssueDate;
 
@@ -67,4 +67,19 @@ public class Commodity {
   @JoinColumn(name = "requested_equipment_group_id")
   @Setter(AccessLevel.PACKAGE)
   private RequestedEquipmentGroup requestedEquipment;
+
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "outer_packaging_id")
+  private OuterPackaging outerPackaging;
+
+  public void assignSubreference(String s) {
+    if (this.commoditySubreference != null && !this.commoditySubreference.equals(s)) {
+      // If the subreference can change, then it can invalidate any existing SI pointing to this
+      // commodity. Detecting this and cleaning it this up is not really worth for the RI.
+      throw new IllegalStateException("Cannot change the commoditySubreference once assigned " +
+        "(this restriction is a RI implementation detail)"
+      );
+    }
+    this.commoditySubreference = s;
+  }
 }
