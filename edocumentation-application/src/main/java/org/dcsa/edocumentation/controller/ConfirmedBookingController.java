@@ -1,8 +1,8 @@
 package org.dcsa.edocumentation.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.service.ShipmentService;
-import org.dcsa.edocumentation.transferobjects.ShipmentTO;
+import org.dcsa.edocumentation.service.ConfirmedBookingService;
+import org.dcsa.edocumentation.transferobjects.ConfirmedBookingTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +15,13 @@ import jakarta.validation.constraints.Size;
 @Validated
 @RestController
 @RequiredArgsConstructor
-public class ShipmentController {
-  private final ShipmentService shipmentService;
+public class ConfirmedBookingController {
+  private final ConfirmedBookingService confirmedBookingService;
 
   @GetMapping(
-      path = "${spring.application.bkg-context-path}" + "/shipments/{carrierBookingReference}")
+      path = "${spring.application.bkg-context-path}" + "/confirmed-bookings/{carrierBookingReference}")
   @ResponseStatus(HttpStatus.OK)
-  public ShipmentTO getShipment(@PathVariable @Size(max = 35) String carrierBookingReference) {
-    return shipmentService.findShipment(carrierBookingReference);
+  public ConfirmedBookingTO getConfirmedBooking(@PathVariable @Size(max = 35) String carrierBookingReference) {
+    return confirmedBookingService.findConfirmedBooking(carrierBookingReference);
   }
 }

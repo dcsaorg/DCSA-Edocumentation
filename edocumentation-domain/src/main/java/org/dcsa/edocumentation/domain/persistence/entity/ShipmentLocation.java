@@ -46,6 +46,6 @@ public class ShipmentLocation {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "shipment_id")
-  private Shipment shipment;
+  @JoinColumn(name = "confirmed_booking_id")
+  private ConfirmedBooking confirmedBooking;
 }

@@ -36,10 +36,10 @@ public class ShippingInstructionSpecification {
         var subquery = query.subquery(UUID.class);
         var subqueryRoot = subquery.from(ShippingInstruction.class);
         var consignmentItemRoot = subqueryRoot.join(ShippingInstruction_.CONSIGNMENT_ITEMS);
-        var consignmentItemShipmentJoin = consignmentItemRoot.join(ConsignmentItem_.SHIPMENT, JoinType.LEFT);
+        var consignmentItemShipmentJoin = consignmentItemRoot.join(ConsignmentItem_.CONFIRMED_BOOKING, JoinType.LEFT);
         subquery.select(subqueryRoot.get(ShippingInstruction_.ID));
         subquery.where(builder
-          .in(consignmentItemShipmentJoin.get(Shipment_.CARRIER_BOOKING_REFERENCE))
+          .in(consignmentItemShipmentJoin.get(ConfirmedBooking_.CARRIER_BOOKING_REFERENCE))
           .value(filters.carrierBookingReference));
         Predicate predicate = builder.in(root.get(ShippingInstruction_.ID)).value(subquery);
         predicates.add(predicate);

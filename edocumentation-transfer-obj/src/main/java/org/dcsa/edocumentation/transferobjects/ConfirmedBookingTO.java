@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-public record ShipmentTO(
+public record ConfirmedBookingTO(
     @NotBlank(message = "The attribute carrierBookingReference is required.")
         @Size(max = 35, message = "The attribute carrierBookingReference has a max size of 35.")
         String carrierBookingReference,
@@ -33,5 +33,5 @@ public record ShipmentTO(
     @Valid List<CarrierClauseTO> carrierClauses) {
 
   @Builder(toBuilder = true)
-  public ShipmentTO {}
+  public ConfirmedBookingTO {}
 }

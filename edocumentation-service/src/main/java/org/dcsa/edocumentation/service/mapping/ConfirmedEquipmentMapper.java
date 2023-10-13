@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
 public interface ConfirmedEquipmentMapper {
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "shipment", ignore = true)
+  @Mapping(target = "confirmedBooking", ignore = true)
   ConfirmedEquipment toDAO(ConfirmedEquipmentTO shipmentCutOffTimeTO);
 
   ConfirmedEquipmentTO toTO(ConfirmedEquipment shipmentCutOffTime);

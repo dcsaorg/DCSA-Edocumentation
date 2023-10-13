@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
+import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentLocation;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentLocationRepository;
 import org.dcsa.edocumentation.service.mapping.ShipmentLocationMapper;
@@ -28,9 +28,9 @@ public class ShipmentLocationService {
   }
 
   @Transactional(TxType.MANDATORY)
-  public void createShipmentLocations(Collection<ShipmentLocationTO> shipmentLocations, Shipment shipment) {
+  public void createShipmentLocations(Collection<ShipmentLocationTO> shipmentLocations, ConfirmedBooking confirmedBooking) {
     createShipments(shipmentLocations,
-      (slTO) -> this.shipmentLocationMapper.toDAO(slTO, shipment)
+      (slTO) -> this.shipmentLocationMapper.toDAO(slTO, confirmedBooking)
     );
   }
 

@@ -6,7 +6,6 @@ import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.*;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.AdvanceManifestFiling;
@@ -66,16 +65,16 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
    */
 
     for (var item : state.getValue().getConsignmentItems()) {
-      var shipment = item.getShipment();
-      if (shipment == null) {
+      var confirmedBooking = item.getConfirmedBooking();
+      if (confirmedBooking == null) {
         continue;
       }
-      var booking = shipment.getBooking();
+      var booking = confirmedBooking.getBooking();
       receiptTypeAtOriginChecker.check(booking.getReceiptTypeAtOrigin());
       deliveryTypeAtDestinationChecker.check(booking.getDeliveryTypeAtDestination());
       cargoMovementTypeAtOriginChecker.check(booking.getCargoMovementTypeAtOrigin());
       cargoMovementTypeAtDestinationChecker.check(booking.getCargoMovementTypeAtDestination());
-      termAndConditionsChecker.check(shipment.getTermsAndConditions());
+      termAndConditionsChecker.check(confirmedBooking.getTermsAndConditions());
       serviceContractReferenceChecker.check(booking.getServiceContractReference());
     }
 
@@ -159,18 +158,18 @@ public class ShippingInstructionValidator implements ConstraintValidator<Shippin
     List<ConsignmentItem> consignmentItems = state.getValue().getConsignmentItems();
 
     ConsignmentItem firstconsignmentItem = state.getValue().getConsignmentItems().get(0);
-    List<AdvanceManifestFiling> advanceManifestFilingBase = firstconsignmentItem.getShipment().getAdvanceManifestFilings();
+    List<AdvanceManifestFiling> advanceManifestFilingBase = firstconsignmentItem.getConfirmedBooking().getAdvanceManifestFilings();
     Map<String,List<AdvanceManifestFiling>> misMatchedConsignmentManifestFilings = new HashMap<>();
 
     for(ConsignmentItem ci: consignmentItems) {
-      List<AdvanceManifestFiling> advanceManifestFilings = ci.getShipment().getAdvanceManifestFilings();
+      List<AdvanceManifestFiling> advanceManifestFilings = ci.getConfirmedBooking().getAdvanceManifestFilings();
       List<AdvanceManifestFiling> misMatchedManifestFilings = advanceManifestFilingBase.stream()
         .filter(two -> advanceManifestFilings.stream()
           .noneMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())
             && one.getCountryCode().equals(two.getCountryCode())))
         .toList();
       if (!misMatchedManifestFilings.isEmpty()) {
-        misMatchedConsignmentManifestFilings.put(ci.getShipment().getCarrierBookingReference(),misMatchedManifestFilings);
+        misMatchedConsignmentManifestFilings.put(ci.getConfirmedBooking().getCarrierBookingReference(),misMatchedManifestFilings);
       }
     }
 

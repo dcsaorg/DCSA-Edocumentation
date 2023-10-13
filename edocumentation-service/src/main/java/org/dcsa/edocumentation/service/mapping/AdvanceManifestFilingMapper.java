@@ -11,6 +11,6 @@ import org.mapstruct.Mapping;
 public interface AdvanceManifestFilingMapper {
   AdvanceManifestFilingTO toDTO(AdvanceManifestFiling filing);
   @Mapping(target = "manifest_id", ignore = true)
-  @Mapping(target = "shipment", ignore = true)
+  @Mapping(target = "confirmedBooking", ignore = true)
   AdvanceManifestFiling toDAO(AdvanceManifestFilingTO manifestFilingTO);
 }

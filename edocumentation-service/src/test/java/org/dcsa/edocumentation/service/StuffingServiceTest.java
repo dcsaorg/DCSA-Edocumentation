@@ -8,12 +8,12 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.dcsa.edocumentation.datafactories.ConsignmentItemDataFactory;
-import org.dcsa.edocumentation.datafactories.ShipmentDataFactory;
+import org.dcsa.edocumentation.datafactories.ConfirmedBookingDataFactory;
 import org.dcsa.edocumentation.datafactories.ShippingInstructionDataFactory;
 import org.dcsa.edocumentation.datafactories.UtilizedTransportEquipmentEquipmentDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.repository.ConsignementItemRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
+import org.dcsa.edocumentation.domain.persistence.repository.ConfirmedBookingRepository;
 import org.dcsa.edocumentation.service.mapping.CargoItemMapper;
 import org.dcsa.edocumentation.service.mapping.ConsignmentItemMapper;
 import org.dcsa.edocumentation.service.mapping.EquipmentMapper;
@@ -30,7 +30,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class StuffingServiceTest {
-  @Mock private ShipmentRepository shipmentRepository;
+  @Mock private ConfirmedBookingRepository confirmedBookingRepository;
   @Mock private ConsignementItemRepository consignementItemRepository;
 
 
@@ -50,7 +50,7 @@ class StuffingServiceTest {
   private ShippingInstruction shippingInstruction;
   private Map<String, UtilizedTransportEquipment> savedUtilizedTransportEquipments;
   private List<ConsignmentItemTO> consignmentItemTOs;
-  private Shipment shipment;
+  private ConfirmedBooking confirmedBooking;
 
   @BeforeEach
   void init() {
@@ -66,13 +66,13 @@ class StuffingServiceTest {
                     Function.identity()));
 
     consignmentItemTOs = List.of(ConsignmentItemDataFactory.singleConsignmentItem());
-    shipment = ShipmentDataFactory.singleShipmentWithBooking();
+    confirmedBooking = ConfirmedBookingDataFactory.singleConfirmedBookingWithBooking();
   }
 
   @Test
   void stuffingServiceTest_testSavedConsignmentItem() {
-    when(shipmentRepository.findByCarrierBookingReference("CBR_01"))
-        .thenReturn(Optional.of(shipment));
+    when(confirmedBookingRepository.findByCarrierBookingReference("CBR_01"))
+        .thenReturn(Optional.of(confirmedBooking));
 
     stuffingService.createStuffing(
         shippingInstruction, savedUtilizedTransportEquipments, consignmentItemTOs);
@@ -88,8 +88,8 @@ class StuffingServiceTest {
         savedConsignmentItem.getShippingInstruction().getShippingInstructionReference());
 
     assertEquals(
-        shipment.getCarrierBookingReference(),
-        savedConsignmentItem.getShipment().getCarrierBookingReference());
+        confirmedBooking.getCarrierBookingReference(),
+        savedConsignmentItem.getConfirmedBooking().getCarrierBookingReference());
 
     assertEquals(2, savedCargoItems.size());
     assertNotNull(
@@ -111,7 +111,7 @@ class StuffingServiceTest {
 
   @Test
   void stuffingServiceTest_testCargoItemDoesNotReferToExistingShipment() {
-    when(shipmentRepository.findByCarrierBookingReference("CBR_01")).thenReturn(Optional.empty());
+    when(confirmedBookingRepository.findByCarrierBookingReference("CBR_01")).thenReturn(Optional.empty());
 
     ConcreteRequestErrorMessageException exceptionCaught =
         assertThrows(
@@ -121,14 +121,14 @@ class StuffingServiceTest {
                     shippingInstruction, savedUtilizedTransportEquipments, consignmentItemTOs));
 
     assertEquals(
-        "No shipment has been found for this carrierBookingReference: CBR_01",
+        "No confirmedBooking has been found for this carrierBookingReference: CBR_01",
         exceptionCaught.getMessage());
   }
 
   @Test
   void stuffingServiceTest_testNoUtilizedTransportEquipmentMatch() {
-    when(shipmentRepository.findByCarrierBookingReference("CBR_01"))
-      .thenReturn(Optional.of(shipment));
+    when(confirmedBookingRepository.findByCarrierBookingReference("CBR_01"))
+      .thenReturn(Optional.of(confirmedBooking));
 
     savedUtilizedTransportEquipments = UtilizedTransportEquipmentEquipmentDataFactory.multipleShipperOwned().stream()
       .map(ute -> utilizedTransportEquipmentMapper.toDAO(ute, equipmentMapper.toDAO(ute.equipment())))

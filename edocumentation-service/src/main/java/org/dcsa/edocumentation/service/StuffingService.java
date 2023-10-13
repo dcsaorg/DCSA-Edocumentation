@@ -6,7 +6,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.repository.ConsignementItemRepository;
-import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
+import org.dcsa.edocumentation.domain.persistence.repository.ConfirmedBookingRepository;
 import org.dcsa.edocumentation.service.mapping.CargoItemMapper;
 import org.dcsa.edocumentation.service.mapping.ConsignmentItemMapper;
 import org.dcsa.edocumentation.transferobjects.CargoItemTO;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StuffingService {
 
-  private final ShipmentRepository shipmentRepository;
+  private final ConfirmedBookingRepository confirmedBookingRepository;
   private final ConsignmentItemMapper consignmentItemMapper;
   private final ConsignementItemRepository consignementItemRepository;
   private final CargoItemMapper cargoItemMapper;
@@ -34,9 +34,9 @@ public class StuffingService {
             .map(
                 consignmentItemTO -> {
                   ConsignmentItem consignmentItem = consignmentItemMapper.toDAO(consignmentItemTO);
-                  Shipment shipment = addShipment(consignmentItemTO.carrierBookingReference());
+                  ConfirmedBooking confirmedBooking = addShipment(consignmentItemTO.carrierBookingReference());
                   return consignmentItem.toBuilder()
-                      .shipment(shipment)
+                      .confirmedBooking(confirmedBooking)
                       .shippingInstruction(shippingInstruction)
                       .cargoItems(
                           addCargoItems(consignmentItemTO.cargoItems(), savedTransportEquipments))
@@ -47,15 +47,15 @@ public class StuffingService {
     consignementItemRepository.saveAll(consignmentItems);
   }
 
-  // A Shipping instruction must link to a shipment (=approved booking) consignmentItems acts like a
-  // 'join-table' between shipping instruction and shipment
-  private Shipment addShipment(String carrierBookingReference) {
-    return shipmentRepository
+  // A Shipping instruction must link to a confirmedBooking (=approved booking) consignmentItems acts like a
+  // 'join-table' between shipping instruction and confirmedBooking
+  private ConfirmedBooking addShipment(String carrierBookingReference) {
+    return confirmedBookingRepository
         .findByCarrierBookingReference(carrierBookingReference)
         .orElseThrow(
             () ->
                 ConcreteRequestErrorMessageException.notFound(
-                    "No shipment has been found for this carrierBookingReference: "
+                    "No confirmedBooking has been found for this carrierBookingReference: "
                         + carrierBookingReference));
   }
 

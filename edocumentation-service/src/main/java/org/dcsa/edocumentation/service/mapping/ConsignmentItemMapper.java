@@ -18,7 +18,7 @@ public interface ConsignmentItemMapper {
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "shippingInstruction", ignore = true)
-  @Mapping(target = "shipment", ignore = true)
+  @Mapping(target = "confirmedBooking", ignore = true)
   @Mapping(target = "commodity", ignore = true)
   ConsignmentItem toDAO(ConsignmentItemTO consignmentItemTO);
 

@@ -21,9 +21,9 @@ public class ConsignmentItemValidator implements ConstraintValidator<Consignment
   }
 
   private void validateConfirmedBookings(ValidationState<ConsignmentItem> state) {
-    var shipment = state.getValue().getShipment();
-    if (shipment.getBooking().getDocumentStatus() != BkgDocumentStatus.CONF) {
-      state.getContext().buildConstraintViolationWithTemplate("The booking " + shipment.getCarrierBookingReference() + " is not in state CONF")
+    var confirmedBooking = state.getValue().getConfirmedBooking();
+    if (confirmedBooking.getBooking().getDocumentStatus() != BkgDocumentStatus.CONF) {
+      state.getContext().buildConstraintViolationWithTemplate("The booking " + confirmedBooking.getCarrierBookingReference() + " is not in state CONF")
         // Match the TO path
         .addPropertyNode("carrierBookingReference")
         .addConstraintViolation();

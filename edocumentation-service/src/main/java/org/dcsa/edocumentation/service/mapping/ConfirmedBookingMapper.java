@@ -1,9 +1,9 @@
 package org.dcsa.edocumentation.service.mapping;
 
-import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
+import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
-import org.dcsa.edocumentation.transferobjects.unofficial.ShipmentRefStatusTO;
-import org.dcsa.edocumentation.transferobjects.ShipmentTO;
+import org.dcsa.edocumentation.transferobjects.unofficial.ConfirmedBookingRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.ConfirmedBookingTO;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,11 +22,11 @@ import org.mapstruct.ReportingPolicy;
     ShipmentCutOffTimeMapper.class,
     AdvanceManifestFilingMapper.class
   })
-public interface ShipmentMapper {
+public interface ConfirmedBookingMapper {
   @Mapping(source = "shipmentTransports", target = "transports")
-  ShipmentTO shipmentToShipmentTO(Shipment shipment);
+  ConfirmedBookingTO confirmedBookingToConfirmedBookingTO(ConfirmedBooking confirmedBooking);
 
-  @Mapping(source = "shipment.booking.bookingRequestUpdatedDateTime", target = "bookingRequestUpdatedDateTime")
-  @Mapping(source = "shipment.booking.bookingRequestCreatedDateTime", target = "bookingRequestCreatedDateTime")
-  ShipmentRefStatusTO toStatusDTO(Shipment shipment, BkgDocumentStatus documentStatus);
+  @Mapping(source = "confirmedBooking.booking.bookingRequestUpdatedDateTime", target = "bookingRequestUpdatedDateTime")
+  @Mapping(source = "confirmedBooking.booking.bookingRequestCreatedDateTime", target = "bookingRequestCreatedDateTime")
+  ConfirmedBookingRefStatusTO toStatusDTO(ConfirmedBooking confirmedBooking, BkgDocumentStatus documentStatus);
 }

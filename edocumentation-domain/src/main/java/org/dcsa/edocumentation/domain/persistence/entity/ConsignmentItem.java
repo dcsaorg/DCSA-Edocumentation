@@ -54,8 +54,8 @@ public class ConsignmentItem {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "shipment_id", nullable = false)
-  private Shipment shipment;
+  @JoinColumn(name = "confirmed_booking_id", nullable = false)
+  private ConfirmedBooking confirmedBooking;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

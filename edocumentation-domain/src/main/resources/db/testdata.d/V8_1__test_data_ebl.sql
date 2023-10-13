@@ -290,7 +290,7 @@ INSERT INTO shipment (
 INSERT INTO reference (
     reference_type_code,
     reference_value,
-    shipment_id
+    confirmed_booking_id
 ) VALUES (
     'CR',
     'AB-123743CR',
@@ -337,7 +337,7 @@ INSERT INTO vessel (
 );
 
 INSERT INTO shipment_transport (
-    shipment_id,
+    confirmed_booking_id,
     transport_plan_stage_sequence_number,
     transport_plan_stage_code,
     load_location_id,
@@ -450,7 +450,7 @@ INSERT INTO party (
 
 INSERT INTO document_party (
     party_id,
-    shipment_id,
+    confirmed_booking_id,
     party_function,
     is_to_be_notified,
     booking_id
@@ -475,7 +475,7 @@ INSERT INTO document_party (
   );
 
 INSERT INTO shipment_location (
-    shipment_id,
+    confirmed_booking_id,
     booking_id,
     location_id,
     shipment_location_type_code
@@ -760,7 +760,7 @@ INSERT INTO consignment_item (
     id,
     shipping_instruction_id,
     carrier_booking_reference,
-    shipment_id,
+    confirmed_booking_id,
     commodity_id,
     commodity_subreference,
     description_of_goods,
@@ -1489,7 +1489,7 @@ INSERT INTO consignment_item (
     id,
     shipping_instruction_id,
     carrier_booking_reference,
-    shipment_id,
+    confirmed_booking_id,
     description_of_goods,
     commodity_subreference,
     si_entry_order
@@ -1556,7 +1556,7 @@ INSERT INTO location (
 );
 
 INSERT INTO shipment_location (
-    shipment_id,
+    confirmed_booking_id,
     booking_id,
     location_id,
     shipment_location_type_code
@@ -1752,7 +1752,7 @@ INSERT INTO consignment_item (
     id,
     shipping_instruction_id,
     carrier_booking_reference,
-    shipment_id,
+    confirmed_booking_id,
     description_of_goods,
     commodity_subreference
 ) VALUES (
@@ -1815,7 +1815,7 @@ INSERT INTO cargo_item (
 INSERT INTO charge (
     id,
     transport_document_id,
-    shipment_id,
+    confirmed_booking_id,
     charge_name,
     currency_amount,
     currency_code,

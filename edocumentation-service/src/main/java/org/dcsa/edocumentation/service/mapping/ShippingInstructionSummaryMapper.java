@@ -19,6 +19,6 @@ public interface ShippingInstructionSummaryMapper {
   ShippingInstructionSummaryTO shippingInstructionToShippingInstructionSummary(ShippingInstruction shippingInstruction);
 
   default String mapShipmentToCarrierBookingReference(ConsignmentItem consignmentItem) {
-    return consignmentItem.getShipment().getCarrierBookingReference();
+    return consignmentItem.getConfirmedBooking().getCarrierBookingReference();
   }
 }

@@ -54,8 +54,8 @@ public class ShippingInstructionDataFactory {
         .build())
       .build();
 
-    Shipment shipments =
-        Shipment.builder()
+    ConfirmedBooking shipments =
+        ConfirmedBooking.builder()
             .carrierBookingReference(UUID.randomUUID().toString())
             .shipmentCreatedDateTime(OffsetDateTime.now())
             .shipmentCreatedDateTime(OffsetDateTime.now())
@@ -87,7 +87,7 @@ public class ShippingInstructionDataFactory {
             .build();
 
     var consignmentItems = List.of(ConsignmentItem.builder()
-      .shipment(shipments)
+      .confirmedBooking(shipments)
       .build());
 
     return ShippingInstruction.builder()
@@ -134,7 +134,7 @@ public class ShippingInstructionDataFactory {
         .build())
       .build();
 
-    Shipment shipment = Shipment.builder()
+    ConfirmedBooking confirmedBooking = ConfirmedBooking.builder()
       .carrierBookingReference(UUID.randomUUID().toString())
       .shipmentCreatedDateTime(OffsetDateTime.now())
       .shipmentCreatedDateTime(OffsetDateTime.now())
@@ -147,7 +147,7 @@ public class ShippingInstructionDataFactory {
 
     var consignmentItems = List.of(
       ConsignmentItem.builder()
-        .shipment(shipment)
+        .confirmedBooking(confirmedBooking)
         .build()
     );
 

@@ -51,7 +51,7 @@ import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumen
     @NamedSubgraph(
       name = "graph.transportDocumentSummary.consignmentItem",
       attributeNodes = {
-        @NamedAttributeNode("shipment")
+        @NamedAttributeNode("confirmedBooking")
       }),
     @NamedSubgraph(
       name = "graph.transportDocumentSummary.issuingParty",

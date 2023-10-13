@@ -7,10 +7,10 @@ import java.util.*;
 import lombok.*;
 
 @NamedEntityGraph(
-    name = "graph.shipment-summary",
+    name = "graph.confirmed-booking-summary",
     attributeNodes = {@NamedAttributeNode("booking")})
 @NamedEntityGraph(
-    name = "graph.shipment",
+    name = "graph.confirmed-booking",
     attributeNodes = {
       @NamedAttributeNode("booking"),
       @NamedAttributeNode("carrier"),
@@ -38,8 +38,8 @@ import lombok.*;
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
 @Entity
-@Table(name = "shipment")
-public class Shipment {
+@Table(name = "confirmed-booking")
+public class ConfirmedBooking {
 
   @Id
   @GeneratedValue
@@ -54,7 +54,7 @@ public class Shipment {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipment")
+  @OneToMany(mappedBy = "confirmed-booking")
   private Set<@Valid ConsignmentItem> consignmentItems;
 
   @ToString.Exclude
@@ -77,23 +77,23 @@ public class Shipment {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipment")
+  @OneToMany(mappedBy = "confirmed-booking")
   private Set<ShipmentTransport> shipmentTransports = new LinkedHashSet<>();
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipment")
+  @OneToMany(mappedBy = "confirmed-booking")
   private Set<@Valid ShipmentLocation> shipmentLocations = new LinkedHashSet<>();
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipment", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "confirmed-booking", cascade = CascadeType.ALL)
   @OrderColumn(name = "list_order")
   private List<@Valid ShipmentCutOffTime> shipmentCutOffTimes;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipment", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "confirmed-booking", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @OrderColumn(name = "list_order")
   private List<ConfirmedEquipment> confirmedEquipments = new ArrayList<>();
 
@@ -102,21 +102,21 @@ public class Shipment {
   @OneToMany
   @JoinTable(
       name = "shipment_carrier_clauses",
-      joinColumns = {@JoinColumn(name = "shipment_id", referencedColumnName = "id")},
+      joinColumns = {@JoinColumn(name = "confirmed_booking_id", referencedColumnName = "id")},
       inverseJoinColumns = {@JoinColumn(name = "carrier_clause_id", referencedColumnName = "id")})
   private Set<CarrierClause> carrierClauses = new LinkedHashSet<>();
 
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shipmentID")
+  @OneToMany(mappedBy = "confirmedBookingID")
   private Set<Charge> charges = new LinkedHashSet<>();
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OrderColumn(name = "list_order")
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "shipment_id")
+  @JoinColumn(name = "confirmed_booking_id")
   private List<AdvanceManifestFiling> advanceManifestFilings = new ArrayList<>();
 
   public void assignConfirmedEquipments(List<ConfirmedEquipment> confirmedEquipments) {
@@ -124,7 +124,7 @@ public class Shipment {
     this.confirmedEquipments.clear();
     this.confirmedEquipments.addAll(confirmedEquipments);
     for (var e : confirmedEquipments) {
-      e.setShipment(this);  // For cascade to work properly
+      e.setConfirmedBooking(this);  // For cascade to work properly
     }
   }
 
@@ -133,7 +133,7 @@ public class Shipment {
     this.shipmentCutOffTimes.clear();
     this.shipmentCutOffTimes.addAll(shipmentCutOffTimes);
     for (var t : shipmentCutOffTimes) {
-      t.setShipment(this);  // For cascade to work properly
+      t.setConfirmedBooking(this);  // For cascade to work properly
     }
   }
 
@@ -146,7 +146,7 @@ public class Shipment {
     }
     this.advanceManifestFilings.addAll(advanceManifestFilings);
     for (var e : advanceManifestFilings) {
-      e.setShipment(this);  // For cascade to work properly
+      e.setConfirmedBooking(this);  // For cascade to work properly
     }
   }
 }

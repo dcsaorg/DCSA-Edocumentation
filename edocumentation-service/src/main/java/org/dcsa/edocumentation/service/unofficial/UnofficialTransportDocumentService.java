@@ -66,8 +66,8 @@ public class UnofficialTransportDocumentService {
 
     boolean shouldHaveDeclaredValue = shippingInstruction.getConsignmentItems()
       .stream()
-      .map(ConsignmentItem::getShipment)
-      .map(Shipment::getBooking)
+      .map(ConsignmentItem::getConfirmedBooking)
+      .map(ConfirmedBooking::getBooking)
       .map(Booking::getDeclaredValue)
       .anyMatch(Objects::nonNull);
 
