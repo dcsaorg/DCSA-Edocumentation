@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.TaxAndLegalReferenceValidation;
 
 import java.util.UUID;
 
@@ -14,35 +16,31 @@ import java.util.UUID;
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "tax_and_legal_reference")
+@TaxAndLegalReferenceValidation(groups = AsyncShipperProvidedDataValidation.class)
 public class TaxAndLegalReference {
 
   @Id
   @GeneratedValue
-  @Column(name = "id", nullable = false)
-  private UUID taxAndLegalReferenceID;
+  private UUID id;
 
-  @Column(name = "tax_and_legal_reference_type_code")
+  @Column(name = "type_code")
   @Size(max = 50)
   @NotBlank
   private String type;
 
-  @Column(name = "tax_and_legal_reference_country_code")
+  @Column(name = "country_code")
   @Size(max = 2)
   @NotBlank
   private String countryCode;
 
-  @Column(name = "tax_and_legal_reference_value")
+  @Column(name = "value")
   @Size(max = 100)
   @NotBlank
   private String value;
 
-//  @JoinColumn(name = "party_id")
-//  @Column(name = "party_id")
-//  private UUID partyID;
-
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "party_id")
   private Party party;
 }

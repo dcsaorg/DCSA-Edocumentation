@@ -242,4 +242,3 @@ INSERT INTO hs_code_item (
   '720711'
 );
 
-

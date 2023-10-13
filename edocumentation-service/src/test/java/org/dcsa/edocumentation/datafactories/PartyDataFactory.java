@@ -14,13 +14,6 @@ public class PartyDataFactory {
     return Party.builder()
       .id(UUID.randomUUID())
       .partyName("DCSA")
-      .taxReference1("1234567890")
-      .publicKey("""
-        -----BEGIN RSA PUBLIC KEY-----
-        MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
-        S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
-        -----END RSA PUBLIC KEY-----
-        """)
       .address(AddressDataFactory.getSingleAddress())
       .partyContactDetails(Set.of(PartyContactDetails.builder()
           .id(UUID.randomUUID())

@@ -1,4 +1,4 @@
-package org.dcsa.edocumentation.transferobjects.validation;
+package org.dcsa.edocumentation.domain.validations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -13,10 +13,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = TaxAndLegalReferenceValidator.class)
-public @interface TaxAndLegalReferenceValidation {
+@Constraint(validatedBy = PartyValidator.class)
+public @interface PartyValidation {
 
-  String message() default "Invalid combination of Tax and Legal Reference type and country code";
+  LocationSubType[] allowedSubtypes() default {};
+
+  String message() default "Illegal party specification";
 
   Class<?>[] groups() default {};
 
