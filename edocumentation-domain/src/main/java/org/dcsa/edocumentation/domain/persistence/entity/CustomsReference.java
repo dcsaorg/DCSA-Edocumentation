@@ -51,9 +51,4 @@ public class CustomsReference {
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private ConsignmentItem consignmentItem;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private CargoItem cargoItem;
-
 }

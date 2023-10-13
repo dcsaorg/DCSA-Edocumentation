@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractCustomsReferenceListValidator {
 
-  public List<CustomsReference>  checkReferencesDuplicates(List<CustomsReference> customsReferences) {
+  protected List<CustomsReference>  checkReferencesDuplicates(List<CustomsReference> customsReferences) {
 
     return customsReferences.stream()
       .collect(Collectors.groupingBy(p -> p.getType() + "-" + p.getCountryCode(), Collectors.toList()))

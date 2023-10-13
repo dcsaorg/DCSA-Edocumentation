@@ -14,6 +14,5 @@ public interface CustomsReferenceMapper {
   @Mapping(target = "utilizedTransportEquipment", ignore = true)
   @Mapping(target = "shippingInstruction", ignore = true)
   @Mapping(target = "consignmentItem", ignore = true)
-  @Mapping(target = "cargoItem", ignore = true)
   CustomsReference toDAO(CustomsReferenceTO customsReferenceTO);
 }
