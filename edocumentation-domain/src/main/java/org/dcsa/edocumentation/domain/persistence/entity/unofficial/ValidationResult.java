@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.domain.persistence.entity.unofficial;
 
 import java.util.List;
 
-public record ValidationResult<E extends Enum<E>> (
+public record ValidationResult<E> (
   E proposedStatus,
   List<String> validationErrors
 ) {

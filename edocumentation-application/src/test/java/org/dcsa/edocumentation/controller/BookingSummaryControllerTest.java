@@ -1,14 +1,15 @@
 package org.dcsa.edocumentation.controller;
 
 import org.dcsa.edocumentation.datafactories.BookingSummaryDataFactory;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.service.BookingSummaryService;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
-import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.skernel.errors.infrastructure.ConcreteRequestErrorMessageExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.FallbackExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.JakartaValidationExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.SpringExceptionHandler;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -84,13 +85,13 @@ class BookingSummaryControllerTest {
   void testBookingSummaryController_getBookingSummariesSingleResultWithDocumentStatus()
       throws Exception {
     BookingSummaryTO mockBookingSummaryTO = BookingSummaryDataFactory.singleBookingSummaryTO();
-    when(bookingSummaryService.findBookingSummaries(any(), eq(BkgDocumentStatus.RECE)))
+    when(bookingSummaryService.findBookingSummaries(any(), eq(BookingStatus.RECEIVED)))
         .thenReturn(new PagedResult<>(new PageImpl<>(List.of(mockBookingSummaryTO))));
 
     mockMvc
         .perform(
             get(path)
-                .param("documentStatus", "RECE")
+                .param("bookingStatus", BookingStatus.RECEIVED)
                 .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
@@ -104,21 +105,22 @@ class BookingSummaryControllerTest {
   void testBookingSummaryController_getBookingSummariesWithInvalidDocumentStatus()
       throws Exception {
     BookingSummaryTO mockBookingSummaryTO = BookingSummaryDataFactory.singleBookingSummaryTO();
-    when(bookingSummaryService.findBookingSummaries(any(), eq(BkgDocumentStatus.RECE)))
-        .thenReturn(new PagedResult<>(new PageImpl<>(List.of(mockBookingSummaryTO))));
+    when(bookingSummaryService.findBookingSummaries(any(), any()))
+      .thenReturn(new PagedResult<>(new PageImpl<>(List.of(mockBookingSummaryTO))));
+
 
     mockMvc
         .perform(
             get(path)
-                .param("documentStatus", "INVALID")
+                .param("bookingStatus", "INVALID")
                 .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.httpMethod").value("GET"))
         .andExpect(jsonPath("$.requestUri").value(path))
-        .andExpect(jsonPath("$.errors[0].reason").value("invalidParameter"))
+        .andExpect(jsonPath("$.errors[0].reason").value("invalidInput"))
         .andExpect(
             jsonPath("$.errors[0].message")
-                .value(containsString("'documentStatus' must be of type BkgDocumentStatus")));
+                .value(containsString("bookingStatus Unexpected value 'INVALID', should have been one of")));
   }
 }

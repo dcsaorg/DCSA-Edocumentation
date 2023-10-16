@@ -5,14 +5,12 @@ import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
 import java.util.*;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.values;
-
-public class DFADefinitionBuilder<S extends Enum<S>> {
+public class DFADefinitionBuilder<S> {
 
 
-  private final EnumSet<S> terminalStates;
-  private final EnumSet<S> unreachableStates;
-  private final EnumMap<S, EnumSet<S>> successorStates;
+  private final Set<S> terminalStates;
+  private final Set<S> unreachableStates;
+  private final Map<S, Set<S>> successorStates;
   private final S initialState;
 
   DFADefinitionBuilder(S initialState) {
@@ -20,9 +18,9 @@ public class DFADefinitionBuilder<S extends Enum<S>> {
       throw ConcreteRequestErrorMessageException.internalServerError("Initial state must not be null");
     }
     this.initialState = initialState;
-    this.successorStates = new EnumMap<>(initialState.getDeclaringClass());
-    this.terminalStates = EnumSet.noneOf(initialState.getDeclaringClass());
-    this.unreachableStates = EnumSet.noneOf(initialState.getDeclaringClass());
+    this.successorStates = new HashMap<>();
+    this.terminalStates = new HashSet<>();
+    this.unreachableStates = new HashSet<>();
   }
 
   /**
@@ -72,44 +70,45 @@ public class DFADefinitionBuilder<S extends Enum<S>> {
 
   private void ensureStateIsUnused(S s) {
     if (this.terminalStates.contains(s)) {
-      throw ConcreteRequestErrorMessageException.internalServerError("State " + s.name()
+      throw ConcreteRequestErrorMessageException.internalServerError("State " + s.toString()
         + " is already declared as a terminal state");
     }
     if (this.unreachableStates.contains(s)) {
-      throw ConcreteRequestErrorMessageException.internalServerError("State " + s.name()
+      throw ConcreteRequestErrorMessageException.internalServerError("State " + s.toString()
         + " is already declared as an unreachable state");
     }
     if (this.successorStates.containsKey(s)) {
-      throw ConcreteRequestErrorMessageException.internalServerError("State " + s.name()
+      throw ConcreteRequestErrorMessageException.internalServerError("State " + s.toString()
         + " is already declared as a non-terminal state");
     }
   }
 
   public DFADefinition<S> build() {
-    EnumMap<S, DFAStateInfo<S>> stateInfo = new EnumMap<>(initialState.getDeclaringClass());
+    Map<S, DFAStateInfo<S>> stateInfo = new HashMap<>();
     for (S s : terminalStates) {
       stateInfo.put(s, DFAStateInfo.terminalState());
     }
     for (S s : unreachableStates) {
       stateInfo.put(s, DFAStateInfo.unreachableState());
     }
-    for (Map.Entry<S, EnumSet<S>> entry : successorStates.entrySet()) {
+    for (Map.Entry<S, Set<S>> entry : successorStates.entrySet()) {
       stateInfo.put(entry.getKey(), DFAStateInfo.successorStates(entry.getValue()));
     }
     DFADefinition<S> definition = new DFADefinition<>(initialState, Map.copyOf(stateInfo));
-    EnumSet<S> expectedReachable = terminalStates.clone();
+    Set<S> expectedReachable = new HashSet<>();
+    expectedReachable.addAll(terminalStates);
     expectedReachable.addAll(successorStates.keySet());
     verifyConsistency(definition, expectedReachable);
     return definition;
   }
 
   private void verifyConsistency(DFADefinition<S> definition, Set<S> expectedReachable) {
-    Set<S> reachableStates = EnumSet.noneOf(initialState.getDeclaringClass());
-    Set<S> pendingStates = EnumSet.noneOf(initialState.getDeclaringClass());
+    Set<S> reachableStates = new HashSet<>();
+    Set<S> pendingStates = new HashSet<>();
     int loopCounter = 0;
     // The implementation should visit every state at most once.  If it does not, then someone
     // introduced a bug that (likely) makes it loop forever.
-    final int loopMax = values().length;
+    final int loopMax = definition.stateInfo.size();
     pendingStates.add(initialState);
 
     while (!pendingStates.isEmpty()) {
@@ -118,11 +117,11 @@ public class DFADefinitionBuilder<S extends Enum<S>> {
       reachableStates.add(nextState);
       DFAStateInfo<S> stateInfo = definition.getStateInfoForState(nextState);
       if (stateInfo == null) {
-        throw ConcreteRequestErrorMessageException.internalServerError("It was possible to reach " + nextState.name()
+        throw ConcreteRequestErrorMessageException.internalServerError("It was possible to reach " + nextState.toString()
           + ", which has not been declared as a known state");
       }
       if (!stateInfo.validState()) {
-        throw ConcreteRequestErrorMessageException.internalServerError("It was possible to reach " + nextState.name()
+        throw ConcreteRequestErrorMessageException.internalServerError("It was possible to reach " + nextState.toString()
           + ", which was explicitly declared as unreachable!");
       }
       stateInfo.successorStates().stream().filter(s -> !reachableStates.contains(s)).forEach(pendingStates::add);
@@ -140,7 +139,7 @@ public class DFADefinitionBuilder<S extends Enum<S>> {
   @RequiredArgsConstructor
   public class DFADefinitionNonTerminalStateBuilder {
     private final S baseState;
-    private final EnumSet<S> successors = EnumSet.noneOf(initialState.getDeclaringClass());
+    private final Set<S> successors = new HashSet<>();
 
     /**
      * Declare which states can follow from this non-terminal state.

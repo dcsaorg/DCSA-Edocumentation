@@ -6,7 +6,6 @@ import jakarta.validation.constraints.*;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 
 public record ShippingInstructionTO(
@@ -15,7 +14,7 @@ public record ShippingInstructionTO(
   String shippingInstructionReference,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  EblDocumentStatus documentStatus,
+  String documentStatus,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   List<RequestedChangeTO> requestedChanges,

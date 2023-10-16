@@ -43,7 +43,7 @@ public record BookingTO(
   String carrierBookingRequestReference,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  BkgDocumentStatus documentStatus,
+  String bookingStatus,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   List<RequestedChangeTO> requestedChanges,
