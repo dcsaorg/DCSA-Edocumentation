@@ -12,7 +12,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationRe
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.service.mapping.BookingMapper;
-import org.dcsa.edocumentation.transferobjects.BookingCancelRequestTO;
+import org.dcsa.edocumentation.transferobjects.unofficial.BookingCancelRequestTO;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.beans.factory.annotation.Qualifier;

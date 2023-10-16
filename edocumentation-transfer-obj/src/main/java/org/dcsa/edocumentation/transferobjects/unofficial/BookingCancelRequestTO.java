@@ -1,4 +1,4 @@
-package org.dcsa.edocumentation.transferobjects;
+package org.dcsa.edocumentation.transferobjects.unofficial;
 
 import lombok.Builder;
 import org.dcsa.skernel.infrastructure.validation.EnumSubset;
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 public record BookingCancelRequestTO(
   @NotNull
-  @EnumSubset(anyOf = "CANCELLED")
+  @EnumSubset(anyOf = "REJECTED,DECLINED")
   String bookingStatus,
   @Size(max = 250)
   String reason

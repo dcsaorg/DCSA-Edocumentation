@@ -1870,7 +1870,7 @@
 											"\r",
 											"pm.test(\"Error message is as expected\", () => {\r",
 											"    const jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.errors[0].message).to.eql(\"must be any of [CANCELLED,REJECTED,DECLINED]\");\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"must be any of [CANCELLED]\");\r",
 											"});"
 										],
 										"type": "text/javascript"
