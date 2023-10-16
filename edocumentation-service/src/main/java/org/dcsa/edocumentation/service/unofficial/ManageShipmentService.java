@@ -7,8 +7,13 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
 import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.*;
@@ -85,6 +90,80 @@ public class ManageShipmentService {
     return new String(cbr);
   }
 
+  private String generateCommoditySubreference() {
+    char[] ref = new char[100];
+    for (int i = 0 ; i < ref.length ; i++) {
+      ref[i] = VALID_CBR_AUTOGEN_CHARS[random.nextInt(VALID_CBR_AUTOGEN_CHARS.length)];
+    }
+    return new String(ref);
+  }
+
+  private void assignCommoditySubreferences(
+    Booking booking,
+    List<@Valid List<@Valid @NotBlank @Size(max = 100) @Pattern(regexp = "^\\S(\\s+\\S+)*$") String>> subreferences
+  ) {
+    if (subreferences != null) {
+      long totalCount = subreferences.stream().mapToLong(Collection::size).sum();
+      long uniqueCount = subreferences.stream()
+        .flatMap(Collection::stream)
+        .distinct()
+        .count();
+      if (totalCount != uniqueCount) {
+        throw ConcreteRequestErrorMessageException.invalidInput("All commoditySubreferences must be unique"
+          + " across the shipment");
+      }
+      var requestedEquipments = booking.getRequestedEquipments();
+      if (subreferences.size() != requestedEquipments.size()) {
+        throw ConcreteRequestErrorMessageException.invalidInput("There are " + requestedEquipments.size()
+         + " requested equipment groups but subreferences for " + subreferences.size()
+         + " requested equipment groups. These two numbers should be the same.");
+      }
+
+      for (int i = 0 ; i < requestedEquipments.size() ; i++) {
+        var commodities = requestedEquipments.get(i).getCommodities();
+        var refs = subreferences.get(i);
+        if (commodities.size() != refs.size()) {
+          throw ConcreteRequestErrorMessageException.invalidInput("There are " + commodities.size()
+            + " commodities in but subreferences for " + refs.size()
+            + " commodities in the requested equipment group with index " + i + "."
+            + " These two numbers should be the same.");
+        }
+        var j = 0;
+        for (var commodity : commodities) {
+          var ref = refs.get(j++);
+          if (commodity.getCommoditySubreference() != null && !commodity.getCommoditySubreference().equals(ref)) {
+            throw ConcreteRequestErrorMessageException.invalidInput("The commodity at index [" + i + ", " + j
+              + "] was already assigned the commodity subreference \"" + commodity.getCommoditySubreference()
+              + "\". As an implementation detail, the RI does not support changing subreferences."
+              + " When (re-)confirming the booking, you must reuse the same commodity subreference for commodities"
+              + " that where already assigned a commodity subreference.");
+          }
+          commodity.assignSubreference(ref);
+        }
+      }
+    } else {
+      Set<String> seen = new HashSet<>();
+      booking.getRequestedEquipments().stream()
+        .map(RequestedEquipmentGroup::getCommodities)
+        .flatMap(Collection::stream)
+        .filter(c -> c.getCommoditySubreference() == null)
+        .forEach(commodity -> {
+          var ref = generateCommoditySubreference();
+          int failures = 0;
+          while(seen.contains(ref)) {
+            if (failures++ > 3) {
+              throw ConcreteRequestErrorMessageException.internalServerError(
+                "Could not generate a unique commodity subreference within a few attempts." +
+                  " This should not happen unless someone broke the subreference generator."
+              );
+            }
+          }
+          commodity.assignSubreference(ref);
+          seen.add(ref);
+        });
+    }
+  }
+
   @Transactional
   public ShipmentRefStatusTO create(ManageShipmentRequestTO shipmentRequestTO) {
     Booking booking = getBooking(shipmentRequestTO);
@@ -95,6 +174,8 @@ public class ManageShipmentService {
     }
     OffsetDateTime confirmationTime = OffsetDateTime.now();
     ValidationResult<String> validationResult = unofficialBookingService.validateBooking(booking, false);
+
+    assignCommoditySubreferences(booking, shipmentRequestTO.commoditySubreferences());
 
     booking.confirm(confirmationTime);
 

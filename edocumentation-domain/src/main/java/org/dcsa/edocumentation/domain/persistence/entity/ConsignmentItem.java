@@ -33,6 +33,12 @@ public class ConsignmentItem {
   @Column(name = "description_of_goods", nullable = false)
   private String descriptionOfGoods;
 
+  @Column(name = "carrier_booking_reference", nullable = false, length = 35)
+  private String carrierBookingReference;
+
+  @Column(name = "commodity_subreference", nullable = false, length = 100)
+  private String commoditySubreference;
+
   @ElementCollection
   @Column(name = "hs_code", nullable = false)
   @CollectionTable(name = "hs_code_item", joinColumns = @JoinColumn(name = "consignment_item_id"))

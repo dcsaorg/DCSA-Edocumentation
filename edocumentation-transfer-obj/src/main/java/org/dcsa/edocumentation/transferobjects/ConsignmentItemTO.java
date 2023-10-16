@@ -20,6 +20,10 @@ public record ConsignmentItemTO(
   String carrierBookingReference,
 
   @NotNull
+  @Size(max = 100)
+  String commoditySubreference,
+
+  @NotNull
   Double weight,
 
   @NotNull

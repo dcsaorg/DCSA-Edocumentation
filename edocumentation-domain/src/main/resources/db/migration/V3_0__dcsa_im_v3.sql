@@ -255,18 +255,31 @@ CREATE TABLE confirmed_equipment (
   list_order int NOT NULL DEFAULT 0
 );
 
+CREATE TABLE outer_packaging (
+	id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  package_code varchar(2),
+  imo_packaging_code varchar(5),
+  number_of_packages int default NULL,
+  description varchar(100)
+);
 
 CREATE TABLE commodity (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     requested_equipment_group_id uuid NOT NULL REFERENCES requested_equipment_group(id),
     commodity_type varchar(550) NOT NULL,
+    commodity_subreference varchar(100) NULL,
     cargo_gross_weight real NULL,
     cargo_gross_weight_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (cargo_gross_weight_unit IN ('KGM','LBR')),
     cargo_gross_volume real NULL,
     cargo_gross_volume_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (cargo_gross_volume_unit IN ('MTQ','FTQ')),
-    number_of_packages integer NULL,
     export_license_issue_date date NULL,
-    export_license_expiry_date date NULL
+    export_license_expiry_date date NULL,
+    list_order int NOT NULL DEFAULT 0,
+    outer_packaging_id uuid NULL REFERENCES outer_packaging(id),
+    -- actually, the uniqueness must be across the entire booking.  However, we cannot
+    -- enforce that SQL-wise.  We can discover a more narrow case and we might as well
+    -- do that.
+    UNIQUE (requested_equipment_group_id, commodity_subreference)
 );
 
 CREATE INDEX ON commodity (requested_equipment_group_id);
@@ -429,8 +442,10 @@ CREATE INDEX ON utilized_transport_equipment (equipment_reference);
 CREATE TABLE consignment_item (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     description_of_goods text NOT NULL,
+    carrier_booking_reference varchar(35) NOT NULL,
+    commodity_subreference varchar(100) NOT NULL,
     shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
-    shipment_id uuid NOT NULL REFERENCES shipment (id),
+    shipment_id uuid NOT NULL REFERENCES shipment (id), -- TODO; should be `NULL` instead of `NOT NULL`.
     commodity_id uuid NULL REFERENCES commodity (id),
     si_entry_order int NOT NULL default 0
 );
@@ -590,3 +605,4 @@ CREATE TABLE requested_carrier_clause (
     requested_clause varchar(100) NOT NULL,
     element_order int NOT NULL default 0
 );
+
