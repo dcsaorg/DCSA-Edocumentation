@@ -296,7 +296,7 @@ CREATE TABLE displayed_address (
 CREATE TABLE shipping_instruction (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     shipping_instruction_reference  varchar(100) NOT NULL DEFAULT uuid_generate_v4()::text,
-    document_status varchar(4) NOT NULL REFERENCES shipment_event_type(shipment_event_type_code) CHECK(document_status IN ('RECE','PENU','DRFT','PENA','APPR','ISSU','SURR','VOID')),
+    document_status varchar(50),
     is_shipped_onboard_type boolean NOT NULL,
     number_of_copies_with_charges integer NULL,
     number_of_copies_without_charges integer NULL,

@@ -582,7 +582,7 @@ INSERT INTO shipping_instruction (
 ) VALUES (
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
     'SI_REF_2',
-    'APPR',
+    'APPROVED',
     TRUE,
     2,
     4,
@@ -593,7 +593,7 @@ INSERT INTO shipping_instruction (
 ),(
     '877ce0f8-3126-45f5-b22e-2d1d27d42d85',
     'SI_REF_3',
-    'RECE',
+    'RECEIVED',
     TRUE,
     2,
     4,
@@ -604,7 +604,7 @@ INSERT INTO shipping_instruction (
 ),(
     '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
     'SI_REF_4',
-    'RECE',
+    'RECEIVED',
     TRUE,
     2,
     4,
@@ -615,7 +615,7 @@ INSERT INTO shipping_instruction (
 ),(
     'cb6354c9-1ceb-452c-aed0-3cb25a04647a',
     'SI_REF_5',
-    'PENU',
+    'PENDING UPDATE',
     TRUE,
     2,
     4,
@@ -626,7 +626,7 @@ INSERT INTO shipping_instruction (
 ),(
     '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
     'SI_REF_6',
-    'APPR',
+    'APPROVED',
     TRUE,
     2,
     4,
@@ -637,7 +637,7 @@ INSERT INTO shipping_instruction (
 ),(
       '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
       'SI_REF_7',
-      'APPR',
+      'APPROVED',
       TRUE,
       2,
       4,
@@ -1325,7 +1325,7 @@ INSERT INTO shipping_instruction (
 ) VALUES (
     'a1c7b95d-3004-40a5-bae1-e379021b7782',
     'SI_REF_9',
-    'RECE',
+    'RECEIVED',
     TRUE,
     2,
     4,
@@ -1618,7 +1618,7 @@ INSERT INTO shipping_instruction (
 ) VALUES (
     '2c337fcc-2814-42b3-a752-f1847e74cba7',
     'SI_REF_10',
-    'DRFT',
+    'DRAFT',
     TRUE,
     2,
     4,

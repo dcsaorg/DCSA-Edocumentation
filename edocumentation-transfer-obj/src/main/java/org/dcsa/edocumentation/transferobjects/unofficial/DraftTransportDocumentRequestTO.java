@@ -20,7 +20,7 @@ public record DraftTransportDocumentRequestTO(
   @NotBlank
   String shippingInstructionReference,
 
-  // No issue date - the DRFT is never issued.
+  // No issue date - the EblDocumentStatus.DRAFT is never issued.
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   LocalDate shipmentDate,

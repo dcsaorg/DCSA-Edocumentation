@@ -1,7 +1,5 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import static org.dcsa.edocumentation.infra.enums.BookingStatus.*;
-
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -24,6 +22,7 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.validations.*;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
+import static org.dcsa.edocumentation.infra.enums.BookingStatus.*;
 import org.dcsa.edocumentation.infra.validation.StringEnumValidation;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
