@@ -38,7 +38,7 @@ import lombok.*;
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
 @Entity
-@Table(name = "confirmed-booking")
+@Table(name = "confirmed_booking")
 public class ConfirmedBooking {
 
   @Id
@@ -54,7 +54,7 @@ public class ConfirmedBooking {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "confirmed-booking")
+  @OneToMany(mappedBy = "confirmedBooking")
   private Set<@Valid ConsignmentItem> consignmentItems;
 
   @ToString.Exclude
@@ -77,23 +77,23 @@ public class ConfirmedBooking {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "confirmed-booking")
+  @OneToMany(mappedBy = "confirmedBooking")
   private Set<ShipmentTransport> shipmentTransports = new LinkedHashSet<>();
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "confirmed-booking")
+  @OneToMany(mappedBy = "confirmedBooking")
   private Set<@Valid ShipmentLocation> shipmentLocations = new LinkedHashSet<>();
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "confirmed-booking", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "confirmedBooking", cascade = CascadeType.ALL)
   @OrderColumn(name = "list_order")
   private List<@Valid ShipmentCutOffTime> shipmentCutOffTimes;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "confirmed-booking", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "confirmedBooking", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @OrderColumn(name = "list_order")
   private List<ConfirmedEquipment> confirmedEquipments = new ArrayList<>();
 

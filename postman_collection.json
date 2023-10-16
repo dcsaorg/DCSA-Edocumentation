@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "00664fb0-efb6-42f3-a6ec-8f3e536db655",
+		"_postman_id": "41405638-178b-4f11-b430-b5d1d048949d",
 		"name": "DCSA-EDocumentation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "10391075",
-		"_collection_link": "https://grey-desert-2866.postman.co/workspace/New-Team-Workspace~9634308f-0889-42d7-99bd-1d4b0f653244/collection/10391075-00664fb0-efb6-42f3-a6ec-8f3e536db655?action=share&source=collection_link&creator=10391075"
+		"_collection_link": "https://grey-desert-2866.postman.co/workspace/New-Team-Workspace~9634308f-0889-42d7-99bd-1d4b0f653244/collection/10391075-41405638-178b-4f11-b430-b5d1d048949d?action=share&source=collection_link&creator=10391075"
 	},
 	"item": [
 		{
@@ -3594,13 +3594,13 @@
 			"description": "The tests in this folder is about testing that the shipper (or their delegate) can create a new shipping instruction.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification."
 		},
 		{
-			"name": "Get Shipment",
+			"name": "Get Confirmed Booking",
 			"item": [
 				{
 					"name": "Positive test cases",
 					"item": [
 						{
-							"name": "Shipment by carrierBookingReference",
+							"name": "Confirmed Booking by carrierBookingReference",
 							"event": [
 								{
 									"listen": "test",
@@ -3624,12 +3624,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/shipments/BR1239719871",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/confirmed-bookings/BR1239719871",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"shipments",
+										"confirmed-bookings",
 										"BR1239719871"
 									]
 								}
@@ -3671,7 +3671,7 @@
 					"name": "Negative test cases",
 					"item": [
 						{
-							"name": "Shipment by carrierBookingReference",
+							"name": "Confirmed Booking by carrierBookingReference",
 							"event": [
 								{
 									"listen": "test",
@@ -3688,7 +3688,7 @@
 											"\r",
 											"pm.test(\"carrierBookingReference size must be between 0 and 35\", () => {\r",
 											"    var jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.errors[0].message).to.eql(\"getShipment.carrierBookingReference size must be between 0 and 35\");\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"getConfirmedBooking.carrierBookingReference size must be between 0 and 35\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -3699,12 +3699,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/shipments/12342394023i49023894i239054345u34593859438534905890438659034582390842390489023758937589347584356765049234823908490237489237482937589347859023745238905743248954739",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/confirmed-bookings/12342394023i49023894i239054345u34593859438534905890438659034582390842390489023758937589347584356765049234823908490237489237482937589347859023745238905743248954739",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"shipments",
+										"confirmed-bookings",
 										"12342394023i49023894i239054345u34593859438534905890438659034582390842390489023758937589347584356765049234823908490237489237482937589347859023745238905743248954739"
 									]
 								}
@@ -3712,7 +3712,7 @@
 							"response": []
 						},
 						{
-							"name": "Shipment not found",
+							"name": "Confirmed Booking not found",
 							"event": [
 								{
 									"listen": "test",
@@ -3729,7 +3729,7 @@
 											"\r",
 											"pm.test(\"No Shipment found\", () => {\r",
 											"    var jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.errors[0].message).to.eql(\"No Shipment found with carrierBookingReference = IdoNotExist\");\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"No Confirmed Booking found with carrierBookingReference = IdoNotExist\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -3740,12 +3740,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/shipments/IdoNotExist",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/confirmed-bookings/IdoNotExist",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"shipments",
+										"confirmed-bookings",
 										"IdoNotExist"
 									]
 								}
@@ -3964,13 +3964,13 @@
 			]
 		},
 		{
-			"name": "POST Shipment",
+			"name": "POST Confirmed Booking",
 			"item": [
 				{
 					"name": "Negative test cases",
 					"item": [
 						{
-							"name": "Test: Post Shipment with NOT connected transport Plans",
+							"name": "Test: Post Confirmed Booking with NOT connected transport Plans",
 							"item": [
 								{
 									"name": "Create a booking",
@@ -4021,7 +4021,7 @@
 									"response": []
 								},
 								{
-									"name": "POST Shipment",
+									"name": "POST Confirmed Booking",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -4065,13 +4065,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipments",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/confirmed-bookings",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipments"
+												"confirmed-bookings"
 											]
 										}
 									},
@@ -4080,7 +4080,7 @@
 							]
 						},
 						{
-							"name": "Test: Post Shipment where all Shipment locations do not appear oin Transport Locations",
+							"name": "Test: Post Confirmed Booking where all Shipment locations do not appear oin Transport Locations",
 							"item": [
 								{
 									"name": "Create a booking",
@@ -4131,7 +4131,7 @@
 									"response": []
 								},
 								{
-									"name": "POST Shipment",
+									"name": "POST Confirmed Booking",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -4176,13 +4176,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipments",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/confirmed-bookings",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipments"
+												"confirmed-bookings"
 											]
 										}
 									},
@@ -4191,7 +4191,7 @@
 							]
 						},
 						{
-							"name": "Test: Post Shipment where POD is NOT the last location and PDE is not provided",
+							"name": "Test: Post Confirmed Booking where POD is NOT the last location and PDE is not provided",
 							"item": [
 								{
 									"name": "Create a booking",
@@ -4242,7 +4242,7 @@
 									"response": []
 								},
 								{
-									"name": "POST Shipment",
+									"name": "POST Confirmed Booking",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -4286,13 +4286,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipments",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/confirmed-bookings",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipments"
+												"confirmed-bookings"
 											]
 										}
 									},
@@ -4439,7 +4439,7 @@
 									"response": []
 								},
 								{
-									"name": "POST Shipment",
+									"name": "POST Confirmed Booking",
 									"event": [
 										{
 											"listen": "test",
@@ -4492,13 +4492,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/shipments",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/confirmed-bookings",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"shipments"
+												"confirmed-bookings"
 											]
 										}
 									},
@@ -4529,12 +4529,12 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/shipments/{{CARRIER_BOOKING_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/confirmed-bookings/{{CARRIER_BOOKING_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"shipments",
+												"confirmed-bookings",
 												"{{CARRIER_BOOKING_REFERENCE}}"
 											]
 										}
