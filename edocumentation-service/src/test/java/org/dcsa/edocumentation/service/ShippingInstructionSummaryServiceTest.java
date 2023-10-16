@@ -2,7 +2,7 @@ package org.dcsa.edocumentation.service;
 
 import org.dcsa.edocumentation.datafactories.ShippingInstructionDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
@@ -87,7 +87,7 @@ class ShippingInstructionSummaryServiceTest {
       .thenReturn(List.of(mockShippingInstruction));
 
     PagedResult<ShippingInstructionSummaryTO> result =
-      service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECE, null);
+      service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECEIVED, null);
     assertEquals(1, result.totalPages());
     assertEquals(
       mockShippingInstruction.getShippingInstructionReference(),
@@ -168,7 +168,7 @@ class ShippingInstructionSummaryServiceTest {
       .thenReturn(List.of(mockShippingInstruction));
 
     PagedResult<ShippingInstructionSummaryTO> result =
-      service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECE, UUID.randomUUID().toString());
+      service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECEIVED, UUID.randomUUID().toString());
     assertEquals(1, result.totalPages());
     assertEquals(
       mockShippingInstruction.getShippingInstructionReference(),

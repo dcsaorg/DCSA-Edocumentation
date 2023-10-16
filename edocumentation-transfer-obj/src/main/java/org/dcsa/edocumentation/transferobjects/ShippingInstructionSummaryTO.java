@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 
 import jakarta.validation.constraints.NotBlank;
@@ -20,7 +19,7 @@ public record ShippingInstructionSummaryTO(
 
   @NotNull(message = "The attribute documentStatus is required.")
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  EblDocumentStatus documentStatus,
+  String documentStatus,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   List<RequestedChangeTO> requestedChanges,

@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.service.TransportDocumentService;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
-import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.dcsa.skernel.infrastructure.validation.EnumSubset;
 import org.springframework.http.HttpStatus;
@@ -47,7 +46,7 @@ public class TransportDocumentController {
   }
 
   private record ApproveTDPayload(
-    @EnumSubset(anyOf = "APPR")
-    EblDocumentStatus documentStatus
+    @EnumSubset(anyOf = "APPROVED")
+    String documentStatus
   ) {}
 }

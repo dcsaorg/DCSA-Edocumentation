@@ -1,7 +1,6 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import java.util.List;
-import java.util.Set;
 import org.dcsa.edocumentation.domain.persistence.entity.CargoItem;
 import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;

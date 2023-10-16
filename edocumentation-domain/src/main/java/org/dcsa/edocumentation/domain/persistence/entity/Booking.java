@@ -1,7 +1,5 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.*;
-
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -15,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.dfa.AbstractStateMachine;
 import org.dcsa.edocumentation.domain.dfa.CannotLeaveTerminalStateException;
 import org.dcsa.edocumentation.domain.dfa.DFADefinition;
@@ -22,6 +21,9 @@ import org.dcsa.edocumentation.domain.dfa.TargetStateIsNotSuccessorException;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.validations.*;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
+import static org.dcsa.edocumentation.infra.enums.BookingStatus.*;
+import org.dcsa.edocumentation.infra.validation.StringEnumValidation;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 
@@ -49,6 +51,7 @@ import org.springframework.data.domain.Persistable;
           name = "graph.party",
           attributeNodes = {@NamedAttributeNode("partyContactDetails")}),
     })
+@Slf4j
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -57,19 +60,30 @@ import org.springframework.data.domain.Persistable;
 @Entity
 @Table(name = "booking")
 @BookingValidation(groups = AsyncShipperProvidedDataValidation.class)
-public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements Persistable<UUID> {
+public class Booking extends AbstractStateMachine<String> implements Persistable<UUID> {
 
+  private static final Set<String> CAN_BE_VALIDATED = Set.of(RECEIVED,
+    PENDING_UPDATES_CONFIRMATION,
+    PENDING_AMENDMENTS_APPROVAL);
 
-  private static final Set<BkgDocumentStatus> CAN_BE_VALIDATED =
-    Set.of(BkgDocumentStatus.RECE, BkgDocumentStatus.PENC);
-
-
-  private static final DFADefinition<BkgDocumentStatus> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECE)
-    .nonTerminalState(RECE).successorNodes(REJE, CANC, PENU, PENC, CONF)
-    .nonTerminalState(PENU).successorNodes(REJE, CANC, PENU, PENC)
-    .nonTerminalState(PENC).successorNodes(REJE, CANC, PENU, PENC, CONF)
-    .nonTerminalState(CONF).successorNodes(REJE, CMPL, PENU, PENC)
-    .terminalStates(CANC, CMPL, REJE)
+  private static final DFADefinition<String> BOOKING_DFA_DEFINITION = DFADefinition.builder(RECEIVED)
+    .nonTerminalState(RECEIVED)
+    .successorNodes(CONFIRMED, PENDING_UPDATE, REJECTED, // Carrier
+      CANCELLED, PENDING_UPDATES_CONFIRMATION) // Shipper
+    .nonTerminalState(PENDING_UPDATE)
+    .successorNodes(PENDING_UPDATE, REJECTED, // Carrier
+      PENDING_UPDATES_CONFIRMATION, CANCELLED) // Shipper
+    .nonTerminalState(PENDING_UPDATES_CONFIRMATION)
+    .successorNodes(CONFIRMED, PENDING_UPDATE, REJECTED, // Carrier
+      CANCELLED) // Shipper
+    .nonTerminalState(CONFIRMED)
+    .successorNodes(PENDING_UPDATE, COMPLETED, DECLINED, // Carrier
+      PENDING_AMENDMENTS_APPROVAL, CANCELLED) // Shipper
+    .nonTerminalState(PENDING_AMENDMENTS_APPROVAL)
+    .successorNodes(PENDING_UPDATE, CONFIRMED, DECLINED, // Carrier
+      CANCELLED) // Shipper
+    .terminalStates(COMPLETED, REJECTED, DECLINED, // Carrier
+      CANCELLED) // Shipper
     .build();
 
   @Id
@@ -79,9 +93,9 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   @Column(name = "carrier_booking_request_reference", length = 100)
   private String carrierBookingRequestReference;
 
-  @Column(name = "document_status")
-  @Enumerated(EnumType.STRING)
-  private BkgDocumentStatus documentStatus;
+  @Column(name = "booking_status")
+  @StringEnumValidation(value= BookingStatus.class)
+  private String bookingStatus;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -254,11 +268,11 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   /**
    * Subject to change. Reefer will probably change it.
    */
-  public ValidationResult<BkgDocumentStatus> asyncValidation(Validator validator) {
+  public ValidationResult<String> asyncValidation(Validator validator) {
     List<String> validationErrors = new ArrayList<>();
 
-    if (!CAN_BE_VALIDATED.contains(documentStatus)) {
-      throw new IllegalStateException("documentStatus must be one of " + CAN_BE_VALIDATED);
+    if (!CAN_BE_VALIDATED.contains(bookingStatus)) {
+      throw new IllegalStateException("bookingStatus must be one of " + CAN_BE_VALIDATED);
     }
     if (this.requestedChanges == null) {
       this.requestedChanges = new ArrayList<>();
@@ -269,10 +283,12 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
       this.requestedChanges.add(BookingRequestedChange.fromConstraintViolation(violation));
       validationErrors.add(violation.getPropertyPath().toString() + ": " +  violation.getMessage());
     }
-    var proposedStatus = validationErrors.isEmpty()
-      ? PENC
-      : PENU
-      ;
+
+    // TODO: according to the latest Booking State Transition Diagram (STD),
+    //  PENDING_UPDATES_CONFIRMATION should be replaced with CONFIRMED, but this change should be done together
+    // with other STD-related changes so that new BOOKING_DFA_DEFINITION does not get broken
+    var proposedStatus = validationErrors.isEmpty() ? PENDING_UPDATES_CONFIRMATION : PENDING_UPDATE;
+
     return new ValidationResult<>(proposedStatus, validationErrors);
   }
 
@@ -284,52 +300,66 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
 
 
   /**
-   * Transition the booking into its {@link BkgDocumentStatus#RECE} state.
+   * Transition the booking into its {@link BookingStatus#RECEIVED} state.
    */
   public void receive() {
-    processTransition(RECE, null, false);
+    processTransition(RECEIVED, null, false);
   }
 
   /**
-   * Transition the booking into its {@link BkgDocumentStatus#CANC} state.
+   * Transition the booking into its {@link BookingStatus#CANCELLED} state.
    */
   public void cancel(String reason, OffsetDateTime updateTime) {
-    processTransition(CANC, reason, updateTime, false);
+    processTransition(CANCELLED, reason, updateTime, false);
   }
 
   /**
-   * Transition the booking into its {@link BkgDocumentStatus#REJE} state.
+   * Transition the booking into its {@link BookingStatus#REJECTED} state.
    */
   public void reject(String reason) {
-    processTransition(REJE, reason, false);
+    processTransition(REJECTED, reason, false);
   }
 
   /**
-   * Transition the booking into its {@link BkgDocumentStatus#PENU} state.
+   * Transition the booking into its {@link BookingStatus#REJECTED} state.
+   */
+  public void decline(String reason) {
+    processTransition(DECLINED, reason, false);
+  }
+
+  /**
+   * Transition the booking into its {@link BookingStatus#PENDING_UPDATE} state.
    */
   public void pendingUpdate(String reason, OffsetDateTime updateTime) {
-    processTransition(PENU, reason, updateTime, false);
+    processTransition(PENDING_UPDATE, reason, updateTime, false);
   }
 
   /**
-   * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
+   * Transition the booking into its {@link BookingStatus#PENDING_UPDATES_CONFIRMATION} state.
    */
-  public void pendingConfirmation(String reason, OffsetDateTime updateTime) {
-    processTransition(PENC, reason, updateTime, true);
+  public void pendingUpdatesConfirmation(String reason, OffsetDateTime updateTime) {
+    processTransition(PENDING_UPDATES_CONFIRMATION, reason, updateTime, true);
   }
 
   /**
-   * Transition the booking into its {@link BkgDocumentStatus#PENC} state.
+   * Transition the booking into its {@link BookingStatus#PENDING_AMENDMENTS_APPROVAL} state.
+   */
+  public void pendingAmendmentsApproval(String reason, OffsetDateTime updateTime) {
+    processTransition(PENDING_AMENDMENTS_APPROVAL, reason, updateTime, true);
+  }
+
+  /**
+   * Transition the booking into its {@link BookingStatus#CONFIRMED} state.
    */
   public void confirm(OffsetDateTime confirmationTime) {
-    processTransition(CONF, null, confirmationTime, true);
+    processTransition(CONFIRMED, null, confirmationTime, true);
   }
 
   /**
-   * Transition the booking into its {@link BkgDocumentStatus#CMPL} state.
+   * Transition the booking into its {@link BookingStatus#COMPLETED} state.
    */
   public void complete() {
-    processTransition(CMPL, null, true);
+    processTransition(COMPLETED, null, true);
   }
 
   public void lockVersion(OffsetDateTime lockTime) {
@@ -340,25 +370,25 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   }
 
   @Override
-  protected DFADefinition<BkgDocumentStatus> getDfaDefinition() {
+  protected DFADefinition<String> getDfaDefinition() {
     return BOOKING_DFA_DEFINITION;
   }
 
   @Override
-  protected BkgDocumentStatus getResumeFromState() {
-    return this.documentStatus;
+  protected String getResumeFromState() {
+    return this.bookingStatus;
   }
 
-  protected void processTransition(BkgDocumentStatus status, String reason, boolean clearRequestedChanges) {
-    processTransition(status, reason, OffsetDateTime.now(), clearRequestedChanges);
+  protected void processTransition(String bookingStatus, String reason, boolean clearRequestedChanges) {
+    processTransition(bookingStatus, reason, OffsetDateTime.now(), clearRequestedChanges);
   }
 
-  protected void processTransition(BkgDocumentStatus status, String reason, OffsetDateTime updateTime, boolean clearRequestedChanges) {
+  protected void processTransition(String bookingStatus, String reason, OffsetDateTime updateTime, boolean clearRequestedChanges) {
     if (this.validUntil != null) {
       throw new IllegalStateException("Cannot change state on a frozen version!");
     }
-    transitionTo(status);
-    this.documentStatus = status;
+    transitionTo(bookingStatus);
+    this.bookingStatus = bookingStatus;
     this.bookingRequestUpdatedDateTime = updateTime;
     if (this.bookingRequestCreatedDateTime == null) {
       this.bookingRequestCreatedDateTime = updateTime;
@@ -376,19 +406,28 @@ public class Booking extends AbstractStateMachine<BkgDocumentStatus> implements 
   }
 
   @Override
-  protected RuntimeException errorForAttemptLeavingToLeaveTerminalState(BkgDocumentStatus currentState, BkgDocumentStatus successorState, CannotLeaveTerminalStateException e) {
+  protected RuntimeException errorForAttemptToLeaveTerminalState(String currentState,
+                                                                 String successorState,
+                                                                 CannotLeaveTerminalStateException e) {
+    log.error("Booking with id=" + (id != null ? id.toString() : "null") +" is in terminal state " + currentState +
+      ", can not transition to state " + successorState);
     return ConcreteRequestErrorMessageException.conflict(
-      "Cannot perform the requested action on the booking because the booking is "
-        + currentState.getValue().toLowerCase() + " (" + currentState.name() + ")",
+      "Cannot perform the requested action on the booking because the booking status is '"
+        + currentState + "'",
       e
     );
   }
 
   @Override
-  protected RuntimeException errorForTargetStatNotListedAsSuccessor(BkgDocumentStatus currentState, BkgDocumentStatus successorState, TargetStateIsNotSuccessorException e) {
+
+  protected RuntimeException errorForTargetStateNotListedAsSuccessor(String currentState,
+                                                                     String successorState,
+                                                                     TargetStateIsNotSuccessorException e) {
+    log.error("Booking with id=" + (id != null ? id.toString() : "null") +" is in state " + currentState +
+      ", can not transition to unexpected state " + successorState);
     return ConcreteRequestErrorMessageException.conflict(
-      "It is not possible to perform the requested action on the booking with documentStatus ("
-        + currentState.name() + ").",
+      "It is not possible to perform the requested action on the booking with the booking status '"
+        + currentState + "'",
       e
     );
   }

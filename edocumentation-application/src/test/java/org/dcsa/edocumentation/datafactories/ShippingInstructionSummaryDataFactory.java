@@ -2,7 +2,7 @@ package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
-import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.TransportDocumentTypeCode;
 
 import java.time.OffsetDateTime;
@@ -15,7 +15,7 @@ public class ShippingInstructionSummaryDataFactory {
   public ShippingInstructionSummaryTO singleShippingInstructionSummaryTO() {
     return ShippingInstructionSummaryTO.builder()
         .shippingInstructionReference(UUID.randomUUID().toString())
-        .documentStatus(EblDocumentStatus.RECE)
+        .documentStatus(EblDocumentStatus.RECEIVED)
         .carrierBookingReferences(
             List.of("bca68f1d3b804ff88aaa1e43055432f7", "832deb4bd4ea4b728430b857c59bd057"))
         .shippingInstructionCreatedDateTime(OffsetDateTime.now())
@@ -36,7 +36,7 @@ public class ShippingInstructionSummaryDataFactory {
   public List<ShippingInstructionSummaryTO> multipleShippingInstructionSummaryTO() {
     ShippingInstructionSummaryTO shippingInstructionSummaryTO = ShippingInstructionSummaryTO.builder()
       .shippingInstructionReference(UUID.randomUUID().toString())
-      .documentStatus(EblDocumentStatus.RECE)
+      .documentStatus(EblDocumentStatus.RECEIVED)
       .carrierBookingReferences(
         List.of("bca68f1d3b804ff88aaa1e43055432f7", "832deb4bd4ea4b728430b857c59bd057"))
       .shippingInstructionCreatedDateTime(OffsetDateTime.now())

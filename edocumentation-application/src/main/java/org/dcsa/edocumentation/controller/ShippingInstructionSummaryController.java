@@ -1,7 +1,9 @@
 package org.dcsa.edocumentation.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.infra.validation.StringEnumValidation;
 import org.dcsa.edocumentation.service.ShippingInstructionSummaryService;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.Pagination;
@@ -29,8 +31,11 @@ public class ShippingInstructionSummaryController {
   @GetMapping(path = "${spring.application.ebl-context-path}" + "/shipping-instructions-summaries")
   @ResponseStatus(HttpStatus.OK)
   List<ShippingInstructionSummaryTO> getShippingInstructionSummaries(
-      @RequestParam(required = false) EblDocumentStatus documentStatus,
-      @RequestParam(required = false) String carrierBookingReference,
+      @RequestParam(required = false)
+      @StringEnumValidation(value = EblDocumentStatus.class)
+      String documentStatus,
+      @RequestParam(required = false)
+      String carrierBookingReference,
       @RequestParam(value = Pagination.DCSA_PAGE_PARAM_NAME, defaultValue = "0", required = false)
           @Min(0)
           int page,

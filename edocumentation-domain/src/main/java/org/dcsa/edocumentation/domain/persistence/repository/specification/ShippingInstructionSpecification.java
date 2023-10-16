@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.*;
@@ -17,7 +16,7 @@ import java.util.UUID;
 public class ShippingInstructionSpecification {
 
   public record ShippingInstructionFilters(
-      List<String> carrierBookingReference, EblDocumentStatus documentStatus) {
+      List<String> carrierBookingReference, String documentStatus) {
     @Builder
     public ShippingInstructionFilters {}
   }
