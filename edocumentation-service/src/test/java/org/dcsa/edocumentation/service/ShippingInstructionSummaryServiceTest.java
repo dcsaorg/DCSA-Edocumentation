@@ -122,7 +122,6 @@ class ShippingInstructionSummaryServiceTest {
         mockShippingInstruction.getConsignmentItems().stream()
             .toList()
             .get(0)
-            .getShipment()
             .getCarrierBookingReference(),
         result.content().get(0).carrierBookingReferences().get(0));
   }
@@ -151,7 +150,6 @@ class ShippingInstructionSummaryServiceTest {
       mockShippingInstruction.getConsignmentItems().stream()
         .toList()
         .get(0)
-        .getShipment()
         .getCarrierBookingReference(),
       result.content().get(0).carrierBookingReferences().get(0));
   }
@@ -180,7 +178,6 @@ class ShippingInstructionSummaryServiceTest {
       mockShippingInstruction.getConsignmentItems().stream()
         .toList()
         .get(0)
-        .getShipment()
         .getCarrierBookingReference(),
       result.content().get(0).carrierBookingReferences().get(0));
   }
@@ -209,7 +206,6 @@ class ShippingInstructionSummaryServiceTest {
       mockShippingInstructions.get(0).getConsignmentItems().stream()
         .toList()
         .get(0)
-        .getShipment()
         .getCarrierBookingReference(),
       result.content().get(0).carrierBookingReferences().get(0));
   }

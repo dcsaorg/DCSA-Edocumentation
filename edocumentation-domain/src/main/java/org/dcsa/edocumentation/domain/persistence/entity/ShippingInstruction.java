@@ -199,7 +199,7 @@ public class ShippingInstruction extends AbstractStateMachine<String>
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shippingInstruction")
+  @OneToMany(mappedBy = "shippingInstruction", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderColumn(name = "si_entry_order")
   private List<@Valid ConsignmentItem> consignmentItems;
 
@@ -430,5 +430,12 @@ public class ShippingInstruction extends AbstractStateMachine<String>
         "It is not possible to perform the requested action on the booking with documentStatus "
             + currentState,
         e);
+  }
+
+  public void assignConsignmentItems(List<ConsignmentItem> consignmentItems) {
+    this.consignmentItems = consignmentItems;
+    for (var ci : consignmentItems) {
+      ci.setShippingInstruction(this);
+    }
   }
 }
