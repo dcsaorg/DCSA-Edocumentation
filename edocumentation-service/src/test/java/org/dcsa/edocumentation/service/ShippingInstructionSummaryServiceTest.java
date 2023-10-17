@@ -5,7 +5,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
-import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionSummaryMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
@@ -36,9 +35,6 @@ import static org.mockito.Mockito.when;
 class ShippingInstructionSummaryServiceTest {
 
   @Mock private ShippingInstructionRepository shippingInstructionRepository;
-
-  @Spy
-  private DocumentStatusMapper documentStatusMapper = Mappers.getMapper(DocumentStatusMapper.class);
 
   @Spy
   private ShippingInstructionSummaryMapper shippingInstructionSummaryMapper =
