@@ -8,10 +8,9 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
-import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
-import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
@@ -25,7 +24,6 @@ public class UnofficialShippingInstructionService {
 
   private final ShippingInstructionMapper shippingInstructionMapper;
   private final ShippingInstructionRepository shippingInstructionRepository;
-  private final DocumentStatusMapper documentStatusMapper;
   @Qualifier("eagerValidator")
   private final Validator validator;
 
@@ -68,10 +66,10 @@ public class UnofficialShippingInstructionService {
     if (!validationResult.validationErrors().isEmpty()) {
       var documentStatus = validationResult.proposedStatus();
       var reason = validationResult.presentErrors(5000);
-      if (documentStatus == EblDocumentStatus.REJECTED) {
+      if (documentStatus.equals(EblDocumentStatus.REJECTED)) {
         shippingInstruction.rejected(reason);
       } else {
-        assert documentStatus == EblDocumentStatus.PENDING_UPDATE;
+        assert documentStatus.equals(EblDocumentStatus.PENDING_UPDATE);
         shippingInstruction.pendingUpdate();
       }
       shippingInstructionRepository.save(shippingInstruction);
