@@ -1,7 +1,5 @@
 package org.dcsa.edocumentation.service.mapping;
 
-import java.util.List;
-import java.util.Set;
 import org.dcsa.edocumentation.domain.persistence.entity.CargoItem;
 import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
@@ -12,6 +10,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Mapper(componentModel = "spring",
@@ -26,12 +26,16 @@ import org.springframework.stereotype.Component;
     AddressMapper.class,
     CustomsReferenceMapper.class,
     RequestedChangeMapper.class,
-    AdvanceManifestFilingEBLMapper.class
+    AdvanceManifestFilingEBLMapper.class,
+    UtilizedTransportEquipmentMapper.class,
   })
 public abstract class ShippingInstructionMapper {
 
   @Autowired
   protected UtilizedTransportEquipmentMapper utilizedTransportEquipmentMapper;
+
+  @Autowired
+  protected ConsignmentItemMapper consignmentItemMapper;
 
   @Mapping(source = "documentParties", target = "documentParties", ignore = true)
   @Mapping(source = "consignmentItems", target = "consignmentItems", ignore = true)
@@ -40,7 +44,14 @@ public abstract class ShippingInstructionMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "isNew", ignore = true)
   @Mapping(target = "validUntil", ignore = true)
-  public abstract ShippingInstruction toDAO(ShippingInstructionTO shippingInstructionTO);
+  protected abstract ShippingInstruction toDAOInternal(ShippingInstructionTO shippingInstructionTO);
+
+
+  public ShippingInstruction toDAO(ShippingInstructionTO shippingInstructionTO) {
+    var si = this.toDAOInternal(shippingInstructionTO);
+    si.assignConsignmentItems(shippingInstructionTO.consignmentItems().stream().map(consignmentItemMapper::toDAO).toList());
+    return si;
+  }
 
   // TODO: Complete this stub mapping (DDT-1296)
   @Mapping(source = "consignmentItems", target = "utilizedTransportEquipments")

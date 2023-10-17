@@ -19,6 +19,10 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.dcsa.edocumentation</groupId>
+			<artifactId>dcsa-edocumentation-infra</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dcsa.edocumentation</groupId>
 			<artifactId>dcsa-edocumentation-transfer-obj</artifactId>
 		</dependency>
 		<dependency>

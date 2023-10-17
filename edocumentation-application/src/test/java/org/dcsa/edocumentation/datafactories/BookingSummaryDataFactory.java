@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
 import org.dcsa.edocumentation.transferobjects.enums.*;
 
@@ -14,7 +15,7 @@ public class BookingSummaryDataFactory {
   public BookingSummaryTO singleBookingSummaryTO() {
     return BookingSummaryTO.builder()
       .carrierBookingRequestReference("BOOKING_REQ_REF_01")
-      .documentStatus(BkgDocumentStatus.RECE)
+      .bookingStatus(BookingStatus.RECEIVED)
       .receiptTypeAtOrigin(ReceiptDeliveryType.CY)
       .deliveryTypeAtDestination(ReceiptDeliveryType.CY)
       .cargoMovementTypeAtOrigin(CargoMovementType.FCL)
@@ -44,7 +45,7 @@ public class BookingSummaryDataFactory {
   public List<BookingSummaryTO> multipleBookingSummaryTos() {
     BookingSummaryTO bookingSummaryTO1 = BookingSummaryTO.builder()
       .carrierBookingRequestReference("BOOKING_REQ_REF_01")
-      .documentStatus(BkgDocumentStatus.RECE)
+      .bookingStatus(BookingStatus.RECEIVED)
       .receiptTypeAtOrigin(ReceiptDeliveryType.CY)
       .deliveryTypeAtDestination(ReceiptDeliveryType.CY)
       .cargoMovementTypeAtOrigin(CargoMovementType.FCL)
@@ -72,7 +73,7 @@ public class BookingSummaryDataFactory {
 
     BookingSummaryTO bookingSummaryTO2 = BookingSummaryTO.builder()
       .carrierBookingRequestReference("BOOKING_REQ_REF_02")
-      .documentStatus(BkgDocumentStatus.RECE)
+      .bookingStatus(BookingStatus.RECEIVED)
       .receiptTypeAtOrigin(ReceiptDeliveryType.CY)
       .deliveryTypeAtDestination(ReceiptDeliveryType.CY)
       .cargoMovementTypeAtOrigin(CargoMovementType.FCL)

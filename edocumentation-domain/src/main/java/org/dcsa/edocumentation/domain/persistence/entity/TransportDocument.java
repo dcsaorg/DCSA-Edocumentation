@@ -3,12 +3,10 @@ package org.dcsa.edocumentation.domain.persistence.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.DocumentTypeCode;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.LocationSubType;
 import org.dcsa.edocumentation.domain.validations.LocationValidation;
-import org.dcsa.edocumentation.domain.validations.PseudoEnum;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -22,8 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
 
 @NamedEntityGraph(
   name = "graph.transportDocumentSummary",
@@ -151,56 +147,57 @@ public class TransportDocument implements Persistable<UUID> {
   }
 
 
-  /** Transition the document into its {@link EblDocumentStatus#DRFT} state. */
+  /** Transition the document into its {@link EblDocumentStatus#DRAFT} state. */
   public void draft() {
-    processTransition(DRFT);
+    processTransition(EblDocumentStatus.DRAFT);
   }
 
 
   /**
-   * Transition the document into its {@link EblDocumentStatus#PENA} state.
+   * Transition the document into its {@link EblDocumentStatus#PENDING_APPROVAL} state.
    *
    * <p>This state is not supported in all EBL flows. E.g., it is not reachable in the Amendment
    * flow.
    */
   public void pendingApproval() {
-    processTransition(PENA);
+    processTransition(EblDocumentStatus.PENDING_APPROVAL);
   }
 
   /**
-   * Check whether the flow supports the {@link EblDocumentStatus#PENA} state.
+   * Check whether the flow supports the {@link EblDocumentStatus#PENDING_APPROVAL} state.
    *
    * <p>This state is not supported in all EBL flows. This will return false when the EBL flow does
    * not support this state at all. I.e., calling {@link #pendingApproval()} will trigger an
    * exception causing an internal server error status.
    */
   public boolean isPendingApprovalSupported() {
-    return shippingInstruction.supportsState(PENA);
+    return shippingInstruction.supportsState(EblDocumentStatus.PENDING_APPROVAL);
   }
 
-  /** Transition the document into its {@link EblDocumentStatus#APPR} state. */
+  /** Transition the document into its {@link EblDocumentStatus#APPROVED} state. */
   public void approveFromShipper() {
-    if (this.shippingInstruction.getCurrentState() != DRFT) {
-      throw ConcreteRequestErrorMessageException.conflict("Cannot approveFromShipper: The TransportDocument is not in the DRFT state", null);
+    if (!this.shippingInstruction.getCurrentState().equals(EblDocumentStatus.DRAFT)) {
+      throw ConcreteRequestErrorMessageException.conflict("Cannot approveFromShipper: The TransportDocument is not in the EblDocumentStatus.DRAFT state", null);
     }
-    processTransition(APPR);
+    processTransition(EblDocumentStatus.APPROVED);
   }
 
 
-  /** Transition the document into its {@link EblDocumentStatus#APPR} state. */
+  /** Transition the document into its {@link EblDocumentStatus#APPROVED} state. */
   public void approveFromCarrier() {
-    if (this.shippingInstruction.getCurrentState() != PENA) {
-      throw ConcreteRequestErrorMessageException.conflict("Cannot approveFromCarrier: The TransportDocument is not in the PENA state", null);
+    if (!this.shippingInstruction.getCurrentState().equals(EblDocumentStatus.PENDING_APPROVAL)) {
+      throw ConcreteRequestErrorMessageException.conflict(
+        "Cannot approveFromCarrier: The TransportDocument is not in the PENDING APPROVAL state", null);
     }
-    processTransition(APPR);
+    processTransition(EblDocumentStatus.APPROVED);
   }
 
-  /** Transition the document into its {@link EblDocumentStatus#ISSU} state. */
+  /** Transition the document into its {@link EblDocumentStatus#ISSUED} state. */
   public void issue() {
     issue(null, null);
   }
 
-  /** Transition the document into its {@link EblDocumentStatus#ISSU} state.
+  /** Transition the document into its {@link EblDocumentStatus#ISSUED} state.
    *
    * @param issueDate Use the provided date as issue date. Should be LocalDate.now() or in the past. If null,
    *                  defaults to LocalDate.now()
@@ -209,7 +206,7 @@ public class TransportDocument implements Persistable<UUID> {
    *                     use LocalDate.now() (if the original value was absent).
    */
   public void issue(LocalDate issueDate, LocalDate shipmentDate) {
-    processTransition(ISSU);
+    processTransition(EblDocumentStatus.ISSUED);
 
     if (shippingInstruction.getIsShippedOnBoardType() == Boolean.TRUE) {
       if (shipmentDate != null || this.shippedOnBoardDate == null) {
@@ -224,19 +221,19 @@ public class TransportDocument implements Persistable<UUID> {
     this.issueDate = Objects.requireNonNullElseGet(issueDate, LocalDate::now);
   }
 
-  /** Transition the document into its {@link EblDocumentStatus#SURR} state. */
+  /** Transition the document into its {@link EblDocumentStatus#SURRENDERED} state. */
   public void surrender() {
-    processTransition(SURR);
+    processTransition(EblDocumentStatus.SURRENDERED);
   }
 
   /** Transition the document into its {@link EblDocumentStatus#VOID} state. */
   // "void" is a keyword and cannot be used as a method name.
   public void voidDocument() {
-    processTransition(VOID);
+    processTransition(EblDocumentStatus.VOID);
   }
 
-  protected void processTransition(EblDocumentStatus status) {
-    shippingInstruction.processTransition(status, true);
+  protected void processTransition(String documentStatus) {
+    shippingInstruction.processTransition(documentStatus, true);
     if (id == null) {
       id = UUID.randomUUID();
       isNew = true;

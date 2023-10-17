@@ -2,10 +2,9 @@ package org.dcsa.edocumentation.service;
 
 import org.dcsa.edocumentation.datafactories.ShippingInstructionDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
-import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionSummaryMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
@@ -36,9 +35,6 @@ import static org.mockito.Mockito.when;
 class ShippingInstructionSummaryServiceTest {
 
   @Mock private ShippingInstructionRepository shippingInstructionRepository;
-
-  @Spy
-  private DocumentStatusMapper documentStatusMapper = Mappers.getMapper(DocumentStatusMapper.class);
 
   @Spy
   private ShippingInstructionSummaryMapper shippingInstructionSummaryMapper =
@@ -87,7 +83,7 @@ class ShippingInstructionSummaryServiceTest {
       .thenReturn(List.of(mockShippingInstruction));
 
     PagedResult<ShippingInstructionSummaryTO> result =
-      service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECE, null);
+      service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECEIVED, null);
     assertEquals(1, result.totalPages());
     assertEquals(
       mockShippingInstruction.getShippingInstructionReference(),
@@ -122,7 +118,6 @@ class ShippingInstructionSummaryServiceTest {
         mockShippingInstruction.getConsignmentItems().stream()
             .toList()
             .get(0)
-            .getConfirmedBooking()
             .getCarrierBookingReference(),
         result.content().get(0).carrierBookingReferences().get(0));
   }
@@ -151,7 +146,6 @@ class ShippingInstructionSummaryServiceTest {
       mockShippingInstruction.getConsignmentItems().stream()
         .toList()
         .get(0)
-        .getConfirmedBooking()
         .getCarrierBookingReference(),
       result.content().get(0).carrierBookingReferences().get(0));
   }
@@ -168,7 +162,7 @@ class ShippingInstructionSummaryServiceTest {
       .thenReturn(List.of(mockShippingInstruction));
 
     PagedResult<ShippingInstructionSummaryTO> result =
-      service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECE, UUID.randomUUID().toString());
+      service.findShippingInstructionSummaries(mockPageRequest, EblDocumentStatus.RECEIVED, UUID.randomUUID().toString());
     assertEquals(1, result.totalPages());
     assertEquals(
       mockShippingInstruction.getShippingInstructionReference(),
@@ -180,7 +174,6 @@ class ShippingInstructionSummaryServiceTest {
       mockShippingInstruction.getConsignmentItems().stream()
         .toList()
         .get(0)
-        .getConfirmedBooking()
         .getCarrierBookingReference(),
       result.content().get(0).carrierBookingReferences().get(0));
   }
@@ -209,7 +202,6 @@ class ShippingInstructionSummaryServiceTest {
       mockShippingInstructions.get(0).getConsignmentItems().stream()
         .toList()
         .get(0)
-        .getConfirmedBooking()
         .getCarrierBookingReference(),
       result.content().get(0).carrierBookingReferences().get(0));
   }

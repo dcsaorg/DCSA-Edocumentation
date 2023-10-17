@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -21,7 +20,7 @@ public class TransportDocumentSpecification {
   @Builder(toBuilder = true)
   public static class Filters {
     private List<String> carrierBookingReference;
-    private EblDocumentStatus documentStatus;
+    private String documentStatus;
     private PageRequest pageRequest;
   }
 

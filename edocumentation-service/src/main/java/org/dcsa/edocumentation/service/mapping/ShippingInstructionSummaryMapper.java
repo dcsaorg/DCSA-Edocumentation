@@ -14,11 +14,11 @@ public interface ShippingInstructionSummaryMapper {
   @Mapping(
     source = "consignmentItems",
     target = "carrierBookingReferences")
-  @Mapping(target = "amendToTransportDocument", ignore = true)  // FIXME: amendToTransportDocument should be mapped!
+  @Mapping(target = "amendToTransportDocument", ignore = true)  // FIXME: amendToTransportDocument is obsolete and should be removed!
   @Mapping(target = "areChargesDisplayedOnOriginals", ignore = true)  // Not in the swagger entity
   ShippingInstructionSummaryTO shippingInstructionToShippingInstructionSummary(ShippingInstruction shippingInstruction);
 
   default String mapShipmentToCarrierBookingReference(ConsignmentItem consignmentItem) {
-    return consignmentItem.getConfirmedBooking().getCarrierBookingReference();
+    return consignmentItem.getCarrierBookingReference();
   }
 }

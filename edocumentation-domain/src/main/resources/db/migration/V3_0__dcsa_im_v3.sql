@@ -160,7 +160,7 @@ CREATE TABLE voyage (
 CREATE TABLE booking (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     carrier_booking_request_reference varchar(100) NOT NULL DEFAULT uuid_generate_v4()::text,
-    document_status varchar(4) NOT NULL REFERENCES shipment_event_type(shipment_event_type_code) CHECK(document_status IN ('RECE', 'PENU', 'REJE', 'CONF','PENC', 'CANC', 'DECL', 'CMPL')),
+    booking_status varchar(50),
     receipt_type_at_origin varchar(3) NOT NULL REFERENCES receipt_delivery_type(receipt_delivery_type_code),
     delivery_type_at_destination varchar(3) NOT NULL REFERENCES receipt_delivery_type(receipt_delivery_type_code),
     cargo_movement_type_at_origin varchar(3) NOT NULL REFERENCES cargo_movement_type(cargo_movement_type_code),
@@ -196,7 +196,7 @@ CREATE TABLE booking (
 CREATE INDEX ON booking (id);
 
 
-create table confirmed_booking (
+CREATE TABLE confirmed_booking (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     booking_id uuid NOT NULL REFERENCES booking(id),
     carrier_id uuid NOT NULL REFERENCES carrier(id),
@@ -309,7 +309,7 @@ CREATE TABLE displayed_address (
 CREATE TABLE shipping_instruction (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     shipping_instruction_reference  varchar(100) NOT NULL DEFAULT uuid_generate_v4()::text,
-    document_status varchar(4) NOT NULL REFERENCES shipment_event_type(shipment_event_type_code) CHECK(document_status IN ('RECE','PENU','DRFT','PENA','APPR','ISSU','SURR','VOID')),
+    document_status varchar(50),
     is_shipped_onboard_type boolean NOT NULL,
     number_of_copies_with_charges integer NULL,
     number_of_copies_without_charges integer NULL,
@@ -429,10 +429,12 @@ CREATE TABLE package_code (
 
 CREATE TABLE utilized_transport_equipment (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    equipment_reference varchar(15) NOT NULL REFERENCES equipment (equipment_reference),
+    equipment_reference varchar(15) NULL,
+    equipment varchar(15) NULL REFERENCES equipment(equipment_reference),
     cargo_gross_weight real NULL,
     cargo_gross_weight_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (cargo_gross_weight_unit IN ('KGM','LBR')),
-    is_shipper_owned boolean NOT NULL
+    is_shipper_owned boolean NOT NULL,
+    list_order int NOT NULL default 0
 );
 
 -- Supporting FK constraints
@@ -470,11 +472,13 @@ CREATE INDEX ON consignment_item (commodity_id);
 CREATE TABLE cargo_item (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     consignment_item_id uuid NOT NULL REFERENCES consignment_item(id),
+    equipment_reference varchar(15) NOT NULL,
     weight real NOT NULL,
     volume real NULL,
     weight_unit varchar(3) NOT NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (weight_unit IN ('KGM','LBR')),
     volume_unit varchar(3) NULL REFERENCES unit_of_measure(unit_of_measure_code) CHECK (volume_unit IN ('MTQ','FTQ')),
-    utilized_transport_equipment_id uuid NOT NULL REFERENCES utilized_transport_equipment (id)
+    utilized_transport_equipment_id uuid NULL REFERENCES utilized_transport_equipment (id),
+    list_order int NOT NULL default 0
 );
 
 -- Supporting FK constraints

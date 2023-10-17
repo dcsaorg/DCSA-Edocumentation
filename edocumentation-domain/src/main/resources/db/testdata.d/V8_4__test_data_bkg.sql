@@ -139,7 +139,7 @@ INSERT INTO shipment_carrier_clauses (
 INSERT INTO booking (
     id,
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -171,7 +171,7 @@ INSERT INTO booking (
 ) VALUES (
     '31629725-418b-41e1-9d10-521763c656c4'::uuid,
     '52c2caa0-0137-44b7-9947-68687b3b4ae6',
-    'PENC',
+    'PENDING UPDATES CONFIRMATION',
     'CY',
     'CY',
     'FCL',
@@ -241,5 +241,3 @@ INSERT INTO hs_code_item (
   'bf93f6fb-98b8-4268-a4dc-23a40eab95a8'::uuid,
   '720711'
 );
-
-

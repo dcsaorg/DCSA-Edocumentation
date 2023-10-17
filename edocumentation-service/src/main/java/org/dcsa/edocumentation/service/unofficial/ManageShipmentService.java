@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
 import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.ShipmentLocationService;
@@ -40,7 +39,7 @@ public class ManageShipmentService {
   private final BookingRepository bookingRepository;
   private final ConfirmedBookingMapper confirmedBookingMapper;
   private final CarrierRepository carrierRepository;
-  private final BookingValidationService bookingValidationService;
+  private final UnofficialBookingService unofficialBookingService;
   private final ShipmentLocationService shipmentLocationService;
   private final ShipmentTransportService shipmentTransportService;
   private final ConfirmedEquipmentMapper confirmedEquipmentMapper;
@@ -174,7 +173,7 @@ public class ManageShipmentService {
         + shipmentRequestTO.carrierSMDGCode() + "\". Note the code may be valid but not loaded into this system.");
     }
     OffsetDateTime confirmationTime = OffsetDateTime.now();
-    ValidationResult<BkgDocumentStatus> validationResult = bookingValidationService.validateBooking(booking, false);
+    ValidationResult<String> validationResult = unofficialBookingService.validateBooking(booking, false);
 
     assignCommoditySubreferences(booking, shipmentRequestTO.commoditySubreferences());
 
@@ -233,7 +232,7 @@ public class ManageShipmentService {
     confirmedBooking = confirmedBookingRepository.save(confirmedBooking);
     shipmentLocationService.createShipmentLocations(shipmentRequestTO.shipmentLocations(), confirmedBooking);
     shipmentTransportService.createShipmentTransports(shipmentRequestTO.transports(), confirmedBooking);
-    return confirmedBookingMapper.toStatusDTO(confirmedBooking, booking.getDocumentStatus());
+    return confirmedBookingMapper.toStatusDTO(confirmedBooking, booking.getBookingStatus());
   }
 
   private Boolean validateTransportPlans(ManageConfirmedBookingRequestTO manageConfirmedBookingRequestTO, List<ShipmentLocationTO> shipmentLocationTOS) {

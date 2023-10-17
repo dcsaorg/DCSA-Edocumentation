@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(
     componentModel = "spring",
     config = EDocumentationMappingConfig.class,
-    uses = {LocationMapper.class, DocumentStatusMapper.class})
+    uses = {LocationMapper.class})
 public interface TransportMapper {
 
   @Mapping(
