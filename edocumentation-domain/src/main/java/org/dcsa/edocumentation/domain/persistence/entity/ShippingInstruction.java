@@ -216,7 +216,7 @@ public class ShippingInstruction extends AbstractStateMachine<String>
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "shipping_instruction_id")
-  private List<CustomsReference> customsReferences;
+  private List<@Valid CustomsReference> customsReferences;
 
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
