@@ -1,11 +1,11 @@
 package org.dcsa.edocumentation.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.service.BookingService;
 import org.dcsa.edocumentation.transferobjects.BookingCancelRequestTO;
 import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingTO;
-import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,11 +43,11 @@ public class BookingController {
   @ResponseStatus(HttpStatus.CREATED)
   public BookingRefStatusTO createBooking(@Valid @RequestBody BookingTO bookingRequest) {
     if (bookingRequest.carrierBookingRequestReference() != null
-      || bookingRequest.documentStatus() != null
+      || bookingRequest.bookingStatus() != null
       || bookingRequest.bookingRequestCreatedDateTime() != null
       || bookingRequest.bookingRequestUpdatedDateTime() != null) {
       throw ConcreteRequestErrorMessageException.invalidInput(
-        "carrierBookingRequestReference, documentStatus, bookingRequestCreatedDateTime and"
+        "carrierBookingRequestReference, bookingStatus, bookingRequestCreatedDateTime and"
           + " bookingRequestUpdatedDateTime are not allowed when creating a booking");
     }
     return bookingService.createBooking(bookingRequest);
@@ -67,11 +67,11 @@ public class BookingController {
       throw ConcreteRequestErrorMessageException.invalidInput(
         "carrierBookingRequestReference must match bookingRequest.carrierBookingRequestReference");
     }
-    if (bookingRequest.documentStatus() != null
+    if (bookingRequest.bookingStatus() != null
       || bookingRequest.bookingRequestCreatedDateTime() != null
       || bookingRequest.bookingRequestUpdatedDateTime() != null) {
       throw ConcreteRequestErrorMessageException.invalidInput(
-        "documentStatus, bookingRequestCreatedDateTime and"
+        "bookingStatus, bookingRequestCreatedDateTime and"
           + " bookingRequestUpdatedDateTime are not allowed when updating a booking");
     }
     return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest)
@@ -90,10 +90,8 @@ public class BookingController {
       @Valid @PathVariable("carrierBookingRequestReference") @NotNull @Size(max = 100)
           String carrierBookingRequestReference,
       @Valid @RequestBody BookingCancelRequestTO bookingCancelRequestTO) {
-    // Fail-safe: The @Valid + @EnumSubset should have covered this. But it felt weird
-    // just to ignore the documentStatus field...
-    if (bookingCancelRequestTO.documentStatus() != BkgDocumentStatus.CANC) {
-      throw ConcreteRequestErrorMessageException.invalidInput("documentStatus must be CANC");
+    if (!bookingCancelRequestTO.bookingStatus().equals(BookingStatus.CANCELLED)) {
+      throw ConcreteRequestErrorMessageException.invalidInput("bookingStatus must be CANCELLED");
     }
     return bookingService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO.reason())
       .orElseThrow(

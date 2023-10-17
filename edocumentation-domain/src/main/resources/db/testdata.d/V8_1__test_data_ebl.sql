@@ -88,7 +88,7 @@ INSERT INTO location (
 INSERT INTO booking (
     id,
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -118,7 +118,7 @@ INSERT INTO booking (
 ) VALUES (
     'b521dbdb-a12b-48f5-b489-8594349731bf'::uuid,
     'CARRIER_BOOKING_REQUEST_REFERENCE_01',
-    'RECE',
+    'RECEIVED',
     'CY',
     'CFS',
     'FCL',
@@ -149,7 +149,7 @@ INSERT INTO booking (
 
 INSERT INTO booking (
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -178,7 +178,7 @@ INSERT INTO booking (
     updated_date_time
 ) VALUES (
     'CARRIER_BOOKING_REQUEST_REFERENCE_02',
-    'RECE',
+    'RECEIVED',
     'CY',
     'CFS',
     'FCL',
@@ -582,7 +582,7 @@ INSERT INTO shipping_instruction (
 ) VALUES (
     '9d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
     'SI_REF_2',
-    'APPR',
+    'APPROVED',
     TRUE,
     2,
     4,
@@ -593,7 +593,7 @@ INSERT INTO shipping_instruction (
 ),(
     '877ce0f8-3126-45f5-b22e-2d1d27d42d85',
     'SI_REF_3',
-    'RECE',
+    'RECEIVED',
     TRUE,
     2,
     4,
@@ -604,7 +604,7 @@ INSERT INTO shipping_instruction (
 ),(
     '770f11e5-aae2-4ae4-b27e-0c689ed2e333',
     'SI_REF_4',
-    'RECE',
+    'RECEIVED',
     TRUE,
     2,
     4,
@@ -615,7 +615,7 @@ INSERT INTO shipping_instruction (
 ),(
     'cb6354c9-1ceb-452c-aed0-3cb25a04647a',
     'SI_REF_5',
-    'PENU',
+    'PENDING UPDATE',
     TRUE,
     2,
     4,
@@ -626,7 +626,7 @@ INSERT INTO shipping_instruction (
 ),(
     '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
     'SI_REF_6',
-    'APPR',
+    'APPROVED',
     TRUE,
     2,
     4,
@@ -637,7 +637,7 @@ INSERT INTO shipping_instruction (
 ),(
       '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d',
       'SI_REF_7',
-      'APPR',
+      'APPROVED',
       TRUE,
       2,
       4,
@@ -932,41 +932,49 @@ INSERT INTO cargo_item (
     consignment_item_id,
     weight,
     weight_unit,
+    equipment_reference,
     utilized_transport_equipment_id
 ) VALUES (
     '10f41e70-0cae-47cd-8eb8-4ee6f05e85c1',
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 ), (
     'c7104528-66d5-4d11-9b82-7af30e84d664',
     1000.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '44068608-da9b-4039-b074-d9ac27ddbfbf'),
     uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '877ce0f8-3126-45f5-b22e-2d1d27d42d85'),
     23.5,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '56812ad8-5d0b-4cbc-afca-e97f2f3c89de'),
     uuid('56812ad8-5d0b-4cbc-afca-e97f2f3c89de')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '877ce0f8-3126-45f5-b22e-2d1d27d42d85'),
     99.9,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '44068608-da9b-4039-b074-d9ac27ddbfbf'),
     uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '770f11e5-aae2-4ae4-b27e-0c689ed2e333'),
     99.9,
     'KGM',
-   uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '44068608-da9b-4039-b074-d9ac27ddbfbf'),
+    uuid('44068608-da9b-4039-b074-d9ac27ddbfbf')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = 'cb6354c9-1ceb-452c-aed0-3cb25a04647a'),
     23.5,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = 'ca030eb6-009b-411c-985c-527ce008b35a'),
     uuid('ca030eb6-009b-411c-985c-527ce008b35a')
 ), (
     (SELECT id FROM consignment_item WHERE shipping_instruction_id = '8fbb78cc-e7c6-4e17-9a23-24dc3ad0378d'),
     23.5,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = 'ca030eb6-009b-411c-985c-527ce008b35a'),
     uuid('ca030eb6-009b-411c-985c-527ce008b35a')
 );
 
@@ -975,12 +983,14 @@ INSERT INTO cargo_item (
   consignment_item_id,
   weight,
   weight_unit,
+  equipment_reference,
   utilized_transport_equipment_id
   ) VALUES (
   '2d5965a5-9e2f-4c78-b8cb-fbb7095e13a0',
   (SELECT id FROM consignment_item WHERE shipping_instruction_id = '9fbb78cc-e7c6-4e17-9a23-24dc3ad0378d'),
   23.5,
   'KGM',
+  (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = 'aa030eb6-009b-411c-985c-527ce008b35a'),
   uuid('aa030eb6-009b-411c-985c-527ce008b35a')
 );
 
@@ -994,7 +1004,7 @@ INSERT INTO shipping_mark (
 
 INSERT INTO booking (
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -1022,7 +1032,7 @@ INSERT INTO booking (
     updated_date_time
 ) VALUES (
     'CARRIER_BOOKING_REQUEST_REFERENCE_03',
-    'CONF',
+    'CONFIRMED',
     'CY',
     'CFS',
     'FCL',
@@ -1052,7 +1062,7 @@ INSERT INTO booking (
 
 INSERT INTO booking (
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -1081,7 +1091,7 @@ INSERT INTO booking (
     updated_date_time
 ) VALUES (
     'CARRIER_BOOKING_REQUEST_REFERENCE_04',
-    'CONF',
+    'CONFIRMED',
     'CY',
     'CFS',
     'FCL',
@@ -1113,7 +1123,7 @@ INSERT INTO booking (
 
 INSERT INTO booking (
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -1141,7 +1151,7 @@ INSERT INTO booking (
     updated_date_time
 ) VALUES (
     'CARRIER_BOOKING_REQUEST_REFERENCE_05',
-    'CONF',
+    'CONFIRMED',
     'CY',
     'CFS',
     'FCL',
@@ -1171,7 +1181,7 @@ INSERT INTO booking (
 
 INSERT INTO booking (
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -1200,7 +1210,7 @@ INSERT INTO booking (
     updated_date_time
 ) VALUES (
     'CARRIER_BOOKING_REQUEST_REFERENCE_06',
-    'CONF',
+    'CONFIRMED',
     'CY',
     'CFS',
     'FCL',
@@ -1359,7 +1369,7 @@ INSERT INTO shipping_instruction (
 ) VALUES (
     'a1c7b95d-3004-40a5-bae1-e379021b7782',
     'SI_REF_9',
-    'RECE',
+    'RECEIVED',
     TRUE,
     2,
     4,
@@ -1373,7 +1383,7 @@ INSERT INTO shipping_instruction (
 INSERT INTO booking (
     id,
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -1403,7 +1413,7 @@ INSERT INTO booking (
 ) VALUES (
     'a169d494-d6dd-4334-b951-512e4e16f075'::uuid,
     'KUBERNETES_IN_ACTION_01',
-    'RECE',
+    'RECEIVED',
     'CY',
     'CFS',
     'FCL',
@@ -1433,7 +1443,7 @@ INSERT INTO booking (
 ), (
     '59ede518-2224-4ecf-a0d0-4d641d365e1b'::uuid,
     'KUBERNETES_IN_ACTION_02',
-    'RECE',
+    'RECEIVED',
     'CY',
     'CFS',
     'FCL',
@@ -1596,21 +1606,25 @@ INSERT INTO cargo_item (
     consignment_item_id,
     weight,
     weight_unit,
+    equipment_reference,
     utilized_transport_equipment_id
 ) VALUES (
     '0e98eef4-6ebd-47eb-bd6e-d3878b341b7f'::uuid,
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 ), (
     '06c0e716-3128-4172-be09-7f82b7ec02ca'::uuid,
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 ), (
     'cf1798fe-9447-4ea8-a4a6-9515de751d5e'::uuid,
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 );
 
@@ -1660,7 +1674,7 @@ INSERT INTO shipping_instruction (
 ) VALUES (
     '2c337fcc-2814-42b3-a752-f1847e74cba7',
     'SI_REF_10',
-    'DRFT',
+    'DRAFT',
     TRUE,
     2,
     4,
@@ -1673,7 +1687,7 @@ INSERT INTO shipping_instruction (
 INSERT INTO booking (
     id,
     carrier_booking_request_reference,
-    document_status,
+    booking_status,
     receipt_type_at_origin,
     delivery_type_at_destination,
     cargo_movement_type_at_origin,
@@ -1703,7 +1717,7 @@ INSERT INTO booking (
 ) VALUES (
     '66802442-4702-4464-9d61-d659fdb7e33c'::uuid,
     'KUBERNETES_IN_ACTION_03',
-    'CONF',
+    'CONFIRMED',
     'CY',
     'CFS',
     'FCL',
@@ -1804,11 +1818,13 @@ INSERT INTO cargo_item (
     consignment_item_id,
     weight,
     weight_unit,
+    equipment_reference,
     utilized_transport_equipment_id
 ) VALUES (
     '5d943239-23fc-4d5c-ab70-a33a469f9e59'::uuid,
     50.0,
     'KGM',
+    (SELECT equipment_reference FROM utilized_transport_equipment WHERE id = '6824b6ca-f3da-4154-96f1-264886b68d53'),
     uuid('6824b6ca-f3da-4154-96f1-264886b68d53')
 );
 

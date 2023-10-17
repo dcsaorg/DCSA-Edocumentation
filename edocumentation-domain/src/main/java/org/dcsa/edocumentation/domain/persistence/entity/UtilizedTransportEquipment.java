@@ -37,8 +37,11 @@ public class UtilizedTransportEquipment {
   @Column(name = "cargo_gross_weight")
   private Double cargoGrossWeight;
 
+  @Column(name = "equipment_reference")
+  private String equipmentReference;
+
   @OneToOne
-  @JoinColumn(name = "equipment_reference")
+  @JoinColumn(name = "equipment")
   private Equipment equipment;
 
   @ToString.Exclude

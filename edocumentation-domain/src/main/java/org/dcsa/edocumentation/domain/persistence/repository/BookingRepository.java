@@ -2,7 +2,6 @@ package org.dcsa.edocumentation.domain.persistence.repository;
 
 import lombok.NonNull;
 import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -17,11 +16,11 @@ import java.util.UUID;
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
   @EntityGraph("graph.booking-summary")
   @Query(
-    value = "FROM Booking WHERE documentStatus = :documentStatus AND validUntil IS NULL",
-    countQuery = "SELECT count(*) FROM Booking WHERE documentStatus = :documentStatus AND validUntil IS NULL"
+    value = "FROM Booking WHERE bookingStatus = :bookingStatus AND validUntil IS NULL",
+    countQuery = "SELECT count(*) FROM Booking WHERE bookingStatus = :bookingStatus AND validUntil IS NULL"
   )
-  Page<Booking> findAllByDocumentStatus(
-      @NonNull BkgDocumentStatus documentStatus, Pageable pageable);
+  Page<Booking> findAllByBookingStatus(
+      @NonNull String bookingStatus, Pageable pageable);
 
   @EntityGraph("graph.booking-summary")
   @Query(

@@ -40,6 +40,9 @@ public class CargoItem {
   @Enumerated(EnumType.STRING)
   private VolumeUnit volumeUnit;
 
+  @Column(name = "equipment_reference", nullable = false)
+  private String equipmentReference;
+
   @ElementCollection
   @Column(name = "shipping_mark", nullable = false)
   @CollectionTable(name = "shipping_mark", joinColumns = @JoinColumn(name = "cargo_item"))
@@ -57,4 +60,10 @@ public class CargoItem {
   @JoinColumn(name = "cargo_item_id")
   private List<@Valid CustomsReference> customsReferences;
 
+  public void assignEquipment(UtilizedTransportEquipment utilizedTransportEquipment) {
+    if (!this.equipmentReference.equals(utilizedTransportEquipment.getEquipmentReference())) {
+      throw new IllegalArgumentException("The provided utilizedTransportEquipment had the wrong equipment reference");
+    }
+    this.utilizedTransportEquipment = utilizedTransportEquipment;
+  }
 }

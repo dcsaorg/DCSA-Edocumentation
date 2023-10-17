@@ -73,7 +73,7 @@ class ShippingInstructionSummaryControllerTest {
         .thenReturn(new PagedResult<>(pageResult));
 
     mockMvc
-        .perform(get(path).param("documentStatus", "RECE").accept(MediaType.APPLICATION_JSON))
+        .perform(get(path).param("documentStatus", "RECEIVED").accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
@@ -82,7 +82,7 @@ class ShippingInstructionSummaryControllerTest {
                 .value(mockShippingInstructionSummaryResponse.shippingInstructionReference()))
         .andExpect(
             jsonPath("$.[0].documentStatus")
-                .value(mockShippingInstructionSummaryResponse.documentStatus().name()));
+                .value(mockShippingInstructionSummaryResponse.documentStatus()));
   }
 
   @Test
@@ -126,7 +126,7 @@ class ShippingInstructionSummaryControllerTest {
         .perform(
             get(path)
                 .param("carrierBookingReference", "bca68f1d3b804ff88aaa1e43055432f7")
-                .param("documentStatus", "RECE")
+                .param("documentStatus", "RECEIVED")
                 .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
@@ -139,7 +139,7 @@ class ShippingInstructionSummaryControllerTest {
                 .value(mockShippingInstructionSummaryResponse.carrierBookingReferences().get(0)))
         .andExpect(
             jsonPath("$.[0].documentStatus")
-                .value(mockShippingInstructionSummaryResponse.documentStatus().name()));
+                .value(mockShippingInstructionSummaryResponse.documentStatus()));
   }
 
   @Test
@@ -169,21 +169,25 @@ class ShippingInstructionSummaryControllerTest {
           .value(mockShippingInstructionSummaries.get(0).carrierBookingReferences().get(0)))
       .andExpect(
         jsonPath("$.[0].documentStatus")
-          .value(mockShippingInstructionSummaries.get(0).documentStatus().name()));
+          .value(mockShippingInstructionSummaries.get(0).documentStatus()));
   }
 
   @Test
   void testShippingInstructionSummary_getShipmentSummariesWithInvalidDocumentStatus()
       throws Exception {
+    List<ShippingInstructionSummaryTO> mockShippingInstructionSummaries = ShippingInstructionSummaryDataFactory.multipleShippingInstructionSummaryTO();
+    Page<ShippingInstructionSummaryTO> pageResult = new PageImpl<>(mockShippingInstructionSummaries);
+    when(shippingInstructionSummaryService.findShippingInstructionSummaries(any(), any(), any())).thenReturn(new PagedResult<>(pageResult));
+
     mockMvc
       .perform(get(path).param("documentStatus", "INVALID").accept(MediaType.APPLICATION_JSON))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.httpMethod").value("GET"))
       .andExpect(jsonPath("$.requestUri").value(path))
-      .andExpect(jsonPath("$.errors[0].reason").value("invalidParameter"))
+      .andExpect(jsonPath("$.errors[0].reason").value("invalidInput"))
       .andExpect(
         jsonPath("$.errors[0].message")
-          .value(containsString("'documentStatus' must be of type EblDocumentStatus")));
+          .value(containsString("documentStatus Unexpected value 'INVALID', should have been one of")));
   }
 }

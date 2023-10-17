@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import jakarta.validation.Valid;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +18,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.ConsignmentItemValidation;
+import org.springframework.web.bind.annotation.Mapping;
 
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -51,6 +54,7 @@ public class ConsignmentItem {
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "shipping_instruction_id", nullable = false)
+  @Setter(AccessLevel.PACKAGE)
   private ShippingInstruction shippingInstruction;
 
   @ToString.Exclude
@@ -74,6 +78,7 @@ public class ConsignmentItem {
   @EqualsAndHashCode.Exclude
   @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "consignment_item_id", referencedColumnName = "id", nullable = false)
+  @OrderColumn(name = "list_order")
   // Since the cargoItem.id is generated it can happen that two cargoItems have the same values and
   // therefore cannot be added to the set
   private List<@Valid CargoItem> cargoItems;
@@ -82,4 +87,11 @@ public class ConsignmentItem {
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "consignment_item_id")
   private List<@Valid CustomsReference> customsReferences;
+
+  public void resolvedShipment(@NotNull Shipment shipment) {
+    if (!this.getCarrierBookingReference().equals(shipment.getCarrierBookingReference())) {
+      throw new IllegalArgumentException("Shipment had the wrong carrier booking reference");
+    }
+    this.shipment = shipment;
+  }
 }

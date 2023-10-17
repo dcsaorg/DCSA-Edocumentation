@@ -14,13 +14,19 @@ import org.mapstruct.Mapping;
     SealMapper.class,
     CustomsReferenceMapper.class,
     ReferenceMapper.class,
+    SealMapper.class,
 })
 public interface UtilizedTransportEquipmentMapper {
 
   @Mapping(source = "utilizedTransportEquipmentTO.isShipperOwned", target = "isShipperOwned")
   @Mapping(source = "equipment", target = "equipment")
+  @Mapping(source = "equipment.equipmentReference", target = "equipmentReference")
   @Mapping(target = "id", ignore = true)
   UtilizedTransportEquipment toDAO(UtilizedTransportEquipmentTO utilizedTransportEquipmentTO, Equipment equipment);
+
+  default UtilizedTransportEquipment toDAO(UtilizedTransportEquipmentTO utilizedTransportEquipmentTO) {
+    return this.toDAO(utilizedTransportEquipmentTO, null);
+  }
 
   @Mapping(target = "equipmentReference", expression = "java(null)")  // FIXME: In TD, always absent. In other cases, conditional on "isSOC"!
   @Mapping(target = "references", ignore = true)  // FIXME: Missing on the DAO

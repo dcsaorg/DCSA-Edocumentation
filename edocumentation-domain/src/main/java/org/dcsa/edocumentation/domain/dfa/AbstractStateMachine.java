@@ -6,10 +6,10 @@ import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 
 import jakarta.persistence.Transient;
 
-public abstract class AbstractStateMachine<S extends Enum<S>> {
+public abstract class AbstractStateMachine<S> {
 
-  protected abstract RuntimeException errorForAttemptLeavingToLeaveTerminalState(S currentState, S successorState, CannotLeaveTerminalStateException e);
-  protected abstract RuntimeException errorForTargetStatNotListedAsSuccessor(S currentState, S successorState, TargetStateIsNotSuccessorException e);
+  protected abstract RuntimeException errorForAttemptToLeaveTerminalState(S currentState, S successorState, CannotLeaveTerminalStateException e);
+  protected abstract RuntimeException errorForTargetStateNotListedAsSuccessor(S currentState, S successorState, TargetStateIsNotSuccessorException e);
 
   @Getter(AccessLevel.PROTECTED)
   @Transient
@@ -42,13 +42,13 @@ public abstract class AbstractStateMachine<S extends Enum<S>> {
        * We have a gap where you really want to start with calling ".receive()" on
        * the Booking/ShippingInstruction to generate the initial ShipmentEvent but
        * (without this special handling) you would be unable to do so as
-       * RECE -> RECE is not a valid transition in general (i.e., creating the DFA
-       * in the initialState (RECE) and then calling transitionTo(RECE) would
+       * RECEIVED -> RECEIVED is not a valid transition in general (i.e., creating the DFA
+       * in the initialState (RECEIVED) and then calling transitionTo(RECEIVED) would
        * trigger an exception).
        *
        * In a "normal" DFA, you would just have a distinct starting state for this
        * case, but would require us to have another "fake" value for in all the
-       * relevant enums (e.g., BkgDocumentStatus).
+       * relevant state machine enumerations
        */
       dfa = dfaDefinition.fromInitialState();
     } else {
@@ -72,10 +72,10 @@ public abstract class AbstractStateMachine<S extends Enum<S>> {
       }
     } catch (CannotLeaveTerminalStateException e) {
       // We always use Conflict because we cannot tell race conditions from bugs here.
-      throw errorForAttemptLeavingToLeaveTerminalState(dfa.getCurrentState(), state, e);
+      throw errorForAttemptToLeaveTerminalState(dfa.getCurrentState(), state, e);
     } catch (TargetStateIsNotSuccessorException e) {
       // We always use Conflict because we cannot tell race conditions from bugs here.
-      throw errorForTargetStatNotListedAsSuccessor(dfa.getCurrentState(), state, e);
+      throw errorForTargetStateNotListedAsSuccessor(dfa.getCurrentState(), state, e);
     } catch (InvalidStateTransitionException e) {
       // Catch all for transitions that are never valid (e.g., unknown or unreachable states)
       throw ConcreteRequestErrorMessageException.internalServerError(e.getMessage(), e);

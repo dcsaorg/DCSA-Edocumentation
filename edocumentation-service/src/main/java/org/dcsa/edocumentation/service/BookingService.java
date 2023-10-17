@@ -57,7 +57,7 @@ public class BookingService {
     existingBooking.lockVersion(updateTime);
 
     var updatedBooking = mapToBooking(bookingRequest, existingBooking);
-    updatedBooking.pendingConfirmation(null, updateTime);
+    updatedBooking.pendingUpdatesConfirmation(null, updateTime);
     // We have to flush the existing booking. Otherwise, JPA might be tempted to re-order that
     // write/save until after the updatedBooking is saved (which triggers the unique constraint
     // in the database).
@@ -113,7 +113,7 @@ public class BookingService {
         // Carry over from the existing booking
         // FIXME: This should not be done via a builder.
         .carrierBookingRequestReference(updateFor.getCarrierBookingRequestReference())
-        .documentStatus(updateFor.getDocumentStatus())
+        .bookingStatus(updateFor.getBookingStatus())
         .bookingRequestCreatedDateTime(updateFor.getBookingRequestCreatedDateTime());
     }
     var booking = bookingBuilder.build();

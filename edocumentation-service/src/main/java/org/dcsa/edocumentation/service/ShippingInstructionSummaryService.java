@@ -3,7 +3,6 @@ package org.dcsa.edocumentation.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.specification.ShippingInstructionSpecification;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionSummaryMapper;
@@ -29,7 +28,9 @@ public class ShippingInstructionSummaryService extends AbstractSpecificationServ
 
   @Transactional
   public PagedResult<ShippingInstructionSummaryTO> findShippingInstructionSummaries(
-    PageRequest pageRequest, EblDocumentStatus documentStatus, @Nullable String carrierBookingReference) {
+    PageRequest pageRequest,
+    String documentStatus,
+    @Nullable String carrierBookingReference) {
     return this.findViaComplexSpecificationWithLookup(
       ShippingInstructionSpecification.withFilters(
         ShippingInstructionSpecification.ShippingInstructionFilters.builder()

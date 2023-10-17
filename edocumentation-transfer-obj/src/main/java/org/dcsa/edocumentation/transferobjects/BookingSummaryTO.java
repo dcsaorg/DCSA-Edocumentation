@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.dcsa.edocumentation.transferobjects.enums.*;
+import org.dcsa.skernel.infrastructure.validation.PseudoEnum;
 import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +18,9 @@ public record BookingSummaryTO(
   String carrierBookingRequestReference,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  BkgDocumentStatus documentStatus,
+  //TODO: enable once DT-211 changes are merged to the master
+  // @PseudoEnum(value = "bookingstatuscodes.csv", column = "booking_status_code")
+  String bookingStatus,
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   List<RequestedChangeTO> requestedChanges,

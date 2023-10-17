@@ -19,7 +19,7 @@ public record TransportDocumentTO(
   @NotNull
   TransportDocumentTypeCode transportDocumentTypeCode,
   @NotNull
-  EblDocumentStatus documentStatus,
+  String documentStatus,
 
   LocalDate issueDate,
 
