@@ -3,7 +3,6 @@ package org.dcsa.edocumentation.service;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.service.mapping.BookingSummaryMapper;
-import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +16,6 @@ import java.util.Optional;
 public class BookingSummaryService {
   private final BookingRepository repository;
   private final BookingSummaryMapper bookingSummaryMapper;
-  private final DocumentStatusMapper documentStatusMapper;
 
   @Transactional
   public PagedResult<BookingSummaryTO> findBookingSummaries(

@@ -5,7 +5,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.Booking;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.service.mapping.BookingSummaryMapper;
-import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,9 +34,6 @@ class BookingSummaryServiceTest {
 
   @Spy
   private BookingSummaryMapper bookingSummaryMapper = Mappers.getMapper(BookingSummaryMapper.class);
-
-  @Spy
-  private DocumentStatusMapper documentStatusMapper = Mappers.getMapper(DocumentStatusMapper.class);
 
   @InjectMocks private BookingSummaryService bookingSummaryService;
 
