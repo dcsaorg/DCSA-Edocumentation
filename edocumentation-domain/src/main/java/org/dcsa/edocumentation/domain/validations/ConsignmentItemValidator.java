@@ -20,7 +20,7 @@ public class ConsignmentItemValidator extends AbstractCustomsReferenceListValida
 
     var state = ValidationState.of(value, context);
     validateConfirmedBookings(state);
-    validateCustomsReference(state);
+    validateCustomsReferences(state,state.getValue().getCustomsReferences());
     return state.isValid();
   }
 
@@ -30,20 +30,6 @@ public class ConsignmentItemValidator extends AbstractCustomsReferenceListValida
       state.getContext().buildConstraintViolationWithTemplate("The booking " + shipment.getCarrierBookingReference() + " is not in state CONF")
         // Match the TO path
         .addPropertyNode("carrierBookingReference")
-        .addConstraintViolation();
-      state.invalidate();
-    }
-  }
-
-  private void validateCustomsReference(ValidationState<ConsignmentItem> state) {
-    if (state.getValue().getCustomsReferences() == null) {
-      return;
-    }
-    List<CustomsReference> duplicateCustomsReference = checkReferencesDuplicates(state.getValue().getCustomsReferences());
-    if (duplicateCustomsReference.size() >1 ) {
-      state.getContext().buildConstraintViolationWithTemplate("The customsreferences contains duplicate combination of Type code and Country code." )
-        // Match the TO path
-        .addPropertyNode("customsReferences")
         .addConstraintViolation();
       state.invalidate();
     }

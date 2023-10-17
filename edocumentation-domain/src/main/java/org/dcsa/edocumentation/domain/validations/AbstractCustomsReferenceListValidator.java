@@ -19,4 +19,18 @@ public abstract class AbstractCustomsReferenceListValidator {
       .flatMap(Collection::stream)
       .toList();
   }
+
+  protected void validateCustomsReferences(ValidationState<?> state, List<CustomsReference> customsReferences) {
+    if (customsReferences == null) {
+      return;
+    }
+    List<CustomsReference> duplicateCustomsReference = checkReferencesDuplicates(customsReferences);
+    if (duplicateCustomsReference.size() >1 ) {
+      state.getContext().buildConstraintViolationWithTemplate("The customsreferences contains duplicate combination of Type code and Country code." )
+        // Match the TO path
+        .addPropertyNode("customsReferences")
+        .addConstraintViolation();
+      state.invalidate();
+    }
+  }
 }

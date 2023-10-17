@@ -17,21 +17,8 @@ public class UtilizedTransportEquipmentValidator extends AbstractCustomsReferenc
     }
     context.disableDefaultConstraintViolation();
     var state = ValidationState.of(value, context);
-    validateCustomsReference(state);
+    validateCustomsReferences(state,state.getValue().getCustomsReferences());
     return state.isValid();
-  }
-
-  private void validateCustomsReference(ValidationState<UtilizedTransportEquipment> state) {
-    if (state.getValue().getCustomsReferences() == null) {
-      return;
-    }
-    List<CustomsReference> duplicateCustomsReference = checkReferencesDuplicates(state.getValue().getCustomsReferences());
-    if (duplicateCustomsReference.size() >1 ) {
-      state.getContext().buildConstraintViolationWithTemplate("The customsreferences contains duplicate combination of Type code and Country code." )
-        // Match the TO path
-        .addConstraintViolation();
-      state.invalidate();
-    }
   }
 
 }

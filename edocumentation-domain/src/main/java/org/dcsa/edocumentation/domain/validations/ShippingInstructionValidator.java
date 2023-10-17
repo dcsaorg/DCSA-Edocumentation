@@ -83,7 +83,7 @@ public class ShippingInstructionValidator extends AbstractCustomsReferenceListVa
     emitConsignmentItemsConstraintIfNotOk(termAndConditionsChecker, state, "All referenced bookings must have the same termsAndConditions");
     emitConsignmentItemsConstraintIfNotOk(serviceContractReferenceChecker, state, "All referenced bookings must have the same serviceContractReference");
     validateManifestFilings(state);
-    validateCustomsReference(state);
+    validateCustomsReferences(state,state.getValue().getCustomsReferences());
   }
 
   private void validateStraightBL(ValidationState<ShippingInstruction> state) {
@@ -208,20 +208,6 @@ public class ShippingInstructionValidator extends AbstractCustomsReferenceListVa
     state.getContext().buildConstraintViolationWithTemplate(message)
       .addPropertyNode("consignmentItems")
       .addConstraintViolation();
-  }
-
-  private void validateCustomsReference(ValidationState<ShippingInstruction> state) {
-    if (state.getValue().getCustomsReferences() == null) {
-      return;
-    }
-    List<CustomsReference> duplicateCustomsReference = checkReferencesDuplicates(state.getValue().getCustomsReferences());
-    if (duplicateCustomsReference.size() >1 ) {
-      state.getContext().buildConstraintViolationWithTemplate("The customsreferences contains duplicate combination of Type code and Country code." )
-        // Match the TO path
-        .addPropertyNode("customsReference")
-        .addConstraintViolation();
-      state.invalidate();
-    }
   }
 
 
