@@ -516,7 +516,8 @@ CREATE TABLE customs_reference (
   list_order int NOT NULL default 0,
   type varchar(50) NOT NULL,
   country_code varchar(2) NOT NULL CHECK ( country_code ~ '^[A-Z]{2}$' ),
-  value varchar(100) NOT NULL
+  value varchar(100) NOT NULL,
+  cargo_item_id uuid NULL REFERENCES cargo_item(id)
 );
 
 

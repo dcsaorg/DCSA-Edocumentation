@@ -7,7 +7,10 @@ import org.mapstruct.Mapping;
 
 @Mapper(
   componentModel = "spring",
-  config = EDocumentationMappingConfig.class
+  config = EDocumentationMappingConfig.class,
+  uses = {
+    CustomsReferenceMapper.class
+  }
 )
 public interface CargoItemMapper {
 

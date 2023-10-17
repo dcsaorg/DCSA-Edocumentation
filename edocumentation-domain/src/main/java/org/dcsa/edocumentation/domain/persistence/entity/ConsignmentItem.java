@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -74,17 +76,17 @@ public class ConsignmentItem {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "consignment_item_id", referencedColumnName = "id", nullable = false)
   @OrderColumn(name = "list_order")
   // Since the cargoItem.id is generated it can happen that two cargoItems have the same values and
   // therefore cannot be added to the set
-  private List<CargoItem> cargoItems;
+  private List<@Valid CargoItem> cargoItems;
 
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "consignment_item_id")
-  private List<CustomsReference> customsReferences;
+  private List<@Valid CustomsReference> customsReferences;
 
   public void resolvedConfirmedBooking(@NotNull ConfirmedBooking confirmedBooking) {
     if (!this.getCarrierBookingReference().equals(confirmedBooking.getCarrierBookingReference())) {

@@ -6,7 +6,8 @@ import jakarta.validation.ConstraintValidatorContext;
 import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
 
-public class ConsignmentItemValidator implements ConstraintValidator<ConsignmentItemValidation, ConsignmentItem> {
+
+public class ConsignmentItemValidator extends AbstractCustomsReferenceListValidator implements ConstraintValidator<ConsignmentItemValidation, ConsignmentItem> {
 
   @Override
   public boolean isValid(ConsignmentItem value, ConstraintValidatorContext context) {
@@ -17,6 +18,7 @@ public class ConsignmentItemValidator implements ConstraintValidator<Consignment
 
     var state = ValidationState.of(value, context);
     validateConfirmedBookings(state);
+    validateCustomsReferences(state,state.getValue().getCustomsReferences());
     return state.isValid();
   }
 
