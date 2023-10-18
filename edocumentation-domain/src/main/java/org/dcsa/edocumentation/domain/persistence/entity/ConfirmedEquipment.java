@@ -29,10 +29,10 @@ public class ConfirmedEquipment {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "shipment_id")
-  // Used by Shipment to make the JPA relations work
+  @JoinColumn(name = "confirmed_booking_id")
+  // Used by confirmed-booking to make the JPA relations work
   @Setter(AccessLevel.PACKAGE)
-  private Shipment shipment;
+  private ConfirmedBooking confirmedBooking;
 
   @Column(name = "iso_equipment_code", nullable = false)
   @Size(max = 4)

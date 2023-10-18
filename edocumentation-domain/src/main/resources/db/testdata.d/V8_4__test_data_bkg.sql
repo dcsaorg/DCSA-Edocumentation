@@ -1,40 +1,40 @@
 
 INSERT INTO shipment_cutoff_time (
-    shipment_id,
+    confirmed_booking_id,
     cut_off_time_code,
     cut_off_time
 ) VALUES (
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
+    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'A379021B7782'),
     'AFD',
     DATE '2021-03-09'
 );
 
 INSERT INTO shipment_cutoff_time (
-    shipment_id,
+    confirmed_booking_id,
     cut_off_time_code,
     cut_off_time
 ) VALUES (
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871'),
+    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'BR1239719871'),
     'DCO',
     DATE '2021-05-01'
 );
 
 INSERT INTO shipment_cutoff_time (
-    shipment_id,
+    confirmed_booking_id,
     cut_off_time_code,
     cut_off_time
 ) VALUES (
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'CR1239719872'),
+    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'CR1239719872'),
     'ECP',
     DATE '2020-07-07'
 );
 
 INSERT INTO shipment_cutoff_time (
-    shipment_id,
+    confirmed_booking_id,
     cut_off_time_code,
     cut_off_time
 ) VALUES (
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'E379021B7782'),
+    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'E379021B7782'),
     'EFC',
     DATE '2020-01-06'
 );
@@ -96,43 +96,43 @@ INSERT INTO carrier_clauses (
 
 INSERT INTO shipment_carrier_clauses (
     carrier_clause_id,
-    shipment_id
+    confirmed_booking_id
 ) VALUES (
     'b8e312ad-7b00-4026-88ad-9881242ca4f4',
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'A379021B7782')
+    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'A379021B7782')
 );
 
 INSERT INTO shipment_carrier_clauses (
     carrier_clause_id,
-    shipment_id
+    confirmed_booking_id
 ) VALUES (
     '93eedc86-f8a3-4ec3-8d30-ad1eb8a079d2',
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719871')
+    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'BR1239719871')
 );
 
 INSERT INTO shipment_carrier_clauses (
     carrier_clause_id,
-    shipment_id
+    confirmed_booking_id
 ) VALUES (
     'cbe900e7-7ad9-45fc-8d9e-0d1628a1b4f7',
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'CR1239719872')
+    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'CR1239719872')
 );
 
 INSERT INTO shipment_carrier_clauses (
     carrier_clause_id,
-    shipment_id
+    confirmed_booking_id
 ) VALUES (
     '3991a845-6cc8-404a-ac25-a1393e1d93a9',
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'BR1239719971')
+    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'BR1239719971')
 );
 
 INSERT INTO shipment_carrier_clauses (
     carrier_clause_id,
-    shipment_id,
+    confirmed_booking_id,
     transport_document_id
 ) VALUES (
     'b8e312ad-7b00-4026-88ad-9881242ca4f4'::uuid,
-    (SELECT id FROM shipment WHERE carrier_booking_reference = 'AR1239719871'),
+    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'AR1239719871'),
     (SELECT id FROM transport_document WHERE transport_document_reference = '9b02401c-b2fb-5009')
 );
 
@@ -210,7 +210,7 @@ INSERT INTO requested_equipment_group (
     is_shipper_owned
 ) VALUES (
     '98c4d459-42a3-42bc-992d-e1de670a9c08',
-    (SELECT booking_id FROM shipment WHERE carrier_booking_reference = 'A379021B7782'),
+    (SELECT booking_id FROM confirmed_booking WHERE carrier_booking_reference = 'A379021B7782'),
     '22GP',
     1,
     false

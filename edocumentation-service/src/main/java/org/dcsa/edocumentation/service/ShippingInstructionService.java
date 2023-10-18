@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.CargoItem;
-import org.dcsa.edocumentation.domain.persistence.entity.Shipment;
+import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
-import org.dcsa.edocumentation.domain.persistence.repository.ShipmentRepository;
+import org.dcsa.edocumentation.domain.persistence.repository.ConfirmedBookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
@@ -25,7 +25,7 @@ public class ShippingInstructionService {
   private final DocumentPartyService documentPartyService;
   private final ReferenceService referenceService;
   private final UtilizedTransportEquipmentService utilizedTransportEquipmentService;
-  private final ShipmentRepository shipmentRepository;
+  private final ConfirmedBookingRepository confirmedBookingRepository;
 
   @Transactional
   public Optional<ShippingInstructionTO> findByReference(String shippingInstructionReference) {
@@ -62,7 +62,7 @@ public class ShippingInstructionService {
     Map<String, UtilizedTransportEquipment> savedTransportEquipments) {
 
     for (var ci : shippingInstruction.getConsignmentItems()) {
-      ci.resolvedShipment(resolveShipment(ci.getCarrierBookingReference()));
+      ci.resolvedConfirmedBooking(resolveConfirmedBooking(ci.getCarrierBookingReference()));
       for (var c : ci.getCargoItems()) {
         c.assignEquipment(findSavedUtilizedTransportEquipmentViaCargoItem(savedTransportEquipments, c));
       }
@@ -71,8 +71,8 @@ public class ShippingInstructionService {
 
   // A Shipping instruction must link to a shipment (=approved booking) consignmentItems acts like a
   // 'join-table' between shipping instruction and shipment
-  private Shipment resolveShipment(String carrierBookingReference) {
-    return shipmentRepository
+  private ConfirmedBooking resolveConfirmedBooking(String carrierBookingReference) {
+    return confirmedBookingRepository
       .findByCarrierBookingReference(carrierBookingReference)
       .orElseThrow(
         () ->

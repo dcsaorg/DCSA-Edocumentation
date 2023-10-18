@@ -23,9 +23,9 @@ public class ConsignmentItemValidator extends AbstractCustomsReferenceListValida
   }
 
   private void validateConfirmedBookings(ValidationState<ConsignmentItem> state) {
-    var shipment = state.getValue().getShipment();
-    if (!shipment.getBooking().getBookingStatus().equals(BookingStatus.CONFIRMED)) {
-      state.getContext().buildConstraintViolationWithTemplate("The booking " + shipment.getCarrierBookingReference() + " is not in state CONFIRMED")
+    var confirmedBooking = state.getValue().getConfirmedBooking();
+    if (!confirmedBooking.getBooking().getBookingStatus().equals(BookingStatus.CONFIRMED)) {
+      state.getContext().buildConstraintViolationWithTemplate("The booking " + confirmedBooking.getCarrierBookingReference() + " is not in state CONFIRMED")
         // Match the TO path
         .addPropertyNode("carrierBookingReference")
         .addConstraintViolation();

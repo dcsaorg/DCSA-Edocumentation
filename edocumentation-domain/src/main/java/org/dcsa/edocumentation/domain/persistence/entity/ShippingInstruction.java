@@ -37,7 +37,7 @@ import org.springframework.data.domain.Persistable;
     @NamedSubgraph(
       name = "graph.shippingInstructionSummary.consignmentItem",
       attributeNodes = {
-        @NamedAttributeNode("shipment")
+        @NamedAttributeNode("confirmedBooking")
       })
   }
 )
@@ -239,14 +239,14 @@ public class ShippingInstruction extends AbstractStateMachine<String>
 
   // certain characteristics like the transport plan, are share among all shipments in the shipping
   // instruction, so it is beneficial to be able to retrieve one
-  public Shipment retrieveOneShipment() {
+  public ConfirmedBooking retrieveOneShipment() {
     return this.consignmentItems.stream()
-        .map(ConsignmentItem::getShipment)
+        .map(ConsignmentItem::getConfirmedBooking)
         .findAny()
         .orElseThrow(
             () ->
                 ConcreteRequestErrorMessageException.notFound(
-                    "No shipment found in Shipping instruction with shipping instruction reference: "
+                    "No confirmedBooking found in Shipping instruction with shipping instruction reference: "
                         + shippingInstructionReference));
   }
 

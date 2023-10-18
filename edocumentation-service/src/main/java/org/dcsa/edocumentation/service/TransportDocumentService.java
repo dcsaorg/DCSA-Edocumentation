@@ -45,7 +45,7 @@ public class TransportDocumentService {
   private String getTermsAndConditions(TransportDocument transportDocument) {
     return Optional.ofNullable(transportDocument.getShippingInstruction())
       .map(ShippingInstruction::retrieveOneShipment)
-      .map(Shipment::getTermsAndConditions)
+      .map(ConfirmedBooking::getTermsAndConditions)
       .orElse(null);
   }
 
@@ -70,7 +70,7 @@ public class TransportDocumentService {
   private Optional<Booking> getBooking(TransportDocument transportDocument) {
     return Optional.ofNullable(transportDocument.getShippingInstruction())
       .map(ShippingInstruction::retrieveOneShipment)
-      .map(Shipment::getBooking);
+      .map(ConfirmedBooking::getBooking);
   }
 
   private TransportDocumentTO.TransportDocumentTOBuilder resolveCarrierCodeListProvider(

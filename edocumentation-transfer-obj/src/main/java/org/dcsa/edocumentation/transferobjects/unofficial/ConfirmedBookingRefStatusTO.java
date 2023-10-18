@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 
-public record ShipmentRefStatusTO(
+public record ConfirmedBookingRefStatusTO(
   @NotBlank @Size(max = 35)
   String carrierBookingReference,
 
@@ -20,5 +20,5 @@ public record ShipmentRefStatusTO(
   OffsetDateTime bookingRequestUpdatedDateTime
 ) {
   @Builder(toBuilder = true)
-  public ShipmentRefStatusTO { }
+  public ConfirmedBookingRefStatusTO { }
 }

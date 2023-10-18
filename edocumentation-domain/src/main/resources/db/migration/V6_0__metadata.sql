@@ -43,6 +43,6 @@ ALTER TABLE transport_document
 ALTER TABLE transport_document
     ADD COLUMN IF NOT EXISTS updated_date_time timestamp with time zone NOT NULL;
 
-ALTER TABLE shipment
+ALTER TABLE confirmed_booking
     ADD COLUMN IF NOT EXISTS updated_date_time timestamp with time zone NOT NULL;
 

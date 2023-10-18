@@ -13,7 +13,7 @@ import org.dcsa.edocumentation.transferobjects.ShipmentCutOffTimeTO;
 import org.dcsa.edocumentation.transferobjects.ShipmentLocationTO;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
 
-public record ManageShipmentRequestTO(
+public record ManageConfirmedBookingRequestTO(
   @Pattern(regexp = "^\\S+(\\s+\\S+)*$")
   @Size(max = 35, message = "The attribute carrierBookingReference has a max size of 35.")
   String carrierBookingReference,
@@ -43,5 +43,5 @@ public record ManageShipmentRequestTO(
   ) {
 
   @Builder(toBuilder = true)
-  public ManageShipmentRequestTO {}
+  public ManageConfirmedBookingRequestTO {}
 }

@@ -196,7 +196,7 @@ CREATE TABLE booking (
 CREATE INDEX ON booking (id);
 
 
-CREATE TABLE shipment (
+CREATE TABLE confirmed_booking (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     booking_id uuid NOT NULL REFERENCES booking(id),
     carrier_id uuid NOT NULL REFERENCES carrier(id),
@@ -228,7 +228,7 @@ CREATE TABLE active_reefer_settings (
 CREATE TABLE requested_equipment_group (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     booking_id uuid NULL REFERENCES booking (id),
-    shipment_id uuid NULL REFERENCES shipment (id),
+    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     iso_equipment_code varchar(4) NOT NULL,
     units int NOT NULL,
     tare_weight real NULL,
@@ -249,7 +249,7 @@ CREATE TABLE requested_equipment_group_equipment_references (
 
 CREATE TABLE confirmed_equipment (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  shipment_id uuid NULL REFERENCES shipment (id),
+  confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
   iso_equipment_code varchar(4) NOT NULL,
   units int NOT NULL CHECK (units > 0),
   list_order int NOT NULL DEFAULT 0
@@ -287,11 +287,11 @@ CREATE INDEX ON commodity (requested_equipment_group_id);
 
 CREATE TABLE shipment_cutoff_time (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    shipment_id uuid NOT NULL REFERENCES shipment(id),
+    confirmed_booking_id uuid NOT NULL REFERENCES confirmed_booking(id),
     cut_off_time_code varchar(3) NOT NULL,
     cut_off_time timestamp with time zone NOT NULL,
     list_order int NOT NULL default 0,
-    UNIQUE (shipment_id, cut_off_time_code)
+    UNIQUE (confirmed_booking_id, cut_off_time_code)
 );
 
 
@@ -372,7 +372,7 @@ CREATE TABLE carrier_clauses (
 
 CREATE TABLE shipment_carrier_clauses (
     carrier_clause_id uuid NOT NULL REFERENCES carrier_clauses (id),
-    shipment_id uuid NULL REFERENCES shipment (id),
+    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     transport_document_id uuid NULL REFERENCES transport_document (id)
 );
 
@@ -380,7 +380,7 @@ CREATE TABLE document_party (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     party_id uuid NOT NULL REFERENCES party (id),
     shipping_instruction_id uuid NULL REFERENCES shipping_instruction (id),
-    shipment_id uuid NULL REFERENCES shipment (id),
+    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     party_function varchar(3) NOT NULL,
     is_to_be_notified boolean NOT NULL,
     booking_id uuid NULL REFERENCES booking(id),
@@ -389,7 +389,7 @@ CREATE TABLE document_party (
 
 -- Supporting FK constraints
 CREATE INDEX ON document_party (party_id);
-CREATE INDEX ON document_party (shipment_id);
+CREATE INDEX ON document_party (confirmed_booking_id);
 CREATE INDEX ON document_party (shipping_instruction_id);
 CREATE INDEX ON document_party (booking_id);
 
@@ -397,7 +397,7 @@ CREATE INDEX ON document_party (booking_id);
 CREATE TABLE charge (
     id varchar(100) PRIMARY KEY,
     transport_document_id uuid NOT NULL REFERENCES transport_document(id),
-    shipment_id uuid NULL REFERENCES shipment (id),
+    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     charge_name varchar(50) NOT NULL,
     currency_amount real NOT NULL,
     currency_code varchar(3) NOT NULL,
@@ -447,7 +447,7 @@ CREATE TABLE consignment_item (
     carrier_booking_reference varchar(35) NOT NULL,
     commodity_subreference varchar(100) NOT NULL,
     shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
-    shipment_id uuid NULL REFERENCES shipment (id),
+    confirmed_booking_id uuid NOT NULL REFERENCES confirmed_booking (id), -- TODO; should be `NULL` instead of `NOT NULL`.
     commodity_id uuid NULL REFERENCES commodity (id),
     si_entry_order int NOT NULL default 0
 );
@@ -465,7 +465,7 @@ CREATE INDEX ON hs_code_item (consignment_item_id);
 
 -- Supporting FK constraints
 CREATE INDEX ON consignment_item (shipping_instruction_id);
-CREATE INDEX ON consignment_item (shipment_id);
+CREATE INDEX ON consignment_item (confirmed_booking_id);
 CREATE INDEX ON consignment_item (commodity_id);
 
 
@@ -498,7 +498,7 @@ CREATE INDEX ON shipping_mark (cargo_item);
 CREATE TABLE reference (
     reference_type_code varchar(3) NOT NULL,
     reference_value varchar(100) NOT NULL,
-    shipment_id uuid NULL REFERENCES shipment (id),
+    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     shipping_instruction_id uuid NULL REFERENCES shipping_instruction (id),
     booking_id uuid NULL REFERENCES booking(id),
     consignment_item_id uuid NULL REFERENCES consignment_item(id)
@@ -535,7 +535,7 @@ CREATE INDEX ON seal (seal_type_code);
 
 
 CREATE TABLE shipment_location (
-    shipment_id uuid NULL REFERENCES shipment (id),
+    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     booking_id uuid NULL REFERENCES booking(id),
     location_id uuid NOT NULL REFERENCES location (id),
     shipment_location_type_code varchar(3) NOT NULL,
@@ -546,7 +546,7 @@ CREATE TABLE shipment_location (
 -- Note the omission of INDEX for "location_id" is deliberate; we rely on the implicit INDEX from the
 -- UNIQUE constraint for that.
 CREATE INDEX ON shipment_location (shipment_location_type_code);
-CREATE INDEX ON shipment_location (shipment_id);
+CREATE INDEX ON shipment_location (confirmed_booking_id);
 CREATE INDEX ON shipment_location (booking_id);
 
 
@@ -565,7 +565,7 @@ CREATE TABLE transport_plan_stage_type (
 
 -- NOT a 1:1 with the DCSA IM version of the similarly named entity
 CREATE TABLE shipment_transport (
-    shipment_id uuid NULL REFERENCES shipment(id),
+    confirmed_booking_id uuid NULL REFERENCES confirmed_booking(id),
     transport_plan_stage_sequence_number integer NOT NULL,
     transport_plan_stage_code varchar(3) NOT NULL REFERENCES transport_plan_stage_type(transport_plan_stage_code),
     dcsa_transport_type varchar(50) NULL,
@@ -584,7 +584,7 @@ CREATE TABLE shipment_transport (
 );
 CREATE TABLE advance_manifest_filing (
 	manifest_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  shipment_id uuid NOT NULL REFERENCES shipment(id),
+  confirmed_booking_id uuid NOT NULL REFERENCES confirmed_booking(id),
   manifest_type_code varchar(50) NOT NULL,
   country_code varchar(2) NOT NULL,
 	list_order int NOT NULL default 0

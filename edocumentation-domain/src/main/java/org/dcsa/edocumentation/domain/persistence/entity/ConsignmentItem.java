@@ -60,8 +60,8 @@ public class ConsignmentItem {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "shipment_id", nullable = false)
-  private Shipment shipment;
+  @JoinColumn(name = "confirmed_booking_id", nullable = false)
+  private ConfirmedBooking confirmedBooking;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -88,10 +88,10 @@ public class ConsignmentItem {
   @JoinColumn(name = "consignment_item_id")
   private List<@Valid CustomsReference> customsReferences;
 
-  public void resolvedShipment(@NotNull Shipment shipment) {
-    if (!this.getCarrierBookingReference().equals(shipment.getCarrierBookingReference())) {
-      throw new IllegalArgumentException("Shipment had the wrong carrier booking reference");
+  public void resolvedConfirmedBooking(@NotNull ConfirmedBooking confirmedBooking) {
+    if (!this.getCarrierBookingReference().equals(confirmedBooking.getCarrierBookingReference())) {
+      throw new IllegalArgumentException("Confirmed Booking had the wrong carrier booking reference");
     }
-    this.shipment = shipment;
+    this.confirmedBooking = confirmedBooking;
   }
 }

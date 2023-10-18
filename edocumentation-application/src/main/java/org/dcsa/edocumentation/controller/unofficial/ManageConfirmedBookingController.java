@@ -2,8 +2,8 @@ package org.dcsa.edocumentation.controller.unofficial;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.service.unofficial.ManageShipmentService;
-import org.dcsa.edocumentation.transferobjects.unofficial.ManageShipmentRequestTO;
-import org.dcsa.edocumentation.transferobjects.unofficial.ShipmentRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.unofficial.ConfirmedBookingRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.unofficial.ManageConfirmedBookingRequestTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,13 +16,13 @@ import jakarta.validation.Valid;
 @Validated
 @RestController
 @RequiredArgsConstructor
-public class ManageShipmentController {
+public class ManageConfirmedBookingController {
 
   private final ManageShipmentService manageShipmentService;
   @PostMapping(
-    path = "/unofficial${spring.application.bkg-context-path}/shipments")
+    path = "/unofficial${spring.application.bkg-context-path}/confirmed-bookings")
   @ResponseStatus(HttpStatus.OK)
-  public ShipmentRefStatusTO createNewShipment(@Valid @RequestBody ManageShipmentRequestTO shipmentRequestTO) {
+  public ConfirmedBookingRefStatusTO createNewConfirmedBooking(@Valid @RequestBody ManageConfirmedBookingRequestTO shipmentRequestTO) {
     return manageShipmentService.create(shipmentRequestTO);
   }
 }

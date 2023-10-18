@@ -47,7 +47,7 @@ import java.util.UUID;
     @NamedSubgraph(
       name = "graph.transportDocumentSummary.consignmentItem",
       attributeNodes = {
-        @NamedAttributeNode("shipment")
+        @NamedAttributeNode("confirmedBooking")
       }),
     @NamedSubgraph(
       name = "graph.transportDocumentSummary.issuingParty",

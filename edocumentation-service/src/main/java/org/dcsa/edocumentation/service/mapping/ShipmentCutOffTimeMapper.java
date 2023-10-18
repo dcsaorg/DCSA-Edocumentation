@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", config = EDocumentationMappingConfig.class)
 public interface ShipmentCutOffTimeMapper {
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "shipment", ignore = true)
+  @Mapping(target = "confirmedBooking", ignore = true)
   ShipmentCutOffTime toDAO(ShipmentCutOffTimeTO shipmentCutOffTimeTO);
 
   ShipmentCutOffTimeTO toTO(ShipmentCutOffTime shipmentCutOffTime);
