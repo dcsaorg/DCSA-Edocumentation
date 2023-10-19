@@ -28,7 +28,7 @@ ALTER TABLE party_identifying_code
 -- Metadata for Booking table to avoid having to query shipmentEvent for
 -- updated date_time necessary for BookingResponseTO
 
-ALTER TABLE booking
+ALTER TABLE booking_request
     ADD COLUMN IF NOT EXISTS updated_date_time timestamp with time zone NOT NULL;
 
 ALTER TABLE shipping_instruction

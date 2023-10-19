@@ -68,7 +68,7 @@ public class UnofficialTransportDocumentService {
       .stream()
       .map(ConsignmentItem::getConfirmedBooking)
       .map(ConfirmedBooking::getBooking)
-      .map(Booking::getDeclaredValue)
+      .map(BookingRequest::getDeclaredValue)
       .anyMatch(Objects::nonNull);
 
     if (shouldHaveDeclaredValue && transportDocumentRequestTO.declaredValue() == null) {

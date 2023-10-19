@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.service;
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.datafactories.ReferenceDataFactory;
 import org.dcsa.edocumentation.datafactories.ShippingInstructionDataFactory;
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.Reference;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.repository.ReferenceRepository;
@@ -38,10 +38,10 @@ class ReferenceServiceTest {
 
   @Test
   void referenceServiceTest_testCreateWithNullBooking() {
-    referenceService.createReferences(null, (Booking) null);
+    referenceService.createReferences(null, (BookingRequest) null);
 
     verify(referenceRepository, never()).saveAll(any());
-    verify(referenceMapper, never()).toDAO(any(), any(Booking.class));
+    verify(referenceMapper, never()).toDAO(any(), any(BookingRequest.class));
   }
 
   @Test
@@ -54,10 +54,10 @@ class ReferenceServiceTest {
 
   @Test
   void referenceServiceTest_testCreateWithEmptyBooking() {
-    referenceService.createReferences(Collections.emptyList(), (Booking) null);
+    referenceService.createReferences(Collections.emptyList(), (BookingRequest) null);
 
     verify(referenceRepository, never()).saveAll(any());
-    verify(referenceMapper, never()).toDAO(any(), any(Booking.class));
+    verify(referenceMapper, never()).toDAO(any(), any(BookingRequest.class));
   }
 
   @Test
@@ -71,15 +71,15 @@ class ReferenceServiceTest {
   @Test
   void referenceServiceTest_testCreateWithBooking() {
     // Setup
-    Booking booking = BookingDataFactory.singleMinimalBooking();
+    BookingRequest bookingRequest = BookingDataFactory.singleMinimalBooking();
     ReferenceTO referenceTO = ReferenceDataFactory.singleReferenceTO();
     Reference reference = ReferenceDataFactory.singleReferenceWithoutId();
 
     // Execute
-    referenceService.createReferences(List.of(referenceTO), booking);
+    referenceService.createReferences(List.of(referenceTO), bookingRequest);
 
     // Verify
-    verify(referenceMapper).toDAO(referenceTO, booking);
+    verify(referenceMapper).toDAO(referenceTO, bookingRequest);
     verify(referenceRepository).saveAll(List.of(reference));
   }
 

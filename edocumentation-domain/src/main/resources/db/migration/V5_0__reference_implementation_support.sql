@@ -27,8 +27,8 @@ CREATE TABLE ebl_solution_provider_type (
 );
 
 --- DDT-948
-ALTER TABLE booking ADD valid_until timestamp with time zone NULL;
-CREATE UNIQUE INDEX unq_valid_until_booking_idx ON booking(carrier_booking_request_reference) WHERE valid_until IS NULL;
+ALTER TABLE booking_request ADD valid_until timestamp with time zone NULL;
+CREATE UNIQUE INDEX unq_valid_until_booking_idx ON booking_request(carrier_booking_request_reference) WHERE valid_until IS NULL;
 
 ALTER TABLE confirmed_booking ADD valid_until timestamp with time zone NULL;
 CREATE UNIQUE INDEX unq_valid_until_shipment_idx ON confirmed_booking(carrier_booking_reference) WHERE valid_until IS NULL;

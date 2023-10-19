@@ -14,7 +14,7 @@ import org.mapstruct.ReportingPolicy;
   config = EDocumentationMappingConfig.class,
   uses = {
     LocationMapper.class,
-    BookingMapper.class,
+    BookingRequestMapper.class,
     TransportMapper.class,
     ConfirmedEquipmentMapper.class,
     ShipmentCutOffTimeMapper.class,

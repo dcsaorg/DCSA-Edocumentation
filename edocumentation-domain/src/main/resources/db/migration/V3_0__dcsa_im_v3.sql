@@ -157,7 +157,7 @@ CREATE TABLE voyage (
 );
 
 
-CREATE TABLE booking (
+CREATE TABLE booking_request (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     carrier_booking_request_reference varchar(100) NOT NULL DEFAULT uuid_generate_v4()::text,
     booking_status varchar(50),
@@ -193,12 +193,12 @@ CREATE TABLE booking (
     voyage_id UUID NULL REFERENCES voyage(id)
 );
 
-CREATE INDEX ON booking (id);
+CREATE INDEX ON booking_request (id);
 
 
 CREATE TABLE confirmed_booking (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    booking_id uuid NOT NULL REFERENCES booking(id),
+    booking_request_id uuid NOT NULL REFERENCES booking_request(id),
     carrier_id uuid NOT NULL REFERENCES carrier(id),
     carrier_booking_reference varchar(35) NOT NULL UNIQUE,
     terms_and_conditions text NULL,
@@ -227,7 +227,7 @@ CREATE TABLE active_reefer_settings (
 
 CREATE TABLE requested_equipment_group (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    booking_id uuid NULL REFERENCES booking (id),
+    booking_request_id uuid NULL REFERENCES booking_request (id),
     confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     iso_equipment_code varchar(4) NOT NULL,
     units int NOT NULL,
@@ -238,7 +238,7 @@ CREATE TABLE requested_equipment_group (
     list_order int NOT NULL DEFAULT 0
 );
 
-CREATE INDEX ON requested_equipment_group (booking_id);
+CREATE INDEX ON requested_equipment_group (booking_request_id);
 
 CREATE TABLE requested_equipment_group_equipment_references (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -351,7 +351,7 @@ CREATE TABLE bkg_requested_change (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     path varchar(500) NULL,
     message varchar(500) NOT NULL,
-    booking_id uuid REFERENCES booking (id),
+    booking_request_id uuid REFERENCES booking_request (id),
     element_order int NOT NULL default 0
 );
 
@@ -383,7 +383,7 @@ CREATE TABLE document_party (
     confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     party_function varchar(3) NOT NULL,
     is_to_be_notified boolean NOT NULL,
-    booking_id uuid NULL REFERENCES booking(id),
+    booking_request_id uuid NULL REFERENCES booking_request(id),
     displayed_address_id uuid NULL REFERENCES displayed_address(id)
 );
 
@@ -391,7 +391,7 @@ CREATE TABLE document_party (
 CREATE INDEX ON document_party (party_id);
 CREATE INDEX ON document_party (confirmed_booking_id);
 CREATE INDEX ON document_party (shipping_instruction_id);
-CREATE INDEX ON document_party (booking_id);
+CREATE INDEX ON document_party (booking_request_id);
 
 
 CREATE TABLE charge (
@@ -500,11 +500,11 @@ CREATE TABLE reference (
     reference_value varchar(100) NOT NULL,
     confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     shipping_instruction_id uuid NULL REFERENCES shipping_instruction (id),
-    booking_id uuid NULL REFERENCES booking(id),
+    booking_request_id uuid NULL REFERENCES booking_request(id),
     consignment_item_id uuid NULL REFERENCES consignment_item(id)
 );
 
-CREATE INDEX ON reference (booking_id);
+CREATE INDEX ON reference (booking_request_id);
 CREATE INDEX ON reference (consignment_item_id);
 
 
@@ -536,7 +536,7 @@ CREATE INDEX ON seal (seal_type_code);
 
 CREATE TABLE shipment_location (
     confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
-    booking_id uuid NULL REFERENCES booking(id),
+    booking_request_id uuid NULL REFERENCES booking_request(id),
     location_id uuid NOT NULL REFERENCES location (id),
     shipment_location_type_code varchar(3) NOT NULL,
     event_date_time timestamp with time zone NULL --optional datetime indicating when the event at the location takes place
@@ -547,7 +547,7 @@ CREATE TABLE shipment_location (
 -- UNIQUE constraint for that.
 CREATE INDEX ON shipment_location (shipment_location_type_code);
 CREATE INDEX ON shipment_location (confirmed_booking_id);
-CREATE INDEX ON shipment_location (booking_id);
+CREATE INDEX ON shipment_location (booking_request_id);
 
 
 CREATE TABLE port_call_status_type (

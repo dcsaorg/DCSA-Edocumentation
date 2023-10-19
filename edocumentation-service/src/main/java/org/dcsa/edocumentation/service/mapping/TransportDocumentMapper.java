@@ -97,7 +97,7 @@ public abstract class TransportDocumentMapper {
     return document.getShippingInstruction().getConsignmentItems().iterator().next().getConfirmedBooking();
   }
 
-  protected Booking resolveAnyBooking(TransportDocument document) {
+  protected BookingRequest resolveAnyBooking(TransportDocument document) {
     return resolveAnyShipment(document).getBooking();
   }
 

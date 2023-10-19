@@ -28,10 +28,10 @@ import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 
 @NamedEntityGraph(
-    name = "graph.booking-summary",
+    name = "graph.booking-request-summary",
     attributeNodes = {@NamedAttributeNode("vessel")})
 @NamedEntityGraph(
-    name = "graph.booking",
+    name = "graph.booking-request",
     attributeNodes = {
       @NamedAttributeNode("vessel"),
       @NamedAttributeNode("placeOfIssue"),
@@ -58,9 +58,9 @@ import org.springframework.data.domain.Persistable;
 @AllArgsConstructor
 @Setter(AccessLevel.PRIVATE)
 @Entity
-@Table(name = "booking")
-@BookingValidation(groups = AsyncShipperProvidedDataValidation.class)
-public class Booking extends AbstractStateMachine<String> implements Persistable<UUID> {
+@Table(name = "booking_request")
+@BookingRequestValidation(groups = AsyncShipperProvidedDataValidation.class)
+public class BookingRequest extends AbstractStateMachine<String> implements Persistable<UUID> {
 
   private static final Set<String> CAN_BE_VALIDATED = Set.of(RECEIVED,
     PENDING_UPDATES_CONFIRMATION,
@@ -100,7 +100,7 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "booking_id", referencedColumnName = "id", nullable = false)
+  @JoinColumn(name = "booking_request_id", referencedColumnName = "id", nullable = false)
   @OrderColumn(name = "element_order")
   private List<BookingRequestedChange> requestedChanges;
 
@@ -222,23 +222,23 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "booking")
+  @OneToMany(mappedBy = "bookingRequest")
   private Set<@Valid Reference> references;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "bookingRequest", cascade = CascadeType.ALL)
   @OrderColumn(name = "list_order")
   private List<@Valid RequestedEquipmentGroup> requestedEquipments;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "booking")
+  @OneToMany(mappedBy = "bookingRequest")
   private Set<@Valid DocumentParty> documentParties;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "booking")
+  @OneToMany(mappedBy = "bookingRequest")
   @Size(min = 2, message = "Must have at least two shipment locations", groups = AsyncShipperProvidedDataValidation.class)
   @NotNull(groups = AsyncShipperProvidedDataValidation.class)
   private Set<@Valid ShipmentLocation> shipmentLocations;
@@ -436,7 +436,7 @@ public class Booking extends AbstractStateMachine<String> implements Persistable
     this.requestedEquipments = requestedEquipments;
     if (requestedEquipments != null) {
       for (var re : requestedEquipments) {
-        re.setBooking(this);
+        re.setBookingRequest(this);
       }
     }
   }

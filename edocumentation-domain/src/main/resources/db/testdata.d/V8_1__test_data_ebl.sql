@@ -85,7 +85,7 @@ INSERT INTO location (
     'DKCPH'
 );
 
-INSERT INTO booking (
+INSERT INTO booking_request (
     id,
     carrier_booking_request_reference,
     booking_status,
@@ -147,7 +147,7 @@ INSERT INTO booking (
     'c703277f-84ca-4816-9ccf-fad8e202d3b6'
 );
 
-INSERT INTO booking (
+INSERT INTO booking_request (
     carrier_booking_request_reference,
     booking_status,
     receipt_type_at_origin,
@@ -210,14 +210,14 @@ INSERT INTO booking (
 
 INSERT INTO confirmed_booking (
     carrier_id,
-    booking_id,
+    booking_request_id,
     carrier_booking_reference,
     terms_and_conditions,
     confirmation_datetime,
     updated_date_time
 ) VALUES (
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     'BR1239719871',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
@@ -226,14 +226,14 @@ INSERT INTO confirmed_booking (
 
 INSERT INTO confirmed_booking (
     carrier_id,
-    booking_id,
+    booking_request_id,
     carrier_booking_reference,
     terms_and_conditions,
     confirmation_datetime,
     updated_date_time
 ) VALUES (
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_02'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_02'),
     'CR1239719872',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
@@ -245,42 +245,42 @@ INSERT INTO confirmed_booking (
  */
 INSERT INTO confirmed_booking (
     carrier_id,
-    booking_id,
+    booking_request_id,
     carrier_booking_reference,
     terms_and_conditions,
     confirmation_datetime,
     updated_date_time
 ) VALUES (
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     'bca68f1d3b804ff88aaa1e43055432f7',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
     DATE '2020-04-07T12:12:12'
 ),(
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     '832deb4bd4ea4b728430b857c59bd057',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
     DATE '2020-04-07T12:12:12'
 ),(
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     '994f0c2b590347ab86ad34cd1ffba505',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
     DATE '2020-04-07T12:12:12'
 ),(
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     '02c965382f5a41feb9f19b24b5fe2906',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
     DATE '2020-04-07T12:12:12'
 ),(
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     'AR1239719871',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
@@ -453,60 +453,60 @@ INSERT INTO document_party (
     confirmed_booking_id,
     party_function,
     is_to_be_notified,
-    booking_id
+    booking_request_id
 ) VALUES (
     '4e448f26-4035-11eb-a49d-7f9eb9bc8dd9',
     (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'BR1239719871'),
     'OS',
     true,
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01')
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01')
 ), (
     '8dd9a4c4-4039-11eb-8770-0b2b19847fab',
     (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'BR1239719871'),
     'CN',
     true,
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01')
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01')
 ), (
       '9dd9a4c4-4039-11eb-8770-0b2b19847fab',
       (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'AR1239719871'),
       'CN',
       true,
-      (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01')
+      (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01')
   );
 
 INSERT INTO shipment_location (
     confirmed_booking_id,
-    booking_id,
+    booking_request_id,
     location_id,
     shipment_location_type_code
 ) VALUES (
     (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'BR1239719871'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     uuid('84bfcf2e-403b-11eb-bc4a-1fc4aa7d879d'),
     'PRE'
 ), (
     (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'BR1239719871'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     uuid('770b7624-403d-11eb-b44b-d3f4ad185386'),
     'POL'
 ), (
     (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'BR1239719871'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
     'POD'
 ), (
     (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'BR1239719871'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     uuid('770b7624-403d-11eb-b44b-d3f4ad185387'),
     'PDE'
 ), (
    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'AR1239719871'),
-   (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+   (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
    uuid('770b7624-403d-11eb-b44b-d3f4ad185386'),
    'POL'
 ), (
    (SELECT id FROM confirmed_booking WHERE carrier_booking_reference = 'AR1239719871'),
-   (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+   (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
    uuid('7f29ce3c-403d-11eb-9579-6bd2f4cf4ed6'),
    'POD'
 );
@@ -649,13 +649,13 @@ INSERT INTO shipping_instruction (
 
 INSERT INTO requested_equipment_group (
     id,
-    booking_id,
+    booking_request_id,
     iso_equipment_code,
     units,
     is_shipper_owned
 ) VALUES (
     'd5ca0842-d90a-49fd-b929-1ef3fa375eec',
-    (SELECT booking.id FROM booking JOIN confirmed_booking ON booking.id=confirmed_booking.booking_id WHERE carrier_booking_reference = 'BR1239719871'),
+    (SELECT booking_request.id FROM booking_request JOIN confirmed_booking ON booking_request.id=confirmed_booking.booking_request_id WHERE carrier_booking_reference = 'BR1239719871'),
     '22GP',
     1,
     false
@@ -1002,7 +1002,7 @@ INSERT INTO shipping_mark (
   'shipping marks'
 );
 
-INSERT INTO booking (
+INSERT INTO booking_request (
     carrier_booking_request_reference,
     booking_status,
     receipt_type_at_origin,
@@ -1060,7 +1060,7 @@ INSERT INTO booking (
     DATE '2021-12-09'
 );
 
-INSERT INTO booking (
+INSERT INTO booking_request (
     carrier_booking_request_reference,
     booking_status,
     receipt_type_at_origin,
@@ -1121,7 +1121,7 @@ INSERT INTO booking (
 );
 
 
-INSERT INTO booking (
+INSERT INTO booking_request (
     carrier_booking_request_reference,
     booking_status,
     receipt_type_at_origin,
@@ -1179,7 +1179,7 @@ INSERT INTO booking (
     DATE '2021-12-09'
 );
 
-INSERT INTO booking (
+INSERT INTO booking_request (
     carrier_booking_request_reference,
     booking_status,
     receipt_type_at_origin,
@@ -1243,28 +1243,28 @@ INSERT INTO booking (
 
 INSERT INTO confirmed_booking (
     carrier_id,
-    booking_id,
+    booking_request_id,
     carrier_booking_reference,
     terms_and_conditions,
     confirmation_datetime,
     updated_date_time
 ) VALUES (
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_03'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_03'),
     '43f615138efc4d3286b36402405f851b',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
     DATE '2020-04-07T12:12:12'
 ),(
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_04'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_04'),
     'e8e9d64172934a40aec82e4308cdf97a',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
     DATE '2020-04-07T12:12:12'
 ),(
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_05'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_05'),
     '6fe84758a4cc471fb5eb-4de63ddadc41',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
@@ -1272,7 +1272,7 @@ INSERT INTO confirmed_booking (
 ),
 (
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_06'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_06'),
     '5dc92988f48a420495b786c224efce7d',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
@@ -1281,13 +1281,13 @@ INSERT INTO confirmed_booking (
 
 INSERT INTO requested_equipment_group (
   id,
-  booking_id,
+  booking_request_id,
   iso_equipment_code,
   units,
   is_shipper_owned
 ) VALUES (
     '90ead08c-8e39-4fd9-8006-b2c01a463cb2',
-    (SELECT booking.id FROM booking WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
+    (SELECT booking_request.id FROM booking_request WHERE carrier_booking_request_reference = 'CARRIER_BOOKING_REQUEST_REFERENCE_01'),
     '22GP',
     1,
     false
@@ -1380,7 +1380,7 @@ INSERT INTO shipping_instruction (
     '8a5ccfed-f106-405b-a61f-c3a633e57ead'::uuid
 );
 
-INSERT INTO booking (
+INSERT INTO booking_request (
     id,
     carrier_booking_request_reference,
     booking_status,
@@ -1474,21 +1474,21 @@ INSERT INTO booking (
 
 INSERT INTO confirmed_booking (
     carrier_id,
-    booking_id,
+    booking_request_id,
     carrier_booking_reference,
     terms_and_conditions,
     confirmation_datetime,
     updated_date_time
 ) VALUES (
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_01'),
     'E379021B7782',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
     DATE '2020-04-07T12:12:12'
 ), (
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_02'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_02'),
     'A379021B7782',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',
@@ -1567,37 +1567,37 @@ INSERT INTO location (
 
 INSERT INTO shipment_location (
     confirmed_booking_id,
-    booking_id,
+    booking_request_id,
     location_id,
     shipment_location_type_code
 ) VALUES (
     null,
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_01'),
     uuid('b4454ae5-dcd4-4955-8080-1f986aa5c6c3'),
     'PRE'
 ),  (
     null,
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_01'),
     uuid('1d09e9e9-dba3-4de1-8ef8-3ab6d32dbb40'),
     'POL'
 ), (
     null,
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_01'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_01'),
     uuid('ea9af21d-8471-47ac-aa59-e949ea74b08e'),
     'POD'
 ), (
     null,
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_02'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_02'),
     uuid('b4454ae5-dcd4-4955-8080-1f986aa5c6c3'),
     'PRE'
 ),  (
     null,
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_02'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_02'),
     uuid('1d09e9e9-dba3-4de1-8ef8-3ab6d32dbb40'),
     'POL'
 ), (
     null,
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_02'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_02'),
     uuid('ea9af21d-8471-47ac-aa59-e949ea74b08e'),
     'POD'
 );
@@ -1684,7 +1684,7 @@ INSERT INTO shipping_instruction (
     DATE '2021-12-31'
 );
 
-INSERT INTO booking (
+INSERT INTO booking_request (
     id,
     carrier_booking_request_reference,
     booking_status,
@@ -1748,14 +1748,14 @@ INSERT INTO booking (
 
 INSERT INTO confirmed_booking (
     carrier_id,
-    booking_id,
+    booking_request_id,
     carrier_booking_reference,
     terms_and_conditions,
     confirmation_datetime,
     updated_date_time
 ) VALUES (
     (SELECT id FROM carrier WHERE smdg_code = 'MSK'),
-    (SELECT id FROM booking WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_03'),
+    (SELECT id FROM booking_request WHERE carrier_booking_request_reference = 'KUBERNETES_IN_ACTION_03'),
     'D659FDB7E33C',
     'TERMS AND CONDITIONS!',
     DATE '2020-03-07T12:12:12',

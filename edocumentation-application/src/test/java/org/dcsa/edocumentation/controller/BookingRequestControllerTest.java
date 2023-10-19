@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.controller;
 
-import org.dcsa.edocumentation.service.BookingService;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.service.BookingRequestService;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.dcsa.skernel.errors.infrastructure.ConcreteRequestErrorMessageExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.FallbackExceptionHandler;
 import org.dcsa.skernel.errors.infrastructure.JakartaValidationExceptionHandler;
@@ -26,23 +26,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = {BookingController.class})
+@WebMvcTest(controllers = {BookingRequestController.class})
 @Import({
   SpringExceptionHandler.class,
   JakartaValidationExceptionHandler.class,
   FallbackExceptionHandler.class,
   ConcreteRequestErrorMessageExceptionHandler.class,
 })
-class BookingControllerTest {
+class BookingRequestControllerTest {
   @Autowired MockMvc mockMvc;
-  @MockBean BookingService bookingService;
-  private final String path = "/bkg/v2/bookings";
+  @MockBean
+  BookingRequestService bookingRequestService;
+  private final String path = "/bkg/v2/booking-requests";
 
   @Test
   void testBookingController_getBookingSingleResult() throws Exception {
 
-    BookingTO mockBookingTO = BookingTO.builder().carrierBookingRequestReference("1234").build();
-    when(bookingService.getBooking("1234")).thenReturn(Optional.of(mockBookingTO));
+    BookingRequestTO mockBookingRequestTO = BookingRequestTO.builder().carrierBookingRequestReference("1234").build();
+    when(bookingRequestService.getBookingRequest("1234")).thenReturn(Optional.of(mockBookingRequestTO));
 
     mockMvc
         .perform(get(path + "/1234").accept(MediaType.APPLICATION_JSON))
@@ -64,12 +65,12 @@ class BookingControllerTest {
             jsonPath("$.errors[0].message")
                 .value(
                     containsString(
-                        "getBooking.carrierBookingRequestReference size must be between 0 and 100")));
+                        "getBookingRequest.carrierBookingRequestReference size must be between 0 and 100")));
   }
 
   @Test
   void testBookingController_getBookingNotFound() throws Exception {
-    when(bookingService.getBooking(any())).thenReturn(Optional.empty());
+    when(bookingRequestService.getBookingRequest(any())).thenReturn(Optional.empty());
     mockMvc
         .perform(get(path + "/IdoNotExist").accept(MediaType.APPLICATION_JSON))
         .andDo(print())
