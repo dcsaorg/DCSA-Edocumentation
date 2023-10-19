@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "b6cb17df-4c1a-40cb-bf3f-94b77910e08e",
+		"_postman_id": "f5fa76b3-98bd-4ed9-badf-df48ecb613ff",
 		"name": "DCSA-EDocumentation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29656260"
+		"_exporter_id": "10391075",
+		"_collection_link": "https://grey-desert-2866.postman.co/workspace/New-Team-Workspace~9634308f-0889-42d7-99bd-1d4b0f653244/collection/10391075-f5fa76b3-98bd-4ed9-badf-df48ecb613ff?action=share&source=collection_link&creator=10391075"
 	},
 	"item": [
 		{
@@ -785,12 +786,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/CARRIER_BOOKING_REQUEST_REFERENCE_01",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/CARRIER_BOOKING_REQUEST_REFERENCE_01",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"bookings",
+										"booking-requests",
 										"CARRIER_BOOKING_REQUEST_REFERENCE_01"
 									]
 								}
@@ -849,7 +850,7 @@
 											"\r",
 											"pm.test(\"carrierBookingRequestReference must contain a valid value\", () => {\r",
 											"    var jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.errors[0].message).to.eql(\"getBooking.carrierBookingRequestReference size must be between 0 and 100\");\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"getBookingRequest.carrierBookingRequestReference size must be between 0 and 100\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -860,12 +861,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/12342394023i49023894i239054345u34593859438534905890438659034582390842390489023758937589347584356765049234823908490237489237482937589347859023745238905743248954739",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/12342394023i49023894i239054345u34593859438534905890438659034582390842390489023758937589347584356765049234823908490237489237482937589347859023745238905743248954739",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"bookings",
+										"booking-requests",
 										"12342394023i49023894i239054345u34593859438534905890438659034582390842390489023758937589347584356765049234823908490237489237482937589347859023745238905743248954739"
 									]
 								}
@@ -890,7 +891,7 @@
 											"\r",
 											"pm.test(\"DocumentStatus must contain a valid value\", () => {\r",
 											"    var jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking found with carrierBookingRequestReference: IdoNotExist\");\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking request found with carrierBookingRequestReference: IdoNotExist\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -901,12 +902,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/IdoNotExist",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/IdoNotExist",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"bookings",
+										"booking-requests",
 										"IdoNotExist"
 									]
 								}
@@ -1114,16 +1115,16 @@
 			]
 		},
 		{
-			"name": "Cancel booking",
+			"name": "Cancel booking request",
 			"item": [
 				{
 					"name": "Positive test cases",
 					"item": [
 						{
-							"name": "Test: Reject newly created booking (shipper)",
+							"name": "Test: Reject newly created booking request (shipper)",
 							"item": [
 								{
-									"name": "Create a booking to be rejected",
+									"name": "Create a booking request to be rejected",
 									"event": [
 										{
 											"listen": "test",
@@ -1164,19 +1165,19 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Reject the new booking",
+									"name": "Reject the new booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -1231,13 +1232,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -1247,10 +1248,10 @@
 							]
 						},
 						{
-							"name": "Test: Decline confirmed booking (shipper)",
+							"name": "Test: Decline confirmed booking request (shipper)",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -1292,12 +1293,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -1327,13 +1328,13 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
 											]
@@ -1411,7 +1412,7 @@
 									"response": []
 								},
 								{
-									"name": "Decline the new booking",
+									"name": "Decline the new booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -1460,13 +1461,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -1498,10 +1499,10 @@
 					]
 				},
 				{
-					"name": "Test: Cancel newly created booking",
+					"name": "Test: Cancel newly created booking request",
 					"item": [
 						{
-							"name": "Create a booking to be canceled",
+							"name": "Create a booking request to be canceled",
 							"event": [
 								{
 									"listen": "test",
@@ -1542,19 +1543,19 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"bookings"
+										"booking-requests"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Cancel the new booking",
+							"name": "Cancel the new booking request",
 							"event": [
 								{
 									"listen": "test",
@@ -1609,12 +1610,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"bookings",
+										"booking-requests",
 										"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 									]
 								}
@@ -1630,7 +1631,7 @@
 							"name": "Test: Cancel twice should fail",
 							"item": [
 								{
-									"name": "Create a booking to be canceled",
+									"name": "Create a booking request to be canceled",
 									"event": [
 										{
 											"listen": "test",
@@ -1665,19 +1666,19 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Cancel Booking first time",
+									"name": "Cancel booking request first time",
 									"event": [
 										{
 											"listen": "test",
@@ -1725,12 +1726,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -1738,7 +1739,7 @@
 									"response": []
 								},
 								{
-									"name": "Cancel Booking not found Copy",
+									"name": "Cancel booking request not found Copy",
 									"event": [
 										{
 											"listen": "test",
@@ -1787,12 +1788,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -1803,7 +1804,7 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Cancel Booking not found",
+							"name": "Cancel booking request not found",
 							"event": [
 								{
 									"listen": "test",
@@ -1820,7 +1821,7 @@
 											"\r",
 											"pm.test(\"Error message is as expected\", () => {\r",
 											"    const jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking found with carrierBookingRequestReference: IdoNotExist\");\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking request found with carrierBookingRequestReference: IdoNotExist\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -1840,12 +1841,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/IdoNotExist",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/IdoNotExist",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"bookings",
+										"booking-requests",
 										"IdoNotExist"
 									]
 								}
@@ -1853,7 +1854,7 @@
 							"response": []
 						},
 						{
-							"name": "Cancel Booking invalid documentStatus",
+							"name": "Cancel Booking Request invalid documentStatus",
 							"event": [
 								{
 									"listen": "test",
@@ -1890,12 +1891,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/DoesNotMatter",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/DoesNotMatter",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"bookings",
+										"booking-requests",
 										"DoesNotMatter"
 									]
 								}
@@ -1908,7 +1909,7 @@
 			"description": "The tests in this folder is about testing that the shipper (or their delegate) can cancel a booking request.\n\nThe positive tests are about features that should be possible according the API specification.\n\nThe negative tests are about features that should not be possible according to the API specification."
 		},
 		{
-			"name": "Post booking",
+			"name": "Post booking request",
 			"item": [
 				{
 					"name": "Positive test cases",
@@ -1917,7 +1918,7 @@
 							"name": "Test: Post a booking and validate",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -1952,12 +1953,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -2000,12 +2001,12 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -2032,13 +2033,13 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
 											]
@@ -2075,10 +2076,10 @@
 					"name": "Negative test cases",
 					"item": [
 						{
-							"name": "Test: Post booking with dates in the past",
+							"name": "Test: Post booking request with dates in the past",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -2113,12 +2114,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -2164,12 +2165,12 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -2196,13 +2197,13 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
 											]
@@ -2214,10 +2215,10 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Test: Post booking with missing POD and PDE.",
+							"name": "Test: Post booking request with missing POD and PDE.",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -2252,12 +2253,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -2303,12 +2304,12 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -2341,13 +2342,13 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
 											]
@@ -2359,10 +2360,10 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Test: Post booking with duplicate address",
+							"name": "Test: Post booking request with duplicate address",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -2397,12 +2398,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -2446,12 +2447,12 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -2484,13 +2485,13 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
 											]
@@ -2502,10 +2503,10 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Test: Post booking with duplicate UNLocationCodes",
+							"name": "Test: Post booking request with duplicate UNLocationCodes",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -2540,12 +2541,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -2590,12 +2591,12 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -2628,13 +2629,13 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
 											]
@@ -2646,10 +2647,10 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Test: Post booking with invalid party function code",
+							"name": "Test: Post booking request with invalid party function code",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -2684,12 +2685,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -2733,12 +2734,12 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -2771,13 +2772,13 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
 											]
@@ -2789,10 +2790,10 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Test: Post booking with invalid party contact details",
+							"name": "Test: Post booking request with invalid party contact details",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -2833,12 +2834,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -2848,10 +2849,10 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Test: Post booking with invalid OuterPackaging packageCode",
+							"name": "Test: Post booking request with invalid OuterPackaging packageCode",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -2892,12 +2893,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -2907,10 +2908,10 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Test: Post booking with invalid OuterPackaging imoPackageCode",
+							"name": "Test: Post booking request with invalid OuterPackaging imoPackageCode",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -2951,12 +2952,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -2966,10 +2967,10 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Test: Post booking with invalid OuterPackaging numberOfPackages",
+							"name": "Test: Post booking request with invalid OuterPackaging numberOfPackages",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -3010,12 +3011,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -3091,16 +3092,16 @@
 			]
 		},
 		{
-			"name": "Put booking",
+			"name": "Put booking request",
 			"item": [
 				{
 					"name": "Positive test cases",
 					"item": [
 						{
-							"name": "Test: Put a newly created booking",
+							"name": "Test: Put a newly created booking request",
 							"item": [
 								{
-									"name": "Create a booking to be updated",
+									"name": "Create a booking request to be updated",
 									"event": [
 										{
 											"listen": "test",
@@ -3135,12 +3136,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -3195,12 +3196,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -3258,12 +3259,12 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -3299,10 +3300,10 @@
 					"name": "Negative test cases",
 					"item": [
 						{
-							"name": "Test: Invalid PUT of existing booking",
+							"name": "Test: Invalid PUT of existing booking request",
 							"item": [
 								{
-									"name": "Create a booking to be updated",
+									"name": "Create a booking request to be updated",
 									"event": [
 										{
 											"listen": "test",
@@ -3337,12 +3338,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -3404,12 +3405,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -3472,12 +3473,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -3540,12 +3541,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -3610,12 +3611,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -3626,7 +3627,7 @@
 							"description": "This folder is one test case that requires multiple API requests to complete."
 						},
 						{
-							"name": "Attempt PUT non-existing booking",
+							"name": "Attempt PUT non-existing booking request",
 							"event": [
 								{
 									"listen": "test",
@@ -3651,7 +3652,7 @@
 											"\r",
 											"pm.test(\"Error message mentions carrierBookingRequestReference as an issue\", () => {\r",
 											"    const jsonData = pm.response.json();\r",
-											"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking found with carrierBookingRequestReference: IdoNotExist\");\r",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"No booking request found with carrierBookingRequestReference: IdoNotExist\");\r",
 											"});"
 										],
 										"type": "text/javascript"
@@ -3680,12 +3681,12 @@
 									}
 								},
 								"url": {
-									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/IdoNotExist",
+									"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/IdoNotExist",
 									"host": [
 										"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 									],
 									"path": [
-										"bookings",
+										"booking-requests",
 										"IdoNotExist"
 									]
 								}
@@ -4386,7 +4387,7 @@
 							"name": "Test: Post Confirmed Booking with NOT connected transport Plans",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -4422,12 +4423,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -4496,7 +4497,7 @@
 							"name": "Test: Post Confirmed Booking where all Shipment locations do not appear oin Transport Locations",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -4532,12 +4533,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -4607,7 +4608,7 @@
 							"name": "Test: Post Confirmed Booking where POD is NOT the last location and PDE is not provided",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -4643,12 +4644,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -4724,10 +4725,10 @@
 					"name": "Positive Tests",
 					"item": [
 						{
-							"name": "Basic [Booking to TD]",
+							"name": "Basic [Booking Request to TD]",
 							"item": [
 								{
-									"name": "Create a booking",
+									"name": "Create a booking request",
 									"event": [
 										{
 											"listen": "test",
@@ -4763,12 +4764,12 @@
 											}
 										},
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings"
+												"booking-requests"
 											]
 										}
 									},
@@ -4801,12 +4802,12 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
+											"raw": "{{BASE_URL}}{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 											"host": [
 												"{{BASE_URL}}{{BKG_CONTEXT_PATH}}"
 											],
 											"path": [
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}"
 											]
 										}
@@ -4837,13 +4838,13 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/bookings/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
+											"raw": "{{BASE_URL}}/unofficial{{BKG_CONTEXT_PATH}}/booking-requests/{{CARRIER_BOOKING_REQUEST_REFERENCE}}/validate",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"unofficial{{BKG_CONTEXT_PATH}}",
-												"bookings",
+												"booking-requests",
 												"{{CARRIER_BOOKING_REQUEST_REFERENCE}}",
 												"validate"
 											]

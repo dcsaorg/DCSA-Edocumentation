@@ -1,14 +1,12 @@
 package org.dcsa.edocumentation.service.mapping;
 
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
-import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(
     componentModel = "spring",
@@ -24,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
       ShipmentLocationMapper.class,
     }
 )
-public interface BookingMapper {
+public interface BookingRequestMapper {
 
   @Mapping(target = "requestedEquipments", ignore = true)
   @Mapping(target = "shipmentLocations", ignore = true)
@@ -35,8 +33,8 @@ public interface BookingMapper {
   // To make it pick up the parameter
   @Mapping(source = "voyage", target = "voyage")
   // TODO: Align names between TO and DAO
-  @Mapping(source = "bookingTO.placeOfBLIssue", target = "placeOfIssue")
-  Booking toDAO(BookingTO bookingTO, Voyage voyage, Vessel vessel);
+  @Mapping(source = "bookingRequestTO.placeOfBLIssue", target = "placeOfIssue")
+  BookingRequest toDAO(BookingRequestTO bookingRequestTO, Voyage voyage, Vessel vessel);
 
   @Mapping(source = "placeOfIssue", target = "placeOfBLIssue")
   @Mapping(source = "voyage.universalVoyageReference", target = "universalExportVoyageReference")
@@ -44,8 +42,8 @@ public interface BookingMapper {
   @Mapping(source = "voyage.service.carrierServiceCode", target = "carrierServiceCode")
   @Mapping(source = "voyage.service.universalServiceReference", target = "universalServiceReference")
   @Mapping(source = "vessel.vesselIMONumber", target = "vesselIMONumber")
-  BookingTO toDTO(Booking booking);
+  BookingRequestTO toDTO(BookingRequest bookingRequest);
 
-  BookingRefStatusTO toStatusDTO(Booking booking);
+  BookingRequestRefStatusTO toStatusDTO(BookingRequest bookingRequest);
 }
 

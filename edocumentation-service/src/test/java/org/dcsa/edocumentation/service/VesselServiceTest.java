@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.service;
 import org.dcsa.edocumentation.datafactories.VesselDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.repository.VesselRepository;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.dcsa.skernel.errors.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,12 +37,12 @@ public class VesselServiceTest {
   @Test
   public void resolveVessel_null() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .vesselIMONumber(null)
       .build();
 
     // Execute
-    assertNull(vesselService.resolveVessel(bookingTO));
+    assertNull(vesselService.resolveVessel(bookingRequestTO));
 
     // Verify
     verify(vesselRepository, never()).findByVesselIMONumber(any());
@@ -51,14 +51,14 @@ public class VesselServiceTest {
   @Test
   public void resolveVessel_unknown() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .vesselIMONumber("1234567")
       .build();
     when(vesselRepository.findByVesselIMONumber(any())).thenReturn(Optional.empty());
 
     // Execute
     NotFoundException exception =
-      assertThrows(NotFoundException.class, () -> vesselService.resolveVessel(bookingTO));
+      assertThrows(NotFoundException.class, () -> vesselService.resolveVessel(bookingRequestTO));
 
     // Verify
     assertEquals("No vessel with vesselIMONumber = '1234567'", exception.getMessage());
@@ -68,14 +68,14 @@ public class VesselServiceTest {
   @Test
   public void resolveVessel_known() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .vesselIMONumber("1234567")
       .build();
     Vessel expected = VesselDataFactory.vessel();
     when(vesselRepository.findByVesselIMONumber(any())).thenReturn(Optional.of(expected));
 
     // Execute
-    Vessel actual = vesselService.resolveVessel(bookingTO);
+    Vessel actual = vesselService.resolveVessel(bookingRequestTO);
 
     // Verify
     assertEquals(expected, actual);

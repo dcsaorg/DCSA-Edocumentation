@@ -136,7 +136,7 @@ INSERT INTO shipment_carrier_clauses (
     (SELECT id FROM transport_document WHERE transport_document_reference = '9b02401c-b2fb-5009')
 );
 
-INSERT INTO booking (
+INSERT INTO booking_request (
     id,
     carrier_booking_request_reference,
     booking_status,
@@ -204,13 +204,13 @@ INSERT INTO booking (
 
 INSERT INTO requested_equipment_group (
     id,
-    booking_id,
+    booking_request_id,
     iso_equipment_code,
     units,
     is_shipper_owned
 ) VALUES (
     '98c4d459-42a3-42bc-992d-e1de670a9c08',
-    (SELECT booking_id FROM confirmed_booking WHERE carrier_booking_reference = 'A379021B7782'),
+    (SELECT booking_request_id FROM confirmed_booking WHERE carrier_booking_reference = 'A379021B7782'),
     '22GP',
     1,
     false

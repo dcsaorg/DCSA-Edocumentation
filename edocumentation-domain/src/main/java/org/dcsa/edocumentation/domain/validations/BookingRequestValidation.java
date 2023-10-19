@@ -13,8 +13,8 @@ import java.lang.annotation.Target;
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = BookingValidator.class)
-public @interface BookingValidation {
+@Constraint(validatedBy = BookingRequestValidator.class)
+public @interface BookingRequestValidation {
   String message() default "This attribute is not used (but required by the Validation API)";
 
   Class<?>[] groups() default {};

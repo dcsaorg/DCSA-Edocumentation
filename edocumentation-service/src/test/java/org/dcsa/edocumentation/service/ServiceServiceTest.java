@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.service;
 import org.dcsa.edocumentation.datafactories.ServiceDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Service;
 import org.dcsa.edocumentation.domain.persistence.repository.ServiceRepository;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.dcsa.skernel.errors.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,13 +39,13 @@ public class ServiceServiceTest {
   @Test
   public void resolveService_null() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .universalServiceReference(null)
       .carrierServiceCode(null)
       .build();
 
     // Execute
-    assertNull(serviceService.resolveService(bookingTO));
+    assertNull(serviceService.resolveService(bookingRequestTO));
 
     // Verify
     verify(serviceRepository, never()).findAll(any(Example.class));
@@ -54,14 +54,14 @@ public class ServiceServiceTest {
   @Test
   public void resolveService_Unknown() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .universalServiceReference("serviceRef")
       .carrierServiceCode("carrierRef")
       .build();
 
     // Execute
     NotFoundException exception =
-      assertThrows(NotFoundException.class, () -> serviceService.resolveService(bookingTO));
+      assertThrows(NotFoundException.class, () -> serviceService.resolveService(bookingRequestTO));
 
     // Verify
     assertEquals("No services that match carrierServiceCode 'carrierRef' and universalServiceReference 'serviceRef'", exception.getMessage());
@@ -71,7 +71,7 @@ public class ServiceServiceTest {
   @Test
   public void resolveService_Known() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .universalServiceReference("serviceRef")
       .carrierServiceCode("carrierRef")
       .build();
@@ -79,7 +79,7 @@ public class ServiceServiceTest {
     when(serviceRepository.findAll(any(Example.class))).thenReturn(List.of(expected));
 
     // Execute
-    Service actual = serviceService.resolveService(bookingTO);
+    Service actual = serviceService.resolveService(bookingRequestTO);
 
     // Verify
     assertEquals(expected, actual);

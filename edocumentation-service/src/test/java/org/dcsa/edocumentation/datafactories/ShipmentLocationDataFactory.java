@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.Location;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentLocation;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
@@ -35,9 +35,9 @@ public class ShipmentLocationDataFactory {
       .build();
   }
 
-  public ShipmentLocation shipmentLocation(Booking booking, OffsetDateTime now) {
+  public ShipmentLocation shipmentLocation(BookingRequest bookingRequest, OffsetDateTime now) {
     return ShipmentLocation.builder()
-      .booking(booking)
+      .bookingRequest(bookingRequest)
       .location(LocationDataFactory.addressLocationWithId())
       .shipmentLocationTypeCode(LocationType.OIR.name())
       .eventDateTime(now)

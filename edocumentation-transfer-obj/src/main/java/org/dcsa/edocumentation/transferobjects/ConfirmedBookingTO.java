@@ -23,7 +23,7 @@ public record ConfirmedBookingTO(
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         OffsetDateTime shipmentUpdatedDateTime,
     String termsAndConditions,
-    @NotNull @Valid BookingTO booking,
+    @NotNull @Valid BookingRequestTO booking,
     @NotNull @Valid List<TransportTO> transports,
     @Valid List<ShipmentCutOffTimeTO> shipmentCutOffTimes,
     @Valid List<ShipmentLocationTO> shipmentLocations,

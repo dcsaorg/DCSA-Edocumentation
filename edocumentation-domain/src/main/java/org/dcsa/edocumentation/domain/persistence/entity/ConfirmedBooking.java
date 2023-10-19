@@ -49,8 +49,8 @@ public class ConfirmedBooking {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "booking_id")
-  private Booking booking;
+  @JoinColumn(name = "booking_request_id")
+  private BookingRequest booking;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

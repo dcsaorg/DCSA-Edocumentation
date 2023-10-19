@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.service;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
 import org.dcsa.edocumentation.domain.persistence.repository.VoyageRepository;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class VoyageService {
   private final VoyageRepository voyageRepository;
 
   @Transactional
-  public Voyage resolveVoyage(BookingTO bookingRequest) {
+  public Voyage resolveVoyage(BookingRequestTO bookingRequest) {
     String universalExportVoyageReference = bookingRequest.universalExportVoyageReference();
     String carrierExportVoyageNumber = bookingRequest.carrierExportVoyageNumber();
 

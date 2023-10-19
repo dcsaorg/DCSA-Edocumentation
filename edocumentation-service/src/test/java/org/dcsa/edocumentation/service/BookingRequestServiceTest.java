@@ -16,14 +16,14 @@ import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.datafactories.LocationDataFactory;
 import org.dcsa.edocumentation.datafactories.VesselDataFactory;
 import org.dcsa.edocumentation.datafactories.VoyageDataFactory;
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
-import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
+import org.dcsa.edocumentation.domain.persistence.repository.BookingRequestRepository;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.service.mapping.*;
-import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,12 +37,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class BookingServiceTest {
+class BookingRequestServiceTest {
   @Nested
-  class GetBooking {
-    @Mock private BookingRepository repository;
+  class GetBookingRequest {
+    @Mock private BookingRequestRepository repository;
 
-    @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
+    @Spy private BookingRequestMapper bookingRequestMapper = Mappers.getMapper(BookingRequestMapper.class);
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
 
@@ -53,15 +53,15 @@ class BookingServiceTest {
     @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
     @Spy private ActiveReeferSettingsMapper activeReeferSettingsMapper = Mappers.getMapper(ActiveReeferSettingsMapper.class);
 
-    @InjectMocks private BookingService service;
+    @InjectMocks private BookingRequestService service;
 
     @BeforeEach
     void setupMappers() {
       DisplayedAddressMapper displayedAddressMapper = new DisplayedAddressMapper();
-      ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
-      ReflectionTestUtils.setField(bookingMapper, "documentPartyMapper", documentPartyMapper);
-      ReflectionTestUtils.setField(bookingMapper, "shipmentLocationMapper", shipmentLocationMapper);
-      ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
+      ReflectionTestUtils.setField(bookingRequestMapper, "locationMapper", locationMapper);
+      ReflectionTestUtils.setField(bookingRequestMapper, "documentPartyMapper", documentPartyMapper);
+      ReflectionTestUtils.setField(bookingRequestMapper, "shipmentLocationMapper", shipmentLocationMapper);
+      ReflectionTestUtils.setField(bookingRequestMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
       ReflectionTestUtils.setField(documentPartyMapper, "displayedAddressMapper", displayedAddressMapper);
       ReflectionTestUtils.setField(documentPartyMapper, "partyMapper", partyMapper);
@@ -75,10 +75,10 @@ class BookingServiceTest {
       when(repository.findBookingByCarrierBookingRequestReference(any()))
         .thenReturn(Optional.of(BookingDataFactory.singleDeepBooking()));
 
-      Optional<BookingTO> result = service.getBooking("test");
+      Optional<BookingRequestTO> result = service.getBookingRequest("test");
       assertTrue(result.isPresent());
 
-      BookingTO bookingResult = result.get();
+      BookingRequestTO bookingResult = result.get();
       assertEquals("BOOKING_REQ_REF_01", bookingResult.carrierBookingRequestReference());
       assertFalse(bookingResult.requestedEquipments().isEmpty());
       assertFalse(bookingResult.references().isEmpty());
@@ -90,10 +90,10 @@ class BookingServiceTest {
       when(repository.findBookingByCarrierBookingRequestReference(any()))
           .thenReturn(Optional.of(BookingDataFactory.singleMinimalBooking()));
 
-      Optional<BookingTO> result = service.getBooking("test");
+      Optional<BookingRequestTO> result = service.getBookingRequest("test");
       assertTrue(result.isPresent());
 
-      BookingTO bookingResult = result.get();
+      BookingRequestTO bookingResult = result.get();
       assertEquals("BOOKING_REQ_REF_01", bookingResult.carrierBookingRequestReference());
       assertFalse(bookingResult.requestedEquipments().isEmpty());
     }
@@ -102,7 +102,7 @@ class BookingServiceTest {
     void bookingServiceTest_testNoBookingFound() {
       when(repository.findBookingByCarrierBookingRequestReference(any())).thenReturn(Optional.empty());
 
-      Optional<BookingTO> result = service.getBooking("test");
+      Optional<BookingRequestTO> result = service.getBookingRequest("test");
       assertFalse(result.isPresent());
     }
 
@@ -110,24 +110,24 @@ class BookingServiceTest {
     void bookingServiceTest_testNullCarrierBookingRequestReference() {
       when(repository.findBookingByCarrierBookingRequestReference(null)).thenReturn(Optional.empty());
 
-      Optional<BookingTO> result = service.getBooking(null);
+      Optional<BookingRequestTO> result = service.getBookingRequest(null);
       assertFalse(result.isPresent());
     }
   }
 
   @Nested
-  class CreateBooking {
+  class CreateBookingRequest {
     @Mock private VoyageService voyageService;
     @Mock private VesselService vesselService;
     @Mock private ReferenceService referenceService;
     @Mock private DocumentPartyService documentPartyService;
     @Mock private ShipmentLocationService shipmentLocationService;
 
-    @Mock private BookingRepository bookingRepository;
+    @Mock private BookingRequestRepository bookingRequestRepository;
 
     @Spy private AddressMapper addressMapper = Mappers.getMapper(AddressMapper.class);
     @Spy private LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
-    @Spy private BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
+    @Spy private BookingRequestMapper bookingRequestMapper = Mappers.getMapper(BookingRequestMapper.class);
     @Spy private ReferenceMapper referenceMapper = Mappers.getMapper(ReferenceMapper.class);
     @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
     @Spy private CommodityMapper commodityMapper = Mappers.getMapper(CommodityMapper.class);
@@ -135,19 +135,19 @@ class BookingServiceTest {
 
     @Spy private OuterPackagingMapper outerPackagingMapper = Mappers.getMapper(OuterPackagingMapper.class);
 
-    @InjectMocks private BookingService bookingService;
+    @InjectMocks private BookingRequestService bookingRequestService;
 
     @BeforeEach
     public void resetMocks() {
       ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
-      ReflectionTestUtils.setField(bookingMapper, "locationMapper", locationMapper);
-      ReflectionTestUtils.setField(bookingMapper, "referenceMapper", referenceMapper);
-      ReflectionTestUtils.setField(bookingMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
+      ReflectionTestUtils.setField(bookingRequestMapper, "locationMapper", locationMapper);
+      ReflectionTestUtils.setField(bookingRequestMapper, "referenceMapper", referenceMapper);
+      ReflectionTestUtils.setField(bookingRequestMapper, "requestedEquipmentGroupMapper", requestedEquipmentGroupMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "activeReeferSettingsMapper", activeReeferSettingsMapper);
       ReflectionTestUtils.setField(requestedEquipmentGroupMapper, "commodityMapper", commodityMapper);
       ReflectionTestUtils.setField(commodityMapper, "outerPackagingMapper", outerPackagingMapper);
       reset(voyageService, vesselService,referenceService, documentPartyService, shipmentLocationService,
-        bookingRepository);
+        bookingRequestRepository);
     }
 
     @Test
@@ -157,12 +157,12 @@ class BookingServiceTest {
       var location = LocationDataFactory.addressLocationWithId();
       OffsetDateTime now = OffsetDateTime.now();
 
-      BookingTO bookingRequest = BookingDataFactory.singleFullBookingRequestTO();
-      Booking bookingToSave = bookingMapper.toDAO(bookingRequest, voyage, vessel).toBuilder()
+      BookingRequestTO bookingRequest = BookingDataFactory.singleFullBookingRequestTO();
+      BookingRequest bookingRequestToSave = bookingRequestMapper.toDAO(bookingRequest, voyage, vessel).toBuilder()
         .placeOfIssue(location)
         .invoicePayableAt(location)
         .build();
-      Booking bookingSaved = bookingToSave.toBuilder()
+      BookingRequest bookingRequestSaved = bookingRequestToSave.toBuilder()
         .carrierBookingRequestReference("carrierBookingRequestRef")
         .bookingRequestCreatedDateTime(now)
         .bookingRequestUpdatedDateTime(now)
@@ -171,10 +171,10 @@ class BookingServiceTest {
 
       when(voyageService.resolveVoyage(any())).thenReturn(voyage);
       when(vesselService.resolveVessel(any())).thenReturn(vessel);
-      when(bookingRepository.save(any())).thenReturn(bookingSaved);
+      when(bookingRequestRepository.save(any())).thenReturn(bookingRequestSaved);
 
        // Execute
-      BookingRefStatusTO result = bookingService.createBooking(bookingRequest);
+      BookingRequestRefStatusTO result = bookingRequestService.createBookingRequest(bookingRequest);
 
       // Verify
       assertEquals("carrierBookingRequestRef", result.carrierBookingRequestReference());
@@ -182,26 +182,26 @@ class BookingServiceTest {
       assertEquals(now, result.bookingRequestUpdatedDateTime());
       assertEquals(BookingStatus.RECEIVED, result.bookingStatus());
 
-      ArgumentCaptor<Booking> bookingArgumentCaptor = ArgumentCaptor.forClass(Booking.class);
+      ArgumentCaptor<BookingRequest> bookingArgumentCaptor = ArgumentCaptor.forClass(BookingRequest.class);
       verify(voyageService).resolveVoyage(bookingRequest);
       verify(vesselService).resolveVessel(bookingRequest);
-      verify(bookingRepository).save(bookingArgumentCaptor.capture());
-      verify(referenceService).createReferences(eq(bookingRequest.references()), any(Booking.class));
-      verify(documentPartyService).createDocumentParties(eq(bookingRequest.documentParties()), any(Booking.class));
-      verify(shipmentLocationService).createShipmentLocations(eq(bookingRequest.shipmentLocations()), any(Booking.class));
+      verify(bookingRequestRepository).save(bookingArgumentCaptor.capture());
+      verify(referenceService).createReferences(eq(bookingRequest.references()), any(BookingRequest.class));
+      verify(documentPartyService).createDocumentParties(eq(bookingRequest.documentParties()), any(BookingRequest.class));
+      verify(shipmentLocationService).createShipmentLocations(eq(bookingRequest.shipmentLocations()), any(BookingRequest.class));
 
-      Booking bookingActuallySaved = bookingArgumentCaptor.getValue();
-      assertEquals(bookingToSave, bookingActuallySaved.toBuilder()
+      BookingRequest bookingRequestActuallySaved = bookingArgumentCaptor.getValue();
+      assertEquals(bookingRequestToSave, bookingRequestActuallySaved.toBuilder()
         .id(null)
         .carrierBookingRequestReference(null)
         .bookingRequestCreatedDateTime(null)
         .bookingRequestUpdatedDateTime(null)
         .bookingStatus(null)
         .build());
-      assertNotNull(bookingActuallySaved.getCarrierBookingRequestReference());
-      assertNotNull(bookingActuallySaved.getBookingRequestCreatedDateTime());
-      assertNotNull(bookingActuallySaved.getBookingRequestUpdatedDateTime());
-      assertEquals(BookingStatus.RECEIVED, bookingActuallySaved.getBookingStatus());
+      assertNotNull(bookingRequestActuallySaved.getCarrierBookingRequestReference());
+      assertNotNull(bookingRequestActuallySaved.getBookingRequestCreatedDateTime());
+      assertNotNull(bookingRequestActuallySaved.getBookingRequestUpdatedDateTime());
+      assertEquals(BookingStatus.RECEIVED, bookingRequestActuallySaved.getBookingStatus());
     }
   }
 }

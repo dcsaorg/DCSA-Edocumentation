@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
   FallbackExceptionHandler.class,
   ConcreteRequestErrorMessageExceptionHandler.class,
 })
-class BookingSummaryControllerTest {
+class BookingRequestSummaryControllerTest {
 
   @Autowired MockMvc mockMvc;
   @MockBean BookingSummaryService bookingSummaryService;

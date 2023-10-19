@@ -7,13 +7,13 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
-import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
+import org.dcsa.edocumentation.domain.persistence.repository.BookingRequestRepository;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
-import org.dcsa.edocumentation.service.mapping.BookingMapper;
+import org.dcsa.edocumentation.service.mapping.BookingRequestMapper;
 import org.dcsa.edocumentation.transferobjects.unofficial.BookingCancelRequestTO;
-import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -22,30 +22,30 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UnofficialBookingService {
-  private final BookingRepository bookingRepository;
-  private final BookingMapper bookingMapper;
+public class UnofficialBookingRequestService {
+  private final BookingRequestRepository bookingRequestRepository;
+  private final BookingRequestMapper bookingRequestMapper;
   @Qualifier("eagerValidator")
   private final Validator validator;
 
   @Transactional
-  public BookingRefStatusTO performBookingValidation(String carrierBookingRequestReference) {
-    Booking booking = bookingRepository.findBookingByCarrierBookingRequestReference(carrierBookingRequestReference)
+  public BookingRequestRefStatusTO performBookingValidation(String carrierBookingRequestReference) {
+    BookingRequest bookingRequest = bookingRequestRepository.findBookingByCarrierBookingRequestReference(carrierBookingRequestReference)
             .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound(
-                    "No booking found with carrierBookingRequestReference='" + carrierBookingRequestReference + "'"));
+                    "No booking request found with carrierBookingRequestReference='" + carrierBookingRequestReference + "'"));
 
-    validateBooking(booking, true);
+    validateBooking(bookingRequest, true);
 
-    return bookingMapper.toStatusDTO(booking);
+    return bookingRequestMapper.toStatusDTO(bookingRequest);
   }
 
   @Transactional
-  public ValidationResult<String> validateBooking(Booking booking, boolean persistOnPENC) {
-    var carrierBookingRequestReference = booking.getCarrierBookingRequestReference();
+  public ValidationResult<String> validateBooking(BookingRequest bookingRequest, boolean persistOnPENC) {
+    var carrierBookingRequestReference = bookingRequest.getCarrierBookingRequestReference();
 
     ValidationResult<String> validationResult;
     try {
-      validationResult = booking.asyncValidation(validator);
+      validationResult = bookingRequest.asyncValidation(validator);
     } catch (IllegalStateException e) {
       throw ConcreteRequestErrorMessageException.conflict(e.getLocalizedMessage(), e);
     }
@@ -53,25 +53,25 @@ public class UnofficialBookingService {
     if (validationResult.validationErrors().isEmpty()) {
       log.debug("Booking {} passed validation", carrierBookingRequestReference);
       if (persistOnPENC) {
-        booking.pendingUpdatesConfirmation("Booking passed validation", OffsetDateTime.now());
-        bookingRepository.save(booking);
+        bookingRequest.pendingUpdatesConfirmation("Booking passed validation", OffsetDateTime.now());
+        bookingRequestRepository.save(bookingRequest);
       }
     } else {
       String reason = validationResult.presentErrors(5000);
-      booking.pendingUpdate(reason, OffsetDateTime.now());
+      bookingRequest.pendingUpdate(reason, OffsetDateTime.now());
       log.debug("Booking {} failed validation because {}", carrierBookingRequestReference, reason);
-      bookingRepository.save(booking);
+      bookingRequestRepository.save(bookingRequest);
     }
     return validationResult;
   }
 
   @Transactional
-  public Optional<BookingRefStatusTO> cancelBooking(String carrierBookingRequestReference,
-                                                    BookingCancelRequestTO bookingCancelRequestTO) {
-    Booking booking = bookingRepository.findBookingByCarrierBookingRequestReference(
+  public Optional<BookingRequestRefStatusTO> cancelBooking(String carrierBookingRequestReference,
+                                                           BookingCancelRequestTO bookingCancelRequestTO) {
+    BookingRequest bookingRequest = bookingRequestRepository.findBookingByCarrierBookingRequestReference(
       carrierBookingRequestReference
     ).orElse(null);
-    if (booking == null) {
+    if (bookingRequest == null) {
       return Optional.empty();
     }
 
@@ -81,14 +81,14 @@ public class UnofficialBookingService {
     - DECLINED (in the case that booking has already been confirmed)
      */
     if (bookingCancelRequestTO.bookingStatus().equals(BookingStatus.REJECTED)) {
-      booking.reject(bookingCancelRequestTO.reason());
+      bookingRequest.reject(bookingCancelRequestTO.reason());
     } else if (bookingCancelRequestTO.bookingStatus().equals(BookingStatus.DECLINED)) {
-      booking.decline(bookingCancelRequestTO.reason());
+      bookingRequest.decline(bookingCancelRequestTO.reason());
     } else {
       throw ConcreteRequestErrorMessageException.invalidInput("bookingStatus must be either REJECTED or DECLINED");
     }
 
-    booking = bookingRepository.save(booking);
-    return Optional.of(bookingMapper.toStatusDTO(booking));
+    bookingRequest = bookingRequestRepository.save(bookingRequest);
+    return Optional.of(bookingRequestMapper.toStatusDTO(bookingRequest));
   }
 }

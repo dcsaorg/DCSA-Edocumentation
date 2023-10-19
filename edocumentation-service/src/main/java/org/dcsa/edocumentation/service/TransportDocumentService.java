@@ -51,23 +51,23 @@ public class TransportDocumentService {
 
   private Float getDeclaredValue(TransportDocument transportDocument) {
     return getBooking(transportDocument)
-      .map(Booking::getDeclaredValue)
+      .map(BookingRequest::getDeclaredValue)
       .orElse(null);
   }
 
   private String getDeclaredValueCurrency(TransportDocument transportDocument) {
     return getBooking(transportDocument)
-      .map(Booking::getDeclaredValueCurrency)
+      .map(BookingRequest::getDeclaredValueCurrency)
       .orElse(null);
   }
 
   private String getServiceContractReference(TransportDocument transportDocument) {
     return getBooking(transportDocument)
-      .map(Booking::getServiceContractReference)
+      .map(BookingRequest::getServiceContractReference)
       .orElse(null);
   }
 
-  private Optional<Booking> getBooking(TransportDocument transportDocument) {
+  private Optional<BookingRequest> getBooking(TransportDocument transportDocument) {
     return Optional.ofNullable(transportDocument.getShippingInstruction())
       .map(ShippingInstruction::retrieveOneShipment)
       .map(ConfirmedBooking::getBooking);

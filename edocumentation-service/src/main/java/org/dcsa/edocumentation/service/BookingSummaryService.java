@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
+import org.dcsa.edocumentation.domain.persistence.repository.BookingRequestRepository;
 import org.dcsa.edocumentation.service.mapping.BookingSummaryMapper;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
 import org.dcsa.skernel.infrastructure.pagination.PagedResult;
@@ -14,7 +14,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class BookingSummaryService {
-  private final BookingRepository repository;
+  private final BookingRequestRepository repository;
   private final BookingSummaryMapper bookingSummaryMapper;
 
   @Transactional

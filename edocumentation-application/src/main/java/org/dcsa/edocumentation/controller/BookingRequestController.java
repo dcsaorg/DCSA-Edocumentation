@@ -2,10 +2,10 @@ package org.dcsa.edocumentation.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
-import org.dcsa.edocumentation.service.BookingService;
+import org.dcsa.edocumentation.service.BookingRequestService;
 import org.dcsa.edocumentation.transferobjects.BookingCancelRequestTO;
-import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,48 +20,48 @@ import jakarta.validation.constraints.Size;
 @Validated
 @RestController
 @RequiredArgsConstructor
-public class BookingController {
-  private final BookingService bookingService;
+public class BookingRequestController {
+  private final BookingRequestService bookingRequestService;
 
   @GetMapping(
-    path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}",
+    path = "${spring.application.bkg-context-path}/booking-requests/{carrierBookingRequestReference}",
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   @ResponseStatus(HttpStatus.OK)
-  public BookingTO getBooking(@PathVariable("carrierBookingRequestReference") @NotBlank @Size(max = 100)
+  public BookingRequestTO getBookingRequest(@PathVariable("carrierBookingRequestReference") @NotBlank @Size(max = 100)
                               String carrierBookingRequestReference) {
-    return bookingService
-      .getBooking(carrierBookingRequestReference)
+    return bookingRequestService
+      .getBookingRequest(carrierBookingRequestReference)
       .orElseThrow(
         () ->
           ConcreteRequestErrorMessageException.notFound(
-            "No booking found with carrierBookingRequestReference: "
+            "No booking request found with carrierBookingRequestReference: "
               + carrierBookingRequestReference));
   }
 
-  @PostMapping(path = "${spring.application.bkg-context-path}/bookings")
+  @PostMapping(path = "${spring.application.bkg-context-path}/booking-requests")
   @ResponseStatus(HttpStatus.CREATED)
-  public BookingRefStatusTO createBooking(@Valid @RequestBody BookingTO bookingRequest) {
+  public BookingRequestRefStatusTO createBookingRequest(@Valid @RequestBody BookingRequestTO bookingRequest) {
     if (bookingRequest.carrierBookingRequestReference() != null
       || bookingRequest.bookingStatus() != null
       || bookingRequest.bookingRequestCreatedDateTime() != null
       || bookingRequest.bookingRequestUpdatedDateTime() != null) {
       throw ConcreteRequestErrorMessageException.invalidInput(
         "carrierBookingRequestReference, bookingStatus, bookingRequestCreatedDateTime and"
-          + " bookingRequestUpdatedDateTime are not allowed when creating a booking");
+          + " bookingRequestUpdatedDateTime are not allowed when creating a booking request");
     }
-    return bookingService.createBooking(bookingRequest);
+    return bookingRequestService.createBookingRequest(bookingRequest);
   }
 
-  @PutMapping(path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}")
+  @PutMapping(path = "${spring.application.bkg-context-path}/booking-requests/{carrierBookingRequestReference}")
   @ResponseStatus(HttpStatus.OK)
-  public BookingRefStatusTO updateBooking(
+  public BookingRequestRefStatusTO updateBookingRequest(
     @PathVariable("carrierBookingRequestReference")
     @NotBlank @Size(max = 100)
     String carrierBookingRequestReference,
 
     @Valid @RequestBody
-    BookingTO bookingRequest
+    BookingRequestTO bookingRequest
   ) {
     if (bookingRequest.carrierBookingRequestReference() == null || !carrierBookingRequestReference.equals(bookingRequest.carrierBookingRequestReference())) {
       throw ConcreteRequestErrorMessageException.invalidInput(
@@ -72,32 +72,32 @@ public class BookingController {
       || bookingRequest.bookingRequestUpdatedDateTime() != null) {
       throw ConcreteRequestErrorMessageException.invalidInput(
         "bookingStatus, bookingRequestCreatedDateTime and"
-          + " bookingRequestUpdatedDateTime are not allowed when updating a booking");
+          + " bookingRequestUpdatedDateTime are not allowed when updating a booking request");
     }
-    return bookingService.updateBooking(carrierBookingRequestReference, bookingRequest)
+    return bookingRequestService.updateBookingRequest(carrierBookingRequestReference, bookingRequest)
       .orElseThrow(
         () ->
           ConcreteRequestErrorMessageException.notFound(
-            "No booking found with carrierBookingRequestReference: "
+            "No booking request found with carrierBookingRequestReference: "
               + carrierBookingRequestReference));
   }
 
   @PatchMapping(
-    path = "${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}",
+    path = "${spring.application.bkg-context-path}/booking-requests/{carrierBookingRequestReference}",
     produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public BookingRefStatusTO cancelBooking(
+  public BookingRequestRefStatusTO cancelBookingRequest(
       @Valid @PathVariable("carrierBookingRequestReference") @NotNull @Size(max = 100)
           String carrierBookingRequestReference,
       @Valid @RequestBody BookingCancelRequestTO bookingCancelRequestTO) {
     if (!bookingCancelRequestTO.bookingStatus().equals(BookingStatus.CANCELLED)) {
       throw ConcreteRequestErrorMessageException.invalidInput("bookingStatus must be CANCELLED");
     }
-    return bookingService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO.reason())
+    return bookingRequestService.cancelBookingRequest(carrierBookingRequestReference, bookingCancelRequestTO.reason())
       .orElseThrow(
         () ->
           ConcreteRequestErrorMessageException.notFound(
-            "No booking found with carrierBookingRequestReference: "
+            "No booking request found with carrierBookingRequestReference: "
               + carrierBookingRequestReference));
   }
 }

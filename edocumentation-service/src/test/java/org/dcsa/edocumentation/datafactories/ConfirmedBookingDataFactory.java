@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.datafactories;
 
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
 
 import java.time.OffsetDateTime;
@@ -22,11 +22,11 @@ public class ConfirmedBookingDataFactory {
   }
 
   public ConfirmedBooking singleConfirmedBookingWithBooking() {
-    Booking booking = BookingDataFactory.singleShallowBooking();
+    BookingRequest bookingRequest = BookingDataFactory.singleShallowBooking();
     return ConfirmedBooking.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5f2"))
         .carrierBookingReference("carrierBookingReference")
-        .booking(booking)
+        .booking(bookingRequest)
         .shipmentCreatedDateTime(OffsetDateTime.now())
         .shipmentUpdatedDateTime(OffsetDateTime.now())
         .termsAndConditions("TERMS AND CONDITIONS")
@@ -34,13 +34,13 @@ public class ConfirmedBookingDataFactory {
   }
 
   public List<ConfirmedBooking> multipleConfirmedBookingsWithBooking() {
-    List<Booking> booking =
+    List<BookingRequest> bookingRequest =
         BookingDataFactory.multipleShallowBookingsWithVesselAndModeOfTransport();
     ConfirmedBooking confirmedBooking1 =
         ConfirmedBooking.builder()
             .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5f2"))
             .carrierBookingReference("carrierBookingReference")
-            .booking(booking.get(0))
+            .booking(bookingRequest.get(0))
             .shipmentCreatedDateTime(OffsetDateTime.now())
             .shipmentUpdatedDateTime(OffsetDateTime.now())
             .termsAndConditions("TERMS AND CONDITIONS")
@@ -50,7 +50,7 @@ public class ConfirmedBookingDataFactory {
         ConfirmedBooking.builder()
             .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5f2"))
             .carrierBookingReference("carrierBookingReference")
-            .booking(booking.get(1))
+            .booking(bookingRequest.get(1))
             .shipmentCreatedDateTime(OffsetDateTime.now())
             .shipmentUpdatedDateTime(OffsetDateTime.now())
             .termsAndConditions("TERMS AND CONDITIONS")

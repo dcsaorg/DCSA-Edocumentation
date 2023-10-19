@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.repository.DocumentPartyRepository;
@@ -26,9 +26,9 @@ public class DocumentPartyService {
   private final PartyService partyService;
 
   @Transactional(TxType.MANDATORY)
-  public void createDocumentParties(Collection<DocumentPartyTO> documentParties, Booking booking) {
+  public void createDocumentParties(Collection<DocumentPartyTO> documentParties, BookingRequest bookingRequest) {
     if (documentParties != null && !documentParties.isEmpty()) {
-      documentParties.forEach(documentPartyTO -> createDocumentParty(documentPartyTO, booking));
+      documentParties.forEach(documentPartyTO -> createDocumentParty(documentPartyTO, bookingRequest));
     }
   }
 
@@ -47,9 +47,9 @@ public class DocumentPartyService {
     }
   }
 
-  private void createDocumentParty(DocumentPartyTO documentPartyTO, Booking booking) {
+  private void createDocumentParty(DocumentPartyTO documentPartyTO, BookingRequest bookingRequest) {
     DocumentParty documentPartyWithBooking =
-        documentPartyMapper.toDAO(documentPartyTO, booking).toBuilder()
+        documentPartyMapper.toDAO(documentPartyTO, bookingRequest).toBuilder()
             .party(partyService.createParty(documentPartyTO.party()))
             .displayedAddress(displayedAddressMapper.toDAO(documentPartyTO.displayedAddress()))
             .build();

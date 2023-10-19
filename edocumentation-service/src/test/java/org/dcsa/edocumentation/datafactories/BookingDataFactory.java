@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.CargoMovementType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.CommunicationChannelCode;
@@ -15,13 +15,13 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.PaymentTerm;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.ReceiptDeliveryType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.TransportDocumentTypeCode;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 
 @UtilityClass
 public class BookingDataFactory {
 
-  public Booking singleShallowBooking() {
-    return Booking.builder()
+  public BookingRequest singleShallowBooking() {
+    return BookingRequest.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
         .carrierBookingRequestReference("BOOKING_REQ_REF_01")
         .bookingStatus(BookingStatus.RECEIVED)
@@ -52,10 +52,10 @@ public class BookingDataFactory {
         .build();
   }
 
-  public Booking singleShallowBookingWithVesselAndModeOfTransport() {
+  public BookingRequest singleShallowBookingWithVesselAndModeOfTransport() {
     Vessel mockVessel = VesselDataFactory.vessel();
 
-    return Booking.builder()
+    return BookingRequest.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
         .carrierBookingRequestReference("BOOKING_REQ_REF_01")
         .bookingStatus(BookingStatus.RECEIVED)
@@ -87,11 +87,11 @@ public class BookingDataFactory {
         .build();
   }
 
-  public List<Booking> multipleShallowBookingsWithVesselAndModeOfTransport() {
+  public List<BookingRequest> multipleShallowBookingsWithVesselAndModeOfTransport() {
     Vessel mockVessel = VesselDataFactory.vessel();
 
-    Booking booking1 =
-        Booking.builder()
+    BookingRequest bookingRequest1 =
+        BookingRequest.builder()
             .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
             .carrierBookingRequestReference("BOOKING_REQ_REF_01")
             .bookingStatus(BookingStatus.RECEIVED)
@@ -122,8 +122,8 @@ public class BookingDataFactory {
             .vessel(mockVessel)
             .build();
 
-    Booking booking2 =
-        Booking.builder()
+    BookingRequest bookingRequest2 =
+        BookingRequest.builder()
             .id(UUID.fromString("3262f836-65d1-43e1-b759-dbeb53ac24ee"))
             .carrierBookingRequestReference("BOOKING_REQ_REF_02")
             .bookingStatus(BookingStatus.RECEIVED)
@@ -154,13 +154,13 @@ public class BookingDataFactory {
             .vessel(mockVessel)
             .build();
 
-    return List.of(booking1, booking2);
+    return List.of(bookingRequest1, bookingRequest2);
   }
 
-  public Booking singleDeepBooking() {
+  public BookingRequest singleDeepBooking() {
     Vessel mockVessel = VesselDataFactory.vessel();
 
-    return Booking.builder()
+    return BookingRequest.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
         .carrierBookingRequestReference("BOOKING_REQ_REF_01")
         .bookingStatus(BookingStatus.RECEIVED)
@@ -196,8 +196,8 @@ public class BookingDataFactory {
         .build();
   }
 
-  public Booking singleMinimalBooking() {
-    return Booking.builder()
+  public BookingRequest singleMinimalBooking() {
+    return BookingRequest.builder()
         .id(UUID.fromString("1bc6f4d1-c728-4504-89fe-98ab10aaf5fd"))
         .carrierBookingRequestReference("BOOKING_REQ_REF_01")
         .bookingStatus(BookingStatus.RECEIVED)
@@ -216,8 +216,8 @@ public class BookingDataFactory {
         .build();
   }
 
-  public BookingTO singleFullBookingRequestTO() {
-    return BookingTO.builder()
+  public BookingRequestTO singleFullBookingRequestTO() {
+    return BookingRequestTO.builder()
       .receiptTypeAtOrigin(org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType.CY)
       .deliveryTypeAtDestination(org.dcsa.edocumentation.transferobjects.enums.ReceiptDeliveryType.CY)
       .cargoMovementTypeAtDestination(org.dcsa.edocumentation.transferobjects.enums.CargoMovementType.FCL)

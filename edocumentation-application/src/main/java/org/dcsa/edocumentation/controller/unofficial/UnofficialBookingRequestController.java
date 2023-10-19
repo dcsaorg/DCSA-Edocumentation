@@ -3,9 +3,9 @@ package org.dcsa.edocumentation.controller.unofficial;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.service.unofficial.UnofficialBookingService;
+import org.dcsa.edocumentation.service.unofficial.UnofficialBookingRequestService;
 import org.dcsa.edocumentation.transferobjects.unofficial.BookingCancelRequestTO;
-import org.dcsa.edocumentation.transferobjects.BookingRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestRefStatusTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,31 +21,31 @@ import jakarta.validation.constraints.Size;
 @Validated
 @RestController
 @RequiredArgsConstructor
-public class UnofficialBookingController {
-  private final UnofficialBookingService unofficialBookingService;
+public class UnofficialBookingRequestController {
+  private final UnofficialBookingRequestService unofficialBookingRequestService;
 
-  @PostMapping(path = "/unofficial${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}/validate")
+  @PostMapping(path = "/unofficial${spring.application.bkg-context-path}/booking-requests/{carrierBookingRequestReference}/validate")
   @ResponseStatus(HttpStatus.OK)
-  public BookingRefStatusTO validateBooking(
+  public BookingRequestRefStatusTO validateBooking(
     @PathVariable("carrierBookingRequestReference")
     @NotBlank @Size(max = 100)
     String carrierBookingRequestReference) {
-    return unofficialBookingService.performBookingValidation(carrierBookingRequestReference);
+    return unofficialBookingRequestService.performBookingValidation(carrierBookingRequestReference);
   }
 
   @PatchMapping(
-    path = "/unofficial${spring.application.bkg-context-path}/bookings/{carrierBookingRequestReference}",
+    path = "/unofficial${spring.application.bkg-context-path}/booking-requests/{carrierBookingRequestReference}",
     produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public BookingRefStatusTO cancelBooking(
+  public BookingRequestRefStatusTO cancelBooking(
     @Valid @PathVariable("carrierBookingRequestReference") @NotNull @Size(max = 100)
     String carrierBookingRequestReference,
     @Valid @RequestBody BookingCancelRequestTO bookingCancelRequestTO) {
-    return unofficialBookingService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO)
+    return unofficialBookingRequestService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO)
       .orElseThrow(
         () ->
           ConcreteRequestErrorMessageException.notFound(
-            "No booking found with carrierBookingRequestReference: "
+            "No booking request found with carrierBookingRequestReference: "
               + carrierBookingRequestReference));
   }
 }

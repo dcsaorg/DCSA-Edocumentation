@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.service;
 import org.dcsa.edocumentation.datafactories.VoyageDataFactory;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
 import org.dcsa.edocumentation.domain.persistence.repository.VoyageRepository;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.dcsa.skernel.errors.exceptions.BadRequestException;
 import org.dcsa.skernel.errors.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,13 +41,13 @@ public class VoyageServiceTest {
   @Test
   public void resolveVoyage_null() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .universalExportVoyageReference(null)
       .carrierExportVoyageNumber(null)
       .build();
 
     // Execute
-    assertNull(voyageService.resolveVoyage(bookingTO));
+    assertNull(voyageService.resolveVoyage(bookingRequestTO));
 
     // Verify
     verify(voyageRepository, never()).findAll(any(Example.class));
@@ -57,14 +57,14 @@ public class VoyageServiceTest {
   @Test
   public void resolveVoyage_nullWithServiceArgs() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .universalServiceReference("serviceRef")
       .carrierServiceCode("carrierRef")
       .build();
 
     // Execute
     BadRequestException exception =
-      assertThrows(BadRequestException.class, () -> voyageService.resolveVoyage(bookingTO));
+      assertThrows(BadRequestException.class, () -> voyageService.resolveVoyage(bookingRequestTO));
 
     // Verify
     assertEquals("carrierServiceCode and/or universalServiceReference provided but both universalExportVoyageReference and carrierExportVoyageNumber are missing", exception.getMessage());
@@ -75,7 +75,7 @@ public class VoyageServiceTest {
   @Test
   public void resolveVoyage_Unknown() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .universalExportVoyageReference("voyageRef")
       .carrierExportVoyageNumber("carrierRef")
       .build();
@@ -83,7 +83,7 @@ public class VoyageServiceTest {
 
     // Execute
     NotFoundException exception =
-      assertThrows(NotFoundException.class, () -> voyageService.resolveVoyage(bookingTO));
+      assertThrows(NotFoundException.class, () -> voyageService.resolveVoyage(bookingRequestTO));
 
     // Verify
     assertEquals("No voyages with universalVoyageReference = 'voyageRef' and carrierExportVoyageNumber = 'carrierRef'", exception.getMessage());
@@ -94,7 +94,7 @@ public class VoyageServiceTest {
   @Test
   public void resolveVoyage_Known() {
     // Setup
-    BookingTO bookingTO = BookingTO.builder()
+    BookingRequestTO bookingRequestTO = BookingRequestTO.builder()
       .universalExportVoyageReference(null)
       .carrierExportVoyageNumber("voyageRef")
       .build();
@@ -102,7 +102,7 @@ public class VoyageServiceTest {
     when(voyageRepository.findAll(any(Example.class))).thenReturn(List.of(expected));
 
     // Execute
-    Voyage actual = voyageService.resolveVoyage(bookingTO);
+    Voyage actual = voyageService.resolveVoyage(bookingRequestTO);
 
     // Verify
     assertEquals(expected, actual);

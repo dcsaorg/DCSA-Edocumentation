@@ -35,8 +35,8 @@ public class Reference {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "booking_id")
-  private Booking booking;
+  @JoinColumn(name = "booking_request_id")
+  private BookingRequest bookingRequest;
 
   @JoinColumn(name = "shipping_instruction_id")
   @Column(name = "shipping_instruction_id")

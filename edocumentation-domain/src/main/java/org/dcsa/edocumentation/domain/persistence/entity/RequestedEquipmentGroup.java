@@ -30,9 +30,9 @@ public class RequestedEquipmentGroup {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "booking_id")
+  @JoinColumn(name = "booking_request_id")
   @Setter(AccessLevel.PACKAGE)
-  private Booking booking;
+  private BookingRequest bookingRequest;
 
   @Column(name = "iso_equipment_code", nullable = false)
   @Size(max = 4)

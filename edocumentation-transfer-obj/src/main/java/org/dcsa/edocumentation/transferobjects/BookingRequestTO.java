@@ -37,7 +37,7 @@ import org.dcsa.skernel.infrastructure.validation.ValidVesselIMONumber;
 @DateRange(startField = "expectedArrivalAtPlaceOfDeliveryStartDate", endField = "expectedArrivalAtPlaceOfDeliveryEndDate")
 @RequiredIfTrue(isFieldReferenceRequired = "isExportDeclarationRequired", fieldReference = "exportDeclarationReference")
 @RequiredIfTrue(isFieldReferenceRequired = "isImportLicenseRequired", fieldReference = "importLicenseReference")
-public record BookingTO(
+public record BookingRequestTO(
   /* Must be null in POST, must be non-null in PUT and GET */
   @Size(max = 100)
   String carrierBookingRequestReference,
@@ -156,5 +156,5 @@ public record BookingTO(
   List<ShipmentLocationTO> shipmentLocations
 ) {
   @Builder(toBuilder = true)
-  public BookingTO { }
+  public BookingRequestTO { }
 }

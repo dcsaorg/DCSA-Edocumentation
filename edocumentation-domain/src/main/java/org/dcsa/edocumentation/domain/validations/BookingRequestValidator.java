@@ -7,12 +7,11 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
-import org.dcsa.edocumentation.domain.persistence.entity.Location;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentLocation;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
 
-public class BookingValidator implements ConstraintValidator<BookingValidation, Booking> {
+public class BookingRequestValidator implements ConstraintValidator<BookingRequestValidation, BookingRequest> {
 
   private static final Predicate<String> IS_SOURCE_LOCATION_TYPE = Set.of(LocationType.PRE.name(), LocationType.POL.name())::contains;
   private static final Predicate<String> IS_DESTINATION_LOCATION_TYPE = Set.of(LocationType.POD.name(), LocationType.PDE.name())::contains;
@@ -25,7 +24,7 @@ public class BookingValidator implements ConstraintValidator<BookingValidation, 
 
 
   @Override
-  public boolean isValid(Booking value, ConstraintValidatorContext context) {
+  public boolean isValid(BookingRequest value, ConstraintValidatorContext context) {
     if (value == null) {
       return true;
     }
@@ -36,7 +35,7 @@ public class BookingValidator implements ConstraintValidator<BookingValidation, 
     return state.isValid();
   }
 
-  private void validateShipmentLocations(ValidationState<Booking> state) {
+  private void validateShipmentLocations(ValidationState<BookingRequest> state) {
     var shipmentLocations = state.getValue().getShipmentLocations();
     if (shipmentLocations == null || shipmentLocations.isEmpty()) {
       // This case is handled by a simple Jakarta annotation.
