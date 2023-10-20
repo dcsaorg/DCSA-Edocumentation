@@ -153,8 +153,8 @@ public class TransportDocumentTOValidator implements ConstraintValidator<Transpo
   private void validateNegotiableBL(ValidationState<TransportDocumentTO> state) {
     validateAtMostOncePartyFunction(state, PartyFunction.END);
 
-    validateLimitOnPartyFunction(state, PartyFunction.OS, 0);
-    validateLimitOnPartyFunction(state, PartyFunction.DDR, 0);
+    validateLimitOnPartyFunction(state, PartyFunction.CN, 0);
+    validateLimitOnPartyFunction(state, PartyFunction.DDS, 0);
   }
 
 
