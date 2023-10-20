@@ -432,7 +432,7 @@ public class ShippingInstruction extends AbstractStateMachine<String>
         e);
   }
 
-  public void assignConsignmentItems(List<ConsignmentItem> consignmentItems) {
+  public void assignConsignmentItems(@NotNull List<ConsignmentItem> consignmentItems) {
     this.consignmentItems = consignmentItems;
     for (var ci : consignmentItems) {
       ci.setShippingInstruction(this);

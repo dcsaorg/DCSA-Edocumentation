@@ -151,16 +151,32 @@ public class ShippingInstructionValidator extends AbstractCustomsReferenceListVa
   }
 
   private void validateManifestFilings(ValidationState<ShippingInstruction> state) {
+    var si = state.getValue();
 
-    List<AdvanceManifestFilingEBL> advanceManifestFilingSIs = state.getValue().getAdvanceManifestFilings();
-    List<ConsignmentItem> consignmentItems = state.getValue().getConsignmentItems();
+    List<AdvanceManifestFilingEBL> advanceManifestFilingSIs = si.getAdvanceManifestFilings();
+    List<ConsignmentItem> consignmentItems = si.getConsignmentItems();
 
-    ConsignmentItem firstconsignmentItem = state.getValue().getConsignmentItems().get(0);
-    List<AdvanceManifestFiling> advanceManifestFilingBase = firstconsignmentItem.getConfirmedBooking().getAdvanceManifestFilings();
+    var firstBooking = si.getConsignmentItems().stream()
+      .map(ConsignmentItem::getConfirmedBooking)
+      .filter(Objects::nonNull)
+      .findFirst()
+      .orElse(null);
+
+    if (firstBooking == null) {
+      // ConsignmentItemValidator flags shipment being null, so we are silent here.
+      return;
+    }
+
+    List<AdvanceManifestFiling> advanceManifestFilingBase = firstBooking.getAdvanceManifestFilings();
     Map<String,List<AdvanceManifestFiling>> misMatchedConsignmentManifestFilings = new HashMap<>();
 
-    for(ConsignmentItem ci: consignmentItems) {
-      List<AdvanceManifestFiling> advanceManifestFilings = ci.getConfirmedBooking().getAdvanceManifestFilings();
+    for (ConsignmentItem ci : consignmentItems) {
+      var confirmedBooking = ci.getConfirmedBooking();
+      if (confirmedBooking == null) {
+        // ConsignmentItemValidator flags shipment being null, so we are silent here.
+        continue;
+      }
+      List<AdvanceManifestFiling> advanceManifestFilings = confirmedBooking.getAdvanceManifestFilings();
       List<AdvanceManifestFiling> misMatchedManifestFilings = advanceManifestFilingBase.stream()
         .filter(two -> advanceManifestFilings.stream()
           .noneMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())

@@ -1,9 +1,12 @@
 package org.dcsa.edocumentation.service;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.CargoItem;
 import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
@@ -62,7 +65,15 @@ public class ShippingInstructionService {
     Map<String, UtilizedTransportEquipment> savedTransportEquipments) {
 
     for (var ci : shippingInstruction.getConsignmentItems()) {
-      ci.resolvedConfirmedBooking(resolveConfirmedBooking(ci.getCarrierBookingReference()));
+      var confirmedBooking = resolveConfirmedBooking(ci.getCarrierBookingReference());
+      Commodity commodity = null;
+      if (confirmedBooking != null) {
+        ci.resolvedConfirmedBooking(confirmedBooking);
+        commodity = resolveCommodity(confirmedBooking, ci.getCommoditySubreference());
+      }
+      if (commodity != null) {
+        ci.resolvedCommodity(commodity);
+      }
       for (var c : ci.getCargoItems()) {
         c.assignEquipment(findSavedUtilizedTransportEquipmentViaCargoItem(savedTransportEquipments, c));
       }
@@ -74,12 +85,18 @@ public class ShippingInstructionService {
   private ConfirmedBooking resolveConfirmedBooking(String carrierBookingReference) {
     return confirmedBookingRepository
       .findByCarrierBookingReference(carrierBookingReference)
-      .orElseThrow(
-        () ->
-          // TODO: This should result in a PENDING UPDATE rather than a HTTP 400 by the time DT-578 is finished
-          ConcreteRequestErrorMessageException.invalidInput(
-            "No shipment has been found for this carrierBookingReference: "
-              + carrierBookingReference));
+      .orElse(null);
+  }
+
+  private Commodity resolveCommodity(@NotNull ConfirmedBooking shipment, @NotNull String commoditySubreference) {
+    for (var reg : shipment.getBooking().getRequestedEquipments()) {
+      for (var commodity : reg.getCommodities()) {
+        if (Objects.equals(commoditySubreference, commodity.getCommoditySubreference())) {
+          return commodity;
+        }
+      }
+    }
+    return null;
   }
 
   private UtilizedTransportEquipment findSavedUtilizedTransportEquipmentViaCargoItem(

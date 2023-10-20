@@ -94,4 +94,11 @@ public class ConsignmentItem {
     }
     this.confirmedBooking = confirmedBooking;
   }
+
+  public void resolvedCommodity(@NotNull Commodity commodity) {
+    if (!this.getCommoditySubreference().equals(commodity.getCommoditySubreference())) {
+      throw new IllegalArgumentException("Commodity had the wrong commodity subreference");
+    }
+    this.commodity = commodity;
+  }
 }

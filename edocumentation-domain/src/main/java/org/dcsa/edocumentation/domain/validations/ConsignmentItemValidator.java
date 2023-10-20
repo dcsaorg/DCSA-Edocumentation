@@ -17,15 +17,39 @@ public class ConsignmentItemValidator extends AbstractCustomsReferenceListValida
     context.disableDefaultConstraintViolation();
 
     var state = ValidationState.of(value, context);
-    validateConfirmedBookings(state);
+    validateBookingAndCommodity(state);
     validateCustomsReferences(state,state.getValue().getCustomsReferences());
     return state.isValid();
   }
 
-  private void validateConfirmedBookings(ValidationState<ConsignmentItem> state) {
-    var confirmedBooking = state.getValue().getConfirmedBooking();
+  private void validateBookingAndCommodity(ValidationState<ConsignmentItem> state) {
+    var consignmentItem = state.getValue();
+    var confirmedBooking = consignmentItem.getConfirmedBooking();
+    if (confirmedBooking == null) {
+      state.getContext().buildConstraintViolationWithTemplate(
+        "Could not resolve booking with reference "
+          + consignmentItem.getCarrierBookingReference()
+          + ": It is not a known carrier booking reference")
+        // Match the TO path
+        .addPropertyNode("carrierBookingReference")
+        .addConstraintViolation();
+      state.invalidate();
+      return;
+    }
     if (!confirmedBooking.getBooking().getBookingStatus().equals(BookingStatus.CONFIRMED)) {
       state.getContext().buildConstraintViolationWithTemplate("The booking " + confirmedBooking.getCarrierBookingReference() + " is not in state CONFIRMED")
+        // Match the TO path
+        .addPropertyNode("carrierBookingReference")
+        .addConstraintViolation();
+      state.invalidate();
+    }
+    if (consignmentItem.getCommodity() == null) {
+      state.getContext().buildConstraintViolationWithTemplate(
+        "Could not resolve the commodity subreference "
+          +  consignmentItem.getCommoditySubreference()
+          + " on the booking with carrier booking reference "
+          + consignmentItem.getCarrierBookingReference()
+          + ": It is not a known commodity subreference on said booking")
         // Match the TO path
         .addPropertyNode("carrierBookingReference")
         .addConstraintViolation();
