@@ -19,7 +19,7 @@ public record TransportDocumentTO(
   @NotNull
   TransportDocumentTypeCode transportDocumentTypeCode,
   @NotNull
-  EblDocumentStatus documentStatus,
+  String documentStatus,
 
   LocalDate issueDate,
 
@@ -120,10 +120,11 @@ public record TransportDocumentTO(
   @Valid
   List<@Valid @NotNull ReferenceTO> references,
 
-  //TODO: Add customs references here
+  List<@Valid @NotNull CustomsReferenceTO> customsReferences,
 
   @Valid
   List<@Valid ChargeTO> charges,
+
   List<@Pattern(regexp = "^\\S+(\\s+\\S+)$") @Size(max = 20000) CarrierClauseTO> carrierClauses
 ) {
   @Builder(toBuilder = true)

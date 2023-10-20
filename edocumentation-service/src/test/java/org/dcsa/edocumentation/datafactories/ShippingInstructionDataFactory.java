@@ -8,6 +8,7 @@ import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 
 @UtilityClass
 public class ShippingInstructionDataFactory {
@@ -16,7 +17,7 @@ public class ShippingInstructionDataFactory {
     return ShippingInstruction.builder()
       .id(UUID.randomUUID())
       .shippingInstructionReference(UUID.randomUUID().toString())
-      .documentStatus(EblDocumentStatus.RECE)
+      .documentStatus(EblDocumentStatus.RECEIVED)
       .shippingInstructionCreatedDateTime(OffsetDateTime.now())
       .shippingInstructionUpdatedDateTime(OffsetDateTime.now())
       .isShippedOnBoardType(true)
@@ -54,8 +55,8 @@ public class ShippingInstructionDataFactory {
         .build())
       .build();
 
-    Shipment shipments =
-        Shipment.builder()
+    ConfirmedBooking shipments =
+        ConfirmedBooking.builder()
             .carrierBookingReference(UUID.randomUUID().toString())
             .shipmentCreatedDateTime(OffsetDateTime.now())
             .shipmentCreatedDateTime(OffsetDateTime.now())
@@ -87,13 +88,13 @@ public class ShippingInstructionDataFactory {
             .build();
 
     var consignmentItems = List.of(ConsignmentItem.builder()
-      .shipment(shipments)
+      .confirmedBooking(shipments)
       .build());
 
     return ShippingInstruction.builder()
       .id(UUID.randomUUID())
       .shippingInstructionReference(UUID.randomUUID().toString())
-      .documentStatus(EblDocumentStatus.RECE)
+      .documentStatus(EblDocumentStatus.RECEIVED)
       .shippingInstructionCreatedDateTime(OffsetDateTime.now())
       .shippingInstructionUpdatedDateTime(OffsetDateTime.now())
       .isShippedOnBoardType(true)
@@ -134,7 +135,7 @@ public class ShippingInstructionDataFactory {
         .build())
       .build();
 
-    Shipment shipment = Shipment.builder()
+    ConfirmedBooking confirmedBooking = ConfirmedBooking.builder()
       .carrierBookingReference(UUID.randomUUID().toString())
       .shipmentCreatedDateTime(OffsetDateTime.now())
       .shipmentCreatedDateTime(OffsetDateTime.now())
@@ -147,14 +148,14 @@ public class ShippingInstructionDataFactory {
 
     var consignmentItems = List.of(
       ConsignmentItem.builder()
-        .shipment(shipment)
+        .confirmedBooking(confirmedBooking)
         .build()
     );
 
     return List.of(ShippingInstruction.builder()
       .id(UUID.randomUUID())
       .shippingInstructionReference(UUID.randomUUID().toString())
-      .documentStatus(EblDocumentStatus.RECE)
+      .documentStatus(EblDocumentStatus.RECEIVED)
       .shippingInstructionCreatedDateTime(OffsetDateTime.now())
       .shippingInstructionUpdatedDateTime(OffsetDateTime.now())
       .isShippedOnBoardType(true)

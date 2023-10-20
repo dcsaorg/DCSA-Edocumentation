@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
 import org.dcsa.edocumentation.domain.persistence.entity.Reference;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.repository.ReferenceRepository;
@@ -21,10 +21,10 @@ public class ReferenceService {
   private final ReferenceMapper referenceMapper;
 
   @Transactional(TxType.MANDATORY)
-  public void createReferences(Collection<ReferenceTO> references, Booking booking) {
+  public void createReferences(Collection<ReferenceTO> references, BookingRequest bookingRequest) {
     if (references != null && !references.isEmpty()) {
       List<Reference> referenceDAOs =
-          references.stream().map(r -> referenceMapper.toDAO(r, booking)).toList();
+          references.stream().map(r -> referenceMapper.toDAO(r, bookingRequest)).toList();
       saveReferenceDAOs(referenceDAOs);
     }
   }

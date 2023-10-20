@@ -1,11 +1,8 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus.*;
-
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.function.Function;
 
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -17,6 +14,8 @@ import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.validations.*;
 import org.dcsa.edocumentation.domain.validations.LocationSubType;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.infra.validation.StringEnumValidation;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Persistable;
 
@@ -38,7 +37,7 @@ import org.springframework.data.domain.Persistable;
     @NamedSubgraph(
       name = "graph.shippingInstructionSummary.consignmentItem",
       attributeNodes = {
-        @NamedAttributeNode("shipment")
+        @NamedAttributeNode("confirmedBooking")
       })
   }
 )
@@ -50,45 +49,45 @@ import org.springframework.data.domain.Persistable;
 @Entity
 @Table(name = "shipping_instruction")
 @ShippingInstructionValidation(groups = AsyncShipperProvidedDataValidation.class)
-public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
+public class ShippingInstruction extends AbstractStateMachine<String>
     implements Persistable<UUID> {
 
-  private static final Set<EblDocumentStatus> CAN_BE_VALIDATED = Set.of(EblDocumentStatus.RECE);
+  private static final Set<String> CAN_BE_VALIDATED = Set.of(EblDocumentStatus.RECEIVED);
 
-  private static final DFADefinition<EblDocumentStatus> DEFAULT_EBL_DFA_DEFINITION =
-      DFADefinition.builder(RECE)
-          .nonTerminalState(RECE)
-          .successorNodes(PENU, DRFT)
-          .nonTerminalState(PENU)
-          .successorNodes(RECE)
-          .nonTerminalState(DRFT)
-          .successorNodes(PENA, APPR)
-          .nonTerminalState(PENA)
-          .successorNodes(DRFT, APPR)
-          .nonTerminalState(APPR)
-          .successorNodes(ISSU)
-          .nonTerminalState(ISSU)
-          .successorNodes(SURR)
-          .nonTerminalState(SURR)
-          .successorNodes(VOID)
-          .terminalStates(VOID)
-          .unreachableStates(REJE)
+  private static final DFADefinition<String> DEFAULT_EBL_DFA_DEFINITION =
+      DFADefinition.builder(EblDocumentStatus.RECEIVED)
+          .nonTerminalState(EblDocumentStatus.RECEIVED)
+          .successorNodes(EblDocumentStatus.PENDING_UPDATE, EblDocumentStatus.DRAFT)
+          .nonTerminalState(EblDocumentStatus.PENDING_UPDATE)
+          .successorNodes(EblDocumentStatus.RECEIVED)
+          .nonTerminalState(EblDocumentStatus.DRAFT)
+          .successorNodes(EblDocumentStatus.PENDING_APPROVAL, EblDocumentStatus.APPROVED)
+          .nonTerminalState(EblDocumentStatus.PENDING_APPROVAL)
+          .successorNodes(EblDocumentStatus.DRAFT, EblDocumentStatus.APPROVED)
+          .nonTerminalState(EblDocumentStatus.APPROVED)
+          .successorNodes(EblDocumentStatus.ISSUED)
+          .nonTerminalState(EblDocumentStatus.ISSUED)
+          .successorNodes(EblDocumentStatus.SURRENDERED)
+          .nonTerminalState(EblDocumentStatus.SURRENDERED)
+          .successorNodes(EblDocumentStatus.VOID)
+          .terminalStates(EblDocumentStatus.VOID)
+          .unreachableStates(EblDocumentStatus.REJECTED)
           .build();
 
-  private static final DFADefinition<EblDocumentStatus> AMENDMENT_EBL_DFA_DEFINITION =
-      DFADefinition.builder(RECE)
-          .nonTerminalState(RECE)
-          .successorNodes(DRFT, REJE)
-          .nonTerminalState(DRFT)
-          .successorNodes(APPR)
-          .nonTerminalState(APPR)
-          .successorNodes(ISSU)
-          .nonTerminalState(ISSU)
-          .successorNodes(SURR)
-          .nonTerminalState(SURR)
-          .successorNodes(VOID)
-          .terminalStates(REJE, VOID)
-          .unreachableStates(PENU, PENA)
+  private static final DFADefinition<String> AMENDMENT_EBL_DFA_DEFINITION =
+      DFADefinition.builder(EblDocumentStatus.RECEIVED)
+          .nonTerminalState(EblDocumentStatus.RECEIVED)
+          .successorNodes(EblDocumentStatus.DRAFT, EblDocumentStatus.REJECTED)
+          .nonTerminalState(EblDocumentStatus.DRAFT)
+          .successorNodes(EblDocumentStatus.APPROVED)
+          .nonTerminalState(EblDocumentStatus.APPROVED)
+          .successorNodes(EblDocumentStatus.ISSUED)
+          .nonTerminalState(EblDocumentStatus.ISSUED)
+          .successorNodes(EblDocumentStatus.SURRENDERED)
+          .nonTerminalState(EblDocumentStatus.SURRENDERED)
+          .successorNodes(EblDocumentStatus.VOID)
+          .terminalStates(EblDocumentStatus.REJECTED, EblDocumentStatus.VOID)
+          .unreachableStates(EblDocumentStatus.PENDING_UPDATE, EblDocumentStatus.PENDING_APPROVAL)
           .build();
 
   @Id
@@ -98,9 +97,9 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @Column(name = "shipping_instruction_reference")
   private String shippingInstructionReference;
 
-  @Enumerated(EnumType.STRING)
   @Column(name = "document_status")
-  private EblDocumentStatus documentStatus;
+  @StringEnumValidation(value= EblDocumentStatus.class)
+  private String documentStatus;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -200,7 +199,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "shippingInstruction")
+  @OneToMany(mappedBy = "shippingInstruction", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderColumn(name = "si_entry_order")
   private List<@Valid ConsignmentItem> consignmentItems;
 
@@ -217,7 +216,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "shipping_instruction_id")
-  private List<CustomsReference> customsReferences;
+  private List<@Valid CustomsReference> customsReferences;
 
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -240,14 +239,14 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
   // certain characteristics like the transport plan, are share among all shipments in the shipping
   // instruction, so it is beneficial to be able to retrieve one
-  public Shipment retrieveOneShipment() {
+  public ConfirmedBooking retrieveOneShipment() {
     return this.consignmentItems.stream()
-        .map(ConsignmentItem::getShipment)
+        .map(ConsignmentItem::getConfirmedBooking)
         .findAny()
         .orElseThrow(
             () ->
                 ConcreteRequestErrorMessageException.notFound(
-                    "No shipment found in Shipping instruction with shipping instruction reference: "
+                    "No confirmedBooking found in Shipping instruction with shipping instruction reference: "
                         + shippingInstructionReference));
   }
 
@@ -257,7 +256,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     return id == null || isNew;
   }
 
-  public ValidationResult<EblDocumentStatus> asyncValidation(Validator validator) {
+  public ValidationResult<String> asyncValidation(Validator validator) {
     List<String> validationErrors = new ArrayList<>();
 
     if (!CAN_BE_VALIDATED.contains(documentStatus)) {
@@ -277,8 +276,8 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     }
 
     var proposedStatus = validationErrors.isEmpty()
-      ? DRFT
-      : (amendmentToTransportDocument != null ? REJE : PENU)
+      ? EblDocumentStatus.DRAFT
+      : (amendmentToTransportDocument != null ? EblDocumentStatus.REJECTED : EblDocumentStatus.PENDING_UPDATE)
       ;
     return new ValidationResult<>(proposedStatus, validationErrors);
   }
@@ -292,39 +291,39 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
 
 
 
-  /** Transition the document into its {@link EblDocumentStatus#RECE} state. */
+  /** Transition the document into its {@link EblDocumentStatus#RECEIVED} state. */
   public void receive() {
-    processTransition(RECE, true);
+    processTransition(EblDocumentStatus.RECEIVED, true);
   }
 
   /**
-   * Transition the document into its {@link EblDocumentStatus#PENU} state.
+   * Transition the document into its {@link EblDocumentStatus#PENDING_UPDATE} state.
    *
    * <p>This state is not supported in all EBL flows. E.g., it is not reachable in the Amendment
    * flow.
    */
   public void pendingUpdate() {
-    processTransition(PENU, false);
+    processTransition(EblDocumentStatus.PENDING_UPDATE, false);
   }
 
   /**
-   * Check whether the flow supports the {@link EblDocumentStatus#PENU} state.
+   * Check whether the flow supports the {@link EblDocumentStatus#PENDING_UPDATE} state.
    *
    * <p>This state is not supported in all EBL flows. This will return false when the EBL flow does
    * not support this state at all. I.e., calling {@link #pendingUpdate()} will trigger an
    * exception causing an internal server error status.
    */
   public boolean isPendingUpdateSupported() {
-    return supportsState(PENU);
+    return supportsState(EblDocumentStatus.PENDING_UPDATE);
   }
 
   /**
-   * Transition the document into its {@link EblDocumentStatus#REJE} state.
+   * Transition the document into its {@link EblDocumentStatus#REJECTED} state.
    *
    * <p>This state is only reachable in the Amendment flow.
    */
   public void rejected(String reason) {
-    processTransition(REJE, false);
+    processTransition(EblDocumentStatus.REJECTED, false);
     this.clearRequestedChanges();
     this.addRequestedChanges(ShippingInstructionRequestedChange.builder().message(reason).build());
   }
@@ -343,18 +342,18 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
     this.validUntil = lockTime;
   }
 
-  protected DFADefinition<EblDocumentStatus> getDfaDefinition() {
+  protected DFADefinition<String> getDfaDefinition() {
     return this.amendmentToTransportDocument != null
         ? AMENDMENT_EBL_DFA_DEFINITION
         : DEFAULT_EBL_DFA_DEFINITION;
   }
 
   @Override
-  protected EblDocumentStatus getResumeFromState() {
+  protected String getResumeFromState() {
     return this.documentStatus;
   }
 
-  protected EblDocumentStatus getCurrentState() {
+  protected String getCurrentState() {
     var d = this.getDfa();
     if (d == null) {
       return this.getResumeFromState();
@@ -363,7 +362,7 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
   @Override
-  protected void transitionTo(EblDocumentStatus state) {
+  protected void transitionTo(String state) {
     super.transitionTo(state);
     this.documentStatus = state;
     this.shippingInstructionUpdatedDateTime = OffsetDateTime.now();
@@ -372,19 +371,19 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   // Re-defined to make it visible to TransportDocument (protected also works like "package-private",
   // so we can keep it "non-public").
   @Override
-  protected boolean supportsState(EblDocumentStatus state) {
+  protected boolean supportsState(String state) {
     return super.supportsState(state);
   }
 
   protected void processTransition(
-    EblDocumentStatus status,
+    String status,
     boolean clearRequestedChanges
   ) {
     processTransition(status, OffsetDateTime.now(), clearRequestedChanges);
   }
 
   protected void processTransition(
-      EblDocumentStatus status,
+      String status,
       OffsetDateTime updateTime,
       boolean clearRequestedChanges
       ) {
@@ -410,30 +409,33 @@ public class ShippingInstruction extends AbstractStateMachine<EblDocumentStatus>
   }
 
   @Override
-  protected RuntimeException errorForAttemptLeavingToLeaveTerminalState(
-      EblDocumentStatus currentState,
-      EblDocumentStatus successorState,
+  protected RuntimeException errorForAttemptToLeaveTerminalState(
+      String currentState,
+      String successorState,
       CannotLeaveTerminalStateException e) {
     // Special-case for terminal states, where we can generate quite nice sounding
-    // messages such as "... because the document is void (VOID)".
+    // messages such as "... because the document is void (EblDocumentStatus.VOID)".
     return ConcreteRequestErrorMessageException.conflict(
-        "Cannot perform the requested action on the document as the document is "
-            + currentState.getValue().toLowerCase()
-            + " ("
-            + currentState.name()
-            + ")",
+        "Cannot perform the requested action on the document as the documentStatus is "
+            + currentState,
         e);
   }
 
   @Override
-  protected RuntimeException errorForTargetStatNotListedAsSuccessor(
-      EblDocumentStatus currentState,
-      EblDocumentStatus successorState,
+  protected RuntimeException errorForTargetStateNotListedAsSuccessor(
+      String currentState,
+      String successorState,
       TargetStateIsNotSuccessorException e) {
     return ConcreteRequestErrorMessageException.conflict(
-        "It is not possible to perform the requested action on the booking with documentStatus ("
-            + currentState.name()
-            + ").",
+        "It is not possible to perform the requested action on the booking with documentStatus "
+            + currentState,
         e);
+  }
+
+  public void assignConsignmentItems(List<ConsignmentItem> consignmentItems) {
+    this.consignmentItems = consignmentItems;
+    for (var ci : consignmentItems) {
+      ci.setShippingInstruction(this);
+    }
   }
 }

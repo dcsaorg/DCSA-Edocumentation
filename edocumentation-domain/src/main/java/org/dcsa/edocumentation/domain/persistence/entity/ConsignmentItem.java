@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +18,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.ConsignmentItemValidation;
+import org.springframework.web.bind.annotation.Mapping;
 
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -33,6 +38,12 @@ public class ConsignmentItem {
   @Column(name = "description_of_goods", nullable = false)
   private String descriptionOfGoods;
 
+  @Column(name = "carrier_booking_reference", nullable = false, length = 35)
+  private String carrierBookingReference;
+
+  @Column(name = "commodity_subreference", nullable = false, length = 100)
+  private String commoditySubreference;
+
   @ElementCollection
   @Column(name = "hs_code", nullable = false)
   @CollectionTable(name = "hs_code_item", joinColumns = @JoinColumn(name = "consignment_item_id"))
@@ -43,13 +54,14 @@ public class ConsignmentItem {
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "shipping_instruction_id", nullable = false)
+  @Setter(AccessLevel.PACKAGE)
   private ShippingInstruction shippingInstruction;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "shipment_id", nullable = false)
-  private Shipment shipment;
+  @JoinColumn(name = "confirmed_booking_id", nullable = false)
+  private ConfirmedBooking confirmedBooking;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -64,14 +76,22 @@ public class ConsignmentItem {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "consignment_item_id", referencedColumnName = "id", nullable = false)
+  @OrderColumn(name = "list_order")
   // Since the cargoItem.id is generated it can happen that two cargoItems have the same values and
   // therefore cannot be added to the set
-  private List<CargoItem> cargoItems;
+  private List<@Valid CargoItem> cargoItems;
 
   @OrderColumn(name = "list_order")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "consignment_item_id")
-  private List<CustomsReference> customsReferences;
+  private List<@Valid CustomsReference> customsReferences;
+
+  public void resolvedConfirmedBooking(@NotNull ConfirmedBooking confirmedBooking) {
+    if (!this.getCarrierBookingReference().equals(confirmedBooking.getCarrierBookingReference())) {
+      throw new IllegalArgumentException("Confirmed Booking had the wrong carrier booking reference");
+    }
+    this.confirmedBooking = confirmedBooking;
+  }
 }

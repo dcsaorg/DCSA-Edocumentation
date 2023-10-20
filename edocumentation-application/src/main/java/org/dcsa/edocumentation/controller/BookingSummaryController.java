@@ -1,9 +1,10 @@
 package org.dcsa.edocumentation.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.validation.StringEnumValidation;
 import org.dcsa.edocumentation.service.BookingSummaryService;
 import org.dcsa.edocumentation.transferobjects.BookingSummaryTO;
-import org.dcsa.edocumentation.transferobjects.enums.BkgDocumentStatus;
 import org.dcsa.skernel.infrastructure.pagination.Pagination;
 import org.dcsa.skernel.infrastructure.sorting.Sorter;
 import org.springframework.data.domain.Sort;
@@ -29,7 +30,9 @@ public class BookingSummaryController {
   @GetMapping(path = "${spring.application.bkg-context-path}" + "/booking-summaries")
   @ResponseStatus(HttpStatus.OK)
   public List<BookingSummaryTO> getBookingSummaries(
-      @RequestParam(required = false) BkgDocumentStatus documentStatus,
+      @RequestParam(required = false)
+      @StringEnumValidation(value = BookingStatus.class)
+      String bookingStatus,
       @RequestParam(value = Pagination.DCSA_PAGE_PARAM_NAME, defaultValue = "0", required = false)
           @Min(0)
           int page,
@@ -49,14 +52,14 @@ public class BookingSummaryController {
             sort,
             List.of(new Sort.Order(Sort.Direction.ASC, "bookingRequestCreatedDateTime")),
             Sorter.SortableFields.of(configureSortableFields()))
-        .paginate(pageRequest -> service.findBookingSummaries(pageRequest, documentStatus));
+        .paginate(pageRequest -> service.findBookingSummaries(pageRequest, bookingStatus));
   }
 
   // ToDo a shared-kernel feature where you can create a sorter based on a TO could be a nice
   // optimization
   private String[] configureSortableFields() {
     return new String[] {
-      "documentStatus",
+      "bookingStatus",
       "bookingRequestCreatedDateTime",
       "bookingRequestUpdatedDateTime",
       "receiptTypeAtOrigin",

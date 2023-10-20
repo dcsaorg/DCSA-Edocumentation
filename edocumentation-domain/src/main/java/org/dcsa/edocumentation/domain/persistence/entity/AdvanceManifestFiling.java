@@ -17,9 +17,9 @@ public class AdvanceManifestFiling {
   @GeneratedValue
   @Id private UUID manifest_id;
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "shipment_id")
+  @JoinColumn(name = "confirmed_booking_id")
   @Setter(AccessLevel.PACKAGE)
-  private Shipment shipment;
+  private ConfirmedBooking confirmedBooking;
 
   @Column(name = "manifest_type_code")
   private String manifestTypeCode;

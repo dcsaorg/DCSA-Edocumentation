@@ -1,5 +1,7 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -7,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.WeightUnit;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.PseudoEnum;
+import org.dcsa.skernel.infrastructure.validation.ISO6346EquipmentReference;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,9 +30,9 @@ public class RequestedEquipmentGroup {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "booking_id")
+  @JoinColumn(name = "booking_request_id")
   @Setter(AccessLevel.PACKAGE)
-  private Booking booking;
+  private BookingRequest bookingRequest;
 
   @Column(name = "iso_equipment_code", nullable = false)
   @Size(max = 4)
@@ -53,7 +56,7 @@ public class RequestedEquipmentGroup {
   @Column(name = "equipment_reference", nullable = false)
   @CollectionTable(name = "requested_equipment_group_equipment_references", joinColumns = @JoinColumn(name = "requested_equipment_group_id"))
   @OrderColumn(name = "list_order")
-  private List<String> equipmentReferences;
+  private List<@Valid @NotBlank @ISO6346EquipmentReference(groups = AsyncShipperProvidedDataValidation.class) String> equipmentReferences;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -63,8 +66,9 @@ public class RequestedEquipmentGroup {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
+  @OrderColumn(name = "list_order")
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "requestedEquipment")
-  private List<Commodity> commodities;
+  private List<@Valid Commodity> commodities;
 
   public void assignCommodities(@NonNull List<Commodity> commodities) {
     this.commodities = commodities;

@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE assigned_equipment (
     id uuid PRIMARY KEY,
-    shipment_id uuid NOT NULL REFERENCES shipment(id),
+    confirmed_booking_id uuid NOT NULL REFERENCES confirmed_booking(id),
     requested_equipment_group_id uuid NOT NULL REFERENCES requested_equipment_group(id)
 );
 
@@ -27,11 +27,11 @@ CREATE TABLE ebl_solution_provider_type (
 );
 
 --- DDT-948
-ALTER TABLE booking ADD valid_until timestamp with time zone NULL;
-CREATE UNIQUE INDEX unq_valid_until_booking_idx ON booking(carrier_booking_request_reference) WHERE valid_until IS NULL;
+ALTER TABLE booking_request ADD valid_until timestamp with time zone NULL;
+CREATE UNIQUE INDEX unq_valid_until_booking_idx ON booking_request(carrier_booking_request_reference) WHERE valid_until IS NULL;
 
-ALTER TABLE shipment ADD valid_until timestamp with time zone NULL;
-CREATE UNIQUE INDEX unq_valid_until_shipment_idx ON shipment(carrier_booking_reference) WHERE valid_until IS NULL;
+ALTER TABLE confirmed_booking ADD valid_until timestamp with time zone NULL;
+CREATE UNIQUE INDEX unq_valid_until_shipment_idx ON confirmed_booking(carrier_booking_reference) WHERE valid_until IS NULL;
 
 ALTER TABLE shipping_instruction ADD valid_until timestamp with time zone NULL;
 CREATE UNIQUE INDEX unq_valid_until_si_idx ON shipping_instruction(shipping_instruction_reference) WHERE valid_until IS NULL;

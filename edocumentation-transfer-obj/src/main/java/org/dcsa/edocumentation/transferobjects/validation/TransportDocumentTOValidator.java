@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
 import org.dcsa.edocumentation.transferobjects.TransportDocumentTO;
-import org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.transferobjects.enums.PartyFunction;
 
 public class TransportDocumentTOValidator implements ConstraintValidator<TransportDocumentTOValidation, TransportDocumentTO> {
@@ -52,8 +52,8 @@ public class TransportDocumentTOValidator implements ConstraintValidator<Transpo
     var td = state.getValue();
     var context = state.getContext();
     var issueDate = td.issueDate();
-    if (issueDate == null && !state.applyResult(td.documentStatus() == EblDocumentStatus.DRFT)) {
-      context.buildConstraintViolationWithTemplate("The issueDate is mandatory for documents that have been issued (documentStatus != DRFT)")
+    if (issueDate == null && !state.applyResult(td.documentStatus().equals(EblDocumentStatus.DRAFT))) {
+      context.buildConstraintViolationWithTemplate("The issueDate is mandatory for documents that have been issued (documentStatus != DRAFT)")
         .addPropertyNode("issueDate")
         .addConstraintViolation();
     }
@@ -153,8 +153,8 @@ public class TransportDocumentTOValidator implements ConstraintValidator<Transpo
   private void validateNegotiableBL(ValidationState<TransportDocumentTO> state) {
     validateAtMostOncePartyFunction(state, PartyFunction.END);
 
-    validateLimitOnPartyFunction(state, PartyFunction.OS, 0);
-    validateLimitOnPartyFunction(state, PartyFunction.DDR, 0);
+    validateLimitOnPartyFunction(state, PartyFunction.CN, 0);
+    validateLimitOnPartyFunction(state, PartyFunction.DDS, 0);
   }
 
 

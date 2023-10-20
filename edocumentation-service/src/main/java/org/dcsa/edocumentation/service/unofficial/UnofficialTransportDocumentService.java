@@ -1,7 +1,5 @@
 package org.dcsa.edocumentation.service.unofficial;
 
-import static org.dcsa.edocumentation.domain.persistence.entity.enums.BkgDocumentStatus.PENC;
-
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import java.util.Objects;
@@ -9,6 +7,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
+import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
+import org.dcsa.edocumentation.domain.persistence.entity.TransportDocument;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.CarrierRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
@@ -16,8 +16,8 @@ import org.dcsa.edocumentation.domain.persistence.repository.TransportDocumentRe
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.EBLValidation;
 import org.dcsa.edocumentation.domain.validations.PaperBLValidation;
+import org.dcsa.edocumentation.infra.enums.BookingStatus;
 import org.dcsa.edocumentation.service.PartyService;
-import org.dcsa.edocumentation.service.mapping.DocumentStatusMapper;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
 import org.dcsa.edocumentation.transferobjects.PartyTO;
@@ -27,6 +27,7 @@ import org.dcsa.edocumentation.transferobjects.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.edocumentation.transferobjects.unofficial.DraftTransportDocumentRequestTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 
 @Slf4j
 @Service
@@ -41,7 +42,6 @@ public class UnofficialTransportDocumentService {
   private final TransportDocumentRepository transportDocumentRepository;
   private final UnofficialShippingInstructionService unofficialShippingInstructionService;
 
-  private final DocumentStatusMapper documentStatusMapper;
   private final Validator validator;
 
   @Transactional
@@ -66,9 +66,9 @@ public class UnofficialTransportDocumentService {
 
     boolean shouldHaveDeclaredValue = shippingInstruction.getConsignmentItems()
       .stream()
-      .map(ConsignmentItem::getShipment)
-      .map(Shipment::getBooking)
-      .map(Booking::getDeclaredValue)
+      .map(ConsignmentItem::getConfirmedBooking)
+      .map(ConfirmedBooking::getBooking)
+      .map(BookingRequest::getDeclaredValue)
       .anyMatch(Objects::nonNull);
 
     if (shouldHaveDeclaredValue && transportDocumentRequestTO.declaredValue() == null) {
@@ -107,11 +107,12 @@ public class UnofficialTransportDocumentService {
     };
     var errors = validator.validate(mapped, validations);
     if (!errors.isEmpty()) {
-      var r = new ValidationResult<>(PENC,
-        errors.stream()
-          .map(v -> v.getPropertyPath().toString() + ": " + v.getMessage())
-          .toList()
-      );
+      var r =
+          new ValidationResult<>(
+              BookingStatus.PENDING_UPDATES_CONFIRMATION,
+              errors.stream()
+                  .map(v -> v.getPropertyPath().toString() + ": " + v.getMessage())
+                  .toList());
       throw new AssertionError("Generated draft TD had validation errors. " + r.presentErrors(Integer.MAX_VALUE));
     }
 
@@ -142,24 +143,25 @@ public class UnofficialTransportDocumentService {
 
   public Optional<TransportDocumentRefStatusTO> changeState(
     String transportDocumentReference,
-    org.dcsa.edocumentation.transferobjects.enums.EblDocumentStatus status
+    String documentStatus
   ) {
     TransportDocument transportDocument = transportDocumentRepository.findByTransportDocumentReferenceAndValidUntilIsNull(transportDocumentReference)
       .orElse(null);
     if (transportDocument == null) {
       return Optional.empty();
     }
-    switch (documentStatusMapper.toDomainEblDocumentStatus(status)) {
-      case APPR -> transportDocument.approveFromCarrier();
-      case PENA -> transportDocument.pendingApproval();
+
+    switch (documentStatus) {
+      case EblDocumentStatus.APPROVED -> transportDocument.approveFromCarrier();
+      case EblDocumentStatus.PENDING_APPROVAL -> transportDocument.pendingApproval();
       // FIXME: issue requires that all documents related to the booking is issued at the same time
       //  That is, if booking is split between multiple SIs, the TDs for those SIs must be issued at the same time
-      case ISSU -> transportDocument.issue();
-      case SURR -> transportDocument.surrender();
-      case VOID -> transportDocument.voidDocument();
-      case DRFT -> throw ConcreteRequestErrorMessageException.invalidInput("Please use the issueDraft endpoint instead!");
-      default -> throw ConcreteRequestErrorMessageException.invalidInput("Cannot go to state " + status);
-    };
+      case EblDocumentStatus.ISSUED -> transportDocument.issue();
+      case EblDocumentStatus.SURRENDERED -> transportDocument.surrender();
+      case EblDocumentStatus.VOID -> transportDocument.voidDocument();
+      case EblDocumentStatus.DRAFT -> throw ConcreteRequestErrorMessageException.invalidInput("Please use the issueDraft endpoint instead!");
+      default -> throw ConcreteRequestErrorMessageException.invalidInput("Cannot go to state " + documentStatus);
+    }
 
     // Note this only works for cases where we can update the documentStatus in-place.
     transportDocument = transportDocumentRepository.save(transportDocument);

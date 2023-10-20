@@ -3,7 +3,7 @@ package org.dcsa.edocumentation.service;
 import lombok.AllArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.Service;
 import org.dcsa.edocumentation.domain.persistence.repository.ServiceRepository;
-import org.dcsa.edocumentation.transferobjects.BookingTO;
+import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.data.domain.Example;
 
@@ -15,7 +15,7 @@ public class ServiceService {
   private final ServiceRepository serviceRepository;
 
   @Transactional
-  public Service resolveService(BookingTO bookingRequest) {
+  public Service resolveService(BookingRequestTO bookingRequest) {
     String carrierServiceCode = bookingRequest.carrierServiceCode();
     String universalServiceReference = bookingRequest.universalServiceReference();
 

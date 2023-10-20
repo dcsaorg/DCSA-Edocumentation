@@ -3,9 +3,9 @@ dcsa:
   specification:
     by-prefix:
       - prefix: /ebl/v3
-        version: 3.0.0
+        version: 3.0.0-Beta-1
       - prefix: /bkg/v2
-        version: 2.0.0
+        version: 2.0.0-Beta-1
   dataloader:
     autoload: [reference]
     sources: classpath:db/dataloader-sources.yml

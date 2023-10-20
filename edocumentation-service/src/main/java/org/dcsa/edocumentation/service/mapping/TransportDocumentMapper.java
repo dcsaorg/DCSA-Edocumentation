@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
     LocationMapper.class,
     DocumentPartyMapper.class,
     DisplayedAddressMapper.class,
-    ConsignmentItemMapper.class,
+    ConsignmentItemMapper.class
   })
 public abstract class TransportDocumentMapper {
 
@@ -90,13 +90,14 @@ public abstract class TransportDocumentMapper {
   @Mapping(target = "cargoMovementTypeAtDestination", expression = "java(cargoMovementTypeAtDestination(transportDocument))")
   @Mapping(target = "utilizedTransportEquipments", ignore = true)  // FIXME: Align DAO/TD or verify it is not necessary and remove FIXME!
   @Mapping(source = "transportDocument.shippingInstruction.invoicePayableAt", target = "invoicePayableAt")
+  @Mapping(source= "transportDocument.shippingInstruction.customsReferences", target = "customsReferences")
   public abstract TransportDocumentTO toDTO(TransportDocument transportDocument);
 
-  protected Shipment resolveAnyShipment(TransportDocument document) {
-    return document.getShippingInstruction().getConsignmentItems().iterator().next().getShipment();
+  protected ConfirmedBooking resolveAnyShipment(TransportDocument document) {
+    return document.getShippingInstruction().getConsignmentItems().iterator().next().getConfirmedBooking();
   }
 
-  protected Booking resolveAnyBooking(TransportDocument document) {
+  protected BookingRequest resolveAnyBooking(TransportDocument document) {
     return resolveAnyShipment(document).getBooking();
   }
 
@@ -161,9 +162,9 @@ public abstract class TransportDocumentMapper {
   }
 
   protected TDTransportTO mapSIToTransports(ShippingInstruction shippingInstruction) {
-    var shipment = shippingInstruction.getConsignmentItems().iterator().next().getShipment();
-    var shipmentLocations = shipment.getShipmentLocations();
-    var shipmentTransports = shipment.getShipmentTransports();
+    var confirmedBooking = shippingInstruction.getConsignmentItems().iterator().next().getConfirmedBooking();
+    var shipmentLocations = confirmedBooking.getShipmentLocations();
+    var shipmentTransports = confirmedBooking.getShipmentTransports();
 
     var preLoc = findLocation(shipmentLocations, LocationType.PRE);
     var polLoc = findLocation(shipmentLocations, LocationType.POL);

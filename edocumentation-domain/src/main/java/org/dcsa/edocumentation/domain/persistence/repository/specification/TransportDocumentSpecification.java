@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
-import org.dcsa.edocumentation.domain.persistence.entity.enums.EblDocumentStatus;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -21,7 +20,7 @@ public class TransportDocumentSpecification {
   @Builder(toBuilder = true)
   public static class Filters {
     private List<String> carrierBookingReference;
-    private EblDocumentStatus documentStatus;
+    private String documentStatus;
     private PageRequest pageRequest;
   }
 
@@ -46,10 +45,10 @@ public class TransportDocumentSpecification {
         var subquery = query.subquery(UUID.class);
         var subqueryRoot = subquery.from(ShippingInstruction.class);
         var consignmentItemRoot = subqueryRoot.join(ShippingInstruction_.CONSIGNMENT_ITEMS);
-        var consignmentItemShipmentJoin = consignmentItemRoot.join(ConsignmentItem_.SHIPMENT, JoinType.LEFT);
+        var consignmentItemShipmentJoin = consignmentItemRoot.join(ConsignmentItem_.CONFIRMED_BOOKING, JoinType.LEFT);
         subquery.select(subqueryRoot.get(ShippingInstruction_.ID));
         subquery.where(builder
-          .in(consignmentItemShipmentJoin.get(Shipment_.CARRIER_BOOKING_REFERENCE))
+          .in(consignmentItemShipmentJoin.get(ConfirmedBooking_.CARRIER_BOOKING_REFERENCE))
           .value(filters.carrierBookingReference));
         Predicate predicate = builder.in(
           root.get(TransportDocument_.SHIPPING_INSTRUCTION).get(ShippingInstruction_.ID)
