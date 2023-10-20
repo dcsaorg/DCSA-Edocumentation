@@ -3732,7 +3732,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"isShippedOnBoardType\": true,\r\n    \"isElectronic\": true,\r\n    \"isToOrder\": true,\r\n    \"displayedNameForPortOfLoad\": [\r\n            \"Port of Rotterdam\"\r\n        ],\r\n    \"customsReferences\": [\r\n        {\r\n            \"type\": \"CERS\",\r\n            \"countryCode\": \"CA\",\r\n            \"value\": \"12345678\"\r\n        }\r\n    ],\r\n    \"consignmentItems\": [\r\n        {\r\n            \"HSCodes\": [\"411510\"],\r\n            \"carrierBookingReference\": \"A379021B7782\",\r\n            \"commoditySubreference\": \"unknown-commodity-subreference\",\r\n            \"weight\": 120.4,\r\n            \"weightUnit\": \"KGM\",\r\n            \"descriptionOfGoods\": \"description\",\r\n            \"cargoItems\": [\r\n                {\r\n                    \"equipmentReference\": \"BMOU2149612\",\r\n                    \"weight\": 120.3,\r\n                    \"weightUnit\": \"KGM\",\r\n                    \"shippingMarks\": [\"bar\"]\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"utilizedTransportEquipments\": [\r\n        {\r\n            \"equipmentReference\": \"BMOU2149612\",\r\n            \"cargoGrossWeight\": 120.3,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"isShipperOwned\": false,\r\n            \"seals\": [\r\n                {\r\n                    \"number\": \"12345\",\r\n                    \"source\": \"CAR\",\r\n                    \"type\": \"BLT\"\r\n                },\r\n                {\r\n                    \"number\": \"98765\",\r\n                    \"source\": \"RACxx\",\r\n                    \"type\": \"TLBxx\"\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"foo party\",\r\n                \"address\": {\r\n                    \"name\": \"foo address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\",\r\n                        \"phone\": \"+31611444666\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"CN\",\r\n            \"displayedAddress\": [\r\n                \"foo\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"foo reference\"\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"isShippedOnBoardType\": true,\r\n    \"isElectronic\": true,\r\n    \"isToOrder\": true,\r\n    \"displayedNameForPortOfLoad\": [\r\n            \"Port of Rotterdam\"\r\n        ],\r\n    \"customsReferences\": [\r\n        {\r\n            \"type\": \"CERS\",\r\n            \"countryCode\": \"CA\",\r\n            \"value\": \"12345678\"\r\n        }\r\n    ],\r\n    \"consignmentItems\": [\r\n        {\r\n            \"HSCodes\": [\"411510\"],\r\n            \"carrierBookingReference\": \"UNKOWN-CBR\",\r\n            \"commoditySubreference\": \"unknown-commodity-subreference\",\r\n            \"weight\": 120.4,\r\n            \"weightUnit\": \"KGM\",\r\n            \"descriptionOfGoods\": \"description\",\r\n            \"cargoItems\": [\r\n                {\r\n                    \"equipmentReference\": \"BMOU2149612\",\r\n                    \"weight\": 120.3,\r\n                    \"weightUnit\": \"KGM\",\r\n                    \"shippingMarks\": [\"bar\"]\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"utilizedTransportEquipments\": [\r\n        {\r\n            \"equipmentReference\": \"BMOU2149612\",\r\n            \"cargoGrossWeight\": 120.3,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"isShipperOwned\": false,\r\n            \"seals\": [\r\n                {\r\n                    \"number\": \"12345\",\r\n                    \"source\": \"CAR\",\r\n                    \"type\": \"BLT\"\r\n                },\r\n                {\r\n                    \"number\": \"98765\",\r\n                    \"source\": \"RACxx\",\r\n                    \"type\": \"TLBxx\"\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"foo party\",\r\n                \"address\": {\r\n                    \"name\": \"foo address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\",\r\n                        \"phone\": \"+31611444666\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"CN\",\r\n            \"displayedAddress\": [\r\n                \"foo\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"foo reference\"\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3831,12 +3831,163 @@
 					"name": "Negative test cases",
 					"item": [
 						{
+							"name": "Test: Unknown carrier booking reference",
+							"item": [
+								{
+									"name": "Create Shipping instruction with unknown CBR",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const parsedBody = pm.response.json();\r",
+													"pm.collectionVariables.set(\"SHIPPING_INSTRUCTION_REFERENCE\", parsedBody.shippingInstructionReference);\r",
+													"\r",
+													"pm.test(\"Status code is 201\", () => {\r",
+													"    pm.response.to.have.status(201);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"documentStatus is RECEIVED\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.documentStatus).to.eql(\"RECEIVED\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"isShippedOnBoardType\": true,\r\n    \"isElectronic\": true,\r\n    \"isToOrder\": true,\r\n    \"displayedNameForPortOfLoad\": [\r\n            \"Port of Rotterdam\"\r\n        ],\r\n    \"customsReferences\": [\r\n        {\r\n            \"type\": \"CERS\",\r\n            \"countryCode\": \"CA\",\r\n            \"value\": \"12345678\"\r\n        }\r\n    ],\r\n    \"consignmentItems\": [\r\n        {\r\n            \"HSCodes\": [\"411510\"],\r\n            \"carrierBookingReference\": \"UNKNOWN-CBR\",\r\n            \"commoditySubreference\": \"unknown-commodity-subreference\",\r\n            \"weight\": 120.4,\r\n            \"weightUnit\": \"KGM\",\r\n            \"descriptionOfGoods\": \"description\",\r\n            \"cargoItems\": [\r\n                {\r\n                    \"equipmentReference\": \"BMOU2149612\",\r\n                    \"weight\": 120.3,\r\n                    \"weightUnit\": \"KGM\",\r\n                    \"shippingMarks\": [\"bar\"]\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"utilizedTransportEquipments\": [\r\n        {\r\n            \"equipmentReference\": \"BMOU2149612\",\r\n            \"cargoGrossWeight\": 120.3,\r\n            \"cargoGrossWeightUnit\": \"KGM\",\r\n            \"isShipperOwned\": false,\r\n            \"seals\": [\r\n                {\r\n                    \"number\": \"12345\",\r\n                    \"source\": \"CAR\",\r\n                    \"type\": \"BLT\"\r\n                },\r\n                {\r\n                    \"number\": \"98765\",\r\n                    \"source\": \"CAR\",\r\n                    \"type\": \"BLT\"\r\n                }\r\n            ],\r\n            \"customsReferences\": [\r\n                {\r\n                    \"type\": \"CERS\",\r\n                    \"countryCode\": \"CA\",\r\n                    \"value\": \"12345678\"\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"documentParties\": [\r\n        {\r\n            \"party\": {\r\n                \"partyName\": \"foo party\",\r\n                \"address\": {\r\n                    \"name\": \"foo address name\"\r\n                },\r\n                \"partyContactDetails\": [\r\n                    {\r\n                        \"name\": \"partycontact details\",\r\n                        \"phone\": \"+31611444666\"\r\n                    }\r\n                ],\r\n                \"identifyingCodes\": [\r\n                    {\r\n                        \"partyCode\": \"foo@bar\",\r\n                        \"DCSAResponsibleAgencyCode\": \"EPI\"\r\n                    }\r\n                ]\r\n            },\r\n            \"partyFunction\": \"OS\",\r\n            \"displayedAddress\": [\r\n                \"foo\"\r\n            ],\r\n            \"isToBeNotified\": false\r\n        }\r\n    ],\r\n    \"references\": [\r\n        {\r\n            \"type\": \"AAO\",\r\n            \"value\": \"foo reference\"\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions",
+											"host": [
+												"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+											],
+											"path": [
+												"shipping-instructions"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Verify saved shipping instruction",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const shippingInstructionReference = pm.collectionVariables.get(\"SHIPPING_INSTRUCTION_REFERENCE\");\r",
+													"\r",
+													"pm.test(\"Status code is 200\", () => {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"\r",
+													"pm.test(\"Response contains updated values\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.shippingInstructionReference).to.eql(shippingInstructionReference);\r",
+													"\r",
+													"    // Posting a new shipping instruction should put us in \"RECEIVED\".\r",
+													"    pm.expect(jsonData.documentStatus).to.eql(\"RECEIVED\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{BASE_URL}}{{EBL_CONTEXT_PATH}}/shipping-instructions/{{SHIPPING_INSTRUCTION_REFERENCE}}",
+											"host": [
+												"{{BASE_URL}}{{EBL_CONTEXT_PATH}}"
+											],
+											"path": [
+												"shipping-instructions",
+												"{{SHIPPING_INSTRUCTION_REFERENCE}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Validate Shipping instruction",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const parsedBody = pm.response.json();\r",
+													"pm.collectionVariables.set(\"SHIPPING_INSTRUCTION_REFERENCE\", parsedBody.shippingInstructionReference);\r",
+													"\r",
+													"pm.collectionVariables.unset(\"SHIPPING_INSTRUCTION_REFERENCE\");\r",
+													"\r",
+													"pm.test(\"Status code is correct\", () => {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"documentStatus is correct\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.documentStatus).to.eql(\"PENDING UPDATE\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"error-message is correct\", () => {\r",
+													"    const jsonData = pm.response.json();\r",
+													"    const requestedChanges = jsonData.requestedChanges;\r",
+													"    pm.expect(requestedChanges[0].path).to.eql(\"consignmentItems[0].carrierBookingReference\");\r",
+													"    pm.expect(requestedChanges[0].message).to.eql(\"Could not resolve booking with reference UNKNOWN-CBR: It is not a known carrier booking reference\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{BASE_URL}}/unofficial{{EBL_CONTEXT_PATH}}/shipping-instructions/{{SHIPPING_INSTRUCTION_REFERENCE}}/validate",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"unofficial{{EBL_CONTEXT_PATH}}",
+												"shipping-instructions",
+												"{{SHIPPING_INSTRUCTION_REFERENCE}}",
+												"validate"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
 							"name": "Create Shipping instruction invalid utilizedTransportEquipment",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
+											"const schema = pm.collectionVariables.get(\"ERROR_SCHEMA\");\r",
+											"const schemaObject = JSON.parse(schema);\r",
+											"\r",
+											"pm.test('Schema is valid', () => {\r",
+											"    pm.response.to.have.jsonSchema(schemaObject);\r",
+											"});\r",
+											"\r",
 											"pm.test(\"Status code is 400\", () => {\r",
 											"    pm.response.to.have.status(400);\r",
 											"});\r",
@@ -3886,6 +4037,13 @@
 									"listen": "test",
 									"script": {
 										"exec": [
+											"const schema = pm.collectionVariables.get(\"ERROR_SCHEMA\");\r",
+											"const schemaObject = JSON.parse(schema);\r",
+											"\r",
+											"pm.test('Schema is valid', () => {\r",
+											"    pm.response.to.have.jsonSchema(schemaObject);\r",
+											"});\r",
+											"\r",
 											"pm.test(\"Status code is 400\", () => {\r",
 											"    pm.response.to.have.status(400);\r",
 											"});\r",
@@ -3993,12 +4151,7 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"const schema = pm.collectionVariables.get(\"ERROR_SCHEMA\");",
-									"const schemaObject = JSON.parse(schema);",
-									"",
-									"pm.test('Schema is valid', () => {",
-									"    pm.response.to.have.jsonSchema(schemaObject);",
-									"});"
+									""
 								]
 							}
 						}
@@ -5422,10 +5575,6 @@
 		},
 		{
 			"key": "CARRIER_BOOKING_REFERENCE",
-			"value": ""
-		},
-		{
-			"key": "SHIPPING_INSTRUCTION_REFERENCE",
 			"value": ""
 		},
 		{
