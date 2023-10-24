@@ -4,6 +4,10 @@ import jakarta.validation.Valid;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
+import org.dcsa.edocumentation.domain.validations.PartyValidation;
+
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,6 +18,7 @@ import java.util.UUID;
 @Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "party")
+@PartyValidation(groups = AsyncShipperProvidedDataValidation.class)
 public class Party {
   @Id
   @GeneratedValue
@@ -22,15 +27,6 @@ public class Party {
 
   @Column(name = "party_name", length = 100)
   private String partyName;
-
-  @Column(name = "tax_reference_1", length = 20)
-  private String taxReference1;
-
-  @Column(name = "tax_reference_2", length = 20)
-  private String taxReference2;
-
-  @Column(name = "public_key", length = 100)
-  private String publicKey;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -42,6 +38,12 @@ public class Party {
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "party")
   private Set<@Valid PartyContactDetails> partyContactDetails;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OrderColumn(name = "list_order")
+  @OneToMany(mappedBy = "party")
+  private Set<@Valid TaxAndLegalReference> taxAndLegalReferences;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

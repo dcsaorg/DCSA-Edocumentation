@@ -11,23 +11,15 @@ public record PartyTO(
   @Size(max = 100)
   String partyName,
 
-  @Size(max = 20)
-  String taxReference1,
-
-  @Size(max = 20)
-  String taxReference2,
-
-  @Size(max = 500)
-  String publicKey,
-
   @Valid
   AddressTO address,
 
-  @Valid @NotEmpty
-  List<PartyContactDetailsTO> partyContactDetails,
+  List<@Valid TaxAndLegalReferenceTO> taxAndLegalReferences,
 
-  @Valid
-  List<PartyIdentifyingCodeTO> identifyingCodes
+  @NotEmpty
+  List<@Valid PartyContactDetailsTO> partyContactDetails,
+
+  List<@Valid PartyIdentifyingCodeTO> identifyingCodes
 ) {
   @Builder(toBuilder = true)
   public PartyTO { }

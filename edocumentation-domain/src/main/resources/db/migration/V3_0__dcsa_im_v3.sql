@@ -65,9 +65,6 @@ CREATE TABLE carrier (
 CREATE TABLE party (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     party_name varchar(100) NULL,
-    tax_reference_1 varchar(20) NULL,
-    tax_reference_2 varchar(20) NULL,
-    public_key varchar(500) NULL,
     address_id uuid NULL REFERENCES address (id)
 );
 
@@ -87,6 +84,14 @@ CREATE TABLE party_identifying_code (
     party_code varchar(100) NOT NULL
 );
 
+CREATE TABLE tax_and_legal_reference (
+   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+   party_id uuid NOT NULL REFERENCES party(id),
+   type_code varchar(50) NOT NULL,
+   country_code varchar(2) NOT NULL,
+   value varchar(100) NOT NULL,
+   list_order int NOT NULL default 0
+);
 
 CREATE TABLE transport_document_type (
     transport_document_type_code varchar(3) PRIMARY KEY,

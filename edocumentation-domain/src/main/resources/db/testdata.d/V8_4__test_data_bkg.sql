@@ -241,3 +241,4 @@ INSERT INTO hs_code_item (
   'bf93f6fb-98b8-4268-a4dc-23a40eab95a8'::uuid,
   '720711'
 );
+

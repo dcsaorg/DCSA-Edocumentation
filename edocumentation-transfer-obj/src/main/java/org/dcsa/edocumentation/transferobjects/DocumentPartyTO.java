@@ -13,8 +13,8 @@ import org.dcsa.edocumentation.transferobjects.validation.PaperBLValidation;
 @DocumentPartyTOEBLValidation(groups = EBLValidation.class)
 @DocumentPartyTOPaperBLValidation(groups = PaperBLValidation.class)
 public record DocumentPartyTO(
-  @NotNull @Valid
-  PartyTO party,
+  @NotNull
+  @Valid PartyTO party,
 
   @NotNull
   // Async validated via @PseudoEnum
