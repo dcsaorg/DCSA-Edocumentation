@@ -53,6 +53,7 @@ class BookingRequestServiceTest {
     @Spy private RequestedEquipmentGroupMapper requestedEquipmentGroupMapper = Mappers.getMapper(RequestedEquipmentGroupMapper.class);
     @Spy private ActiveReeferSettingsMapper activeReeferSettingsMapper = Mappers.getMapper(ActiveReeferSettingsMapper.class);
 
+    @Spy private TaxAndLegalReferenceMapper taxAndLegalReferenceMapper = Mappers.getMapper(TaxAndLegalReferenceMapper.class);
     @InjectMocks private BookingRequestService service;
 
     @BeforeEach
@@ -68,6 +69,7 @@ class BookingRequestServiceTest {
       ReflectionTestUtils.setField(partyMapper, "addressMapper", addressMapper);
       ReflectionTestUtils.setField(locationMapper, "addressMapper", addressMapper);
       ReflectionTestUtils.setField(shipmentLocationMapper, "locationMapper", locationMapper);
+      ReflectionTestUtils.setField(partyMapper, "taxAndLegalReferenceMapper", taxAndLegalReferenceMapper);
     }
 
     @Test

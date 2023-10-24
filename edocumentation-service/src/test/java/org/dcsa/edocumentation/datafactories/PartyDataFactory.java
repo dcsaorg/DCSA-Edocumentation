@@ -14,6 +14,7 @@ public class PartyDataFactory {
     return Party.builder()
       .id(UUID.randomUUID())
       .partyName("DCSA")
+      .taxAndLegalReferences(Set.of(TaxAndLegalReferencesDataFactory.singleTaxAndLegalReference()))
       .address(AddressDataFactory.getSingleAddress())
       .partyContactDetails(Set.of(PartyContactDetails.builder()
           .id(UUID.randomUUID())
