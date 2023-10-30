@@ -447,7 +447,7 @@ CREATE TABLE consignment_item (
     carrier_booking_reference varchar(35) NOT NULL,
     commodity_subreference varchar(100) NOT NULL,
     shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
-    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id), -- TODO; should be `NULL` instead of `NOT NULL`.
+    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     commodity_id uuid NULL REFERENCES commodity (id),
     si_entry_order int NOT NULL default 0
 );
