@@ -14,21 +14,6 @@ import java.util.UUID;
 
 @Repository
 public interface BookingRequestRepository extends JpaRepository<BookingRequest, UUID> {
-  @EntityGraph("graph.booking-request-summary")
-  @Query(
-    value = "FROM BookingRequest WHERE bookingStatus = :bookingStatus AND validUntil IS NULL",
-    countQuery = "SELECT count(*) FROM BookingRequest WHERE bookingStatus = :bookingStatus AND validUntil IS NULL"
-  )
-  Page<BookingRequest> findAllByBookingStatus(
-      @NonNull String bookingStatus, Pageable pageable);
-
-  @EntityGraph("graph.booking-request-summary")
-  @Query(
-    value = "FROM BookingRequest WHERE validUntil IS NULL",
-    countQuery = "SELECT count(*) FROM BookingRequest WHERE validUntil IS NULL"
-  )
-  @Override
-  Page<BookingRequest> findAll(Pageable pageable);
 
   @EntityGraph("graph.booking-request")
   @Query("FROM BookingRequest WHERE carrierBookingRequestReference = :carrierBookingRequestReference AND validUntil IS NULL")
