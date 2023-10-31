@@ -1,7 +1,7 @@
 package org.dcsa.edocumentation.service.mapping;
 
 import java.time.LocalDate;
-
+import java.util.Objects;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.DCSATransportType;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.LocationType;
@@ -93,40 +93,54 @@ public abstract class TransportDocumentMapper {
   @Mapping(source= "transportDocument.shippingInstruction.customsReferences", target = "customsReferences")
   public abstract TransportDocumentTO toDTO(TransportDocument transportDocument);
 
-  protected ConfirmedBooking resolveAnyShipment(TransportDocument document) {
-    return document.getShippingInstruction().getConsignmentItems().iterator().next().getConfirmedBooking();
+  protected Booking resolveAnyBooking(TransportDocument document) {
+    return resolveAnyBooking(document.getShippingInstruction());
   }
 
-  protected BookingRequest resolveAnyBooking(TransportDocument document) {
-    return resolveAnyShipment(document).getBooking();
+  protected Booking resolveAnyBooking(ShippingInstruction shippingInstruction) {
+    return shippingInstruction.getConsignmentItems().iterator().next().getBooking();
+  }
+
+  protected BookingData resolveAnyBookingData(TransportDocument document) {
+    return Objects.requireNonNull(
+      resolveAnyBooking(document).getLastConfirmedBookingData(),
+      "Cannot generate a transport document if the booking was never confirmed!"
+    );
+  }
+
+  protected BookingData resolveAnyBookingData(ShippingInstruction shippingInstruction) {
+    return Objects.requireNonNull(
+      resolveAnyBooking(shippingInstruction).getLastConfirmedBookingData(),
+      "Cannot generate a transport document if the booking was never confirmed!"
+    );
   }
 
   protected String termsAndConditions(TransportDocument document) {
-    return resolveAnyShipment(document).getTermsAndConditions();
+    return resolveAnyBookingData(document).getTermsAndConditions();
   }
 
   protected String serviceContractReference(TransportDocument document) {
-    return resolveAnyBooking(document).getServiceContractReference();
+    return resolveAnyBookingData(document).getServiceContractReference();
   }
 
   protected String contractQuotationReference(TransportDocument document) {
-    return resolveAnyBooking(document).getContractQuotationReference();
+    return resolveAnyBookingData(document).getContractQuotationReference();
   }
 
   protected ReceiptDeliveryType receiptTypeAtOrigin(TransportDocument document) {
-    return eMapper.toTO(resolveAnyBooking(document).getReceiptTypeAtOrigin());
+    return eMapper.toTO(resolveAnyBookingData(document).getReceiptTypeAtOrigin());
   }
 
   protected ReceiptDeliveryType deliveryTypeAtDestination(TransportDocument document) {
-    return eMapper.toTO(resolveAnyBooking(document).getDeliveryTypeAtDestination());
+    return eMapper.toTO(resolveAnyBookingData(document).getDeliveryTypeAtDestination());
   }
 
   protected CargoMovementType cargoMovementTypeAtOrigin(TransportDocument document) {
-    return eMapper.toTO(resolveAnyBooking(document).getCargoMovementTypeAtOrigin());
+    return eMapper.toTO(resolveAnyBookingData(document).getCargoMovementTypeAtOrigin());
   }
 
   protected CargoMovementType cargoMovementTypeAtDestination(TransportDocument document) {
-    return eMapper.toTO(resolveAnyBooking(document).getCargoMovementTypeAtDestination());
+    return eMapper.toTO(resolveAnyBookingData(document).getCargoMovementTypeAtDestination());
   }
 
 
@@ -162,9 +176,9 @@ public abstract class TransportDocumentMapper {
   }
 
   protected TDTransportTO mapSIToTransports(ShippingInstruction shippingInstruction) {
-    var confirmedBooking = shippingInstruction.getConsignmentItems().iterator().next().getConfirmedBooking();
-    var shipmentLocations = confirmedBooking.getShipmentLocations();
-    var shipmentTransports = confirmedBooking.getShipmentTransports();
+    var bookingData = resolveAnyBookingData(shippingInstruction);
+    var shipmentLocations = bookingData.getShipmentLocations();
+    var shipmentTransports = bookingData.getShipmentTransports();
 
     var preLoc = findLocation(shipmentLocations, LocationType.PRE);
     var polLoc = findLocation(shipmentLocations, LocationType.POL);

@@ -1,6 +1,7 @@
 package org.dcsa.edocumentation.service;
 
 import jakarta.transaction.Transactional;
+
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
@@ -44,33 +45,34 @@ public class TransportDocumentService {
 
   private String getTermsAndConditions(TransportDocument transportDocument) {
     return Optional.ofNullable(transportDocument.getShippingInstruction())
-      .map(ShippingInstruction::retrieveOneShipment)
-      .map(ConfirmedBooking::getTermsAndConditions)
+      .map(ShippingInstruction::retrieveOneBooking)
+      .map(Booking::getLastConfirmedBookingData)
+      .map(BookingData::getTermsAndConditions)
       .orElse(null);
   }
 
   private Float getDeclaredValue(TransportDocument transportDocument) {
-    return getBooking(transportDocument)
-      .map(BookingRequest::getDeclaredValue)
+    return getLastConfirmedBookingData(transportDocument)
+      .map(BookingData::getDeclaredValue)
       .orElse(null);
   }
 
   private String getDeclaredValueCurrency(TransportDocument transportDocument) {
-    return getBooking(transportDocument)
-      .map(BookingRequest::getDeclaredValueCurrency)
+    return getLastConfirmedBookingData(transportDocument)
+      .map(BookingData::getDeclaredValueCurrency)
       .orElse(null);
   }
 
   private String getServiceContractReference(TransportDocument transportDocument) {
-    return getBooking(transportDocument)
-      .map(BookingRequest::getServiceContractReference)
+    return getLastConfirmedBookingData(transportDocument)
+      .map(BookingData::getServiceContractReference)
       .orElse(null);
   }
 
-  private Optional<BookingRequest> getBooking(TransportDocument transportDocument) {
+  private Optional<BookingData> getLastConfirmedBookingData(TransportDocument transportDocument) {
     return Optional.ofNullable(transportDocument.getShippingInstruction())
-      .map(ShippingInstruction::retrieveOneShipment)
-      .map(ConfirmedBooking::getBooking);
+      .map(ShippingInstruction::retrieveOneBooking)
+      .map(Booking::getLastConfirmedBookingData);
   }
 
   private TransportDocumentTO.TransportDocumentTOBuilder resolveCarrierCodeListProvider(

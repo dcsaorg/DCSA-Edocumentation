@@ -17,6 +17,7 @@ import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValida
 import org.dcsa.edocumentation.domain.validations.EBLValidation;
 import org.dcsa.edocumentation.domain.validations.PaperBLValidation;
 import org.dcsa.edocumentation.infra.enums.BookingStatus;
+import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 import org.dcsa.edocumentation.service.PartyService;
 import org.dcsa.edocumentation.service.mapping.TransportDocumentMapper;
 import org.dcsa.edocumentation.transferobjects.PartyIdentifyingCodeTO;
@@ -27,7 +28,6 @@ import org.dcsa.edocumentation.transferobjects.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.edocumentation.transferobjects.unofficial.DraftTransportDocumentRequestTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
-import org.dcsa.edocumentation.infra.enums.EblDocumentStatus;
 
 @Slf4j
 @Service
@@ -66,9 +66,10 @@ public class UnofficialTransportDocumentService {
 
     boolean shouldHaveDeclaredValue = shippingInstruction.getConsignmentItems()
       .stream()
-      .map(ConsignmentItem::getConfirmedBooking)
-      .map(ConfirmedBooking::getBooking)
-      .map(BookingRequest::getDeclaredValue)
+      .map(ConsignmentItem::getBooking)
+      .map(Booking::getLastConfirmedBookingData)
+      .filter(Objects::nonNull)
+      .map(BookingData::getDeclaredValue)
       .anyMatch(Objects::nonNull);
 
     if (shouldHaveDeclaredValue && transportDocumentRequestTO.declaredValue() == null) {

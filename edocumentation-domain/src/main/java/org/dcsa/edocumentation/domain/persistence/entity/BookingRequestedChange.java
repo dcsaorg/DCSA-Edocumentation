@@ -25,7 +25,7 @@ public class BookingRequestedChange {
     @Column(name = "message", length = 500)
     private String message;
 
-    public static BookingRequestedChange fromConstraintViolation(ConstraintViolation<BookingRequest> violation) {
+    public static BookingRequestedChange fromConstraintViolation(ConstraintViolation<BookingData> violation) {
         return BookingRequestedChange.builder()
                 .path(violation.getPropertyPath().toString())
                 .message(violation.getMessage())

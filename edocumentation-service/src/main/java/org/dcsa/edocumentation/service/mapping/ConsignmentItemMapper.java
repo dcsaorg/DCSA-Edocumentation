@@ -4,7 +4,6 @@ import org.dcsa.edocumentation.domain.persistence.entity.ConsignmentItem;
 import org.dcsa.edocumentation.transferobjects.ConsignmentItemTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(
   componentModel = "spring",
@@ -19,7 +18,7 @@ public interface ConsignmentItemMapper {
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "shippingInstruction", ignore = true)
-  @Mapping(target = "confirmedBooking", ignore = true)
+  @Mapping(target = "booking", ignore = true)
   @Mapping(target = "commodity", ignore = true)
   ConsignmentItem toDAO(ConsignmentItemTO consignmentItemTO);
 

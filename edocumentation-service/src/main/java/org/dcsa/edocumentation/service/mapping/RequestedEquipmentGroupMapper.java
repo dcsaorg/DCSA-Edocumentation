@@ -19,7 +19,7 @@ public abstract class RequestedEquipmentGroupMapper {
   @Autowired
   protected CommodityMapper commodityMapper;
 
-  @Mapping(target = "bookingRequest", ignore = true)
+  @Mapping(target = "bookingData", ignore = true)
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "commodities", ignore = true)
   protected abstract RequestedEquipmentGroup toDAOInternal(RequestedEquipmentTO requestedEquipment);

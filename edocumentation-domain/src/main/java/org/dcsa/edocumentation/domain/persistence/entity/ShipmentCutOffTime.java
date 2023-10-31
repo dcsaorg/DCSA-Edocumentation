@@ -21,10 +21,10 @@ public class ShipmentCutOffTime {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "confirmed_booking_id")
+  @JoinColumn(name = "booking_data_id")
   // Used by confirmed-booking to make the JPA relations work
   @Setter(AccessLevel.PACKAGE)
-  private ConfirmedBooking confirmedBooking;
+  private BookingData bookingData;
 
   @Column(name = "cut_off_time_code")
   private String cutOffDateTimeCode;

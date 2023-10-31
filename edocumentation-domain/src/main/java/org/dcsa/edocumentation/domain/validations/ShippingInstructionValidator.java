@@ -3,7 +3,6 @@ package org.dcsa.edocumentation.domain.validations;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
@@ -62,17 +61,20 @@ public class ShippingInstructionValidator extends AbstractCustomsReferenceListVa
    */
 
     for (var item : state.getValue().getConsignmentItems()) {
-      var confirmedBooking = item.getConfirmedBooking();
-      if (confirmedBooking == null) {
+      var booking = item.getBooking();
+      if (booking == null) {
         continue;
       }
-      var booking = confirmedBooking.getBooking();
-      receiptTypeAtOriginChecker.check(booking.getReceiptTypeAtOrigin());
-      deliveryTypeAtDestinationChecker.check(booking.getDeliveryTypeAtDestination());
-      cargoMovementTypeAtOriginChecker.check(booking.getCargoMovementTypeAtOrigin());
-      cargoMovementTypeAtDestinationChecker.check(booking.getCargoMovementTypeAtDestination());
-      termAndConditionsChecker.check(confirmedBooking.getTermsAndConditions());
-      serviceContractReferenceChecker.check(booking.getServiceContractReference());
+      var bookingData = booking.getLastConfirmedBookingData();
+      if (bookingData == null) {
+        continue;
+      }
+      receiptTypeAtOriginChecker.check(bookingData.getReceiptTypeAtOrigin());
+      deliveryTypeAtDestinationChecker.check(bookingData.getDeliveryTypeAtDestination());
+      cargoMovementTypeAtOriginChecker.check(bookingData.getCargoMovementTypeAtOrigin());
+      cargoMovementTypeAtDestinationChecker.check(bookingData.getCargoMovementTypeAtDestination());
+      termAndConditionsChecker.check(bookingData.getTermsAndConditions());
+      serviceContractReferenceChecker.check(bookingData.getServiceContractReference());
     }
 
     emitConsignmentItemsConstraintIfNotOk(receiptTypeAtOriginChecker, state, "All referenced bookings must have the same receiptTypeAtOrigin");
@@ -157,33 +159,38 @@ public class ShippingInstructionValidator extends AbstractCustomsReferenceListVa
     List<ConsignmentItem> consignmentItems = si.getConsignmentItems();
 
     var firstBooking = si.getConsignmentItems().stream()
-      .map(ConsignmentItem::getConfirmedBooking)
+      .map(ConsignmentItem::getBooking)
       .filter(Objects::nonNull)
       .findFirst()
       .orElse(null);
 
     if (firstBooking == null) {
-      // ConsignmentItemValidator flags shipment being null, so we are silent here.
+      // ConsignmentItemValidator flags Booking being null, so we are silent here.
+      return;
+    }
+    var bookingData = firstBooking.getLastConfirmedBookingData();
+    if (bookingData == null) {
+      // ConsignmentItemValidator flags booking having the wrong status, so we are silent here.
       return;
     }
 
-    List<AdvanceManifestFiling> advanceManifestFilingBase = firstBooking.getAdvanceManifestFilings();
+    List<AdvanceManifestFiling> advanceManifestFilingBase = bookingData.getAdvanceManifestFilings();
     Map<String,List<AdvanceManifestFiling>> misMatchedConsignmentManifestFilings = new HashMap<>();
 
     for (ConsignmentItem ci : consignmentItems) {
-      var confirmedBooking = ci.getConfirmedBooking();
+      var confirmedBooking = ci.getBooking();
       if (confirmedBooking == null) {
         // ConsignmentItemValidator flags shipment being null, so we are silent here.
         continue;
       }
-      List<AdvanceManifestFiling> advanceManifestFilings = confirmedBooking.getAdvanceManifestFilings();
+      List<AdvanceManifestFiling> advanceManifestFilings = bookingData.getAdvanceManifestFilings();
       List<AdvanceManifestFiling> misMatchedManifestFilings = advanceManifestFilingBase.stream()
         .filter(two -> advanceManifestFilings.stream()
           .noneMatch(one -> one.getManifestTypeCode().equals(two.getManifestTypeCode())
             && one.getCountryCode().equals(two.getCountryCode())))
         .toList();
       if (!misMatchedManifestFilings.isEmpty()) {
-        misMatchedConsignmentManifestFilings.put(ci.getConfirmedBooking().getCarrierBookingReference(),misMatchedManifestFilings);
+        misMatchedConsignmentManifestFilings.put(ci.getBooking().getCarrierBookingReference(),misMatchedManifestFilings);
       }
     }
 

@@ -16,10 +16,11 @@ import java.util.UUID;
 public class AdvanceManifestFiling {
   @GeneratedValue
   @Id private UUID manifest_id;
+
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "confirmed_booking_id")
+  @JoinColumn(name = "booking_data_id")
   @Setter(AccessLevel.PACKAGE)
-  private ConfirmedBooking confirmedBooking;
+  private BookingData bookingData;
 
   @Column(name = "manifest_type_code")
   private String manifestTypeCode;

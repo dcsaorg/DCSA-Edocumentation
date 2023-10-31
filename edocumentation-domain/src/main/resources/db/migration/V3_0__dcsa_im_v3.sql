@@ -156,53 +156,50 @@ CREATE TABLE voyage (
     service_id uuid NULL REFERENCES service (id) INITIALLY DEFERRED
 );
 
-
-CREATE TABLE booking_request (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    carrier_booking_request_reference varchar(100) NOT NULL DEFAULT uuid_generate_v4()::text,
-    booking_status varchar(50),
-    receipt_type_at_origin varchar(3) NOT NULL REFERENCES receipt_delivery_type(receipt_delivery_type_code),
-    delivery_type_at_destination varchar(3) NOT NULL REFERENCES receipt_delivery_type(receipt_delivery_type_code),
-    cargo_movement_type_at_origin varchar(3) NOT NULL REFERENCES cargo_movement_type(cargo_movement_type_code),
-    cargo_movement_type_at_destination varchar(3) NOT NULL REFERENCES cargo_movement_type(cargo_movement_type_code),
-    booking_request_datetime timestamp with time zone NOT NULL,
-    service_contract_reference varchar(30) NULL,
-    payment_term_code varchar(3) NULL,
-    is_partial_load_allowed boolean NOT NULL,
-    is_export_declaration_required boolean NOT NULL,
-    export_declaration_reference varchar(35) NULL,
-    is_import_license_required boolean NOT NULL,
-    import_license_reference varchar(35) NULL,
-    is_ams_aci_filing_required boolean NULL,
-    is_destination_filing_required boolean NULL,
-    contract_quotation_reference varchar(35) NULL,
-    incoterms varchar(3) NULL,
-    invoice_payable_at_id uuid NULL REFERENCES location(id),
-    expected_departure_date date NULL,
-    expected_arrival_at_place_of_delivery_start_date date NULL CHECK ((expected_arrival_at_place_of_delivery_start_date IS NULL) OR (expected_arrival_at_place_of_delivery_end_date IS NULL) OR expected_arrival_at_place_of_delivery_start_date <= expected_arrival_at_place_of_delivery_end_date),
-    expected_arrival_at_place_of_delivery_end_date date NULL,
-    transport_document_type_code varchar(3) NULL REFERENCES transport_document_type(transport_document_type_code),
-    transport_document_reference varchar(20) NULL,
-    booking_channel_reference varchar(20) NULL,
-    communication_channel_code varchar(2) NOT NULL,
-    is_equipment_substitution_allowed boolean NOT NULL,
-    vessel_id uuid NULL REFERENCES vessel(id),
-    declared_value_currency_code varchar(3) NULL,
-    declared_value real NULL,
-    place_of_issue_id uuid NULL REFERENCES location(id),
-    voyage_id UUID NULL REFERENCES voyage(id)
+CREATE TABLE booking_data (
+   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+   receipt_type_at_origin varchar(3) NOT NULL REFERENCES receipt_delivery_type(receipt_delivery_type_code),
+   delivery_type_at_destination varchar(3) NOT NULL REFERENCES receipt_delivery_type(receipt_delivery_type_code),
+   cargo_movement_type_at_origin varchar(3) NOT NULL REFERENCES cargo_movement_type(cargo_movement_type_code),
+   cargo_movement_type_at_destination varchar(3) NOT NULL REFERENCES cargo_movement_type(cargo_movement_type_code),
+   service_contract_reference varchar(30) NULL,
+   payment_term_code varchar(3) NULL,
+   is_partial_load_allowed boolean NOT NULL,
+   is_export_declaration_required boolean NOT NULL,
+   export_declaration_reference varchar(35) NULL,
+   is_import_license_required boolean NOT NULL,
+   import_license_reference varchar(35) NULL,
+   is_ams_aci_filing_required boolean NULL,
+   is_destination_filing_required boolean NULL,
+   contract_quotation_reference varchar(35) NULL,
+   incoterms varchar(3) NULL,
+   invoice_payable_at_id uuid NULL REFERENCES location(id),
+   expected_departure_date date NULL,
+   expected_arrival_at_place_of_delivery_start_date date NULL CHECK ((expected_arrival_at_place_of_delivery_start_date IS NULL) OR (expected_arrival_at_place_of_delivery_end_date IS NULL) OR expected_arrival_at_place_of_delivery_start_date <= expected_arrival_at_place_of_delivery_end_date),
+   expected_arrival_at_place_of_delivery_end_date date NULL,
+   transport_document_type_code varchar(3) NULL REFERENCES transport_document_type(transport_document_type_code),
+   transport_document_reference varchar(20) NULL,
+   booking_channel_reference varchar(20) NULL,
+   communication_channel_code varchar(2) NOT NULL,
+   is_equipment_substitution_allowed boolean NOT NULL,
+   vessel_id uuid NULL REFERENCES vessel(id),
+   declared_value_currency_code varchar(3) NULL,
+   declared_value real NULL,
+   place_of_issue_id uuid NULL REFERENCES location(id),
+   terms_and_conditions text NULL,
+   carrier_id uuid NULL REFERENCES carrier(id),
+   voyage_id UUID NULL REFERENCES voyage(id)
 );
 
-CREATE INDEX ON booking_request (id);
-
-
-CREATE TABLE confirmed_booking (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    booking_request_id uuid NOT NULL REFERENCES booking_request(id),
-    carrier_id uuid NOT NULL REFERENCES carrier(id),
-    carrier_booking_reference varchar(35) NOT NULL UNIQUE,
-    terms_and_conditions text NULL,
-    confirmation_datetime timestamp with time zone NOT NULL
+CREATE TABLE booking (
+   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+   carrier_booking_request_reference varchar(100) NOT NULL UNIQUE DEFAULT uuid_generate_v4()::text,
+   carrier_booking_reference varchar(35) NULL UNIQUE,
+   booking_status varchar(50),
+   booking_data_id uuid NOT NULL REFERENCES booking_data(id),
+   last_confirmed_booking_data_id uuid NULL REFERENCES booking_data(id),
+   created_date_time timestamp with time zone NOT NULL default now(),
+   updated_date_time timestamp with time zone NOT NULL default now()
 );
 
 
@@ -227,8 +224,7 @@ CREATE TABLE active_reefer_settings (
 
 CREATE TABLE requested_equipment_group (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    booking_request_id uuid NULL REFERENCES booking_request (id),
-    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
+    booking_data_id uuid NULL REFERENCES booking_data (id),
     iso_equipment_code varchar(4) NOT NULL,
     units int NOT NULL,
     tare_weight real NULL,
@@ -238,7 +234,7 @@ CREATE TABLE requested_equipment_group (
     list_order int NOT NULL DEFAULT 0
 );
 
-CREATE INDEX ON requested_equipment_group (booking_request_id);
+CREATE INDEX ON requested_equipment_group (booking_data_id);
 
 CREATE TABLE requested_equipment_group_equipment_references (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -249,7 +245,7 @@ CREATE TABLE requested_equipment_group_equipment_references (
 
 CREATE TABLE confirmed_equipment (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
+  booking_data uuid NULL REFERENCES booking_data (id),
   iso_equipment_code varchar(4) NOT NULL,
   units int NOT NULL CHECK (units > 0),
   list_order int NOT NULL DEFAULT 0
@@ -287,11 +283,11 @@ CREATE INDEX ON commodity (requested_equipment_group_id);
 
 CREATE TABLE shipment_cutoff_time (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    confirmed_booking_id uuid NOT NULL REFERENCES confirmed_booking(id),
+    booking_data_id uuid NOT NULL REFERENCES booking_data(id),
     cut_off_time_code varchar(3) NOT NULL,
     cut_off_time timestamp with time zone NOT NULL,
     list_order int NOT NULL default 0,
-    UNIQUE (confirmed_booking_id, cut_off_time_code)
+    UNIQUE (booking_data_id, cut_off_time_code)
 );
 
 
@@ -351,7 +347,7 @@ CREATE TABLE bkg_requested_change (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     path varchar(500) NULL,
     message varchar(500) NOT NULL,
-    booking_request_id uuid REFERENCES booking_request (id),
+    booking_id uuid REFERENCES booking (id),
     element_order int NOT NULL default 0
 );
 
@@ -372,7 +368,7 @@ CREATE TABLE carrier_clauses (
 
 CREATE TABLE shipment_carrier_clauses (
     carrier_clause_id uuid NOT NULL REFERENCES carrier_clauses (id),
-    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
+    booking_data_id uuid NULL REFERENCES booking_data (id),
     transport_document_id uuid NULL REFERENCES transport_document (id)
 );
 
@@ -380,24 +376,22 @@ CREATE TABLE document_party (
     id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     party_id uuid NOT NULL REFERENCES party (id),
     shipping_instruction_id uuid NULL REFERENCES shipping_instruction (id),
-    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     party_function varchar(3) NOT NULL,
     is_to_be_notified boolean NOT NULL,
-    booking_request_id uuid NULL REFERENCES booking_request(id),
+    booking_data_id uuid NULL REFERENCES booking_data (id),
     displayed_address_id uuid NULL REFERENCES displayed_address(id)
 );
 
 -- Supporting FK constraints
 CREATE INDEX ON document_party (party_id);
-CREATE INDEX ON document_party (confirmed_booking_id);
 CREATE INDEX ON document_party (shipping_instruction_id);
-CREATE INDEX ON document_party (booking_request_id);
+CREATE INDEX ON document_party (booking_data_id);
 
 
 CREATE TABLE charge (
     id varchar(100) PRIMARY KEY,
     transport_document_id uuid NOT NULL REFERENCES transport_document(id),
-    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
+    booking_data_id uuid NULL REFERENCES booking_data (id),
     charge_name varchar(50) NOT NULL,
     currency_amount real NOT NULL,
     currency_code varchar(3) NOT NULL,
@@ -447,7 +441,7 @@ CREATE TABLE consignment_item (
     carrier_booking_reference varchar(35) NOT NULL,
     commodity_subreference varchar(100) NOT NULL,
     shipping_instruction_id uuid NOT NULL REFERENCES shipping_instruction (id),
-    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
+    booking_id uuid NULL REFERENCES booking (id),
     commodity_id uuid NULL REFERENCES commodity (id),
     si_entry_order int NOT NULL default 0
 );
@@ -465,7 +459,7 @@ CREATE INDEX ON hs_code_item (consignment_item_id);
 
 -- Supporting FK constraints
 CREATE INDEX ON consignment_item (shipping_instruction_id);
-CREATE INDEX ON consignment_item (confirmed_booking_id);
+CREATE INDEX ON consignment_item (booking_id);
 CREATE INDEX ON consignment_item (commodity_id);
 
 
@@ -498,13 +492,12 @@ CREATE INDEX ON shipping_mark (cargo_item);
 CREATE TABLE reference (
     reference_type_code varchar(3) NOT NULL,
     reference_value varchar(100) NOT NULL,
-    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
     shipping_instruction_id uuid NULL REFERENCES shipping_instruction (id),
-    booking_request_id uuid NULL REFERENCES booking_request(id),
+    booking_data_id uuid NULL REFERENCES booking_data(id),
     consignment_item_id uuid NULL REFERENCES consignment_item(id)
 );
 
-CREATE INDEX ON reference (booking_request_id);
+CREATE INDEX ON reference (booking_data_id);
 CREATE INDEX ON reference (consignment_item_id);
 
 
@@ -535,8 +528,7 @@ CREATE INDEX ON seal (seal_type_code);
 
 
 CREATE TABLE shipment_location (
-    confirmed_booking_id uuid NULL REFERENCES confirmed_booking (id),
-    booking_request_id uuid NULL REFERENCES booking_request(id),
+    booking_data_id uuid NULL REFERENCES booking_data (id),
     location_id uuid NOT NULL REFERENCES location (id),
     shipment_location_type_code varchar(3) NOT NULL,
     event_date_time timestamp with time zone NULL --optional datetime indicating when the event at the location takes place
@@ -546,8 +538,7 @@ CREATE TABLE shipment_location (
 -- Note the omission of INDEX for "location_id" is deliberate; we rely on the implicit INDEX from the
 -- UNIQUE constraint for that.
 CREATE INDEX ON shipment_location (shipment_location_type_code);
-CREATE INDEX ON shipment_location (confirmed_booking_id);
-CREATE INDEX ON shipment_location (booking_request_id);
+CREATE INDEX ON shipment_location (booking_data_id);
 
 
 CREATE TABLE port_call_status_type (
@@ -565,7 +556,7 @@ CREATE TABLE transport_plan_stage_type (
 
 -- NOT a 1:1 with the DCSA IM version of the similarly named entity
 CREATE TABLE shipment_transport (
-    confirmed_booking_id uuid NULL REFERENCES confirmed_booking(id),
+    booking_data_id uuid NULL REFERENCES booking_data(id),
     transport_plan_stage_sequence_number integer NOT NULL,
     transport_plan_stage_code varchar(3) NOT NULL REFERENCES transport_plan_stage_type(transport_plan_stage_code),
     dcsa_transport_type varchar(50) NULL,
@@ -582,13 +573,15 @@ CREATE TABLE shipment_transport (
     universal_export_voyage_reference varchar(5) NULL,
     universal_service_reference varchar(8) NULL
 );
+
 CREATE TABLE advance_manifest_filing (
 	manifest_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-  confirmed_booking_id uuid NOT NULL REFERENCES confirmed_booking(id),
+  booking_data_id uuid NOT NULL REFERENCES booking_data (id),
   manifest_type_code varchar(50) NOT NULL,
   country_code varchar(2) NOT NULL,
 	list_order int NOT NULL default 0
 );
+
 CREATE TABLE advance_manifest_filing_ebl (
 	manifest_id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   shipping_instruction_id uuid REFERENCES shipping_instruction (id),

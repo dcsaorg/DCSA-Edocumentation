@@ -26,8 +26,8 @@ public class ShipmentTransport {
   @Id private UUID id;
 
   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "confirmed_booking_id", nullable = false)
-  private ConfirmedBooking confirmedBooking;
+  @JoinColumn(name = "booking_data_id", nullable = false)
+  private BookingData bookingData;
 
   @Column(name = "transport_plan_stage_sequence_number")
   private Integer transportPlanStageSequenceNumber;

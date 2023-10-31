@@ -1,9 +1,14 @@
 package org.dcsa.edocumentation.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
+import java.util.List;
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.datafactories.ReferenceDataFactory;
 import org.dcsa.edocumentation.datafactories.ShippingInstructionDataFactory;
-import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingData;
 import org.dcsa.edocumentation.domain.persistence.entity.Reference;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.repository.ReferenceRepository;
@@ -17,12 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReferenceServiceTest {
@@ -38,10 +37,10 @@ class ReferenceServiceTest {
 
   @Test
   void referenceServiceTest_testCreateWithNullBooking() {
-    referenceService.createReferences(null, (BookingRequest) null);
+    referenceService.createReferences(null, (BookingData) null);
 
     verify(referenceRepository, never()).saveAll(any());
-    verify(referenceMapper, never()).toDAO(any(), any(BookingRequest.class));
+    verify(referenceMapper, never()).toDAO(any(), any(BookingData.class));
   }
 
   @Test
@@ -54,10 +53,10 @@ class ReferenceServiceTest {
 
   @Test
   void referenceServiceTest_testCreateWithEmptyBooking() {
-    referenceService.createReferences(Collections.emptyList(), (BookingRequest) null);
+    referenceService.createReferences(Collections.emptyList(), (BookingData) null);
 
     verify(referenceRepository, never()).saveAll(any());
-    verify(referenceMapper, never()).toDAO(any(), any(BookingRequest.class));
+    verify(referenceMapper, never()).toDAO(any(), any(BookingData.class));
   }
 
   @Test
@@ -71,15 +70,15 @@ class ReferenceServiceTest {
   @Test
   void referenceServiceTest_testCreateWithBooking() {
     // Setup
-    BookingRequest bookingRequest = BookingDataFactory.singleMinimalBooking();
+    var booking = BookingDataFactory.singleMinimalBooking();
     ReferenceTO referenceTO = ReferenceDataFactory.singleReferenceTO();
     Reference reference = ReferenceDataFactory.singleReferenceWithoutId();
 
     // Execute
-    referenceService.createReferences(List.of(referenceTO), bookingRequest);
+    referenceService.createReferences(List.of(referenceTO), booking.getBookingData());
 
     // Verify
-    verify(referenceMapper).toDAO(referenceTO, bookingRequest);
+    verify(referenceMapper).toDAO(referenceTO, booking.getBookingData());
     verify(referenceRepository).saveAll(List.of(reference));
   }
 
