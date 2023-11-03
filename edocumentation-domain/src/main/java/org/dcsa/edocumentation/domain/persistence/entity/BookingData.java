@@ -183,7 +183,7 @@ public class BookingData {
   @JoinColumn(name = "carrier_id")
   private Carrier carrier;
 
-  @Column(name = "terms_and_conditions", length = 35)
+  @Column(name = "terms_and_conditions", length = 20000)
   private String termsAndConditions;
 
   @ToString.Exclude
