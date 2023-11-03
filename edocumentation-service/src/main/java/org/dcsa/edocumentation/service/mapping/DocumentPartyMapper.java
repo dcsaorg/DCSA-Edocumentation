@@ -14,11 +14,11 @@ import org.mapstruct.Mapping;
 })
 public interface DocumentPartyMapper {
 
-  @Mapping(source = "bookingRequest", target = "bookingRequest")
-  @Mapping(source = "bookingRequest.id", target = "id", ignore = true)
+  @Mapping(source = "bookingData", target = "bookingData")
+  @Mapping(source = "bookingData.id", target = "id", ignore = true)
   @Mapping(source = "documentPartyTO.displayedAddress", target = "displayedAddress", ignore = true)
   @Mapping(target = "shippingInstructionID", ignore = true)
-  DocumentParty toDAO(DocumentPartyTO documentPartyTO, BookingRequest bookingRequest);
+  DocumentParty toDAO(DocumentPartyTO documentPartyTO, BookingData bookingData);
 
   default DocumentParty toDAO(DocumentPartyTO documentPartyTO) {
     return this.toDAO(documentPartyTO, null);

@@ -40,12 +40,6 @@ public class ShipmentLocation {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "booking_request_id")
-  private BookingRequest bookingRequest;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "confirmed_booking_id")
-  private ConfirmedBooking confirmedBooking;
+  @JoinColumn(name = "booking_data_id")
+  private BookingData bookingData;
 }

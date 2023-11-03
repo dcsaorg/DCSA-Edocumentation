@@ -1,9 +1,8 @@
 package org.dcsa.edocumentation.service.mapping;
 
-import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingData;
 import org.dcsa.edocumentation.domain.persistence.entity.Vessel;
 import org.dcsa.edocumentation.domain.persistence.entity.Voyage;
-import org.dcsa.edocumentation.transferobjects.BookingRequestRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,28 +21,27 @@ import org.mapstruct.Mapping;
       ShipmentLocationMapper.class,
     }
 )
-public interface BookingRequestMapper {
+public interface BookingDataMapper {
 
   @Mapping(target = "requestedEquipments", ignore = true)
   @Mapping(target = "shipmentLocations", ignore = true)
   @Mapping(target = "documentParties", ignore = true)
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "isNew", ignore = true)
-  @Mapping(target = "validUntil", ignore = true)
   // To make it pick up the parameter
   @Mapping(source = "voyage", target = "voyage")
   // TODO: Align names between TO and DAO
   @Mapping(source = "bookingRequestTO.placeOfBLIssue", target = "placeOfIssue")
-  BookingRequest toDAO(BookingRequestTO bookingRequestTO, Voyage voyage, Vessel vessel);
+  // Carrier-only fields - they cannot (and should not) provided by the shipper.
+  // Therefore, it is fine to ignore these.
+  @Mapping(target = "carrier", ignore = true)
+  @Mapping(target = "termsAndConditions", ignore = true)
+  @Mapping(target = "carrierClauses", ignore = true)
+  @Mapping(target = "shipmentTransports", ignore = true)
+  @Mapping(target = "shipmentCutOffTimes", ignore = true)
+  @Mapping(target = "confirmedEquipments", ignore = true)
+  @Mapping(target = "charges", ignore = true)
+  @Mapping(target = "advanceManifestFilings", ignore = true)
+  BookingData toDAO(BookingRequestTO bookingRequestTO, Voyage voyage, Vessel vessel);
 
-  @Mapping(source = "placeOfIssue", target = "placeOfBLIssue")
-  @Mapping(source = "voyage.universalVoyageReference", target = "universalExportVoyageReference")
-  @Mapping(source = "voyage.carrierVoyageNumber", target = "carrierExportVoyageNumber")
-  @Mapping(source = "voyage.service.carrierServiceCode", target = "carrierServiceCode")
-  @Mapping(source = "voyage.service.universalServiceReference", target = "universalServiceReference")
-  @Mapping(source = "vessel.vesselIMONumber", target = "vesselIMONumber")
-  BookingRequestTO toDTO(BookingRequest bookingRequest);
-
-  BookingRequestRefStatusTO toStatusDTO(BookingRequest bookingRequest);
 }
 

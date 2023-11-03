@@ -1,13 +1,12 @@
 package org.dcsa.edocumentation.domain.persistence.entity;
 
 import jakarta.persistence.*;
-import java.time.OffsetDateTime;
-import java.util.*;
-
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import java.time.OffsetDateTime;
+import java.util.*;
 import lombok.*;
 import org.dcsa.edocumentation.domain.dfa.*;
 import org.dcsa.edocumentation.domain.persistence.entity.enums.*;
@@ -37,7 +36,7 @@ import org.springframework.data.domain.Persistable;
     @NamedSubgraph(
       name = "graph.shippingInstructionSummary.consignmentItem",
       attributeNodes = {
-        @NamedAttributeNode("confirmedBooking")
+        @NamedAttributeNode("booking")
       })
   }
 )
@@ -239,9 +238,9 @@ public class ShippingInstruction extends AbstractStateMachine<String>
 
   // certain characteristics like the transport plan, are share among all shipments in the shipping
   // instruction, so it is beneficial to be able to retrieve one
-  public ConfirmedBooking retrieveOneShipment() {
+  public Booking retrieveOneBooking() {
     return this.consignmentItems.stream()
-        .map(ConsignmentItem::getConfirmedBooking)
+        .map(ConsignmentItem::getBooking)
         .findAny()
         .orElseThrow(
             () ->

@@ -5,8 +5,7 @@ import jakarta.transaction.Transactional.TxType;
 import java.util.Collection;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
-import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingData;
 import org.dcsa.edocumentation.domain.persistence.entity.ShipmentLocation;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentLocationRepository;
 import org.dcsa.edocumentation.service.mapping.ShipmentLocationMapper;
@@ -20,17 +19,9 @@ public class ShipmentLocationService {
   private final ShipmentLocationMapper shipmentLocationMapper;
 
   @Transactional(TxType.MANDATORY)
-  public void createShipmentLocations(
-      Collection<ShipmentLocationTO> shipmentLocations, BookingRequest bookingRequest) {
+  public void createShipmentLocations(Collection<ShipmentLocationTO> shipmentLocations, BookingData bookingData) {
     createShipments(shipmentLocations,
-            (slTO) -> this.shipmentLocationMapper.toDAO(slTO, bookingRequest)
-    );
-  }
-
-  @Transactional(TxType.MANDATORY)
-  public void createShipmentLocations(Collection<ShipmentLocationTO> shipmentLocations, ConfirmedBooking confirmedBooking) {
-    createShipments(shipmentLocations,
-      (slTO) -> this.shipmentLocationMapper.toDAO(slTO, confirmedBooking)
+      slTO -> this.shipmentLocationMapper.toDAO(slTO, bookingData)
     );
   }
 

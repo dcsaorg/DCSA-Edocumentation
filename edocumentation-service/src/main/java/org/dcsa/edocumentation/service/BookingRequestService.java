@@ -1,13 +1,14 @@
 package org.dcsa.edocumentation.service;
 
 import jakarta.transaction.Transactional;
-import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
-import org.dcsa.edocumentation.domain.persistence.repository.BookingRequestRepository;
-import org.dcsa.edocumentation.service.mapping.BookingRequestMapper;
+import org.dcsa.edocumentation.domain.persistence.entity.Booking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingData;
+import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
+import org.dcsa.edocumentation.service.mapping.BookingDataMapper;
+import org.dcsa.edocumentation.service.mapping.BookingMapper;
 import org.dcsa.edocumentation.service.mapping.RequestedEquipmentGroupMapper;
 import org.dcsa.edocumentation.transferobjects.BookingRequestRefStatusTO;
 import org.dcsa.edocumentation.transferobjects.BookingRequestTO;
@@ -22,101 +23,88 @@ public class BookingRequestService {
   private final DocumentPartyService documentPartyService;
   private final ShipmentLocationService shipmentLocationService;
 
-  private final BookingRequestRepository bookingRequestRepository;
+  private final BookingRepository bookingRepository;
 
-  private final BookingRequestMapper bookingRequestMapper;
+  private final BookingMapper bookingMapper;
+  private final BookingDataMapper bookingDataMapper;
 
   private final RequestedEquipmentGroupMapper requestedEquipmentGroupMapper;
 
   @Transactional
   public Optional<BookingRequestTO> getBookingRequest(String carrierBookingRequestReference) {
-    return bookingRequestRepository
-      .findBookingByCarrierBookingRequestReference(carrierBookingRequestReference)
-      .map(bookingRequestMapper::toDTO);
+    return bookingRepository
+      .findByCarrierBookingRequestReference(carrierBookingRequestReference)
+      .map(bookingMapper::toDTO);
   }
 
   @Transactional
   public BookingRequestRefStatusTO createBookingRequest(BookingRequestTO bookingRequest) {
-    BookingRequest booking = mapToBooking(bookingRequest);
+    var bookingData = mapToBookingData(bookingRequest);
+    var booking = Booking.builder()
+      .bookingData(bookingData)
+      .build();
 
     booking.receive();
-    booking = saveBookingRequest(booking, bookingRequest);
+    booking = saveBooking(booking, bookingRequest);
 
-    return bookingRequestMapper.toStatusDTO(booking);
+    return bookingMapper.toStatusDTO(booking);
   }
 
   @Transactional
   public Optional<BookingRequestRefStatusTO> updateBookingRequest(String carrierBookingRequestReference, BookingRequestTO bookingRequest) {
-    BookingRequest existingBookingRequest = bookingRequestRepository.findBookingByCarrierBookingRequestReference(
+    Booking existingBooking = bookingRepository.findByCarrierBookingRequestReference(
       carrierBookingRequestReference
     ).orElse(null);
-    if (existingBookingRequest == null) {
+    if (existingBooking == null) {
       return Optional.empty();
     }
-    OffsetDateTime updateTime = OffsetDateTime.now();
-    existingBookingRequest.lockVersion(updateTime);
 
-    var updatedBooking = mapToBooking(bookingRequest, existingBookingRequest);
-    updatedBooking.pendingUpdatesConfirmation(null, updateTime);
+    var updatedBookingData = mapToBookingData(bookingRequest);
+    existingBooking.pendingUpdatesConfirmation(updatedBookingData);
     // We have to flush the existing booking. Otherwise, JPA might be tempted to re-order that
     // write/save until after the updatedBooking is saved (which triggers the unique constraint
     // in the database).
-    bookingRequestRepository.saveAndFlush(existingBookingRequest);
-    updatedBooking = saveBookingRequest(updatedBooking, bookingRequest);
+    existingBooking = bookingRepository.saveAndFlush(existingBooking);
+    existingBooking = saveBooking(existingBooking, bookingRequest);
 
     // A couple of fail-safe checks that should be unnecessary unless we introduce bugs.
-    assert existingBookingRequest.getValidUntil() != null;
-    assert Objects.equals(existingBookingRequest.getCarrierBookingRequestReference(), updatedBooking.getBookingChannelReference());
-    assert updatedBooking.getId() != null && !updatedBooking.getId().equals(existingBookingRequest.getId());
+    assert Objects.equals(existingBooking.getCarrierBookingRequestReference(), updatedBookingData.getBookingChannelReference());
+    assert updatedBookingData.getId() != null && !updatedBookingData.getId().equals(existingBooking.getId());
 
-    return Optional.of(bookingRequestMapper.toStatusDTO(updatedBooking));
+    return Optional.of(bookingMapper.toStatusDTO(existingBooking));
   }
 
-  private void createDeepObjectsForBookingRequest(BookingRequestTO bookingRequest, BookingRequest booking) {
-    referenceService.createReferences(bookingRequest.references(), booking);
-    documentPartyService.createDocumentParties(bookingRequest.documentParties(), booking);
-    shipmentLocationService.createShipmentLocations(bookingRequest.shipmentLocations(), booking);
+  private void createDeepObjectsForBookingData(BookingRequestTO bookingRequest, BookingData bookingData) {
+    referenceService.createReferences(bookingRequest.references(), bookingData);
+    documentPartyService.createDocumentParties(bookingRequest.documentParties(), bookingData);
+    shipmentLocationService.createShipmentLocations(bookingRequest.shipmentLocations(), bookingData);
   }
 
   @Transactional
-  public Optional<BookingRequestRefStatusTO> cancelBookingRequest(String carrierBookingRequestReference,
-                                                                  String reason) {
-    BookingRequest bookingRequest = bookingRequestRepository.findBookingByCarrierBookingRequestReference(
+  public Optional<BookingRequestRefStatusTO> cancelBooking(String carrierBookingRequestReference,
+                                                           String reason) {
+    var booking = bookingRepository.findByCarrierBookingRequestReference(
       carrierBookingRequestReference
     ).orElse(null);
-    if (bookingRequest == null) {
+    if (booking == null) {
       return Optional.empty();
     }
-    OffsetDateTime updateTime = OffsetDateTime.now();
     // This works because we do not need to support versioning/rollback
-    bookingRequest.cancel(reason, updateTime);
-    bookingRequest = bookingRequestRepository.save(bookingRequest);
-    return Optional.of(bookingRequestMapper.toStatusDTO(bookingRequest));
+    booking.cancel(reason);
+    booking = bookingRepository.save(booking);
+    return Optional.of(bookingMapper.toStatusDTO(booking));
   }
 
-  private BookingRequest saveBookingRequest(BookingRequest booking, BookingRequestTO bookingRequest) {
-    BookingRequest updatedBookingRequest = bookingRequestRepository.save(booking);
-    createDeepObjectsForBookingRequest(bookingRequest, updatedBookingRequest);
-    return updatedBookingRequest;
+  private Booking saveBooking(Booking booking, BookingRequestTO bookingRequest) {
+    var updatedBooking = bookingRepository.save(booking);
+    createDeepObjectsForBookingData(bookingRequest, updatedBooking.getBookingData());
+    return updatedBooking;
   }
 
-  private BookingRequest mapToBooking(BookingRequestTO bookingRequest) {
-    return mapToBooking(bookingRequest, null);
-  }
-
-  private BookingRequest mapToBooking(BookingRequestTO bookingRequest, BookingRequest updateFor) {
+  private BookingData mapToBookingData(BookingRequestTO bookingRequest) {
     var voyage = voyageService.resolveVoyage(bookingRequest);
     var vessel = vesselService.resolveVessel(bookingRequest);
-    var bookingBuilder = bookingRequestMapper.toDAO(bookingRequest, voyage, vessel).toBuilder();
-    if (updateFor != null) {
-      bookingBuilder = bookingBuilder
-        // Carry over from the existing booking
-        // FIXME: This should not be done via a builder.
-        .carrierBookingRequestReference(updateFor.getCarrierBookingRequestReference())
-        .bookingStatus(updateFor.getBookingStatus())
-        .bookingRequestCreatedDateTime(updateFor.getBookingRequestCreatedDateTime());
-    }
-    var booking = bookingBuilder.build();
+    var booking = bookingDataMapper.toDAO(bookingRequest, voyage, vessel);
     booking.assignRequestedEquipment(
       bookingRequest.requestedEquipments()
         .stream()

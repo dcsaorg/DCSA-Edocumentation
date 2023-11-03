@@ -8,10 +8,7 @@ import java.util.List;
 import org.dcsa.edocumentation.datafactories.BookingDataFactory;
 import org.dcsa.edocumentation.datafactories.DocumentPartyDataFactory;
 import org.dcsa.edocumentation.datafactories.ShippingInstructionDataFactory;
-import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
-import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
-import org.dcsa.edocumentation.domain.persistence.entity.Party;
-import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
+import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.mapping.AddressMapper;
 import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
@@ -69,7 +66,7 @@ class DocumentPartyServiceTest {
 
   @Test
   void documentPartyServiceTest_testCreateNullWithBooking() {
-    documentPartyService.createDocumentParties(null, (BookingRequest) null);
+    documentPartyService.createDocumentParties(null, (BookingData) null);
 
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
@@ -97,7 +94,7 @@ class DocumentPartyServiceTest {
 
   @Test
   void documentPartyServiceTest_testCreateEmptyWithBooking() {
-    documentPartyService.createDocumentParties(Collections.emptyList(), (BookingRequest) null);
+    documentPartyService.createDocumentParties(Collections.emptyList(), (BookingData) null);
 
     verify(documentPartyRepository, never()).save(any());
     verify(documentPartyMapper, never()).toDAO(any(DocumentPartyTO.class), any());
@@ -126,7 +123,7 @@ class DocumentPartyServiceTest {
   @Test
   void documentPartyServiceTest_createFullDocumentPartyWithBooking() {
     // Setup
-    BookingRequest bookingRequest = BookingDataFactory.singleMinimalBooking();
+    var booking = BookingDataFactory.singleMinimalBooking();
     DocumentPartyTO documentPartyTO = DocumentPartyDataFactory.fullDocumentPartyTO();
     Party party = DocumentPartyDataFactory.partialParty();
     DocumentParty documentParty = DocumentPartyDataFactory.partialDocumentParty(party);
@@ -135,7 +132,7 @@ class DocumentPartyServiceTest {
     when(documentPartyRepository.save(any())).thenReturn(documentParty);
 
     // Execute
-    documentPartyService.createDocumentParties(List.of(documentPartyTO), bookingRequest);
+    documentPartyService.createDocumentParties(List.of(documentPartyTO), booking.getBookingData());
 
     // Verify
     verify(partyService).createParty(documentPartyTO.party());

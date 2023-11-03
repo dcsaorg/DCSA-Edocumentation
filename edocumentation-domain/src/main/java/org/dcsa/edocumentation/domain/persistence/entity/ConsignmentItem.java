@@ -18,7 +18,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dcsa.edocumentation.domain.validations.AsyncShipperProvidedDataValidation;
 import org.dcsa.edocumentation.domain.validations.ConsignmentItemValidation;
-import org.springframework.web.bind.annotation.Mapping;
 
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -60,8 +59,8 @@ public class ConsignmentItem {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "confirmed_booking_id", nullable = false)
-  private ConfirmedBooking confirmedBooking;
+  @JoinColumn(name = "booking_id", nullable = false)
+  private Booking booking;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -88,11 +87,11 @@ public class ConsignmentItem {
   @JoinColumn(name = "consignment_item_id")
   private List<@Valid CustomsReference> customsReferences;
 
-  public void resolvedConfirmedBooking(@NotNull ConfirmedBooking confirmedBooking) {
-    if (!this.getCarrierBookingReference().equals(confirmedBooking.getCarrierBookingReference())) {
+  public void resolvedConfirmedBooking(@NotNull Booking booking) {
+    if (!this.getCarrierBookingReference().equals(booking.getCarrierBookingReference())) {
       throw new IllegalArgumentException("Confirmed Booking had the wrong carrier booking reference");
     }
-    this.confirmedBooking = confirmedBooking;
+    this.booking = booking;
   }
 
   public void resolvedCommodity(@NotNull Commodity commodity) {

@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Documented
 @Constraint(validatedBy = BookingRequestValidator.class)
-public @interface BookingRequestValidation {
+public @interface BookingDataValidation {
   String message() default "This attribute is not used (but required by the Validation API)";
 
   Class<?>[] groups() default {};

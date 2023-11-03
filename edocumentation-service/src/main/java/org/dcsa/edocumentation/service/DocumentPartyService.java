@@ -1,7 +1,11 @@
 package org.dcsa.edocumentation.service;
 
+import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional.TxType;
+import java.util.Collection;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingData;
 import org.dcsa.edocumentation.domain.persistence.entity.DocumentParty;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.repository.DocumentPartyRepository;
@@ -9,11 +13,6 @@ import org.dcsa.edocumentation.service.mapping.DisplayedAddressMapper;
 import org.dcsa.edocumentation.service.mapping.DocumentPartyMapper;
 import org.dcsa.edocumentation.transferobjects.DocumentPartyTO;
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import jakarta.transaction.Transactional.TxType;
-import java.util.Collection;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +25,9 @@ public class DocumentPartyService {
   private final PartyService partyService;
 
   @Transactional(TxType.MANDATORY)
-  public void createDocumentParties(Collection<DocumentPartyTO> documentParties, BookingRequest bookingRequest) {
+  public void createDocumentParties(Collection<DocumentPartyTO> documentParties, BookingData bookingData) {
     if (documentParties != null && !documentParties.isEmpty()) {
-      documentParties.forEach(documentPartyTO -> createDocumentParty(documentPartyTO, bookingRequest));
+      documentParties.forEach(documentPartyTO -> createDocumentParty(documentPartyTO, bookingData));
     }
   }
 
@@ -47,9 +46,9 @@ public class DocumentPartyService {
     }
   }
 
-  private void createDocumentParty(DocumentPartyTO documentPartyTO, BookingRequest bookingRequest) {
+  private void createDocumentParty(DocumentPartyTO documentPartyTO, BookingData bookingData) {
     DocumentParty documentPartyWithBooking =
-        documentPartyMapper.toDAO(documentPartyTO, bookingRequest).toBuilder()
+        documentPartyMapper.toDAO(documentPartyTO, bookingData).toBuilder()
             .party(partyService.createParty(documentPartyTO.party()))
             .displayedAddress(displayedAddressMapper.toDAO(documentPartyTO.displayedAddress()))
             .build();

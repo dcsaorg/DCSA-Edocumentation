@@ -8,10 +8,9 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.CargoItem;
-import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
 import org.dcsa.edocumentation.domain.persistence.entity.ShippingInstruction;
 import org.dcsa.edocumentation.domain.persistence.entity.UtilizedTransportEquipment;
-import org.dcsa.edocumentation.domain.persistence.repository.ConfirmedBookingRepository;
+import org.dcsa.edocumentation.domain.persistence.repository.BookingRepository;
 import org.dcsa.edocumentation.domain.persistence.repository.ShippingInstructionRepository;
 import org.dcsa.edocumentation.service.mapping.ShippingInstructionMapper;
 import org.dcsa.edocumentation.transferobjects.ShippingInstructionRefStatusTO;
@@ -28,7 +27,7 @@ public class ShippingInstructionService {
   private final DocumentPartyService documentPartyService;
   private final ReferenceService referenceService;
   private final UtilizedTransportEquipmentService utilizedTransportEquipmentService;
-  private final ConfirmedBookingRepository confirmedBookingRepository;
+  private final BookingRepository bookingRepository;
 
   @Transactional
   public Optional<ShippingInstructionTO> findByReference(String shippingInstructionReference) {
@@ -82,14 +81,14 @@ public class ShippingInstructionService {
 
   // A Shipping instruction must link to a shipment (=approved booking) consignmentItems acts like a
   // 'join-table' between shipping instruction and shipment
-  private ConfirmedBooking resolveConfirmedBooking(String carrierBookingReference) {
-    return confirmedBookingRepository
+  private Booking resolveConfirmedBooking(String carrierBookingReference) {
+    return bookingRepository
       .findByCarrierBookingReference(carrierBookingReference)
       .orElse(null);
   }
 
-  private Commodity resolveCommodity(@NotNull ConfirmedBooking shipment, @NotNull String commoditySubreference) {
-    for (var reg : shipment.getBooking().getRequestedEquipments()) {
+  private Commodity resolveCommodity(@NotNull Booking booking, @NotNull String commoditySubreference) {
+    for (var reg : booking.getBookingData().getRequestedEquipments()) {
       for (var commodity : reg.getCommodities()) {
         if (Objects.equals(commoditySubreference, commodity.getCommoditySubreference())) {
           return commodity;

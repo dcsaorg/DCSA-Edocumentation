@@ -1,43 +1,36 @@
 package org.dcsa.edocumentation.service.unofficial;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.BookingRequest;
-import org.dcsa.edocumentation.domain.persistence.entity.RequestedEquipmentGroup;
-import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
+import org.dcsa.edocumentation.domain.persistence.entity.*;
 import org.dcsa.edocumentation.domain.persistence.entity.unofficial.ValidationResult;
 import org.dcsa.edocumentation.domain.persistence.repository.*;
 import org.dcsa.edocumentation.service.ShipmentLocationService;
 import org.dcsa.edocumentation.service.ShipmentTransportService;
-import org.dcsa.edocumentation.service.mapping.ConfirmedEquipmentMapper;
-import org.dcsa.edocumentation.service.mapping.ShipmentCutOffTimeMapper;
-import org.dcsa.edocumentation.service.mapping.AdvanceManifestFilingMapper;
-import org.dcsa.edocumentation.service.mapping.ConfirmedBookingMapper;
+import org.dcsa.edocumentation.service.mapping.*;
 import org.dcsa.edocumentation.transferobjects.*;
 import org.dcsa.edocumentation.transferobjects.enums.DCSATransportType;
 import org.dcsa.edocumentation.transferobjects.enums.ShipmentLocationTypeCode;
 import org.dcsa.edocumentation.transferobjects.enums.TransportPlanStageCode;
-import org.dcsa.edocumentation.transferobjects.unofficial.ManageConfirmedBookingRequestTO;
 import org.dcsa.edocumentation.transferobjects.unofficial.ConfirmedBookingRefStatusTO;
+import org.dcsa.edocumentation.transferobjects.unofficial.ManageConfirmedBookingRequestTO;
 import org.dcsa.skernel.errors.exceptions.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class ManageShipmentService {
-  private final ConfirmedBookingRepository confirmedBookingRepository;
-  private final BookingRequestRepository bookingRequestRepository;
-  private final ConfirmedBookingMapper confirmedBookingMapper;
+  private final BookingRepository bookingRepository;
+  private final BookingMapper bookingMapper;
   private final CarrierRepository carrierRepository;
   private final UnofficialBookingRequestService unofficialBookingRequestService;
   private final ShipmentLocationService shipmentLocationService;
@@ -99,7 +92,7 @@ public class ManageShipmentService {
   }
 
   private void assignCommoditySubreferences(
-    BookingRequest bookingRequest,
+    BookingData bookingData,
     List<@Valid List<@Valid @NotBlank @Size(max = 100) @Pattern(regexp = "^\\S(\\s+\\S+)*$") String>> subreferences
   ) {
     if (subreferences != null) {
@@ -112,7 +105,7 @@ public class ManageShipmentService {
         throw ConcreteRequestErrorMessageException.invalidInput("All commoditySubreferences must be unique"
           + " across the confirmedBooking");
       }
-      var requestedEquipments = bookingRequest.getRequestedEquipments();
+      var requestedEquipments = bookingData.getRequestedEquipments();
       if (subreferences.size() != requestedEquipments.size()) {
         throw ConcreteRequestErrorMessageException.invalidInput("There are " + requestedEquipments.size()
          + " requested equipment groups but subreferences for " + subreferences.size()
@@ -143,7 +136,7 @@ public class ManageShipmentService {
       }
     } else {
       Set<String> seen = new HashSet<>();
-      bookingRequest.getRequestedEquipments().stream()
+      bookingData.getRequestedEquipments().stream()
         .map(RequestedEquipmentGroup::getCommodities)
         .flatMap(Collection::stream)
         .filter(c -> c.getCommoditySubreference() == null)
@@ -166,35 +159,37 @@ public class ManageShipmentService {
 
   @Transactional
   public ConfirmedBookingRefStatusTO create(ManageConfirmedBookingRequestTO shipmentRequestTO) {
-    BookingRequest bookingRequest = getBooking(shipmentRequestTO);
+    Booking booking = getBooking(shipmentRequestTO);
     var carrier = carrierRepository.findBySmdgCode(shipmentRequestTO.carrierSMDGCode());
     if (carrier == null) {
       throw ConcreteRequestErrorMessageException.invalidInput("Unrecognized SMDG LCL party code \""
         + shipmentRequestTO.carrierSMDGCode() + "\". Note the code may be valid but not loaded into this system.");
     }
-    OffsetDateTime confirmationTime = OffsetDateTime.now();
-    ValidationResult<String> validationResult = unofficialBookingRequestService.validateBooking(bookingRequest, false);
 
-    assignCommoditySubreferences(bookingRequest, shipmentRequestTO.commoditySubreferences());
+    if (booking.getCarrierBookingReference() != null && !booking.getCarrierBookingReference().equals(shipmentRequestTO.carrierBookingReference())) {
+      throw ConcreteRequestErrorMessageException.invalidInput("The booking already has a *different* carrier booking reference");
+    } else if (booking.getCarrierBookingReference() == null) {
+      // Note: The carrier booking reference (CBR) can be assigned earlier than the time of confirmation (
+      // but it is required once the booking has been confirmed).
+      // In the RI, we assign as a part attempting to confirm the booking (no matter if the validation succeeds).
+      // Other implementations can choose differently here as long as they obey the condition of CBR being
+      // mandatory at and after the CONFIRMED state.
+      booking.assignCarrierBookingReference(
+        Objects.requireNonNullElseGet(shipmentRequestTO.carrierBookingReference(), this::generateCarrierBookingReference)
+      );
+    }
 
-    bookingRequest.confirm(confirmationTime);
+    ValidationResult<String> validationResult = unofficialBookingRequestService.validateBooking(booking, false);
 
-    // FIXME: Check if the confirmedBooking (CBR) already exists and then attempt to reconfirm it if possible rather than
-    //  die with a 409 Conflict (or create a duplicate or whatever happens). Probably just set "valid_until = now()"
-    //  on the old confirmedBooking if it exists and then create a new one.
-    //  On reconfirm: If a CBR is not provided, then keep the original CBR. Otherwise, if they are distinct, replace
-    //  the old one with the new.
-    ConfirmedBooking confirmedBooking = ConfirmedBooking.builder()
-            // FIXME: The booking must be deeply cloned, so the confirmedBooking is not mutable via PUT /bookings/{...}
-            .booking(bookingRequest)
-            .carrier(carrier)
-            .carrierBookingReference(Objects.requireNonNullElseGet(shipmentRequestTO.carrierBookingReference(), this::generateCarrierBookingReference))
-            .shipmentCreatedDateTime(confirmationTime)
-            .shipmentUpdatedDateTime(confirmationTime)
-            .termsAndConditions(shipmentRequestTO.termsAndConditions())
-            .build();
 
-    confirmedBooking.assignAdvanceManifestFiling(
+    if (!validationResult.validationErrors().isEmpty()) {
+      return bookingMapper.toConfirmedStatusDTO(booking);
+    }
+
+    assignCommoditySubreferences(booking.getBookingData(), shipmentRequestTO.commoditySubreferences());
+
+    var bookingData = booking.getBookingData();
+    bookingData.assignAdvanceManifestFiling(
       Objects.requireNonNullElse(
           shipmentRequestTO.advanceManifestFilings(),
           Collections.<AdvanceManifestFilingTO>emptyList()
@@ -203,23 +198,20 @@ public class ManageShipmentService {
         .toList()
     );
 
-    if (!validationResult.validationErrors().isEmpty()) {
-      return confirmedBookingMapper.toStatusDTO(confirmedBooking, validationResult.proposedStatus());
-    }
 
     // FIXME: This should be processed into a status DTO rather than exception style.
     validateTransportPlans(shipmentRequestTO, shipmentRequestTO.shipmentLocations());
 
-    confirmedBooking.assignConfirmedEquipments(
+    bookingData.assignConfirmedEquipments(
       Objects.requireNonNullElse(
-        shipmentRequestTO.confirmedEquipments(),
-        Collections.<ConfirmedEquipmentTO>emptyList()
-      ).stream()
+          shipmentRequestTO.confirmedEquipments(),
+          Collections.<ConfirmedEquipmentTO>emptyList()
+        ).stream()
         .map(confirmedEquipmentMapper::toDAO)
         .toList()
     );
 
-    confirmedBooking.assignShipmentCutOffTimes(
+    bookingData.assignShipmentCutOffTimes(
       Objects.requireNonNullElse(
           shipmentRequestTO.shipmentCutOffTimes(),
           Collections.<ShipmentCutOffTimeTO>emptyList()
@@ -227,12 +219,13 @@ public class ManageShipmentService {
         .map(shipmentCutOffTimeMapper::toDAO)
         .toList()
     );
-
-
-    confirmedBooking = confirmedBookingRepository.save(confirmedBooking);
-    shipmentLocationService.createShipmentLocations(shipmentRequestTO.shipmentLocations(), confirmedBooking);
-    shipmentTransportService.createShipmentTransports(shipmentRequestTO.transports(), confirmedBooking);
-    return confirmedBookingMapper.toStatusDTO(confirmedBooking, bookingRequest.getBookingStatus());
+    bookingData.assignTermsAndConditions(shipmentRequestTO.termsAndConditions());
+    bookingData.assignCarrier(carrier);
+    shipmentLocationService.createShipmentLocations(shipmentRequestTO.shipmentLocations(), booking.getBookingData());
+    shipmentTransportService.createShipmentTransports(shipmentRequestTO.transports(), booking.getBookingData());
+    booking.confirm();
+    booking = bookingRepository.save(booking);
+    return bookingMapper.toConfirmedStatusDTO(booking);
   }
 
   private Boolean validateTransportPlans(ManageConfirmedBookingRequestTO manageConfirmedBookingRequestTO, List<ShipmentLocationTO> shipmentLocationTOS) {
@@ -416,8 +409,8 @@ public class ManageShipmentService {
     }
   }
 
-  private BookingRequest getBooking(ManageConfirmedBookingRequestTO shipmentRequestTO) {
-    return bookingRequestRepository.findBookingByCarrierBookingRequestReference(shipmentRequestTO.carrierBookingRequestReference())
+  private Booking getBooking(ManageConfirmedBookingRequestTO shipmentRequestTO) {
+    return bookingRepository.findByCarrierBookingRequestReference(shipmentRequestTO.carrierBookingRequestReference())
       .orElseThrow(() -> ConcreteRequestErrorMessageException.notFound("No booking with reference " + shipmentRequestTO.carrierBookingRequestReference()));
   }
 

@@ -39,8 +39,8 @@ public class DocumentParty {
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "booking_request_id")
-  private BookingRequest bookingRequest;
+  @JoinColumn(name = "booking_data_id")
+  private BookingData bookingData;
 
   @JoinColumn(name = "shipping_instruction_id")
   @Column(name = "shipping_instruction_id")

@@ -21,8 +21,8 @@ public class Charge {
   @Column(name = "transport_document_id")
   private UUID transportDocumentID;
 
-  @Column(name = "confirmed_booking_id")
-  private UUID confirmedBookingID;
+  @Column(name = "booking_data_id")
+  private UUID bookingDataID;
 
   @Column(name = "charge_name")
   private String chargeName;

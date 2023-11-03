@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import jakarta.transaction.Transactional.TxType;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
-import org.dcsa.edocumentation.domain.persistence.entity.ConfirmedBooking;
+import org.dcsa.edocumentation.domain.persistence.entity.BookingData;
 import org.dcsa.edocumentation.domain.persistence.repository.ShipmentTransportRepository;
 import org.dcsa.edocumentation.service.mapping.ShipmentTransportMapper;
 import org.dcsa.edocumentation.transferobjects.TransportTO;
@@ -17,7 +17,7 @@ public class ShipmentTransportService {
   private final ShipmentTransportMapper shipmentTransportMapper;
 
   @Transactional(TxType.MANDATORY)
-  public void createShipmentTransports(Collection<TransportTO> shipmentTransports, ConfirmedBooking confirmedBooking) {
+  public void createShipmentTransports(Collection<TransportTO> shipmentTransports, BookingData bookingData) {
     if (shipmentTransports != null && !shipmentTransports.isEmpty()) {
       shipmentTransportRepository.saveAll(
         shipmentTransports.stream()
@@ -25,7 +25,7 @@ public class ShipmentTransportService {
             sl ->
               shipmentTransportMapper.toDAO(
                 sl,
-                      confirmedBooking,
+                      bookingData,
                 sl.loadLocation(),
                 sl.dischargeLocation()
               ))

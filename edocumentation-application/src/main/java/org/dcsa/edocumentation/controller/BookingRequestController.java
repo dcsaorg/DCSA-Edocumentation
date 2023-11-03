@@ -93,7 +93,7 @@ public class BookingRequestController {
     if (!bookingCancelRequestTO.bookingStatus().equals(BookingStatus.CANCELLED)) {
       throw ConcreteRequestErrorMessageException.invalidInput("bookingStatus must be CANCELLED");
     }
-    return bookingRequestService.cancelBookingRequest(carrierBookingRequestReference, bookingCancelRequestTO.reason())
+    return bookingRequestService.cancelBooking(carrierBookingRequestReference, bookingCancelRequestTO.reason())
       .orElseThrow(
         () ->
           ConcreteRequestErrorMessageException.notFound(
